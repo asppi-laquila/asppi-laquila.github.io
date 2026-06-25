@@ -673,22 +673,17 @@ function FormContratto({apt,onBack}){
 // ══════════════════════════════════════════════════════════════════════════════
 function AdminApp({onExit}){
   const [scr,setScr]=useState("home");
-  const [adminAuth,setAdminAuth]=useState(false);
-  const [adminPwd,setAdminPwd]=useState("");
+  // Inizializzazione diretta da localStorage — nessun hook condizionale
+  const [adminAuth,setAdminAuth]=useState(()=>{
+    try { return localStorage.getItem("asppi_admin_auth")==="true"; } catch(e){ return false; }
+  });
+  const [adminPwd,setAdminPwd]=useState(()=>{
+    try { return localStorage.getItem("asppi_admin_pwd")||""; } catch(e){ return ""; }
+  });
   const [adminErr,setAdminErr]=useState("");
-  const [adminRicorda,setAdminRicorda]=useState(false);
-
-  // Check se admin già loggato
-  const [adminChecked,setAdminChecked]=useState(false);
-  if(!adminChecked){
-    setAdminChecked(true);
-    try {
-      const saved=localStorage.getItem("asppi_admin_auth");
-      if(saved==="true") setAdminAuth(true);
-      const savedPwd=localStorage.getItem("asppi_admin_pwd");
-      if(savedPwd) setAdminPwd(savedPwd);
-    } catch(e){}
-  }
+  const [adminRicorda,setAdminRicorda]=useState(()=>{
+    try { return !!localStorage.getItem("asppi_admin_pwd"); } catch(e){ return false; }
+  });
 
   const adminLogin=()=>{
     if(adminPwd==="Asppi2025!"){
