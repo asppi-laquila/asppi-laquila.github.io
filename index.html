@@ -670,6 +670,74 @@ function FormContratto({apt,onBack}){
 // ══════════════════════════════════════════════════════════════════════════════
 function AdminApp({onExit}){
   const [scr,setScr]=useState("home");
+  const [adminAuth,setAdminAuth]=useState(false);
+  const [adminPwd,setAdminPwd]=useState("");
+  const [adminErr,setAdminErr]=useState("");
+  const [adminRicorda,setAdminRicorda]=useState(false);
+
+  // Check se admin già loggato
+  const [adminChecked,setAdminChecked]=useState(false);
+  if(!adminChecked){
+    setAdminChecked(true);
+    try {
+      const saved=localStorage.getItem("asppi_admin_auth");
+      if(saved==="true") setAdminAuth(true);
+      const savedPwd=localStorage.getItem("asppi_admin_pwd");
+      if(savedPwd) setAdminPwd(savedPwd);
+    } catch(e){}
+  }
+
+  const adminLogin=()=>{
+    if(adminPwd==="Asppi2025!"){
+      setAdminAuth(true);
+      setAdminErr("");
+      if(adminRicorda){
+        localStorage.setItem("asppi_admin_auth","true");
+        localStorage.setItem("asppi_admin_pwd",adminPwd);
+      } else {
+        localStorage.removeItem("asppi_admin_auth");
+        localStorage.removeItem("asppi_admin_pwd");
+      }
+    } else {
+      setAdminErr("Password non corretta");
+    }
+  };
+
+  if(!adminAuth) return(
+    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:wh,minHeight:"100vh",display:"flex",flexDirection:"column"}}>
+      <div style={{backgroundColor:nv,padding:"48px 32px 36px"}}>
+        <div style={{color:or,fontSize:11,fontWeight:700,letterSpacing:"0.12em",marginBottom:8}}>ASPPI L'AQUILA · ADMIN</div>
+        <div style={{color:wh,fontSize:24,fontWeight:800}}>Accesso riservato</div>
+        <div style={{color:"#A0A0A0",fontSize:13,marginTop:6}}>Solo personale autorizzato</div>
+      </div>
+      <div style={{padding:"32px 24px",flex:1}}>
+        <div style={{backgroundColor:"#EBF2FB",borderRadius:12,padding:"12px 16px",marginBottom:24,fontSize:12,color:bl}}>
+          🔒 Pannello riservato a Simeoni Maurizio — ASPPI L'Aquila
+        </div>
+        <label style={lbl}>Password amministratore</label>
+        <input
+          type="password"
+          value={adminPwd}
+          onChange={e=>setAdminPwd(e.target.value)}
+          onKeyDown={e=>e.key==="Enter"&&adminLogin()}
+          placeholder="••••••••"
+          style={inp}
+        />
+        {adminErr&&<div style={{backgroundColor:rl,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:13,color:rd}}>{adminErr}</div>}
+        <div onClick={()=>setAdminRicorda(v=>!v)} style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,cursor:"pointer"}}>
+          <div style={{width:20,height:20,borderRadius:6,border:`2px solid ${adminRicorda?or:bd}`,backgroundColor:adminRicorda?or:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            {adminRicorda&&<span style={{color:wh,fontSize:11,fontWeight:700}}>✓</span>}
+          </div>
+          <span style={{fontSize:13,color:dk}}>Ricorda password su questo dispositivo</span>
+        </div>
+        <button onClick={adminLogin} style={{...btnP,backgroundColor:nv}}>Accedi al pannello</button>
+        <button onClick={onExit} style={btnS}>← Torna alla home</button>
+        <div style={{fontSize:11,color:st,textAlign:"center",marginTop:20}}>
+          Per assistenza: centroserviziasppiaq@asppi.it
+        </div>
+      </div>
+    </div>
+  );
   const [sel,setSel]=useState(null);
   const [chatMsgs,setChatMsgs]=useState({});
   const [msg,setMsg]=useState("");
@@ -700,7 +768,7 @@ function AdminApp({onExit}){
       <div><div style={{color:or,fontSize:10,fontWeight:700,letterSpacing:"0.1em"}}>ASPPI L'AQUILA · ADMIN</div>
       <div style={{color:wh,fontSize:15,fontWeight:700}}>{title}</div></div>
       {back?<button onClick={back} style={{background:"none",border:"1px solid #fff4",color:wh,borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer"}}>← Indietro</button>
-      :<button onClick={onExit} style={{background:"none",border:"1px solid #fff4",color:wh,borderRadius:8,padding:"6px 10px",fontSize:11,cursor:"pointer"}}>← Esci</button>}
+      :<button onClick={()=>{localStorage.removeItem("asppi_admin_auth");onExit();}} style={{background:"none",border:"1px solid #fff4",color:wh,borderRadius:8,padding:"6px 10px",fontSize:11,cursor:"pointer"}}>← Esci</button>}
     </div>
   );
 
@@ -939,6 +1007,16 @@ function AuthScreen({onLogin}){
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
 
+  const [ricorda,setRicorda]=useState(true);
+
+  // Pre-compila se salvato
+  useState(()=>{
+    try {
+      const saved = JSON.parse(localStorage.getItem("asppi_remember")||"null");
+      if(saved) { setEmail(saved.email||""); setPassword(saved.password||""); setRicorda(true); }
+    } catch(e){}
+  });
+
   const submit = async () => {
     if(!email||!password) { setError("Email e password obbligatorie"); return; }
     if(tab==="register"&&!nome) { setError("Il nome è obbligatorio"); return; }
@@ -948,6 +1026,11 @@ function AuthScreen({onLogin}){
     if(res.ok) {
       saveToken(res.token);
       saveUser({nome:res.nome, email:res.email, userId:res.userId});
+      if(ricorda) {
+        localStorage.setItem("asppi_remember", JSON.stringify({email,password}));
+      } else {
+        localStorage.removeItem("asppi_remember");
+      }
       onLogin(res);
     } else {
       setError(res.error||"Errore. Riprova.");
@@ -980,6 +1063,12 @@ function AuthScreen({onLogin}){
         <label style={lbl}>Password *</label>
         <input value={password} onChange={e=>setPassword(e.target.value)} type="password" placeholder="••••••••" style={inp}/>
         {error&&<div style={{backgroundColor:rl,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:13,color:rd}}>{error}</div>}
+        <div onClick={()=>setRicorda(v=>!v)} style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,cursor:"pointer"}}>
+          <div style={{width:20,height:20,borderRadius:6,border:`2px solid ${ricorda?or:bd}`,backgroundColor:ricorda?or:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            {ricorda&&<span style={{color:wh,fontSize:11,fontWeight:700}}>✓</span>}
+          </div>
+          <span style={{fontSize:13,color:dk}}>Ricorda email e password</span>
+        </div>
         <button onClick={submit} disabled={loading} style={{...btnP,opacity:loading?0.6:1}}>
           {loading?"Attendere...":tab==="login"?"Accedi":"Crea account"}
         </button>
@@ -1024,8 +1113,8 @@ function App(){
 
 
 const domContainer = document.getElementById('root');
-const root = ReactDOM.createRoot(domContainer);
-root.render(React.createElement(App));
+const reactRoot = ReactDOM.createRoot(domContainer);
+reactRoot.render(React.createElement(App));
   </script>
 
   <script>
