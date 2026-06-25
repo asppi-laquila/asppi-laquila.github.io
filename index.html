@@ -320,9 +320,7 @@ window.addEventListener('load', () => {
   try {
     const saved = JSON.parse(localStorage.getItem('asppi_session') || 'null');
     if (saved && saved.token && saved.user) {
-      state.token = saved.token;
-      state.user  = saved.user;
-      showSocio(saved.user);
+      window.location.href = 'socio.html';
       return;
     }
     // Pre-compila credenziali
@@ -414,7 +412,7 @@ async function doLogin() {
       localStorage.removeItem('asppi_remember');
     }
     localStorage.setItem('asppi_session', JSON.stringify({ token: res.token, user: res }));
-    showSocio(res);
+    window.location.href = 'socio.html';
   } else {
     showErr('login-error', res.error || 'Credenziali non valide');
   }
@@ -438,7 +436,7 @@ async function doRegister() {
       localStorage.setItem('asppi_remember', JSON.stringify({ email, pwd }));
     }
     localStorage.setItem('asppi_session', JSON.stringify({ token: res.token, user: res }));
-    showSocio(res);
+    window.location.href = 'socio.html';
   } else {
     showErr('reg-error', res.error || 'Errore registrazione. Riprova.');
   }
