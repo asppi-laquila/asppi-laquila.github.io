@@ -282,22 +282,46 @@ let sOrari = new Set(['09:00','09:30','10:00','10:30','11:00','11:30','15:00','1
 let bloccati = [];
 
 window.onload = async function() {
-  if(localStorage.getItem('asppi_admin_ok')!=='yes'){window.location.replace('index.html');return;}
+  if(localStorage.getItem('asppi_admin_ok')!=='yes'){
+    window.location.replace('index.html');
+    return;
+  }
+  // Carica dati
   await carica();
   initSlot();
 };
 
 async function call(action,data){
   try{
-    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action,token:ATOKEN,...data}),redirect:'follow'});
+    const controller = new AbortController();
+    const timeout = setTimeout(function(){ controller.abort(); }, 15000);
+    const r=await fetch(API,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify(Object.assign({action:action,token:ATOKEN},data||{})),
+      redirect:'follow',
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
     const t=await r.text();
-    try{return JSON.parse(t);}catch(e){return{ok:false,error:'Risposta non valida: '+t.substring(0,100)};}
-  }catch(e){return{ok:false,error:'Errore connessione: '+e.message};}
+    try{return JSON.parse(t);}catch(e){return{ok:false,error:'Risposta non valida'};}
+  }catch(e){
+    if(e.name==='AbortError') return{ok:false,error:'Timeout - il server non risponde. Riprova.'};
+    return{ok:false,error:'Errore connessione: '+e.message};
+  }
 }
 
 async function carica(){
+  // Mostra stato caricamento
+  document.getElementById('h-prens').innerHTML='<div class="info">Connessione al server...</div>';
+  document.getElementById('h-prats').innerHTML='<div class="info">Connessione al server...</div>';
+  
   const r=await call('adminGetAll');
-  if(!r.ok){alert('Errore caricamento: '+r.error);return;}
+  if(!r.ok){
+    document.getElementById('h-prens').innerHTML='<div style="background:#FDEEEC;border-radius:10px;padding:10px 14px;font-size:12px;color:#C0392B">❌ Errore: '+r.error+'<br><button onclick="carica()" style="margin-top:8px;padding:6px 12px;background:#E8631A;color:#fff;border:none;border-radius:8px;cursor:pointer">Riprova</button></div>';
+    document.getElementById('h-prats').innerHTML='';
+    return;
+  }
   D.prenotazioni=r.prenotazioni||[];
   D.contratti=r.contratti||[];
   D.utenti=r.utenti||[];
@@ -488,35 +512,38 @@ function renderChat(){
   // Include free chats too
   const allChats = [...D.contratti];
   if(!allChats.length){el.innerHTML='<div class="info">Nessuna conversazione ancora.</div>';return;}
-  el.innerHTML=allChats.map(function(c){
-    const msgs = D.chat.filter(function(m){ return m.contrattoId===c.id; });
-    const last = msgs[msgs.length-1];
-    const unread = msgs.filter(function(m){ return m.mittente==='socio' && !m.letto; }).length;
-    // Nome socio: cerca dall'ultimo messaggio del socio
-    let nomeSocio = '—';
-    const msgSocio = msgs.find(function(m){ return m.mittente==='socio'; });
-    if(msgSocio && msgSocio.nomeUtente && msgSocio.nomeUtente.trim()) {
-      nomeSocio = msgSocio.nomeUtente;
+  el.innerHTML = '';
+  allChats.forEach(function(cItem) {
+    var msgs = D.chat.filter(function(m){ return m.contrattoId===cItem.id; });
+    var last = msgs[msgs.length-1];
+    var unread = msgs.filter(function(m){ return m.mittente==='socio' && !m.letto; }).length;
+    var nomeSocio = 'Socio';
+    var msgSocio = msgs.find(function(m){ return m.mittente==='socio'; });
+    if(msgSocio && msgSocio.nomeUtente) {
+      nomeSocio = msgSocio.nomeUtente.trim() || nomeSocio;
     } else {
-      // Fallback: cerca nell'utenti
-      const utente = D.utenti.find(function(u){ return u.id === c.userId; });
-      if(utente) nomeSocio = (utente.nome||'') + ' ' + (utente.cognome||'');
+      var utente = D.utenti.find(function(u){ return u.id === cItem.userId; });
+      if(utente) nomeSocio = ((utente.nome||'') + ' ' + (utente.cognome||'')).trim() || nomeSocio;
     }
-    nomeSocio = nomeSocio.trim() || '—';
-    const iniziali = nomeSocio.split(' ').map(function(n){ return n[0]||''; }).join('').slice(0,2).toUpperCase();
-    const titolo = nomeContratto(c);
-    return '<div class="row" onclick="apriChatAdmin(''+c.id+'')">'
-      + '<div class="bar" style="background:'+(unread?'#E8631A':'#8A8A8A')+'"></div>'
+    var iniziali = nomeSocio.split(' ').map(function(n){ return n[0]||''; }).join('').slice(0,2).toUpperCase() || 'S';
+    var titolo = nomeContratto(cItem);
+    var barColor = unread ? '#E8631A' : '#8A8A8A';
+    var div = document.createElement('div');
+    div.className = 'row';
+    div.style.cursor = 'pointer';
+    div.addEventListener('click', (function(id){ return function(){ apriChatAdmin(id); }; })(cItem.id));
+    div.innerHTML = '<div class="bar" style="background:'+barColor+'"></div>'
       + '<div class="rb" style="display:flex;align-items:center;gap:12px">'
       + '<div style="width:40px;height:40px;border-radius:20px;background:'+(unread?'#E8631A':'#F8F7F5')+';display:flex;align-items:center;justify-content:center;color:'+(unread?'#fff':'#8A8A8A')+';font-weight:800;font-size:13px;flex-shrink:0">'+iniziali+'</div>'
       + '<div style="flex:1;min-width:0">'
       + '<div style="display:flex;justify-content:space-between;align-items:center">'
       + '<div class="rt">'+titolo+'</div>'
-      + (unread?'<div style="width:8px;height:8px;border-radius:4px;background:#E8631A;flex-shrink:0"></div>':'')
+      + (unread ? '<div style="width:8px;height:8px;border-radius:4px;background:#E8631A;flex-shrink:0"></div>' : '')
       + '</div>'
-      + '<div class="rs" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><strong style="color:#1A1A1A">'+nomeSocio+'</strong> · '+(last?last.testo:'Nessun messaggio')+'</div>'
-      + '</div></div></div>';
-  }).join('');
+      + '<div class="rs" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><strong style="color:#1A1A1A">'+nomeSocio+'</strong> - '+(last?last.testo:'Nessun messaggio')+'</div>'
+      + '</div></div>';
+    el.appendChild(div);
+  });
 }
 
 function apriChatAdmin(id){
