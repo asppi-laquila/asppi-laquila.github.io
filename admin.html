@@ -367,34 +367,41 @@ function renderHome(){
   document.getElementById('sh-soc').textContent=D.utenti.length;
 
   const hp=document.getElementById('h-prens');
-  const prens=D.prenotazioni.filter(p=>p.stato==='confermata').slice(0,3);
-  hp.innerHTML=!prens.length?'<div class="info">Nessun appuntamento confermato.</div>'
-    :prens.map(p=>cardPren(p)).join('');
+  var prens = D.prenotazioni.filter(function(p){ return p.stato==='confermata'; }).slice(0,3);
+  hp.innerHTML = '';
+  if(!prens.length){ hp.innerHTML='<div class="info">Nessun appuntamento confermato.</div>'; }
+  else { prens.forEach(function(p){ hp.appendChild(cardPren(p)); }); }
 
-  const hpr=document.getElementById('h-prats');
-  hpr.innerHTML=!D.contratti.length?'<div class="info">Nessuna pratica ancora.</div>'
-    :D.contratti.slice(0,3).map(c=>cardPrat(c)).join('');
+  var hpr=document.getElementById('h-prats');
+  hpr.innerHTML = '';
+  if(!D.contratti.length){ hpr.innerHTML='<div class="info">Nessuna pratica ancora.</div>'; }
+  else { D.contratti.slice(0,3).forEach(function(c){ hpr.appendChild(cardPrat(c)); }); }
 }
 
 // ── PRENOTAZIONI ──────────────────────────────────────────────
 function cardPren(p){
-  const col=p.stato==='cancellata'?'#8A8A8A':'#2D7A4F';
-  return `<div class="row" onclick="apriPren('${p.id}')">
-    <div class="bar" style="background:${col}"></div>
-    <div class="rb">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div class="rt">${p.nomeUtente||'—'}</div>
-        <div style="font-size:15px;font-weight:800;color:#E8631A">${p.ora||'—'}</div>
-      </div>
-      <div class="rs">${p.motivo||''} · ${p.data||''}</div>
-    </div><div class="ra">›</div>
-  </div>`;
+  var col = p.stato==='cancellata' ? '#8A8A8A' : '#2D7A4F';
+  var div = document.createElement('div');
+  div.className = 'row';
+  div.addEventListener('click', (function(id){ return function(){ apriPren(id); }; })(p.id));
+  div.innerHTML = '<div class="bar" style="background:'+col+'"></div>'
+    + '<div class="rb">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center">'
+    + '<div class="rt">'+(p.nomeUtente||'—')+'</div>'
+    + '<div style="font-size:15px;font-weight:800;color:#E8631A">'+(p.ora||'—')+'</div>'
+    + '</div>'
+    + '<div class="rs">'+(p.motivo||'')+' &middot; '+(p.data||'')+'</div>'
+    + '</div><div class="ra">&#8250;</div>';
+  return div;
 }
 
 function renderPren(f){
-  let list=D.prenotazioni;
-  if(f!=='tutte') list=list.filter(p=>p.stato===f);
-  document.getElementById('l-pren').innerHTML=!list.length?'<div class="info">Nessuna prenotazione.</div>':list.map(p=>cardPren(p)).join('');
+  var list = D.prenotazioni.slice();
+  if(f!=='tutte') list = list.filter(function(p){ return p.stato===f; });
+  var el = document.getElementById('l-pren');
+  el.innerHTML = '';
+  if(!list.length){ el.innerHTML='<div class="info">Nessuna prenotazione.</div>'; return; }
+  list.forEach(function(p){ el.appendChild(cardPren(p)); });
 }
 
 function filtraPren(f){
@@ -430,29 +437,34 @@ function parseLocs(json){
   try{
     const a=JSON.parse(json||'[]');
     if(!a.length)return '<div class="val">—</div>';
-    return a.map((p,i)=>`<div style="background:#F8F7F5;border-radius:10px;padding:12px;margin-bottom:8px">
-      <div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:6px">N°${i+1}</div>
-      <div class="lbl">Nome</div><div class="val">${p.cognome||''} ${p.nome||''}</div>
-      <div class="lbl">CF</div><div class="val" style="font-family:monospace">${p.cf||'—'}</div>
-      ${p.quota?`<div class="lbl">Quota</div><div class="val">${p.quota}%</div>`:''}
-    </div>`).join('');
+    return a.map(function(p,i){
+      var quota = p.quota ? '<div class="lbl">Quota</div><div class="val">'+p.quota+'%</div>' : '';
+      return '<div style="background:#F8F7F5;border-radius:10px;padding:12px;margin-bottom:8px">'
+        + '<div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:6px">N°'+(i+1)+'</div>'
+        + '<div class="lbl">Nome</div><div class="val">'+(p.cognome||'')+' '+(p.nome||'')+'</div>'
+        + '<div class="lbl">CF</div><div class="val" style="font-family:monospace">'+(p.cf||'—')+'</div>'
+        + quota
+        + '</div>';
+    }).join('');
   }catch(e){return '<div class="val">—</div>';}
 }
 
 function cardPrat(c){
-  const col=statoCol(c.stato);
-  let nome='—';
-  try{const l=JSON.parse(c.locatoriJSON||'[]');if(l[0])nome=(l[0].cognome||'')+' '+(l[0].nome||'');}catch(e){}
-  return `<div class="row" onclick="apriPrat('${c.id}')">
-    <div class="bar" style="background:${col}"></div>
-    <div class="rb">
-      <div style="display:flex;justify-content:space-between">
-        <div class="rt">${nome}</div>
-        <span class="bdg" style="color:${col};background:${col}22">${statoLbl(c.stato)}</span>
-      </div>
-      <div class="rs">${nomeContratto(c)} · ${c.dataRichiesta?c.dataRichiesta.substring(0,10):''}</div>
-    </div><div class="ra">›</div>
-  </div>`;
+  var col = statoCol(c.stato);
+  var nome = '—';
+  try{ var l=JSON.parse(c.locatoriJSON||'[]'); if(l[0]) nome=(l[0].cognome||'')+' '+(l[0].nome||''); }catch(e){}
+  var div = document.createElement('div');
+  div.className = 'row';
+  div.addEventListener('click', (function(id){ return function(){ apriPrat(id); }; })(c.id));
+  div.innerHTML = '<div class="bar" style="background:'+col+'"></div>'
+    + '<div class="rb">'
+    + '<div style="display:flex;justify-content:space-between">'
+    + '<div class="rt">'+nome+'</div>'
+    + '<span class="bdg" style="color:'+col+';background:'+col+'22">'+statoLbl(c.stato)+'</span>'
+    + '</div>'
+    + '<div class="rs">'+nomeContratto(c)+' &middot; '+(c.dataRichiesta?c.dataRichiesta.substring(0,10):'')+'</div>'
+    + '</div><div class="ra">&#8250;</div>';
+  return div;
 }
 
 function renderPrat(f){
@@ -568,7 +580,7 @@ function apriChatAdmin(id){
     if(utente) nomeSocio = (utente.nome||'')+' '+(utente.cognome||'');
   }
   nomeSocio = nomeSocio.trim()||'—';
-  document.getElementById('opr-lbl').textContent='CHAT · '+nomeContratto(c||{id});
+  document.getElementById('opr-lbl').textContent='CHAT · '+nomeContratto(c||{});
   document.getElementById('opr-ttl').textContent=nomeSocio;
   // Render pratica dati minimali
   document.getElementById('opr-tipo').textContent=c?.tipo||'—';
@@ -610,12 +622,26 @@ const TGIORNI=['Lun','Mar','Mer','Gio','Ven','Sab'];
 const TORARI=['08:30','09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00','17:30'];
 
 function initSlot(){
-  document.getElementById('slot-giorni').innerHTML=TGIORNI.map(g=>`
-    <button class="gbtn ${sGiorni.has(g)?'on':'off'}" id="sg-${g}" onclick="togGiorno('${g}')">${g}</button>
-  `).join('');
-  document.getElementById('slot-orari').innerHTML=TORARI.map(o=>`
-    <button class="sbt ${sOrari.has(o)?'on':'off'}" id="so-${o.replace(':','-')}" onclick="togOrario('${o}')">${o}</button>
-  `).join('');
+  var gContainer = document.getElementById('slot-giorni');
+  gContainer.innerHTML = '';
+  TGIORNI.forEach(function(g){
+    var btn = document.createElement('button');
+    btn.className = 'gbtn ' + (sGiorni.has(g)?'on':'off');
+    btn.id = 'sg-'+g;
+    btn.textContent = g;
+    btn.addEventListener('click', (function(day){ return function(){ togGiorno(day); }; })(g));
+    gContainer.appendChild(btn);
+  });
+  var oContainer = document.getElementById('slot-orari');
+  oContainer.innerHTML = '';
+  TORARI.forEach(function(o){
+    var btn = document.createElement('button');
+    btn.className = 'sbt ' + (sOrari.has(o)?'on':'off');
+    btn.id = 'so-'+o.replace(':','-');
+    btn.textContent = o;
+    btn.addEventListener('click', (function(ora){ return function(){ togOrario(ora); }; })(o));
+    oContainer.appendChild(btn);
+  });
   renderChiusure(); renderBloccati();
 }
 
@@ -634,32 +660,47 @@ function togOrario(o){
 function renderChiusure(){
   const el=document.getElementById('slot-chiusure');
   if(!D.chiusure.length){el.innerHTML='<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessuna chiusura impostata</div>';return;}
-  el.innerHTML=D.chiusure.map(c=>`<div class="li">
-    <span style="font-size:18px">🏖️</span>
-    <div style="flex:1"><div style="font-size:13px;font-weight:700;color:#1A1A1A">${c.label}</div>
-    <div style="font-size:11px;color:#8A8A8A">dal ${c.dal} al ${c.al}</div></div>
-    <button onclick="delChiusura('${c.id}')" style="background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px">✕</button>
-  </div>`).join('');
+  el.innerHTML = '';
+  D.chiusure.forEach(function(ch){
+    var div = document.createElement('div');
+    div.className = 'li';
+    div.innerHTML = '<span style="font-size:18px">🏖️</span>'
+      + '<div style="flex:1"><div style="font-size:13px;font-weight:700;color:#1A1A1A">'+ch.label+'</div>'
+      + '<div style="font-size:11px;color:#8A8A8A">dal '+ch.dal+' al '+ch.al+'</div></div>';
+    var btn = document.createElement('button');
+    btn.style.cssText = 'background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px';
+    btn.textContent = '✕';
+    btn.addEventListener('click', (function(id){ return function(){ delChiusura(id); }; })(ch.id));
+    div.appendChild(btn);
+    el.appendChild(div);
+  });
 }
 
 function renderBloccati(){
   const el=document.getElementById('slot-bloccati');
   if(!bloccati.length){el.innerHTML='<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessun giorno bloccato</div>';return;}
-  el.innerHTML=bloccati.map((b,i)=>`<div class="li">
-    <span>🚫</span>
-    <div style="flex:1;font-size:13px;font-weight:600;color:#1A1A1A">${b}</div>
-    <button onclick="bloccati.splice(${i},1);renderBloccati()" style="background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px">✕</button>
-  </div>`).join('');
+  el.innerHTML = '';
+  bloccati.forEach(function(b, i){
+    var div = document.createElement('div');
+    div.className = 'li';
+    div.innerHTML = '<span>🚫</span><div style="flex:1;font-size:13px;font-weight:600;color:#1A1A1A">'+b+'</div>';
+    var btn = document.createElement('button');
+    btn.style.cssText = 'background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px';
+    btn.textContent = '✕';
+    btn.addEventListener('click', (function(idx){ return function(){ bloccati.splice(idx,1); renderBloccati(); }; })(i));
+    div.appendChild(btn);
+    el.appendChild(div);
+  });
 }
 
 async function addChiusura(){
-  const label=document.getElementById('ch-lbl').value.trim();
-  const dal=document.getElementById('ch-dal').value.trim();
-  const al=document.getElementById('ch-al').value.trim();
+  var label=document.getElementById('ch-lbl').value.trim();
+  var dal=document.getElementById('ch-dal').value.trim();
+  var al=document.getElementById('ch-al').value.trim();
   if(!label||!dal||!al){alert('Compila tutti i campi chiusura');return;}
-  const r=await call('saveChiusura',{label,dal,al});
+  var r=await call('saveChiusura',{label:label,dal:dal,al:al});
   if(r.ok){
-    D.chiusure.push({id:r.id,label,dal,al});
+    D.chiusure.push({id:r.id,label:label,dal:dal,al:al});
     renderChiusure();
     document.getElementById('ch-lbl').value='';
     document.getElementById('ch-dal').value='';
@@ -668,7 +709,7 @@ async function addChiusura(){
 }
 
 async function delChiusura(id){
-  const r=await call('deleteChiusura',{id});
+  const r=await call('deleteChiusura',{id:id});
   if(r.ok){D.chiusure=D.chiusure.filter(c=>c.id!==id);renderChiusure();}
 }
 
