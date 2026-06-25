@@ -163,9 +163,16 @@ textarea.inp{min-height:100px;resize:vertical;}
 
 <!-- CHAT -->
 <div id="p-chat" class="pg">
-  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:4px">Chat</div>
-  <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px">Messaggi con lo studio ASPPI</div>
-  <div id="lchat"><div class="info">Caricamento...</div></div>
+  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:4px">Chat con lo studio</div>
+  <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px">Scrivi liberamente allo studio ASPPI</div>
+  <div class="cms" id="lchat-msgs" style="background:#fff;border-radius:14px;min-height:400px;margin-bottom:12px;padding:16px"></div>
+  <div class="ci" style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+    <input type="text" class="inp" id="chat-free-inp" placeholder="Scrivi un messaggio allo studio..." style="margin-bottom:0" onkeydown="if(event.key==='Enter')sendFreeMsg()"/>
+    <button class="cs" onclick="sendFreeMsg()">›</button>
+  </div>
+  <div style="font-size:11px;color:#8A8A8A;text-align:center;margin-top:10px">
+    Puoi anche fare riferimento a un contratto specifico nei messaggi.
+  </div>
 </div>
 
 <!-- PROFILO -->
@@ -207,6 +214,26 @@ textarea.inp{min-height:100px;resize:vertical;}
     <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin-bottom:10px">Contratti</div>
     <div id="oa-cnts"></div>
     <button class="bp" onclick="apriNuovoCnt()">＋ Nuovo contratto</button>
+    <button class="bs" onclick="modificaApt()">✏️ Modifica nome immobile</button>
+    <button class="bs" style="color:#C0392B;border-color:#FDEEEC" onclick="cancellaApt()">🗑️ Rimuovi immobile</button>
+  </div>
+</div>
+
+<!-- OV: MODIFICA APPARTAMENTO -->
+<div id="ov-mod-apt" class="ov">
+  <div class="oh">
+    <div><div class="oh-lbl">MODIFICA IMMOBILE</div><div class="oh-ttl" id="mapt-ttl">—</div></div>
+    <button style="background:none;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer" onclick="chiudi('ov-mod-apt')">← Indietro</button>
+  </div>
+  <div style="padding:16px">
+    <div class="card"><div class="cb">
+      <div class="sec">MODIFICA NOME</div>
+      <div class="infob">ℹ️ Puoi cambiare il nome che hai assegnato all'immobile. I dati catastali non cambiano.</div>
+      <label class="lbl">Nuovo nome immobile</label>
+      <input type="text" class="inp" id="mapt-nome" placeholder='es. "Casa Garibaldi"'/>
+      <div class="infog" id="mapt-ok" style="display:none">✅ Nome aggiornato!</div>
+      <button class="bp" onclick="salvaModApt()">Salva nome</button>
+    </div></div>
   </div>
 </div>
 
@@ -247,6 +274,7 @@ textarea.inp{min-height:100px;resize:vertical;}
       <span style="font-size:22px">📤</span><div><div style="font-size:14px;font-weight:700">Cessione</div><div style="font-size:12px;color:#8A8A8A">Cede il contratto a terzi</div></div><span style="margin-left:auto;color:#8A8A8A">›</span>
     </div>
     <button class="bs" onclick="apriChatCnt()">💬 Chat con lo studio</button>
+    <button class="bs" style="color:#1A5FA8;border-color:#EBF2FB" onclick="modificaCnt()">✏️ Modifica questo contratto</button>
   </div>
 </div>
 
@@ -357,6 +385,16 @@ async function call(action, data) {
   } catch(e) { return {ok:false,error:'Errore connessione: '+e.message}; }
 }
 
+function fmtDate(d) {
+  if(!d) return '—';
+  // Handle ISO format 2026-06-01T00:00:00.000Z
+  if(d.includes('T')) {
+    const parts = d.substring(0,10).split('-');
+    return parts[2]+'/'+parts[1]+'/'+parts[0];
+  }
+  return d;
+}
+
 async function carica() {
   const [a,c,p,sl] = await Promise.all([
     call('getAppartamenti'), call('getContratti'),
@@ -376,6 +414,7 @@ function nav(id) {
   document.getElementById('p-'+id).classList.add('on');
   document.getElementById('nb-'+id).classList.add('on');
   window.scrollTo(0,0);
+  if(id==='chat') loadFreeChat();
 }
 
 function apri(id) { document.getElementById(id).classList.add('on'); document.getElementById(id).scrollTop=0; }
@@ -457,8 +496,8 @@ function apriCnt(id) {
   document.getElementById('oc-lbl').textContent    ='CONTRATTO '+id;
   document.getElementById('oc-ttl').textContent    =curCnt.tipo||'—';
   document.getElementById('oc-tipo').textContent   =curCnt.tipo||'—';
-  document.getElementById('oc-dal').textContent    =curCnt.duraDal||'—';
-  document.getElementById('oc-al').textContent     =curCnt.duraAl||'—';
+  document.getElementById('oc-dal').textContent    =fmtDate(curCnt.duraDal);
+  document.getElementById('oc-al').textContent     =fmtDate(curCnt.duraAl);
   document.getElementById('oc-canone').textContent =curCnt.canoneMensile?'€ '+curCnt.canoneMensile+'/mese':'—';
   document.getElementById('oc-dep').textContent    =curCnt.depositoImporto?'€ '+curCnt.depositoImporto:'—';
   document.getElementById('oc-taj').textContent    =curCnt.taj||'Non inserito';
@@ -607,7 +646,7 @@ function selDay(ds) {
   const slots=D.slot.length?D.slot:['09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00'];
   document.getElementById('p-slot-grid').innerHTML=slots.map(s=>{
     const bsy=occ.includes(s), sel=calSlot===s;
-    return `<button class="sb${sel?' sel':''}${bsy?' bsy':''}" ${bsy?'':'onclick="selSlot(\''+s+'\')"'}>${s}</button>`;
+    return `<button class='sb${sel?" sel":""}${bsy?" bsy":""}' ${bsy?'':('onclick="selSlot(\''+s+'\')"')}>${s}</button>`;
   }).join('');
 }
 
@@ -749,16 +788,24 @@ function ncntBody() {
   </div></div>`;
 
   if(ncntStep===1) return `<div class="card"><div class="cb"><div class="sec">1 — DURATA</div>
-    <label class="lbl">Data inizio *</label><input type="text" class="inp" id="c1a" placeholder="gg/mm/aaaa" value="${ncntD.duraDal||''}"/>
-    <label class="lbl">Data fine *</label><input type="text" class="inp" id="c1b" placeholder="gg/mm/aaaa" value="${ncntD.duraAl||''}"/>
-    <label class="lbl">N° mensilità</label><input type="text" class="inp" id="c1c" placeholder="es. 36" value="${ncntD.duraMesi||''}"/>
+    <label class="lbl">Data inizio *</label>
+    <input type="text" class="inp" id="c1a" placeholder="gg/mm/aaaa" maxlength="10" value="${ncntD.duraDal||''}"
+      oninput="autoDate(this)" onblur="calcMesi()"/>
+    <label class="lbl">Data fine *</label>
+    <input type="text" class="inp" id="c1b" placeholder="gg/mm/aaaa" maxlength="10" value="${ncntD.duraAl||''}"
+      oninput="autoDate(this)" onblur="calcMesi()"/>
+    <label class="lbl">N° mensilità (calcolate automaticamente)</label>
+    <input type="text" class="inp" id="c1c" placeholder="—" value="${ncntD.duraMesi||''}" readonly style="background:#F8F7F5;color:#8A8A8A"/>
   </div></div>`;
 
   if(ncntStep===2) return `
     <div class="card"><div class="cb"><div class="sec">2 — CANONE</div>
-      <label class="lbl">Canone mensile € *</label><input type="text" class="inp" id="c2a" placeholder="es. 580,00" value="${ncntD.canoneMensile||''}"/>
-      <label class="lbl">Canone annuale/periodo €</label><input type="text" class="inp" id="c2b" placeholder="es. 6.960,00" value="${ncntD.canoneAnnuale||''}"/>
-      <label class="lbl">IBAN locatore</label><input type="text" class="inp" id="c2c" placeholder="IT60 X054..." style="font-family:monospace" value="${ncntD.canoneIBAN||''}"/>
+      <label class="lbl">Canone mensile € *</label>
+      <input type="text" class="inp" id="c2a" placeholder="es. 580,00" value="${ncntD.canoneMensile||''}" oninput="calcAnnuale()"/>
+      <label class="lbl">Canone annuale/periodo € (calcolato automaticamente)</label>
+      <input type="text" class="inp" id="c2b" placeholder="—" value="${ncntD.canoneAnnuale||''}" readonly style="background:#F8F7F5;color:#8A8A8A"/>
+      <label class="lbl">IBAN locatore (opzionale)</label>
+      <input type="text" class="inp" id="c2c" placeholder="IT60 X054..." style="font-family:monospace" value="${ncntD.canoneIBAN||''}"/>
     </div></div>
     <div class="card"><div class="cb"><div class="sec">3 — DEPOSITO CAUZIONALE</div>
       <label class="lbl">Importo € *</label><input type="text" class="inp" id="c2d" placeholder="es. 1.160,00" value="${ncntD.depositoImporto||''}"/>
@@ -767,13 +814,12 @@ function ncntBody() {
     <div class="card"><div class="cb"><div class="sec">4 — ONERI ACCESSORI</div>
       <div class="infob">💡 Se sconosciuti lasciare vuoto.</div>
       <label class="lbl">Oneri mensili €</label><input type="text" class="inp" id="c2f" placeholder="es. 50,00" value="${ncntD.oneriMensili||''}"/>
-      <label class="lbl">IBAN condominio</label><input type="text" class="inp" id="c2g" placeholder="IT60 X054..." style="font-family:monospace" value="${ncntD.oneriIBAN||''}"/>
     </div></div>`;
 
   if(ncntStep===3) return `
     <div class="card"><div class="cb"><div class="sec">5 — DATI IMMOBILE</div>
       <div class="infob">ℹ️ I dati catastali sono già salvati nell'immobile. Compilare APE e composizione.</div>
-      <label class="lbl">N° certificato APE</label><input type="text" class="inp" id="c3a" placeholder="es. AQ-2024-0012345" value="${ncntD.apeNumero||''}"/>
+      <label class="lbl">N° certificato APE (opzionale)</label><input type="text" class="inp" id="c3a" placeholder="es. AQ-2024-0012345" value="${ncntD.apeNumero||''}"/>
       <label class="lbl">Classe energetica</label><input type="text" class="inp" id="c3b" placeholder="es. D" value="${ncntD.apeClasse||''}"/>
       <div class="sec" style="margin-top:4px">COMPOSIZIONE</div>
       <div class="g2">
@@ -889,12 +935,138 @@ async function ncntNext(){
   if(ncntStep===7){ncntD.note=document.getElementById('c7a')?.value||'';}
   if(ncntStep===8){
     if(!ncntD.g1||!ncntD.g2||!ncntD.g3||!ncntD.g4){alert('Devi accettare tutti e 4 i consensi GDPR');return;}
+    // Aggiungi nome contratto automatico
+    ncntD.nomeContratto = nomeContratto(ncntD);
+    if(ncntD._modifica) ncntD.modificato = new Date().toISOString();
     const r=await call('saveContratto',{data:ncntD});
-    if(r.ok){chiudi('ov-ncnt');chiudi('ov-apt');await carica();nav('home');alert('✅ Richiesta contratto inviata! Lo studio ti contatterà via chat.');}
-    else alert('Errore: '+(r.error||'Riprova'));
+    if(r.ok){
+      chiudi('ov-ncnt');chiudi('ov-apt');chiudi('ov-cnt');
+      await carica();nav('home');
+      const msg = ncntD._modifica ? '✅ Contratto modificato! L'admin vedrà l'aggiornamento.' : '✅ Richiesta contratto inviata! Lo studio ti contatterà via chat.';
+      alert(msg);
+    } else alert('Errore: '+(r.error||'Riprova'));
     return;
   }
   ncntStep++; renderNcnt();
+}
+
+// ── AUTO DATE FORMAT ─────────────────────────────────────────
+function autoDate(inp) {
+  let v = inp.value.replace(/\D/g,'');
+  if(v.length>=3) v = v.substring(0,2)+'/'+v.substring(2);
+  if(v.length>=6) v = v.substring(0,5)+'/'+v.substring(5);
+  inp.value = v.substring(0,10);
+}
+
+function calcMesi() {
+  const a = document.getElementById('c1a')?.value;
+  const b = document.getElementById('c1b')?.value;
+  if(!a||!b||a.length<10||b.length<10) return;
+  try {
+    const [da,ma,ya] = a.split('/').map(Number);
+    const [db,mb,yb] = b.split('/').map(Number);
+    const mesi = (yb-ya)*12 + (mb-ma) + (db>=da?0:-1) + 1;
+    if(mesi>0) {
+      document.getElementById('c1c').value = mesi;
+      ncntD.duraMesi = mesi;
+      calcAnnuale();
+    }
+  } catch(e){}
+}
+
+function calcAnnuale() {
+  const mesi = parseInt(document.getElementById('c1c')?.value||ncntD.duraMesi||'0');
+  const mensile = parseFloat((document.getElementById('c2a')?.value||'0').replace(',','.'));
+  if(mesi>0&&mensile>0) {
+    const annuale = (mensile*mesi).toFixed(2).replace('.',',');
+    if(document.getElementById('c2b')) document.getElementById('c2b').value = annuale;
+    ncntD.canoneAnnuale = annuale;
+  }
+}
+
+// ── NOME CONTRATTO ────────────────────────────────────────────
+function nomeContratto(d) {
+  const locs = d.locatori||[];
+  const cons  = d.conduttori||[];
+  const cogL = locs[0]?.cognome||locs[0]?.nome||'Locatore';
+  const cogC = cons[0]?.cognome||cons[0]?.nome||'Conduttore';
+  return 'CNT_'+cogL+'_'+cogC;
+}
+
+// ── CHAT LIBERA ───────────────────────────────────────────────
+const FREE_CHAT_ID = 'FREE_'+S?.user?.userId||'free';
+
+async function loadFreeChat() {
+  const r = await call('getChat', {contrattoId: 'FREE_'+S.user.userId});
+  const msgs = r.ok?(r.data||[]):[];
+  const el = document.getElementById('lchat-msgs');
+  if(!msgs.length) { el.innerHTML='<div class="info">Nessun messaggio ancora. Scrivi liberamente allo studio!</div>'; return; }
+  el.innerHTML = msgs.map(m => {
+    const mine = m.mittente==='socio';
+    return `<div class="bbl ${mine?'bm':'bo'}">${m.testo}</div>
+    <div class="bt" style="align-self:${mine?'flex-end':'flex-start'}">${mine?'Tu':'Studio ASPPI'} · ${m.timestamp?m.timestamp.substring(11,16):''}</div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendFreeMsg() {
+  const t = document.getElementById('chat-free-inp').value.trim();
+  if(!t) return;
+  document.getElementById('chat-free-inp').value = '';
+  const r = await call('sendMessage', {contrattoId: 'FREE_'+S.user.userId, testo: t});
+  if(r.ok) await loadFreeChat();
+}
+
+// ── MODIFICA CONTRATTO ────────────────────────────────────────
+function modificaCnt() {
+  // Riapri il form con i dati esistenti
+  ncntStep = 0;
+  ncntD = {...curCnt, locatori: [], conduttori: [], garanti: [], _modifica: true};
+  try { ncntD.locatori  = JSON.parse(curCnt.locatoriJSON  ||'[]'); } catch(e){ ncntD.locatori=[{}]; }
+  try { ncntD.conduttori= JSON.parse(curCnt.conduttoriJSON||'[]'); } catch(e){ ncntD.conduttori=[{}]; }
+  try { ncntD.garanti   = JSON.parse(curCnt.garantiJSON   ||'[]'); } catch(e){ ncntD.garanti=[]; }
+  document.getElementById('ncnt-apt-lbl').textContent = '✏️ MODIFICA CONTRATTO';
+  renderNcnt();
+  apri('ov-ncnt');
+}
+
+// ── MODIFICA/CANCELLA APPARTAMENTO ───────────────────────────
+function modificaApt() {
+  document.getElementById('mapt-ttl').textContent = curApt.nome||'Immobile';
+  document.getElementById('mapt-nome').value = curApt.nome||'';
+  document.getElementById('mapt-ok').style.display = 'none';
+  apri('ov-mod-apt');
+}
+
+async function salvaModApt() {
+  const nome = document.getElementById('mapt-nome').value.trim();
+  if(!nome) { alert('Inserisci un nome'); return; }
+  curApt.nome = nome;
+  const r = await call('saveAppartamento', {data: curApt});
+  if(r.ok) {
+    document.getElementById('mapt-ok').style.display = '';
+    document.getElementById('oa-ttl').textContent = nome;
+    D.appartamenti = D.appartamenti.map(a => a.id===curApt.id ? {...a,nome} : a);
+    renderImmobili();
+  } else alert('Errore: '+r.error);
+}
+
+async function cancellaApt() {
+  const cnts = D.contratti.filter(c=>c.appartamentoId===curApt.id);
+  if(cnts.length) {
+    if(!confirm('Questo immobile ha '+cnts.length+' contratto/i associato/i. Sei sicuro di volerlo rimuovere?')) return;
+  } else {
+    if(!confirm('Sei sicuro di voler rimuovere "'+curApt.nome+'" dal tuo profilo?')) return;
+  }
+  // Segna come rimosso (soft delete)
+  curApt.rimosso = true;
+  const r = await call('saveAppartamento', {data: curApt});
+  if(r.ok) {
+    D.appartamenti = D.appartamenti.filter(a=>a.id!==curApt.id);
+    renderImmobili();
+    chiudi('ov-apt');
+    alert('✅ Immobile rimosso.');
+  } else alert('Errore: '+r.error);
 }
 
 // ── CAMBIO PASSWORD ───────────────────────────────────────────

@@ -1,689 +1,654 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="theme-color" content="#0D1B2A"/>
-  <title>ASPPI Admin</title>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F8F7F5;min-height:100vh;padding-bottom:80px;}
-    .topbar{background:#0D1B2A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;}
-    .topbar-label{color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
-    .topbar-title{color:#fff;font-size:15px;font-weight:700;}
-    .btn-exit{background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer;}
-    /* Bottom nav */
-    .bottomnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #E5E5E5;display:flex;padding:8px 0 16px;z-index:100;}
-    .navbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:transparent;cursor:pointer;padding:6px 0;}
-    .navbtn .icon{font-size:20px;opacity:.35;}
-    .navbtn .lbl{font-size:9px;font-weight:500;color:#8A8A8A;}
-    .navbtn.active .icon{opacity:1;}
-    .navbtn.active .lbl{color:#E8631A;font-weight:700;}
-    /* Screens */
-    .screen{display:none;padding:16px;}
-    .screen.active{display:block;}
-    /* Cards */
-    .card{background:#fff;border-radius:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;}
-    .card-body{padding:14px;}
-    .card-row{display:flex;border-left:4px solid #E8631A;}
-    .card-row .card-body{flex:1;}
-    .card-row .card-arrow{display:flex;align-items:center;padding-right:14px;color:#8A8A8A;font-size:16px;}
-    .card-title{font-size:14px;font-weight:700;color:#1A1A1A;}
-    .card-sub{font-size:12px;color:#8A8A8A;margin-top:2px;}
-    .sec-title{font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.12em;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid #E5E5E5;margin-bottom:14px;}
-    .badge{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
-    .badge-orange{color:#E8631A;background:#FDF0E8;}
-    .badge-green{color:#2D7A4F;background:#EBF5F0;}
-    .badge-gray{color:#8A8A8A;background:#F8F7F5;}
-    .stat-row{display:flex;gap:8px;margin-bottom:20px;}
-    .stat-box{flex:1;background:#fff;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06);}
-    .stat-num{font-size:26px;font-weight:800;line-height:1;}
-    .stat-lbl{font-size:10px;color:#8A8A8A;margin-top:4px;line-height:1.3;}
-    /* Form elements */
-    label{display:block;font-size:11px;font-weight:600;color:#8A8A8A;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
-    input,select,textarea{width:100%;padding:11px 13px;border-radius:10px;border:1.5px solid #E5E5E5;font-size:14px;color:#1A1A1A;background:#fff;margin-bottom:12px;outline:none;font-family:inherit;}
-    input:focus,select:focus,textarea:focus{border-color:#E8631A;}
-    .btn-primary{width:100%;padding:13px 0;border-radius:12px;border:none;background:#E8631A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
-    .btn-secondary{width:100%;padding:11px 0;border-radius:12px;border:1.5px solid #E5E5E5;background:#fff;color:#1A1A1A;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;}
-    .btn-small{padding:6px 14px;border-radius:16px;border:none;font-size:12px;font-weight:700;cursor:pointer;}
-    .btn-small-orange{background:#E8631A;color:#fff;}
-    .btn-small-gray{background:#F8F7F5;color:#8A8A8A;}
-    .info{background:#FDF0E8;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#4A4A4A;line-height:1.6;}
-    .info-blue{background:#EBF2FB;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#1A5FA8;line-height:1.6;}
-    .success{background:#EBF5F0;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#2D7A4F;}
-    .error{background:#FDEEEC;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#C0392B;}
-    /* Slot grid */
-    .slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
-    .slot-btn{padding:10px 0;text-align:center;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;}
-    .slot-btn.on{background:#E8631A;color:#fff;}
-    .slot-btn.off{background:#F8F7F5;color:#8A8A8A;}
-    /* Chat */
-    .chat-area{display:flex;flex-direction:column;gap:4px;padding:16px 0;min-height:300px;}
-    .bubble{max-width:78%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.5;}
-    .bubble-socio{background:#fff;color:#1A1A1A;border:1px solid #E5E5E5;align-self:flex-start;border-radius:4px 16px 16px 16px;}
-    .bubble-admin{background:#E8631A;color:#fff;align-self:flex-end;border-radius:16px 4px 16px 16px;}
-    .bubble-time{font-size:10px;color:#8A8A8A;margin-bottom:10px;}
-    .chat-input-row{display:flex;gap:8px;padding:12px 0;border-top:1px solid #E5E5E5;position:sticky;bottom:80px;background:#F8F7F5;}
-    .chat-input-row input{flex:1;margin-bottom:0;}
-    .chat-send{width:44px;height:44px;border-radius:22px;border:none;background:#E8631A;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;}
-    /* Giorni */
-    .giorni-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
-    .giorno-btn{padding:8px 14px;border-radius:20px;border:none;font-weight:700;font-size:13px;cursor:pointer;}
-    /* List item */
-    .list-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #E5E5E5;}
-    .list-item:last-child{border-bottom:none;}
-    /* Detail overlay */
-    .overlay{display:none;position:fixed;inset:0;background:#F8F7F5;z-index:200;overflow-y:auto;padding-bottom:80px;}
-    .overlay.active{display:block;}
-    .overlay-header{background:#0D1B2A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;}
-    .field-label{font-size:11px;color:#8A8A8A;text-transform:uppercase;margin-bottom:3px;}
-    .field-value{font-size:14px;font-weight:600;color:#1A1A1A;margin-bottom:12px;}
-    .tab-row{display:flex;border-bottom:1px solid #E5E5E5;background:#fff;padding:0 16px;}
-    .tab-btn{flex:1;padding:12px 0;border:none;background:transparent;font-size:13px;font-weight:700;cursor:pointer;color:#8A8A8A;border-bottom:3px solid transparent;}
-    .tab-btn.active{color:#E8631A;border-bottom-color:#E8631A;}
-    /* Prenotazioni filtro */
-    .filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;}
-    .filter-btn{flex-shrink:0;padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer;}
-    .filter-btn.active{background:#E8631A;color:#fff;}
-    .filter-btn.inactive{background:#fff;color:#8A8A8A;}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#0D1B2A"/>
+<title>ASPPI Admin</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F8F7F5;min-height:100vh;padding-bottom:80px;}
+.top{background:#0D1B2A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;}
+.tl{color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+.tt{color:#fff;font-size:15px;font-weight:700;}
+.nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e5e5;display:flex;padding:8px 0 16px;z-index:100;}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:transparent;cursor:pointer;padding:6px 0;}
+.nb span:first-child{font-size:18px;opacity:.35;}
+.nb span:last-child{font-size:9px;color:#8A8A8A;}
+.nb.on span:first-child{opacity:1;}
+.nb.on span:last-child{color:#E8631A;font-weight:700;}
+.pg{display:none;padding:16px;}
+.pg.on{display:block;}
+.card{background:#fff;border-radius:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
+.cb{padding:16px;}
+.row{display:flex;overflow:hidden;border-radius:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);cursor:pointer;}
+.bar{width:4px;flex-shrink:0;background:#E8631A;}
+.rb{flex:1;padding:14px;}
+.rt{font-size:14px;font-weight:700;color:#1A1A1A;}
+.rs{font-size:12px;color:#8A8A8A;margin-top:2px;}
+.ra{display:flex;align-items:center;padding-right:14px;color:#8A8A8A;}
+.sec{font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.12em;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid #e5e5e5;margin-bottom:14px;}
+.lbl{display:block;font-size:11px;font-weight:600;color:#8A8A8A;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
+.val{font-size:14px;font-weight:600;color:#1A1A1A;margin-bottom:12px;}
+.inp{width:100%;padding:11px 13px;border-radius:10px;border:1.5px solid #e5e5e5;font-size:14px;color:#1A1A1A;background:#fff;margin-bottom:12px;outline:none;font-family:inherit;}
+.inp:focus{border-color:#E8631A;}
+select.inp{cursor:pointer;}
+.bp{width:100%;padding:13px 0;border-radius:12px;border:none;background:#E8631A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;}
+.bs{width:100%;padding:11px 0;border-radius:12px;border:1.5px solid #e5e5e5;background:#fff;color:#1A1A1A;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;}
+.info{background:#FDF0E8;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#4A4A4A;line-height:1.6;}
+.infob{background:#EBF2FB;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#1A5FA8;line-height:1.6;}
+.infog{background:#EBF5F0;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#2D7A4F;line-height:1.6;}
+.bdg{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+.stat{display:flex;gap:8px;margin-bottom:20px;}
+.sb{flex:1;background:#fff;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.sn{font-size:26px;font-weight:800;line-height:1;}
+.sl{font-size:10px;color:#8A8A8A;margin-top:4px;line-height:1.3;}
+.frow{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;}
+.fb{flex-shrink:0;padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer;}
+.fb.on{background:#E8631A;color:#fff;}
+.fb.off{background:#fff;color:#8A8A8A;}
+.ov{display:none;position:fixed;inset:0;background:#F8F7F5;z-index:200;overflow-y:auto;padding-bottom:100px;}
+.ov.on{display:block;}
+.oh{background:#0D1B2A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;}
+.ohlbl{color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.ohttl{color:#fff;font-size:15px;font-weight:700;}
+.tabrow{display:flex;border-bottom:1px solid #e5e5e5;background:#fff;padding:0 16px;}
+.tabbtn{flex:1;padding:12px 0;border:none;background:transparent;font-size:13px;font-weight:700;cursor:pointer;color:#8A8A8A;border-bottom:3px solid transparent;}
+.tabbtn.on{color:#E8631A;border-bottom-color:#E8631A;}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.sbt{padding:10px 0;text-align:center;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;}
+.sbt.on{background:#E8631A;color:#fff;}
+.sbt.off{background:#F8F7F5;color:#8A8A8A;}
+.grow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.gbtn{padding:8px 14px;border-radius:20px;border:none;font-weight:700;font-size:13px;cursor:pointer;}
+.gbtn.on{background:#E8631A;color:#fff;}
+.gbtn.off{background:#F8F7F5;color:#8A8A8A;}
+.li{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #e5e5e5;}
+.li:last-child{border-bottom:none;}
+.cms{display:flex;flex-direction:column;gap:4px;padding:16px;min-height:300px;}
+.bbl{max-width:78%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.5;}
+.bm{background:#E8631A;color:#fff;align-self:flex-end;border-radius:16px 4px 16px 16px;}
+.bo{background:#fff;color:#1A1A1A;border:1px solid #e5e5e5;align-self:flex-start;border-radius:4px 16px 16px 16px;}
+.bt{font-size:10px;color:#8A8A8A;margin-bottom:8px;}
+.ci{display:flex;gap:8px;padding:12px 16px;background:#fff;border-top:1px solid #e5e5e5;position:sticky;bottom:0;}
+.ci input{flex:1;margin-bottom:0;}
+.cs{width:44px;height:44px;border-radius:22px;border:none;background:#E8631A;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;}
+</style>
 </head>
 <body>
 
-<div class="topbar">
-  <div>
-    <div class="topbar-label">ASPPI L'Aquila · Admin</div>
-    <div class="topbar-title">Simeoni Maurizio</div>
-  </div>
-  <button class="btn-exit" onclick="esci()">Esci</button>
+<div class="top">
+  <div><div class="tl">ASPPI L'Aquila · Admin</div><div class="tt">Simeoni Maurizio</div></div>
+  <button style="background:none;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer" onclick="esci()">Esci</button>
 </div>
 
-<!-- SCREENS -->
-<div id="s-home" class="screen active">
-  <div class="stat-row">
-    <div class="stat-box"><div class="stat-num" style="color:#E8631A" id="stat-oggi">—</div><div class="stat-lbl">Appuntamenti oggi</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:#E8631A" id="stat-chat">—</div><div class="stat-lbl">Pratiche in attesa</div></div>
-    <div class="stat-box"><div class="stat-num" style="color:#2D7A4F" id="stat-soci">—</div><div class="stat-lbl">Soci registrati</div></div>
+<!-- HOME -->
+<div id="p-home" class="pg on">
+  <div class="stat">
+    <div class="sb"><div class="sn" style="color:#E8631A" id="sh-app">—</div><div class="sl">Appuntamenti</div></div>
+    <div class="sb"><div class="sn" style="color:#E8631A" id="sh-att">—</div><div class="sl">In attesa</div></div>
+    <div class="sb"><div class="sn" style="color:#2D7A4F" id="sh-soc">—</div><div class="sl">Soci</div></div>
   </div>
-  <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin-bottom:10px">📅 Appuntamenti oggi</div>
-  <div id="home-prenotazioni"><div class="info">Caricamento...</div></div>
+  <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin-bottom:10px">📅 Prossimi appuntamenti</div>
+  <div id="h-prens"><div class="info">Caricamento...</div></div>
   <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin:16px 0 10px">📝 Pratiche recenti</div>
-  <div id="home-pratiche"><div class="info">Caricamento...</div></div>
+  <div id="h-prats"><div class="info">Caricamento...</div></div>
 </div>
 
-<div id="s-prenotazioni" class="screen">
-  <div class="filter-row">
-    <button class="filter-btn active" id="f-tutte" onclick="filterPren('tutte')">Tutte</button>
-    <button class="filter-btn inactive" id="f-oggi" onclick="filterPren('oggi')">Oggi</button>
-    <button class="filter-btn inactive" id="f-domani" onclick="filterPren('domani')">Domani</button>
-    <button class="filter-btn inactive" id="f-cancellate" onclick="filterPren('cancellate')">Cancellate</button>
+<!-- PRENOTAZIONI -->
+<div id="p-pren" class="pg">
+  <div class="frow">
+    <button class="fb on" id="f-tutte" onclick="filtraPren('tutte')">Tutte</button>
+    <button class="fb off" id="f-conf" onclick="filtraPren('confermata')">Confermate</button>
+    <button class="fb off" id="f-canc" onclick="filtraPren('cancellata')">Cancellate</button>
   </div>
-  <div id="lista-prenotazioni"><div class="info">Caricamento...</div></div>
+  <div id="l-pren"><div class="info">Caricamento...</div></div>
 </div>
 
-<div id="s-pratiche" class="screen">
-  <div class="filter-row">
-    <button class="filter-btn active" id="fp-tutte" onclick="filterPrat('tutte')">Tutte</button>
-    <button class="filter-btn inactive" id="fp-richiesta" onclick="filterPrat('richiesta')">In attesa</button>
-    <button class="filter-btn inactive" id="fp-completato" onclick="filterPrat('completato')">Completate</button>
+<!-- PRATICHE -->
+<div id="p-prat" class="pg">
+  <div class="frow">
+    <button class="fb on" id="fp-tutte" onclick="filtraPrat('tutte')">Tutte</button>
+    <button class="fb off" id="fp-rich" onclick="filtraPrat('richiesta')">In attesa</button>
+    <button class="fb off" id="fp-lav" onclick="filtraPrat('lavorazione')">In lavorazione</button>
+    <button class="fb off" id="fp-comp" onclick="filtraPrat('completato')">Completate</button>
   </div>
-  <div id="lista-pratiche"><div class="info">Caricamento...</div></div>
+  <div id="l-prat"><div class="info">Caricamento...</div></div>
 </div>
 
-<div id="s-chat" class="screen">
-  <div id="lista-chat"><div class="info">Caricamento...</div></div>
+<!-- CHAT -->
+<div id="p-chat" class="pg">
+  <div id="l-chat"><div class="info">Caricamento...</div></div>
 </div>
 
-<div id="s-slot" class="screen">
-  <div class="card">
-    <div class="card-body">
-      <div class="sec-title">GIORNI DI RICEVIMENTO</div>
-      <div class="giorni-row" id="giorni-row"></div>
-      <div style="font-size:11px;color:#8A8A8A">I giorni attivi si ripetono ogni settimana, salvo chiusure.</div>
+<!-- SLOT -->
+<div id="p-slot" class="pg">
+  <div class="card"><div class="cb">
+    <div class="sec">GIORNI DI RICEVIMENTO</div>
+    <div class="grow" id="slot-giorni"></div>
+    <div style="font-size:11px;color:#8A8A8A">I giorni attivi si ripetono ogni settimana, salvo chiusure.</div>
+  </div></div>
+  <div class="card"><div class="cb">
+    <div class="sec">ORARI (ogni 30 min)</div>
+    <div class="sg" id="slot-orari"></div>
+  </div></div>
+  <div class="card"><div class="cb">
+    <div class="sec">PERIODI DI CHIUSURA</div>
+    <div id="slot-chiusure"></div>
+    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+      <input type="text" class="inp" id="ch-lbl" placeholder="Descrizione" style="flex:3;margin-bottom:0"/>
+      <input type="text" class="inp" id="ch-dal" placeholder="dal gg/mm/aa" style="flex:2;margin-bottom:0"/>
+      <input type="text" class="inp" id="ch-al" placeholder="al gg/mm/aa" style="flex:2;margin-bottom:0"/>
+      <button onclick="addChiusura()" style="flex-shrink:0;padding:8px 14px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">＋</button>
     </div>
-  </div>
-  <div class="card">
-    <div class="card-body">
-      <div class="sec-title">ORARI (ogni 30 min)</div>
-      <div class="slot-grid" id="orari-grid"></div>
+  </div></div>
+  <div class="card"><div class="cb">
+    <div class="sec">GIORNI SINGOLI BLOCCATI</div>
+    <div id="slot-bloccati"></div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <input type="text" class="inp" id="blocco-d" placeholder="gg/mm/aaaa" style="flex:1;margin-bottom:0"/>
+      <button onclick="addBlocco()" style="padding:8px 14px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">＋</button>
     </div>
-  </div>
-  <div class="card">
-    <div class="card-body">
-      <div class="sec-title">PERIODI DI CHIUSURA</div>
-      <div id="chiusure-list"></div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input type="text" id="ch-label" placeholder='Descrizione es. "Ferie agosto"' style="flex:2;margin-bottom:0"/>
-        <input type="text" id="ch-dal" placeholder="dal gg/mm/aa" style="flex:1;margin-bottom:0"/>
-        <input type="text" id="ch-al" placeholder="al gg/mm/aa" style="flex:1;margin-bottom:0"/>
-      </div>
-      <button class="btn-small btn-small-orange" style="margin-top:8px;padding:8px 16px" onclick="addChiusura()">＋ Aggiungi chiusura</button>
-    </div>
-  </div>
-  <div class="card">
-    <div class="card-body">
-      <div class="sec-title">GIORNI SINGOLI BLOCCATI</div>
-      <div id="bloccati-list"></div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input type="text" id="blocco-data" placeholder="gg/mm/aaaa" style="flex:1;margin-bottom:0"/>
-        <button class="btn-small btn-small-orange" onclick="addBlocco()">＋</button>
-      </div>
-    </div>
-  </div>
-  <div class="info" style="margin-top:8px">⚡️ Le prenotazioni già confermate non vengono cancellate automaticamente.</div>
-  <button class="btn-primary" style="margin-top:4px" onclick="saveSlot()">Salva tutte le impostazioni</button>
-  <div id="slot-ok" class="success" style="display:none;margin-top:8px">✅ Impostazioni salvate!</div>
+  </div></div>
+  <div class="info">⚡️ Le prenotazioni già confermate non vengono cancellate automaticamente.</div>
+  <button class="bp" onclick="salvaSlot()" style="margin-top:4px">Salva tutte le impostazioni</button>
+  <div class="infog" id="slot-ok" style="display:none;margin-top:8px">✅ Impostazioni salvate!</div>
+  <div class="card" style="margin-top:16px"><div class="cb">
+    <div class="sec">🔑 CAMBIO PASSWORD ADMIN</div>
+    <label class="lbl">Password attuale</label><input type="password" class="inp" id="acp-old" placeholder="••••••••"/>
+    <label class="lbl">Nuova password (min. 8 caratteri)</label><input type="password" class="inp" id="acp-new" placeholder="••••••••"/>
+    <label class="lbl">Conferma nuova password</label><input type="password" class="inp" id="acp-new2" placeholder="••••••••"/>
+    <div style="background:#FDEEEC;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#C0392B;display:none" id="acp-err"></div>
+    <div class="infog" id="acp-ok" style="display:none">✅ Password aggiornata!</div>
+    <button class="bp" style="background:#0D1B2A" onclick="cambiaPwdAdmin()">Aggiorna password admin</button>
+  </div></div>
 </div>
 
-<!-- OVERLAY DETTAGLIO PRENOTAZIONE -->
-<div id="overlay-pren" class="overlay">
-  <div class="overlay-header">
-    <div>
-      <div style="color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.1em">APPUNTAMENTO</div>
-      <div style="color:#fff;font-size:15px;font-weight:700" id="op-title">—</div>
-    </div>
-    <button class="btn-exit" onclick="closeOverlay('overlay-pren')">← Chiudi</button>
+<!-- OV: DETTAGLIO PRENOTAZIONE -->
+<div id="ov-pren" class="ov">
+  <div class="oh">
+    <div><div class="ohlbl">APPUNTAMENTO</div><div class="ohttl" id="op-ttl"></div></div>
+    <button style="background:none;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer" onclick="chiudi('ov-pren')">← Chiudi</button>
   </div>
   <div style="padding:16px">
-    <div class="card"><div class="card-body">
-      <div class="sec-title">DATI APPUNTAMENTO</div>
-      <div class="field-label">Data e ora</div><div class="field-value" id="op-data">—</div>
-      <div class="field-label">Stato</div><div class="field-value" id="op-stato">—</div>
+    <div class="card"><div class="cb">
+      <div class="sec">APPUNTAMENTO</div>
+      <div class="lbl">Data e ora</div><div class="val" id="op-data"></div>
+      <div class="lbl">Stato</div><div class="val" id="op-stato"></div>
     </div></div>
-    <div class="card"><div class="card-body">
-      <div class="sec-title">DATI SOCIO</div>
-      <div class="field-label">Nome</div><div class="field-value" id="op-nome">—</div>
-      <div class="field-label">Email</div><div class="field-value" id="op-email">—</div>
-      <div class="field-label">Telefono</div><div class="field-value" id="op-tel">—</div>
-      <div class="field-label">Motivo</div><div class="field-value" id="op-motivo">—</div>
+    <div class="card"><div class="cb">
+      <div class="sec">DATI SOCIO</div>
+      <div class="lbl">Nome</div><div class="val" id="op-nome"></div>
+      <div class="lbl">Email</div><div class="val" id="op-email"></div>
+      <div class="lbl">Telefono</div><div class="val" id="op-tel"></div>
+      <div class="lbl">Motivo</div><div class="val" id="op-motivo"></div>
     </div></div>
-    <button class="btn-primary" style="background:#C0392B" onclick="cancelPren()">Cancella appuntamento</button>
-    <div id="op-ok" class="success" style="display:none;margin-top:8px">✅ Appuntamento cancellato</div>
+    <div class="infog" id="op-ok" style="display:none">✅ Appuntamento cancellato</div>
+    <button class="bp" style="background:#C0392B" id="op-canc-btn" onclick="cancellaPren()">Cancella appuntamento</button>
   </div>
 </div>
 
-<!-- OVERLAY DETTAGLIO PRATICA -->
-<div id="overlay-prat" class="overlay">
-  <div class="overlay-header">
-    <div>
-      <div style="color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.1em" id="pp-id">PRATICA</div>
-      <div style="color:#fff;font-size:15px;font-weight:700" id="pp-nome">—</div>
-    </div>
-    <button class="btn-exit" onclick="closeOverlay('overlay-prat')">← Chiudi</button>
+<!-- OV: DETTAGLIO PRATICA -->
+<div id="ov-prat" class="ov">
+  <div class="oh">
+    <div><div class="ohlbl" id="opr-lbl">PRATICA</div><div class="ohttl" id="opr-ttl"></div></div>
+    <button style="background:none;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer" onclick="chiudi('ov-prat')">← Chiudi</button>
   </div>
-  <div class="tab-row">
-    <button class="tab-btn active" id="tab-dati" onclick="switchPratTab('dati')">📋 Dati</button>
-    <button class="tab-btn" id="tab-chat-prat" onclick="switchPratTab('chat')">💬 Chat</button>
+  <div class="tabrow">
+    <button class="tabbtn on" id="tab-dati" onclick="switchTab('dati')">📋 Dati</button>
+    <button class="tabbtn" id="tab-chat" onclick="switchTab('chat')">💬 Chat</button>
   </div>
-  <div id="pp-dati" style="padding:16px">
-    <div class="card"><div class="card-body">
-      <div class="sec-title">TIPO CONTRATTO</div>
-      <div class="field-value" id="pp-tipo">—</div>
-      <div class="field-label">Stato</div><div class="field-value" id="pp-stato">—</div>
+  <!-- TAB DATI -->
+  <div id="tab-dati-body" style="padding:16px">
+    <div class="card"><div class="cb">
+      <div class="sec">TIPO E STATO</div>
+      <div id="opr-modificato" style="display:none;background:#FDF0E8;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#E8631A;font-weight:700">
+        ⚠️ Questo contratto è stato modificato dal socio il <span id="opr-data-mod"></span>
+      </div>
+      <div class="lbl">Nome contratto</div><div class="val" id="opr-nome-cnt" style="font-family:monospace;font-size:13px"></div>
+      <div class="lbl">Tipo</div><div class="val" id="opr-tipo"></div>
+      <div class="lbl">Stato attuale</div><div class="val" id="opr-stato"></div>
+      <label class="lbl">Aggiorna stato</label>
+      <select class="inp" id="opr-stato-sel">
+        <option value="richiesta">In attesa</option>
+        <option value="lavorazione">In lavorazione</option>
+        <option value="completato">Completato</option>
+      </select>
+      <button class="bp" onclick="aggiornaPrat()">Aggiorna stato</button>
+      <div class="infog" id="opr-ok" style="display:none;margin-top:8px">✅ Stato aggiornato!</div>
     </div></div>
-    <div class="card"><div class="card-body">
-      <div class="sec-title">LOCATORI</div>
-      <div id="pp-locatori">—</div>
+    <div class="card"><div class="cb">
+      <div class="sec">DURATA E CANONE</div>
+      <div class="lbl">Dal</div><div class="val" id="opr-dal"></div>
+      <div class="lbl">Al</div><div class="val" id="opr-al"></div>
+      <div class="lbl">Canone mensile</div><div class="val" id="opr-canone"></div>
+      <div class="lbl">Deposito</div><div class="val" id="opr-dep"></div>
     </div></div>
-    <div class="card"><div class="card-body">
-      <div class="sec-title">CONDUTTORI</div>
-      <div id="pp-conduttori">—</div>
+    <div class="card"><div class="cb">
+      <div class="sec">LOCATORI</div>
+      <div id="opr-locs"></div>
     </div></div>
-    <div class="card"><div class="card-body">
-      <div class="sec-title">DURATA E CANONE</div>
-      <div class="field-label">Dal</div><div class="field-value" id="pp-dal">—</div>
-      <div class="field-label">Al</div><div class="field-value" id="pp-al">—</div>
-      <div class="field-label">Canone mensile</div><div class="field-value" id="pp-canone">—</div>
-      <div class="field-label">Deposito</div><div class="field-value" id="pp-deposito">—</div>
-    </div></div>
-    <div class="card"><div class="card-body">
-      <div class="sec-title">AGGIORNA STATO</div>
-      <select id="pp-stato-select"><option value="richiesta">In attesa</option><option value="lavorazione">In lavorazione</option><option value="completato">Completato</option></select>
-      <button class="btn-primary" onclick="updateStatoPratica()">Aggiorna stato</button>
-      <div id="pp-ok" class="success" style="display:none;margin-top:8px">✅ Stato aggiornato!</div>
+    <div class="card"><div class="cb">
+      <div class="sec">CONDUTTORI</div>
+      <div id="opr-cons"></div>
     </div></div>
   </div>
-  <div id="pp-chat" style="display:none;padding:16px">
-    <div class="chat-area" id="pp-chat-msgs"></div>
-    <div class="chat-input-row">
-      <input type="text" id="pp-chat-input" placeholder="Rispondi al socio..." onkeydown="if(event.key==='Enter')sendChatMsg()"/>
-      <button class="chat-send" onclick="sendChatMsg()">›</button>
+  <!-- TAB CHAT -->
+  <div id="tab-chat-body" style="display:none">
+    <div class="cms" id="admin-msgs"></div>
+    <div class="ci">
+      <input type="text" class="inp" id="admin-chat-inp" placeholder="Rispondi al socio..." style="margin-bottom:0" onkeydown="if(event.key==='Enter')adminSendMsg()"/>
+      <button class="cs" onclick="adminSendMsg()">›</button>
     </div>
   </div>
 </div>
 
 <!-- BOTTOM NAV -->
-<div class="bottomnav">
-  <button class="navbtn active" id="nav-home" onclick="showScreen('home')">
-    <span class="icon">📊</span><span class="lbl">Home</span>
-  </button>
-  <button class="navbtn" id="nav-prenotazioni" onclick="showScreen('prenotazioni')">
-    <span class="icon">📅</span><span class="lbl">Prenotaz.</span>
-  </button>
-  <button class="navbtn" id="nav-pratiche" onclick="showScreen('pratiche')">
-    <span class="icon">📋</span><span class="lbl">Pratiche</span>
-  </button>
-  <button class="navbtn" id="nav-chat" onclick="showScreen('chat')">
-    <span class="icon">💬</span><span class="lbl">Chat</span>
-  </button>
-  <button class="navbtn" id="nav-slot" onclick="showScreen('slot')">
-    <span class="icon">🗓️</span><span class="lbl">Slot</span>
-  </button>
+<div class="nav">
+  <button class="nb on" id="nb-home" onclick="nav('home')"><span>📊</span><span>Home</span></button>
+  <button class="nb" id="nb-pren" onclick="nav('pren')"><span>📅</span><span>Prenotaz.</span></button>
+  <button class="nb" id="nb-prat" onclick="nav('prat')"><span>📋</span><span>Pratiche</span></button>
+  <button class="nb" id="nb-chat" onclick="nav('chat')"><span>💬</span><span>Chat</span></button>
+  <button class="nb" id="nb-slot" onclick="nav('slot')"><span>🗓️</span><span>Slot</span></button>
 </div>
 
 <script>
 const API = "https://rough-resonance-cba6.asppilaquila.workers.dev";
-const ADMIN_TOKEN = "ASPPI_ADMIN_asppi2025laquila";
 
-let DATA = { prenotazioni:[], contratti:[], utenti:[], chat:[], chiusure:[], slot:{giorni:[],orari:[]} };
-let currentPratId = null;
-let currentPrenId = null;
-let slotGiorni = new Set(['Lun','Mar','Gio','Ven']);
-let slotOrari  = new Set(['09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00']);
-let bloccati   = [];
-
-// ── INIT ─────────────────────────────────────────────────────
-window.addEventListener('load', async () => {
-  // Verifica auth
-  const adminPwd = localStorage.getItem('asppi_admin_custom_pwd') || 'Asppi2025!';
-  const stored   = localStorage.getItem('asppi_admin_ok');
-  if (stored !== 'yes') { window.location.href = 'index.html'; return; }
-  await loadAll();
-  initSlot();
-});
-
-async function api(action, data) {
-  try {
-    const payload = JSON.stringify({action, token: ADMIN_TOKEN, ...data});
-    const res = await fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' },
-      body: payload,
-      redirect: 'follow',
-    });
-    const text = await res.text();
-    try { return JSON.parse(text); }
-    catch(e) { return {ok:false, error:'Risposta non valida dal server'}; }
-  } catch(e) {
-    return {ok:false, error:'Errore di connessione. Controlla la rete.'};
+function fmtDate(d) {
+  if(!d) return '—';
+  if(d.includes('T')) {
+    const parts = d.substring(0,10).split('-');
+    return parts[2]+'/'+parts[1]+'/'+parts[0];
   }
+  return d;
 }
 
-async function loadAll() {
-  const res = await api('adminGetAll');
-  if (!res.ok) { console.error(res.error); return; }
-  DATA = res;
-  renderHome();
-  renderPrenotazioni('tutte');
-  renderPratiche('tutte');
-  renderChat();
-  loadSlot();
+function nomeContratto(c) {
+  if(c.nomeContratto) return c.nomeContratto;
+  try {
+    const locs = JSON.parse(c.locatoriJSON||'[]');
+    const cons  = JSON.parse(c.conduttoriJSON||'[]');
+    const cogL = locs[0]?.cognome||locs[0]?.nome||'Locatore';
+    const cogC = cons[0]?.cognome||cons[0]?.nome||'Conduttore';
+    return 'CNT_'+cogL+'_'+cogC;
+  } catch(e) { return c.tipo||'Contratto'; }
+}
+const ATOKEN = "ASPPI_ADMIN_asppi2025laquila";
+let D = {prenotazioni:[],contratti:[],utenti:[],chat:[],chiusure:[],slot:{giorni:[],orari:[]}};
+let curPrenId = null, curPratId = null, curChatId = null;
+let sGiorni = new Set(['Lun','Mar','Gio','Ven']);
+let sOrari = new Set(['09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00']);
+let bloccati = [];
+
+window.onload = async function() {
+  if(localStorage.getItem('asppi_admin_ok')!=='yes'){window.location.replace('index.html');return;}
+  await carica();
+  initSlot();
+};
+
+async function call(action,data){
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action,token:ATOKEN,...data}),redirect:'follow'});
+    const t=await r.text();
+    try{return JSON.parse(t);}catch(e){return{ok:false,error:'Risposta non valida: '+t.substring(0,100)};}
+  }catch(e){return{ok:false,error:'Errore connessione: '+e.message};}
 }
 
-// ── NAVIGATION ───────────────────────────────────────────────
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'));
-  document.getElementById('s-' + name).classList.add('active');
-  document.getElementById('nav-' + name).classList.add('active');
+async function carica(){
+  const r=await call('adminGetAll');
+  if(!r.ok){alert('Errore caricamento: '+r.error);return;}
+  D.prenotazioni=r.prenotazioni||[];
+  D.contratti=r.contratti||[];
+  D.utenti=r.utenti||[];
+  D.chat=r.chat||[];
+  D.chiusure=r.chiusure||[];
+  if(r.slot){sGiorni=new Set(r.slot.giorni||[]);sOrari=new Set(r.slot.orari||[]);}
+  renderHome();renderPren('tutte');renderPrat('tutte');renderChat();
 }
 
-function closeOverlay(id) {
-  document.getElementById(id).classList.remove('active');
+function nav(id){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.getElementById('p-'+id).classList.add('on');
+  document.getElementById('nb-'+id).classList.add('on');
+  window.scrollTo(0,0);
 }
 
-function openOverlay(id) {
-  document.getElementById(id).classList.add('active');
-  document.getElementById(id).scrollTop = 0;
-}
+function apri(id){document.getElementById(id).classList.add('on');document.getElementById(id).scrollTop=0;}
+function chiudi(id){document.getElementById(id).classList.remove('on');}
 
-function esci() {
+function esci(){
   localStorage.removeItem('asppi_admin_ok');
-  window.location.href = 'index.html';
+  localStorage.removeItem('asppi_admin_pwd');
+  window.location.replace('index.html');
 }
 
-// ── HOME ─────────────────────────────────────────────────────
-function oggi() {
-  return new Date().toLocaleDateString('it-IT',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'});
+function statoLbl(s){return s==='completato'?'Completato':s==='lavorazione'?'In lavorazione':'In attesa';}
+function statoCol(s){return s==='completato'?'#2D7A4F':s==='lavorazione'?'#1A5FA8':'#E8631A';}
+
+// ── HOME ──────────────────────────────────────────────────────
+function renderHome(){
+  document.getElementById('sh-app').textContent=D.prenotazioni.filter(p=>p.stato==='confermata').length;
+  document.getElementById('sh-att').textContent=D.contratti.filter(c=>c.stato==='richiesta').length;
+  document.getElementById('sh-soc').textContent=D.utenti.length;
+
+  const hp=document.getElementById('h-prens');
+  const prens=D.prenotazioni.filter(p=>p.stato==='confermata').slice(0,3);
+  hp.innerHTML=!prens.length?'<div class="info">Nessun appuntamento confermato.</div>'
+    :prens.map(p=>cardPren(p)).join('');
+
+  const hpr=document.getElementById('h-prats');
+  hpr.innerHTML=!D.contratti.length?'<div class="info">Nessuna pratica ancora.</div>'
+    :D.contratti.slice(0,3).map(c=>cardPrat(c)).join('');
 }
 
-function renderHome() {
-  const oggiStr = oggi();
-  const preOggi = DATA.prenotazioni.filter(p => p.data && p.stato === 'confermata');
-  const inAttesa = DATA.contratti.filter(c => c.stato === 'richiesta');
-  document.getElementById('stat-oggi').textContent  = preOggi.length;
-  document.getElementById('stat-chat').textContent  = inAttesa.length;
-  document.getElementById('stat-soci').textContent  = DATA.utenti.length;
-
-  // Prenotazioni oggi
-  const hp = document.getElementById('home-prenotazioni');
-  if (!preOggi.length) { hp.innerHTML = '<div class="info">Nessun appuntamento oggi.</div>'; }
-  else hp.innerHTML = preOggi.slice(0,3).map(p => cardPren(p)).join('');
-
-  // Pratiche recenti
-  const hpr = document.getElementById('home-pratiche');
-  if (!DATA.contratti.length) { hpr.innerHTML = '<div class="info">Nessuna pratica ancora.</div>'; }
-  else hpr.innerHTML = DATA.contratti.slice(0,3).map(c => cardPrat(c)).join('');
-}
-
-// ── PRENOTAZIONI ─────────────────────────────────────────────
-function cardPren(p) {
-  const color = p.stato==='confermata' ? '#2D7A4F' : '#8A8A8A';
-  return `<div class="card card-row" onclick="openPren('${p.id}')" style="border-left-color:${color};cursor:pointer">
-    <div class="card-body">
+// ── PRENOTAZIONI ──────────────────────────────────────────────
+function cardPren(p){
+  const col=p.stato==='cancellata'?'#8A8A8A':'#2D7A4F';
+  return `<div class="row" onclick="apriPren('${p.id}')">
+    <div class="bar" style="background:${col}"></div>
+    <div class="rb">
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <div class="card-title">${p.nomeUtente||'—'}</div>
+        <div class="rt">${p.nomeUtente||'—'}</div>
         <div style="font-size:15px;font-weight:800;color:#E8631A">${p.ora||'—'}</div>
       </div>
-      <div class="card-sub">${p.motivo||''} · ${p.data||''}</div>
-    </div>
-    <div class="card-arrow">›</div>
+      <div class="rs">${p.motivo||''} · ${p.data||''}</div>
+    </div><div class="ra">›</div>
   </div>`;
 }
 
-function renderPrenotazioni(filtro) {
-  let list = DATA.prenotazioni || [];
-  if (filtro === 'oggi')      list = list.filter(p => p.stato === 'confermata');
-  if (filtro === 'cancellate') list = list.filter(p => p.stato === 'cancellata');
-  const el = document.getElementById('lista-prenotazioni');
-  if (!list.length) { el.innerHTML = '<div class="info">Nessuna prenotazione trovata.</div>'; return; }
-  el.innerHTML = list.map(p => cardPren(p)).join('');
+function renderPren(f){
+  let list=D.prenotazioni;
+  if(f!=='tutte') list=list.filter(p=>p.stato===f);
+  document.getElementById('l-pren').innerHTML=!list.length?'<div class="info">Nessuna prenotazione.</div>':list.map(p=>cardPren(p)).join('');
 }
 
-function filterPren(f) {
-  ['tutte','oggi','domani','cancellate'].forEach(x => {
-    document.getElementById('f-'+x).className = 'filter-btn ' + (x===f?'active':'inactive');
-  });
-  renderPrenotazioni(f);
+function filtraPren(f){
+  ['tutte','conf','canc'].forEach(x=>document.getElementById('f-'+x).className='fb off');
+  document.getElementById('f-'+f).className='fb on';
+  const map={'tutte':'tutte','conf':'confermata','canc':'cancellata'};
+  renderPren(map[f]||f);
 }
 
-function openPren(id) {
-  const p = DATA.prenotazioni.find(x => x.id === id);
-  if (!p) return;
-  currentPrenId = id;
-  document.getElementById('op-title').textContent  = p.nomeUtente || '—';
-  document.getElementById('op-data').textContent   = (p.data||'—') + ' ore ' + (p.ora||'—');
-  document.getElementById('op-stato').textContent  = p.stato || '—';
-  document.getElementById('op-nome').textContent   = p.nomeUtente || '—';
-  document.getElementById('op-email').textContent  = p.emailUtente || '—';
-  document.getElementById('op-tel').textContent    = p.telUtente || '—';
-  document.getElementById('op-motivo').textContent = p.motivo || '—';
-  document.getElementById('op-ok').style.display   = 'none';
-  openOverlay('overlay-pren');
+function apriPren(id){
+  const p=D.prenotazioni.find(x=>x.id===id);if(!p)return;
+  curPrenId=id;
+  document.getElementById('op-ttl').textContent=p.nomeUtente||'—';
+  document.getElementById('op-data').textContent=(p.data||'—')+' ore '+(p.ora||'—');
+  document.getElementById('op-stato').textContent=p.stato==='confermata'?'✅ Confermata':'❌ Cancellata';
+  document.getElementById('op-nome').textContent=p.nomeUtente||'—';
+  document.getElementById('op-email').textContent=p.emailUtente||'—';
+  document.getElementById('op-tel').textContent=p.telUtente||'—';
+  document.getElementById('op-motivo').textContent=p.motivo||'—';
+  document.getElementById('op-ok').style.display='none';
+  document.getElementById('op-canc-btn').style.display=p.stato==='cancellata'?'none':'';
+  apri('ov-pren');
 }
 
-async function cancelPren() {
-  if (!currentPrenId) return;
-  const res = await api('cancelPrenotazione', {id: currentPrenId});
-  if (res.ok) {
-    document.getElementById('op-ok').style.display = '';
-    await loadAll();
-  }
+async function cancellaPren(){
+  const r=await call('cancelPrenotazione',{id:curPrenId});
+  if(r.ok){document.getElementById('op-ok').style.display='';document.getElementById('op-canc-btn').style.display='none';await carica();}
+  else alert('Errore: '+r.error);
 }
 
 // ── PRATICHE ─────────────────────────────────────────────────
-function statoColor(s) {
-  if (s==='richiesta')   return '#E8631A';
-  if (s==='lavorazione') return '#1A5FA8';
-  if (s==='completato')  return '#2D7A4F';
-  return '#8A8A8A';
-}
-function statoLabel(s) {
-  if (s==='richiesta')   return 'In attesa';
-  if (s==='lavorazione') return 'In lavorazione';
-  if (s==='completato')  return 'Completato';
-  return s;
+function parseLocs(json){
+  try{
+    const a=JSON.parse(json||'[]');
+    if(!a.length)return '<div class="val">—</div>';
+    return a.map((p,i)=>`<div style="background:#F8F7F5;border-radius:10px;padding:12px;margin-bottom:8px">
+      <div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:6px">N°${i+1}</div>
+      <div class="lbl">Nome</div><div class="val">${p.cognome||''} ${p.nome||''}</div>
+      <div class="lbl">CF</div><div class="val" style="font-family:monospace">${p.cf||'—'}</div>
+      ${p.quota?`<div class="lbl">Quota</div><div class="val">${p.quota}%</div>`:''}
+    </div>`).join('');
+  }catch(e){return '<div class="val">—</div>';}
 }
 
-function cardPrat(c) {
-  const color = statoColor(c.stato);
-  const nomeLocatore = (() => { try { const l=JSON.parse(c.locatoriJSON||'[]'); return l[0]?l[0].nome+' '+l[0].cognome:'—'; } catch(e){return '—';} })();
-  return `<div class="card card-row" onclick="openPrat('${c.id}')" style="border-left-color:${color};cursor:pointer">
-    <div class="card-body">
+function cardPrat(c){
+  const col=statoCol(c.stato);
+  let nome='—';
+  try{const l=JSON.parse(c.locatoriJSON||'[]');if(l[0])nome=(l[0].cognome||'')+' '+(l[0].nome||'');}catch(e){}
+  return `<div class="row" onclick="apriPrat('${c.id}')">
+    <div class="bar" style="background:${col}"></div>
+    <div class="rb">
       <div style="display:flex;justify-content:space-between">
-        <div class="card-title">${nomeLocatore}</div>
-        <span class="badge" style="color:${color};background:${color}22">${statoLabel(c.stato)}</span>
+        <div class="rt">${nome}</div>
+        <span class="bdg" style="color:${col};background:${col}22">${statoLbl(c.stato)}</span>
       </div>
-      <div class="card-sub">${c.tipo||'—'} · ${c.dataRichiesta?c.dataRichiesta.substring(0,10):''}</div>
-    </div>
-    <div class="card-arrow">›</div>
+      <div class="rs">${nomeContratto(c)} · ${c.dataRichiesta?c.dataRichiesta.substring(0,10):''}</div>
+    </div><div class="ra">›</div>
   </div>`;
 }
 
-function renderPratiche(filtro) {
-  let list = DATA.contratti || [];
-  if (filtro !== 'tutte') list = list.filter(c => c.stato === filtro);
-  const el = document.getElementById('lista-pratiche');
-  if (!list.length) { el.innerHTML = '<div class="info">Nessuna pratica trovata.</div>'; return; }
-  el.innerHTML = list.map(c => cardPrat(c)).join('');
+function renderPrat(f){
+  let list=D.contratti;
+  if(f!=='tutte') list=list.filter(c=>c.stato===f);
+  document.getElementById('l-prat').innerHTML=!list.length?'<div class="info">Nessuna pratica trovata.</div>':list.map(c=>cardPrat(c)).join('');
 }
 
-function filterPrat(f) {
-  ['tutte','richiesta','completato'].forEach(x => {
-    document.getElementById('fp-'+x).className = 'filter-btn ' + (x===f?'active':'inactive');
-  });
-  renderPratiche(f);
+function filtraPrat(f){
+  ['tutte','rich','lav','comp'].forEach(x=>document.getElementById('fp-'+x).className='fb off');
+  const map={tutte:'fp-tutte',richiesta:'fp-rich',lavorazione:'fp-lav',completato:'fp-comp'};
+  if(map[f]) document.getElementById(map[f]).className='fb on';
+  renderPrat(f);
 }
 
-function parsePeople(json) {
-  try {
-    const arr = JSON.parse(json || '[]');
-    if (!arr.length) return '<div class="field-value">—</div>';
-    return arr.map((p,i) => `
-      <div style="background:#F8F7F5;border-radius:10px;padding:12px;margin-bottom:8px">
-        <div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:6px">N° ${i+1}</div>
-        <div class="field-label">Nome</div><div class="field-value">${p.nome||''} ${p.cognome||''}</div>
-        <div class="field-label">CF</div><div class="field-value" style="font-family:monospace">${p.cf||'—'}</div>
-        ${p.quota?`<div class="field-label">Quota</div><div class="field-value">${p.quota}%</div>`:''}
-      </div>`).join('');
-  } catch(e) { return '<div class="field-value">—</div>'; }
-}
-
-function openPrat(id) {
-  const c = DATA.contratti.find(x => x.id === id);
-  if (!c) return;
-  currentPratId = id;
-  document.getElementById('pp-id').textContent    = 'PRATICA ' + id;
-  document.getElementById('pp-nome').textContent  = (() => { try{const l=JSON.parse(c.locatoriJSON||'[]');return l[0]?l[0].nome+' '+l[0].cognome:'—';}catch(e){return '—';}})();
-  document.getElementById('pp-tipo').textContent  = c.tipo || '—';
-  document.getElementById('pp-stato').textContent = statoLabel(c.stato);
-  document.getElementById('pp-locatori').innerHTML   = parsePeople(c.locatoriJSON);
-  document.getElementById('pp-conduttori').innerHTML = parsePeople(c.conduttoriJSON);
-  document.getElementById('pp-dal').textContent     = c.duraDal || '—';
-  document.getElementById('pp-al').textContent      = c.duraAl  || '—';
-  document.getElementById('pp-canone').textContent  = c.canoneMensile ? '€ ' + c.canoneMensile + '/mese' : '—';
-  document.getElementById('pp-deposito').textContent = c.depositoImporto ? '€ ' + c.depositoImporto : '—';
-  document.getElementById('pp-stato-select').value  = c.stato || 'richiesta';
-  document.getElementById('pp-ok').style.display    = 'none';
-  // Reset tab
-  switchPratTab('dati');
-  openOverlay('overlay-prat');
-}
-
-function switchPratTab(tab) {
-  document.getElementById('pp-dati').style.display      = tab==='dati' ? '' : 'none';
-  document.getElementById('pp-chat').style.display      = tab==='chat' ? '' : 'none';
-  document.getElementById('tab-dati').classList.toggle('active', tab==='dati');
-  document.getElementById('tab-chat-prat').classList.toggle('active', tab==='chat');
-  if (tab==='chat') loadPratChat();
-}
-
-async function loadPratChat() {
-  const msgs = (DATA.chat||[]).filter(m => m.contrattoId === currentPratId);
-  const el = document.getElementById('pp-chat-msgs');
-  if (!msgs.length) { el.innerHTML = '<div class="info">Nessun messaggio ancora.</div>'; return; }
-  el.innerHTML = msgs.map(m => `
-    <div class="${m.mittente==='socio'?'bubble bubble-socio':'bubble bubble-admin'}">${m.testo}</div>
-    <div class="bubble-time" style="align-self:${m.mittente==='socio'?'flex-start':'flex-end'}">${m.nomeUtente||''} · ${m.timestamp?m.timestamp.substring(11,16):''}</div>
-  `).join('');
-  el.scrollTop = el.scrollHeight;
-}
-
-async function sendChatMsg() {
-  const testo = document.getElementById('pp-chat-input').value.trim();
-  if (!testo || !currentPratId) return;
-  document.getElementById('pp-chat-input').value = '';
-  const res = await api('sendMessage', { contrattoId: currentPratId, testo });
-  if (res.ok) { await loadAll(); loadPratChat(); }
-}
-
-async function updateStatoPratica() {
-  const stato = document.getElementById('pp-stato-select').value;
-  const c = DATA.contratti.find(x => x.id === currentPratId);
-  if (!c) return;
-  c.stato = stato;
-  const res = await api('saveContratto', { data: c });
-  if (res.ok) {
-    document.getElementById('pp-ok').style.display = '';
-    document.getElementById('pp-stato').textContent = statoLabel(stato);
-    await loadAll();
+function apriPrat(id){
+  const c=D.contratti.find(x=>x.id===id);if(!c)return;
+  curPratId=id; curChatId=id;
+  let nome='—';
+  try{const l=JSON.parse(c.locatoriJSON||'[]');if(l[0])nome=(l[0].cognome||'')+' '+(l[0].nome||'');}catch(e){}
+  document.getElementById('opr-lbl').textContent='PRATICA '+id;
+  document.getElementById('opr-ttl').textContent=nomeContratto(c);
+  document.getElementById('opr-nome-cnt').textContent=nomeContratto(c);
+  document.getElementById('opr-tipo').textContent=c.tipo||'—';
+  document.getElementById('opr-stato').textContent=statoLbl(c.stato);
+  // Mostra avviso se modificato
+  const modDiv = document.getElementById('opr-modificato');
+  if(c.modificato) {
+    const dataM = fmtDate(c.modificato);
+    document.getElementById('opr-data-mod').textContent = dataM;
+    modDiv.style.display = '';
+  } else {
+    modDiv.style.display = 'none';
   }
+  document.getElementById('opr-stato-sel').value=c.stato||'richiesta';
+  document.getElementById('opr-dal').textContent=fmtDate(c.duraDal);
+  document.getElementById('opr-al').textContent=fmtDate(c.duraAl);
+  document.getElementById('opr-canone').textContent=c.canoneMensile?'€ '+c.canoneMensile+'/mese':'—';
+  document.getElementById('opr-dep').textContent=c.depositoImporto?'€ '+c.depositoImporto:'—';
+  document.getElementById('opr-locs').innerHTML=parseLocs(c.locatoriJSON);
+  document.getElementById('opr-cons').innerHTML=parseLocs(c.conduttoriJSON);
+  document.getElementById('opr-ok').style.display='none';
+  switchTab('dati');
+  apri('ov-prat');
 }
 
-// ── CHAT LIST ─────────────────────────────────────────────────
-function renderChat() {
-  const el = document.getElementById('lista-chat');
-  const contratti = DATA.contratti || [];
-  if (!contratti.length) { el.innerHTML = '<div class="info">Nessuna conversazione ancora.</div>'; return; }
-  el.innerHTML = contratti.map(c => {
-    const msgs = (DATA.chat||[]).filter(m => m.contrattoId === c.id);
-    const last = msgs[msgs.length-1];
-    const unread = msgs.filter(m => m.mittente==='socio' && !m.letto).length;
-    const nomeLocatore = (() => { try{const l=JSON.parse(c.locatoriJSON||'[]');return l[0]?l[0].nome+' '+l[0].cognome:'—';}catch(e){return '—';}})();
-    return `<div class="card card-row" onclick="openChatFromList('${c.id}')" style="cursor:pointer">
-      <div class="card-body" style="display:flex;align-items:center;gap:12px">
+function switchTab(t){
+  document.getElementById('tab-dati-body').style.display=t==='dati'?'':'none';
+  document.getElementById('tab-chat-body').style.display=t==='chat'?'':'none';
+  document.getElementById('tab-dati').classList.toggle('on',t==='dati');
+  document.getElementById('tab-chat').classList.toggle('on',t==='chat');
+  if(t==='chat') caricaMsgsAdmin();
+}
+
+async function aggiornaPrat(){
+  const c=D.contratti.find(x=>x.id===curPratId);if(!c)return;
+  c.stato=document.getElementById('opr-stato-sel').value;
+  const r=await call('saveContratto',{data:c});
+  if(r.ok){document.getElementById('opr-ok').style.display='';document.getElementById('opr-stato').textContent=statoLbl(c.stato);await carica();}
+  else alert('Errore: '+r.error);
+}
+
+// ── CHAT ─────────────────────────────────────────────────────
+function renderChat(){
+  const el=document.getElementById('l-chat');
+  // Include free chats too
+  const allChats = [...D.contratti];
+  if(!allChats.length){el.innerHTML='<div class="info">Nessuna conversazione ancora.</div>';return;}
+  el.innerHTML=allChats.map(c=>{
+    const msgs=D.chat.filter(m=>m.contrattoId===c.id);
+    const last=msgs[msgs.length-1];
+    const unread=msgs.filter(m=>m.mittente==='socio'&&!m.letto).length;
+    let nome='—';
+    try{const l=JSON.parse(c.locatoriJSON||'[]');if(l[0])nome=(l[0].cognome||'')+' '+(l[0].nome||'');}catch(e){}
+    return `<div class="row" onclick="apriChatAdmin('${c.id}')">
+      <div class="bar" style="background:${unread?'#E8631A':'#8A8A8A'}"></div>
+      <div class="rb" style="display:flex;align-items:center;gap:12px">
         <div style="width:40px;height:40px;border-radius:20px;background:${unread?'#E8631A':'#F8F7F5'};display:flex;align-items:center;justify-content:center;color:${unread?'#fff':'#8A8A8A'};font-weight:800;font-size:13px;flex-shrink:0">
-          ${nomeLocatore.split(' ').map(n=>n[0]).join('').slice(0,2)}
+          ${nome.split(' ').map(n=>n[0]||'').join('').slice(0,2).toUpperCase()}
         </div>
         <div style="flex:1;min-width:0">
-          <div style="display:flex;justify-content:space-between">
-            <div class="card-title">${nomeLocatore}</div>
-            ${unread?`<div style="width:8px;height:8px;border-radius:4px;background:#E8631A;flex-shrink:0;margin-top:4px"></div>`:''}
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="rt">${nomeContratto(c)||nome}</div>
+            ${unread?`<div style="width:8px;height:8px;border-radius:4px;background:#E8631A;flex-shrink:0"></div>`:''}
           </div>
-          <div class="card-sub" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${last?last.testo:'Nessun messaggio'}</div>
+          <div class="rs" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${last?last.testo:'Nessun messaggio'}</div>
         </div>
       </div>
     </div>`;
   }).join('');
 }
 
-function openChatFromList(id) {
-  currentPratId = id;
-  const c = DATA.contratti.find(x => x.id === id);
-  if (!c) return;
-  const nomeLocatore = (() => { try{const l=JSON.parse(c.locatoriJSON||'[]');return l[0]?l[0].nome+' '+l[0].cognome:'—';}catch(e){return '—';}})();
-  document.getElementById('pp-id').textContent   = 'PRATICA ' + id;
-  document.getElementById('pp-nome').textContent = nomeLocatore;
-  switchPratTab('chat');
-  openOverlay('overlay-prat');
+function apriChatAdmin(id){
+  curChatId=id; curPratId=id;
+  const c=D.contratti.find(x=>x.id===id);
+  let nome='—';
+  try{const l=JSON.parse(c?.locatoriJSON||'[]');if(l[0])nome=(l[0].cognome||'')+' '+(l[0].nome||'');}catch(e){}
+  document.getElementById('opr-lbl').textContent='CHAT · '+id;
+  document.getElementById('opr-ttl').textContent=nome;
+  // Render pratica dati minimali
+  document.getElementById('opr-tipo').textContent=c?.tipo||'—';
+  document.getElementById('opr-stato').textContent=statoLbl(c?.stato);
+  document.getElementById('opr-stato-sel').value=c?.stato||'richiesta';
+  document.getElementById('opr-dal').textContent=fmtDate(c?.duraDal);
+  document.getElementById('opr-al').textContent=fmtDate(c?.duraAl);
+  document.getElementById('opr-canone').textContent=c?.canoneMensile?'€ '+c.canoneMensile+'/mese':'—';
+  document.getElementById('opr-dep').textContent=c?.depositoImporto?'€ '+c.depositoImporto:'—';
+  document.getElementById('opr-locs').innerHTML=parseLocs(c?.locatoriJSON);
+  document.getElementById('opr-cons').innerHTML=parseLocs(c?.conduttoriJSON);
+  document.getElementById('opr-ok').style.display='none';
+  switchTab('chat');
+  apri('ov-prat');
+}
+
+async function caricaMsgsAdmin(){
+  const r=await call('getChat',{contrattoId:curChatId});
+  const msgs=r.ok?(r.data||[]):[];
+  const el=document.getElementById('admin-msgs');
+  if(!msgs.length){el.innerHTML='<div class="info">Nessun messaggio ancora.</div>';return;}
+  el.innerHTML=msgs.map(m=>{
+    const mine=m.mittente==='admin';
+    return `<div class="bbl ${mine?'bm':'bo'}">${m.testo}</div>
+    <div class="bt" style="align-self:${mine?'flex-end':'flex-start'}">${mine?'Tu':m.nomeUtente||'Socio'} · ${m.timestamp?m.timestamp.substring(11,16):''}</div>`;
+  }).join('');
+  el.scrollTop=el.scrollHeight;
+}
+
+async function adminSendMsg(){
+  const t=document.getElementById('admin-chat-inp').value.trim();if(!t||!curChatId)return;
+  document.getElementById('admin-chat-inp').value='';
+  const r=await call('sendMessage',{contrattoId:curChatId,testo:t});
+  if(r.ok){await caricaMsgsAdmin();await carica();}
 }
 
 // ── SLOT ─────────────────────────────────────────────────────
-const TUTTI_GIORNI = ['Lun','Mar','Mer','Gio','Ven','Sab'];
-const TUTTI_ORARI  = ['08:30','09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00','17:30'];
+const TGIORNI=['Lun','Mar','Mer','Gio','Ven','Sab'];
+const TORARI=['08:30','09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00','17:30'];
 
-function initSlot() {
-  // Giorni
-  const gr = document.getElementById('giorni-row');
-  gr.innerHTML = TUTTI_GIORNI.map(g => `
-    <button class="giorno-btn" id="g-${g}" onclick="toggleGiorno('${g}')"
-      style="background:${slotGiorni.has(g)?'#E8631A':'#F8F7F5'};color:${slotGiorni.has(g)?'#fff':'#8A8A8A'}">${g}</button>
+function initSlot(){
+  document.getElementById('slot-giorni').innerHTML=TGIORNI.map(g=>`
+    <button class="gbtn ${sGiorni.has(g)?'on':'off'}" id="sg-${g}" onclick="togGiorno('${g}')">${g}</button>
   `).join('');
-  // Orari
-  const og = document.getElementById('orari-grid');
-  og.innerHTML = TUTTI_ORARI.map(o => `
-    <button class="slot-btn ${slotOrari.has(o)?'on':'off'}" id="o-${o.replace(':','-')}" onclick="toggleOrario('${o}')">${o}</button>
+  document.getElementById('slot-orari').innerHTML=TORARI.map(o=>`
+    <button class="sbt ${sOrari.has(o)?'on':'off'}" id="so-${o.replace(':','-')}" onclick="togOrario('${o}')">${o}</button>
   `).join('');
-  renderChiusure();
-  renderBloccati();
+  renderChiusure(); renderBloccati();
 }
 
-async function loadSlot() {
-  const res = await api('getSlot');
-  if (res.ok) {
-    slotGiorni = new Set(res.giorni || []);
-    slotOrari  = new Set(res.orari  || []);
-  }
-  const res2 = await api('getChiusure');
-  if (res2.ok) DATA.chiusure = res2.data || [];
-  initSlot();
+function togGiorno(g){
+  if(sGiorni.has(g))sGiorni.delete(g);else sGiorni.add(g);
+  const b=document.getElementById('sg-'+g);
+  b.className='gbtn '+(sGiorni.has(g)?'on':'off');
 }
 
-function toggleGiorno(g) {
-  if (slotGiorni.has(g)) slotGiorni.delete(g); else slotGiorni.add(g);
-  const btn = document.getElementById('g-'+g);
-  btn.style.background = slotGiorni.has(g)?'#E8631A':'#F8F7F5';
-  btn.style.color      = slotGiorni.has(g)?'#fff':'#8A8A8A';
+function togOrario(o){
+  if(sOrari.has(o))sOrari.delete(o);else sOrari.add(o);
+  const b=document.getElementById('so-'+o.replace(':','-'));
+  b.className='sbt '+(sOrari.has(o)?'on':'off');
 }
 
-function toggleOrario(o) {
-  if (slotOrari.has(o)) slotOrari.delete(o); else slotOrari.add(o);
-  const btn = document.getElementById('o-'+o.replace(':','-'));
-  btn.className = 'slot-btn ' + (slotOrari.has(o)?'on':'off');
+function renderChiusure(){
+  const el=document.getElementById('slot-chiusure');
+  if(!D.chiusure.length){el.innerHTML='<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessuna chiusura impostata</div>';return;}
+  el.innerHTML=D.chiusure.map(c=>`<div class="li">
+    <span style="font-size:18px">🏖️</span>
+    <div style="flex:1"><div style="font-size:13px;font-weight:700;color:#1A1A1A">${c.label}</div>
+    <div style="font-size:11px;color:#8A8A8A">dal ${c.dal} al ${c.al}</div></div>
+    <button onclick="delChiusura('${c.id}')" style="background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px">✕</button>
+  </div>`).join('');
 }
 
-function renderChiusure() {
-  const el = document.getElementById('chiusure-list');
-  if (!DATA.chiusure.length) { el.innerHTML = '<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessuna chiusura impostata</div>'; return; }
-  el.innerHTML = DATA.chiusure.map(c => `
-    <div class="list-item">
-      <span style="font-size:18px">🏖️</span>
-      <div style="flex:1">
-        <div style="font-size:13px;font-weight:700;color:#1A1A1A">${c.label}</div>
-        <div style="font-size:11px;color:#8A8A8A">dal ${c.dal} al ${c.al}</div>
-      </div>
-      <button onclick="delChiusura('${c.id}')" style="background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px">✕</button>
-    </div>`).join('');
+function renderBloccati(){
+  const el=document.getElementById('slot-bloccati');
+  if(!bloccati.length){el.innerHTML='<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessun giorno bloccato</div>';return;}
+  el.innerHTML=bloccati.map((b,i)=>`<div class="li">
+    <span>🚫</span>
+    <div style="flex:1;font-size:13px;font-weight:600;color:#1A1A1A">${b}</div>
+    <button onclick="bloccati.splice(${i},1);renderBloccati()" style="background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px">✕</button>
+  </div>`).join('');
 }
 
-function renderBloccati() {
-  const el = document.getElementById('bloccati-list');
-  if (!bloccati.length) { el.innerHTML = '<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessun giorno bloccato</div>'; return; }
-  el.innerHTML = bloccati.map((b,i) => `
-    <div class="list-item">
-      <span>🚫</span>
-      <div style="flex:1;font-size:13px;font-weight:600;color:#1A1A1A">${b}</div>
-      <button onclick="bloccati.splice(${i},1);renderBloccati()" style="background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px">✕</button>
-    </div>`).join('');
-}
-
-async function addChiusura() {
-  const label = document.getElementById('ch-label').value.trim();
-  const dal   = document.getElementById('ch-dal').value.trim();
-  const al    = document.getElementById('ch-al').value.trim();
-  if (!label||!dal||!al) { alert('Compila tutti i campi chiusura'); return; }
-  const res = await api('saveChiusura', {label,dal,al});
-  if (res.ok) {
-    DATA.chiusure.push({id:res.id,label,dal,al});
+async function addChiusura(){
+  const label=document.getElementById('ch-lbl').value.trim();
+  const dal=document.getElementById('ch-dal').value.trim();
+  const al=document.getElementById('ch-al').value.trim();
+  if(!label||!dal||!al){alert('Compila tutti i campi chiusura');return;}
+  const r=await call('saveChiusura',{label,dal,al});
+  if(r.ok){
+    D.chiusure.push({id:r.id,label,dal,al});
     renderChiusure();
-    document.getElementById('ch-label').value='';
+    document.getElementById('ch-lbl').value='';
     document.getElementById('ch-dal').value='';
     document.getElementById('ch-al').value='';
   }
 }
 
-async function delChiusura(id) {
-  const res = await api('deleteChiusura', {id});
-  if (res.ok) { DATA.chiusure = DATA.chiusure.filter(c=>c.id!==id); renderChiusure(); }
+async function delChiusura(id){
+  const r=await call('deleteChiusura',{id});
+  if(r.ok){D.chiusure=D.chiusure.filter(c=>c.id!==id);renderChiusure();}
 }
 
-function addBlocco() {
-  const d = document.getElementById('blocco-data').value.trim();
-  if (!d) return;
-  bloccati.push(d);
-  document.getElementById('blocco-data').value='';
-  renderBloccati();
+function addBlocco(){
+  const d=document.getElementById('blocco-d').value.trim();if(!d)return;
+  bloccati.push(d);document.getElementById('blocco-d').value='';renderBloccati();
 }
 
-async function saveSlot() {
-  const res = await api('saveSlot', {
-    giorni: [...slotGiorni],
-    orari:  [...slotOrari],
-    durata: 30
-  });
-  const ok = document.getElementById('slot-ok');
-  ok.style.display = '';
-  setTimeout(()=>ok.style.display='none', 3000);
+async function salvaSlot(){
+  const r=await call('saveSlot',{giorni:[...sGiorni],orari:[...sOrari],durata:30});
+  const ok=document.getElementById('slot-ok');
+  ok.style.display='';setTimeout(()=>ok.style.display='none',3000);
+}
+
+// ── CAMBIO PASSWORD ADMIN ─────────────────────────────────────
+function cambiaPwdAdmin(){
+  const o=document.getElementById('acp-old').value;
+  const n=document.getElementById('acp-new').value;
+  const n2=document.getElementById('acp-new2').value;
+  const errEl=document.getElementById('acp-err');
+  errEl.style.display='none';document.getElementById('acp-ok').style.display='none';
+  const cur=localStorage.getItem('asppi_admin_custom_pwd')||'Asppi2025!';
+  if(o!==cur){errEl.textContent='Password attuale non corretta';errEl.style.display='';return;}
+  if(n.length<8){errEl.textContent='Minimo 8 caratteri';errEl.style.display='';return;}
+  if(n!==n2){errEl.textContent='Le due password non coincidono';errEl.style.display='';return;}
+  localStorage.setItem('asppi_admin_custom_pwd',n);
+  if(localStorage.getItem('asppi_admin_pwd'))localStorage.setItem('asppi_admin_pwd',n);
+  document.getElementById('acp-ok').style.display='';
+  document.getElementById('acp-old').value='';
+  document.getElementById('acp-new').value='';
+  document.getElementById('acp-new2').value='';
 }
 </script>
 </body>
