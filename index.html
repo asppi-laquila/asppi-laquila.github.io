@@ -1,93 +1,71 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <meta name="theme-color" content="#E8631A"/>
-  <link rel="manifest" href="manifest.json"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-title" content="ASPPI Aquila"/>
-  <title>ASPPI L'Aquila</title>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F8F7F5;min-height:100vh;}
-    .screen{display:none;max-width:430px;margin:0 auto;min-height:100vh;}
-    .screen.active{display:flex;flex-direction:column;}
-    /* Header */
-    .header{padding:48px 28px 32px;background:#1A1A1A;color:#fff;}
-    .header-label{font-size:11px;font-weight:700;color:#E8631A;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;}
-    .header h1{font-size:24px;font-weight:800;line-height:1.1;}
-    .header p{font-size:13px;color:#A0A0A0;margin-top:6px;}
-    .header-navy{background:#0D1B2A;}
-    /* Body */
-    .body{padding:28px 24px;flex:1;}
-    /* Tabs */
-    .tabs{display:flex;background:#F8F7F5;border-radius:10px;padding:4px;margin-bottom:24px;}
-    .tab{flex:1;padding:9px 0;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#8A8A8A;transition:all .2s;}
-    .tab.active{background:#fff;color:#1A1A1A;box-shadow:0 1px 4px rgba(0,0,0,.1);}
-    /* Form */
-    label{display:block;font-size:11px;font-weight:600;color:#8A8A8A;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
-    input[type=email],input[type=password],input[type=text],input[type=tel]{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #E5E5E5;font-size:15px;color:#1A1A1A;background:#fff;margin-bottom:14px;outline:none;font-family:inherit;}
-    input:focus{border-color:#E8631A;}
-    /* Buttons */
-    .btn-primary{width:100%;padding:14px 0;border-radius:12px;border:none;background:#E8631A;color:#fff;font-size:15px;font-weight:700;cursor:pointer;}
-    .btn-primary:hover{background:#C94F0F;}
-    .btn-primary.navy{background:#0D1B2A;}
-    .btn-secondary{width:100%;padding:12px 0;border-radius:12px;border:1.5px solid #E5E5E5;background:#fff;color:#1A1A1A;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;}
-    .btn-link{width:100%;background:none;border:none;color:#E8631A;font-size:13px;font-weight:600;cursor:pointer;padding:10px 0;margin-top:4px;}
-    /* Error */
-    .error{background:#FDEEEC;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#C0392B;}
-    .info{background:#FDF0E8;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#4A4A4A;line-height:1.6;}
-    .info-blue{background:#EBF2FB;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1A5FA8;line-height:1.6;}
-    .success{background:#EBF5F0;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#2D7A4F;}
-    /* Check */
-    .check-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;cursor:pointer;}
-    .check-box{width:20px;height:20px;border-radius:6px;border:2px solid #E5E5E5;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
-    .check-box.checked{border-color:#E8631A;background:#E8631A;color:#fff;font-size:11px;font-weight:700;}
-    /* Splash */
-    #splash{position:fixed;inset:0;background:#1A1A1A;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;}
-    #splash.hide{opacity:0;pointer-events:none;transition:opacity .4s;}
-    .splash-logo{width:80px;height:80px;border-radius:20px;background:#E8631A;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:20px;}
-    .splash-bar{width:120px;height:3px;background:#333;border-radius:3px;margin-top:28px;overflow:hidden;}
-    .splash-fill{height:100%;background:#E8631A;border-radius:3px;animation:fill 1.8s ease forwards;}
-    @keyframes fill{from{width:0}to{width:100%}}
-    /* Choose */
-    .choose-btn{width:100%;max-width:280px;padding:14px 0;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;}
-    /* Code input */
-    .code-input{width:100%;padding:14px;border-radius:10px;border:1.5px solid #E5E5E5;font-size:28px;letter-spacing:.3em;text-align:center;font-family:monospace;color:#1A1A1A;margin-bottom:12px;outline:none;}
-    .code-input:focus{border-color:#E8631A;}
-    /* Center */
-    .center{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:32px;}
-    .emoji-big{font-size:60px;margin-bottom:16px;}
-    /* Steps indicator */
-    .steps{display:flex;gap:4px;margin-bottom:20px;}
-    .step-dot{flex:1;height:4px;border-radius:4px;background:#E5E5E5;}
-    .step-dot.done{background:#2D7A4F;}
-    .step-dot.active{background:#E8631A;}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#E8631A"/>
+<title>ASPPI L'Aquila</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F8F7F5;min-height:100vh;}
+.wrap{max-width:430px;margin:0 auto;min-height:100vh;background:#fff;}
+/* Header */
+.hdr{padding:48px 28px 32px;background:#1A1A1A;}
+.hdr-lbl{font-size:11px;font-weight:700;color:#E8631A;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;}
+.hdr h1{font-size:26px;font-weight:800;color:#fff;line-height:1.1;}
+.hdr p{font-size:13px;color:#A0A0A0;margin-top:6px;}
+.hdr-nv{background:#0D1B2A;}
+/* Body */
+.body{padding:28px 24px;}
+/* Tabs */
+.tabs{display:flex;background:#F8F7F5;border-radius:10px;padding:4px;margin-bottom:24px;}
+.tab{flex:1;padding:9px 0;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#8A8A8A;}
+.tab.on{background:#fff;color:#1A1A1A;box-shadow:0 1px 4px rgba(0,0,0,.1);}
+/* Form */
+label{display:block;font-size:11px;font-weight:600;color:#8A8A8A;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
+input{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #E5E5E5;font-size:15px;color:#1A1A1A;background:#fff;margin-bottom:14px;outline:none;font-family:inherit;box-sizing:border-box;}
+input[type=password]{letter-spacing:.1em;}
+input:focus{border-color:#E8631A;}
+/* Buttons */
+.bp{width:100%;padding:14px 0;border-radius:12px;border:none;background:#E8631A;color:#fff;font-size:15px;font-weight:700;cursor:pointer;}
+.bp:disabled{opacity:.5;cursor:not-allowed;}
+.bp.nv{background:#0D1B2A;}
+.bs{width:100%;padding:12px 0;border-radius:12px;border:1.5px solid #E5E5E5;background:#fff;color:#1A1A1A;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;}
+.bl{width:100%;background:none;border:none;color:#E8631A;font-size:13px;font-weight:600;cursor:pointer;padding:10px 0;margin-top:4px;}
+/* Check */
+.cr{display:flex;align-items:center;gap:10px;margin-bottom:16px;cursor:pointer;}
+.cb{width:20px;height:20px;border-radius:6px;border:2px solid #E5E5E5;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;}
+.cb.on{border-color:#E8631A;background:#E8631A;color:#fff;}
+/* Error / Info */
+.err{background:#FDEEEC;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#C0392B;display:none;}
+.info-box{background:#FDF0E8;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#4A4A4A;line-height:1.6;}
+.info-blue{background:#EBF2FB;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#1A5FA8;line-height:1.6;}
+/* Recupero password */
+.code-inp{width:100%;padding:14px;border-radius:10px;border:1.5px solid #E5E5E5;font-size:28px;letter-spacing:.3em;text-align:center;font-family:monospace;color:#1A1A1A;margin-bottom:12px;outline:none;box-sizing:border-box;}
+.code-inp:focus{border-color:#E8631A;}
+.center{text-align:center;padding:40px 20px;}
+.emoji{font-size:56px;margin-bottom:16px;}
+/* Pagine */
+.page{display:none;}
+.page.on{display:block;}
+</style>
 </head>
 <body>
 
-<!-- SPLASH -->
-<div id="splash">
-  <div class="splash-logo">🏛️</div>
-  <h1 style="color:#fff;font-size:22px;font-weight:800;margin-bottom:6px">ASPPI L'Aquila</h1>
-  <p style="color:#8A8A8A;font-size:13px">Portale Soci</p>
-  <div class="splash-bar"><div class="splash-fill"></div></div>
-</div>
+<div class="wrap">
 
-<!-- SCHERMATA SCELTA -->
-<div id="screen-choose" class="screen active">
-  <div class="header" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 32px;">
-    <div style="font-size:56px;margin-bottom:20px">🏛️</div>
-    <div class="header-label">Portale</div>
-    <h1 style="font-size:26px;margin-bottom:6px">ASPPI L'Aquila</h1>
+<!-- SCELTA -->
+<div id="pg-scelta" class="page on">
+  <div class="hdr" style="min-height:40vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+    <div style="font-size:56px;margin-bottom:16px">🏛️</div>
+    <div class="hdr-lbl">Portale</div>
+    <h1>ASPPI L'Aquila</h1>
     <p>Associazione Piccoli Proprietari Immobiliari</p>
   </div>
-  <div class="body" style="display:flex;flex-direction:column;align-items:center;background:#fff;">
-    <button class="btn-primary choose-btn" onclick="show('screen-login')">📱 Accesso Soci</button>
-    <button class="btn-secondary choose-btn" style="max-width:280px" onclick="show('screen-admin-login')">🔧 Admin — Simeoni</button>
-    <p style="font-size:11px;color:#8A8A8A;margin-top:16px;text-align:center;max-width:260px;line-height:1.6">
+  <div class="body" style="display:flex;flex-direction:column;align-items:center;">
+    <button class="bp" style="max-width:280px;margin-bottom:10px" onclick="mostra('pg-login')">📱 Accesso Soci</button>
+    <button class="bs" style="max-width:280px" onclick="mostra('pg-admin-login')">🔧 Admin — Simeoni</button>
+    <p style="font-size:11px;color:#8A8A8A;margin-top:20px;text-align:center;max-width:260px;line-height:1.6">
       Portale riservato ai soci ASPPI L'Aquila<br>
       C.so Vittorio Emanuele 9 · +39 392 519 1490
     </p>
@@ -95,374 +73,264 @@
 </div>
 
 <!-- LOGIN SOCI -->
-<div id="screen-login" class="screen">
-  <div class="header">
-    <div class="header-label">ASPPI L'Aquila</div>
+<div id="pg-login" class="page">
+  <div class="hdr">
+    <div class="hdr-lbl">ASPPI L'Aquila</div>
     <h1>Portale Soci</h1>
     <p>Accedi al tuo account</p>
   </div>
   <div class="body">
     <div class="tabs">
-      <button class="tab active" id="tab-login" onclick="switchTab('login')">Accedi</button>
-      <button class="tab" id="tab-register" onclick="switchTab('register')">Registrati</button>
+      <button class="tab on" id="tab-acc" onclick="switchTab('acc')">Accedi</button>
+      <button class="tab" id="tab-reg" onclick="switchTab('reg')">Registrati</button>
     </div>
 
     <!-- ACCEDI -->
-    <div id="form-login">
+    <div id="form-acc">
       <label>Email</label>
-      <input type="email" id="login-email" placeholder="mario.rossi@email.com"/>
+      <input type="email" id="acc-email" placeholder="mario.rossi@email.com"/>
       <label>Password</label>
-      <input type="password" id="login-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
-      <div id="login-error" class="error" style="display:none"></div>
-      <div class="check-row" onclick="toggleCheck('remember-login')">
-        <div class="check-box" id="remember-login-box"></div>
+      <input type="password" id="acc-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <div class="err" id="acc-err"></div>
+      <div class="cr" onclick="toggleRem('rem-acc')">
+        <div class="cb" id="rem-acc-box"></div>
         <span style="font-size:13px;color:#1A1A1A">Ricorda email e password</span>
       </div>
-      <button class="btn-primary" onclick="doLogin()" id="login-btn">Accedi</button>
-      <button class="btn-link" onclick="show('screen-forgot')">Password dimenticata?</button>
-      <button class="btn-secondary" onclick="show('screen-choose')" style="margin-top:8px">← Indietro</button>
+      <button class="bp" onclick="doLogin()" id="acc-btn">Accedi</button>
+      <button class="bl" onclick="mostra('pg-forgot')">Password dimenticata?</button>
+      <button class="bs" onclick="mostra('pg-scelta')">← Indietro</button>
     </div>
 
     <!-- REGISTRATI -->
-    <div id="form-register" style="display:none">
-      <label>Nome *</label>
-      <input type="text" id="reg-nome" placeholder="Mario"/>
-      <label>Cognome</label>
-      <input type="text" id="reg-cognome" placeholder="Rossi"/>
-      <label>Telefono</label>
-      <input type="tel" id="reg-tel" placeholder="+39 333 000 0000"/>
-      <label>Email *</label>
-      <input type="email" id="reg-email" placeholder="mario.rossi@email.com"/>
+    <div id="form-reg" style="display:none">
+      <label>Nome *</label><input type="text" id="reg-nome" placeholder="Mario"/>
+      <label>Cognome</label><input type="text" id="reg-cog" placeholder="Rossi"/>
+      <label>Telefono</label><input type="text" id="reg-tel" placeholder="+39 333 000 0000"/>
+      <label>Email *</label><input type="email" id="reg-email" placeholder="mario.rossi@email.com"/>
       <label>Password * (min. 8 caratteri)</label>
       <input type="password" id="reg-pwd" placeholder="••••••••"/>
-      <div id="reg-error" class="error" style="display:none"></div>
-      <div class="check-row" onclick="toggleCheck('remember-reg')">
-        <div class="check-box" id="remember-reg-box"></div>
+      <div class="err" id="reg-err"></div>
+      <div class="cr" onclick="toggleRem('rem-reg')">
+        <div class="cb" id="rem-reg-box"></div>
         <span style="font-size:13px;color:#1A1A1A">Ricorda email e password</span>
       </div>
-      <button class="btn-primary" onclick="doRegister()">Crea account</button>
-      <button class="btn-secondary" onclick="show('screen-choose')" style="margin-top:8px">← Indietro</button>
+      <button class="bp" onclick="doRegister()">Crea account</button>
+      <button class="bs" onclick="mostra('pg-scelta')">← Indietro</button>
     </div>
   </div>
 </div>
 
 <!-- RECUPERO PASSWORD -->
-<div id="screen-forgot" class="screen">
-  <div class="header">
-    <div class="header-label">ASPPI L'Aquila</div>
+<div id="pg-forgot" class="page">
+  <div class="hdr">
+    <div class="hdr-lbl">ASPPI L'Aquila</div>
     <h1>Recupero password</h1>
   </div>
   <div class="body">
-    <div id="forgot-step1">
-      <div class="info">📧 Inserisci la tua email. Ti invieremo un codice di 6 cifre per reimpostare la password.</div>
+    <div id="fp-s1">
+      <div class="info-box">📧 Inserisci la tua email. Ti invieremo un codice di 6 cifre.</div>
       <label>La tua email</label>
-      <input type="email" id="forgot-email" placeholder="mario.rossi@email.com"/>
-      <div id="forgot-error" class="error" style="display:none"></div>
-      <button class="btn-primary" onclick="doForgotStep1()">Invia codice via email</button>
-      <button class="btn-secondary" onclick="show('screen-login')">← Torna al login</button>
+      <input type="email" id="fp-email" placeholder="mario.rossi@email.com"/>
+      <div class="err" id="fp-err1"></div>
+      <button class="bp" onclick="fpStep1()">Invia codice via email</button>
+      <button class="bs" onclick="mostra('pg-login')">← Torna al login</button>
     </div>
-    <div id="forgot-step2" style="display:none">
-      <div class="success" id="forgot-email-sent"></div>
+    <div id="fp-s2" style="display:none">
+      <div style="background:#EBF5F0;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#2D7A4F" id="fp-sent"></div>
       <label>Codice di verifica (6 cifre)</label>
-      <input type="text" class="code-input" id="forgot-code" placeholder="000000" maxlength="6"/>
-      <div id="forgot-error2" class="error" style="display:none"></div>
-      <button class="btn-primary" onclick="doForgotStep2()">Verifica codice</button>
-      <button class="btn-secondary" onclick="showForgotStep(1)">← Cambia email</button>
+      <input type="text" class="code-inp" id="fp-code" placeholder="000000" maxlength="6"/>
+      <div class="err" id="fp-err2"></div>
+      <button class="bp" onclick="fpStep2()">Verifica codice</button>
+      <button class="bs" onclick="fpReset()">← Cambia email</button>
     </div>
-    <div id="forgot-step3" style="display:none">
-      <div class="info">🔑 Codice verificato! Ora scegli una nuova password.</div>
+    <div id="fp-s3" style="display:none">
+      <div class="info-box">🔑 Codice verificato! Scegli una nuova password.</div>
       <label>Nuova password (min. 8 caratteri)</label>
-      <input type="password" id="forgot-newpwd" placeholder="••••••••"/>
+      <input type="password" id="fp-p1" placeholder="••••••••"/>
       <label>Conferma nuova password</label>
-      <input type="password" id="forgot-newpwd2" placeholder="••••••••"/>
-      <div id="forgot-error3" class="error" style="display:none"></div>
-      <button class="btn-primary" onclick="doForgotStep3()">Salva nuova password</button>
+      <input type="password" id="fp-p2" placeholder="••••••••"/>
+      <div class="err" id="fp-err3"></div>
+      <button class="bp" onclick="fpStep3()">Salva nuova password</button>
     </div>
-    <div id="forgot-step4" style="display:none" class="center">
-      <div class="emoji-big">✅</div>
+    <div id="fp-s4" style="display:none" class="center">
+      <div class="emoji">✅</div>
       <h2 style="font-size:20px;font-weight:800;color:#1A1A1A;margin-bottom:8px">Password aggiornata!</h2>
       <p style="font-size:13px;color:#8A8A8A;margin-bottom:24px">Ora puoi accedere con la nuova password.</p>
-      <button class="btn-primary" style="width:200px;border-radius:12px" onclick="show('screen-login')">Vai al login</button>
+      <button class="bp" style="max-width:200px;margin:0 auto" onclick="mostra('pg-login')">Vai al login</button>
     </div>
   </div>
 </div>
 
 <!-- ADMIN LOGIN -->
-<div id="screen-admin-login" class="screen">
-  <div class="header header-navy">
-    <div class="header-label">ASPPI L'Aquila · Admin</div>
+<div id="pg-admin-login" class="page">
+  <div class="hdr hdr-nv">
+    <div class="hdr-lbl">ASPPI L'Aquila · Admin</div>
     <h1>Accesso riservato</h1>
     <p>Solo personale autorizzato</p>
   </div>
   <div class="body">
-    <div class="info-blue">🔒 Pannello riservato a Simeoni Maurizio — ASPPI L'Aquila</div>
+    <div class="info-blue">🔒 Pannello riservato a Simeoni Maurizio</div>
     <label>Password amministratore</label>
-    <input type="password" id="admin-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
-    <div id="admin-error" class="error" style="display:none"></div>
-    <div class="check-row" onclick="toggleCheck('remember-admin')">
-      <div class="check-box" id="remember-admin-box"></div>
+    <input type="password" id="adm-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+    <div class="err" id="adm-err"></div>
+    <div class="cr" onclick="toggleRem('rem-adm')">
+      <div class="cb" id="rem-adm-box"></div>
       <span style="font-size:13px;color:#1A1A1A">Ricorda password su questo dispositivo</span>
     </div>
-    <button class="btn-primary navy" onclick="doAdminLogin()">Accedi al pannello</button>
-    <button class="btn-secondary" onclick="show('screen-choose')">← Indietro</button>
+    <button class="bp nv" onclick="doAdminLogin()">Accedi al pannello</button>
+    <button class="bs" onclick="mostra('pg-scelta')">← Indietro</button>
     <p style="font-size:11px;color:#8A8A8A;text-align:center;margin-top:20px">
-      Per assistenza: centroserviziasppiaq@asppi.it
+      centroserviziasppiaq@asppi.it
     </p>
   </div>
 </div>
 
-<!-- SOCIO HOME (placeholder — si espanderà) -->
-<div id="screen-socio" class="screen">
-  <div style="background:#1A1A1A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
-    <div>
-      <div style="color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.1em">ASPPI L'AQUILA</div>
-      <div style="color:#fff;font-size:15px;font-weight:700" id="socio-nome-header">Portale Soci</div>
-    </div>
-    <button onclick="doLogout()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer">Esci</button>
-  </div>
-  <div style="padding:20px;flex:1">
-    <div style="font-size:12px;color:#8A8A8A;margin-bottom:4px">Benvenuto,</div>
-    <div style="font-size:22px;font-weight:800;color:#1A1A1A;margin-bottom:24px" id="socio-nome">Socio</div>
-    <div class="info-blue">✅ Login effettuato con successo! L'app completa sarà disponibile a breve.</div>
-    <div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
-      <div style="font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #E5E5E5">IL TUO ACCOUNT</div>
-      <div style="font-size:13px;color:#8A8A8A;margin-bottom:4px">Email</div>
-      <div style="font-size:14px;font-weight:600;color:#1A1A1A;margin-bottom:12px" id="socio-email">—</div>
-      <button onclick="show('screen-cambia-pwd')" style="background:none;border:1px solid #E5E5E5;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:#1A1A1A">🔑 Cambia password</button>
-    </div>
-  </div>
-</div>
-
-<!-- ADMIN HOME (placeholder) -->
-<div id="screen-admin" class="screen">
-  <div style="background:#0D1B2A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
-    <div>
-      <div style="color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.1em">ASPPI L'AQUILA · ADMIN</div>
-      <div style="color:#fff;font-size:15px;font-weight:700">Simeoni Maurizio</div>
-    </div>
-    <button onclick="doAdminLogout()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer">Esci</button>
-  </div>
-  <div style="padding:20px;flex:1">
-    <div class="info-blue">✅ Accesso admin effettuato! Il pannello completo sarà disponibile a breve.</div>
-    <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
-      <div style="font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #E5E5E5">IMPOSTAZIONI ADMIN</div>
-      <button onclick="show('screen-admin-cambia-pwd')" style="background:none;border:1px solid #E5E5E5;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:#1A1A1A">🔑 Cambia password admin</button>
-    </div>
-  </div>
-</div>
-
-<!-- CAMBIA PASSWORD SOCIO -->
-<div id="screen-cambia-pwd" class="screen">
-  <div style="background:#1A1A1A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
-    <div>
-      <div style="color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.1em">ASPPI L'AQUILA</div>
-      <div style="color:#fff;font-size:15px;font-weight:700">Cambia password</div>
-    </div>
-    <button onclick="show('screen-socio')" style="background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer">← Indietro</button>
-  </div>
-  <div class="body">
-    <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
-      <div style="font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #E5E5E5">MODIFICA PASSWORD</div>
-      <label>Password attuale</label>
-      <input type="password" id="cp-old" placeholder="••••••••"/>
-      <label>Nuova password (min. 8 caratteri)</label>
-      <input type="password" id="cp-new" placeholder="••••••••"/>
-      <label>Conferma nuova password</label>
-      <input type="password" id="cp-new2" placeholder="••••••••"/>
-      <div id="cp-error" class="error" style="display:none"></div>
-      <div id="cp-ok" class="success" style="display:none">✅ Password aggiornata con successo!</div>
-      <button class="btn-primary" onclick="doCambiaPwd()">Salva nuova password</button>
-    </div>
-  </div>
-</div>
-
-<!-- CAMBIA PASSWORD ADMIN -->
-<div id="screen-admin-cambia-pwd" class="screen">
-  <div style="background:#0D1B2A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
-    <div>
-      <div style="color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.1em">ADMIN</div>
-      <div style="color:#fff;font-size:15px;font-weight:700">Cambia password admin</div>
-    </div>
-    <button onclick="show('screen-admin')" style="background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer">← Indietro</button>
-  </div>
-  <div class="body">
-    <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
-      <label>Password attuale</label>
-      <input type="password" id="acp-old" placeholder="••••••••"/>
-      <label>Nuova password (min. 8 caratteri)</label>
-      <input type="password" id="acp-new" placeholder="••••••••"/>
-      <label>Conferma nuova password</label>
-      <input type="password" id="acp-new2" placeholder="••••••••"/>
-      <div id="acp-error" class="error" style="display:none"></div>
-      <div id="acp-ok" class="success" style="display:none">✅ Password aggiornata!</div>
-      <button class="btn-primary navy" onclick="doAdminCambiaPwd()">Aggiorna password</button>
-    </div>
-  </div>
-</div>
+</div><!-- end wrap -->
 
 <script>
 const API = "https://rough-resonance-cba6.asppilaquila.workers.dev";
-const ADMIN_PWD_DEFAULT = "Asppi2025!";
+const ADM_PWD_DEFAULT = "Asppi2025!";
 
-// ── STATO ────────────────────────────────────────────────────
-let state = { token: null, user: null, forgotCode: null, forgotEmail: null };
-let checks = { 'remember-login': false, 'remember-reg': false, 'remember-admin': false };
+// ── INIT: pulisci SEMPRE sessione all'avvio ──────────────────
+(function(){
+  // Cancella qualsiasi sessione esistente - login sempre obbligatorio
+  localStorage.removeItem('asppi_session');
+  localStorage.removeItem('asppi_admin_ok');
 
-// ── INIT ─────────────────────────────────────────────────────
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const s = document.getElementById('splash');
-    s.classList.add('hide');
-    setTimeout(() => s.remove(), 400);
-  }, 1800);
-
-  // Ripristina sessione salvata
+  // Pre-compila solo se "Ricordami" era attivo
   try {
-    // SEMPRE cancella la sessione all'apertura della pagina di login
-    // L'utente DEVE sempre fare il login manualmente
-    localStorage.removeItem('asppi_session');
-    localStorage.removeItem('asppi_admin_ok');
-    // Pre-compila credenziali
-    const rem = JSON.parse(localStorage.getItem('asppi_remember') || 'null');
-    if (rem) {
-      document.getElementById('login-email').value = rem.email || '';
-      document.getElementById('login-pwd').value   = rem.pwd   || '';
-      setCheck('remember-login', true);
+    const rem = JSON.parse(localStorage.getItem('asppi_remember')||'null');
+    if(rem && rem.email) {
+      document.getElementById('acc-email').value = rem.email || '';
+      document.getElementById('acc-pwd').value   = rem.pwd   || '';
+      setCheck('rem-acc', true);
     }
-    // Admin remember - pre-compila solo se ricordami era attivo
-    const adminPwd = localStorage.getItem('asppi_admin_pwd');
-    if (adminPwd) {
-      document.getElementById('admin-pwd').value = adminPwd;
-      setCheck('remember-admin', true);
+  } catch(e){}
+
+  try {
+    const admPwd = localStorage.getItem('asppi_admin_pwd');
+    if(admPwd) {
+      document.getElementById('adm-pwd').value = admPwd;
+      setCheck('rem-adm', true);
     }
-    // Assicurati che l'admin non sia auto-loggato senza password
-    localStorage.removeItem('asppi_admin_ok');
-  } catch(e) {}
-});
+  } catch(e){}
+
+  // Cancella service worker vecchi
+  if('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(regs){
+      regs.forEach(function(r){ r.unregister(); });
+    });
+    caches.keys().then(function(keys){
+      keys.forEach(function(k){ caches.delete(k); });
+    });
+  }
+})();
 
 // ── NAVIGATION ───────────────────────────────────────────────
-function show(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
+function mostra(id) {
+  document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); });
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
 }
 
-function switchTab(tab) {
-  document.getElementById('form-login').style.display    = tab === 'login'    ? '' : 'none';
-  document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none';
-  document.getElementById('tab-login').classList.toggle('active',    tab === 'login');
-  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+function switchTab(t) {
+  document.getElementById('form-acc').style.display = t==='acc' ? '' : 'none';
+  document.getElementById('form-reg').style.display = t==='reg' ? '' : 'none';
+  document.getElementById('tab-acc').className = 'tab' + (t==='acc'?' on':'');
+  document.getElementById('tab-reg').className = 'tab' + (t==='reg'?' on':'');
 }
 
 // ── CHECKBOX ─────────────────────────────────────────────────
-function toggleCheck(id) {
+var checks = {};
+function toggleRem(id) {
   checks[id] = !checks[id];
   setCheck(id, checks[id]);
 }
 function setCheck(id, val) {
   checks[id] = val;
-  const box = document.getElementById(id + '-box');
-  if (!box) return;
-  box.classList.toggle('checked', val);
+  var box = document.getElementById(id+'-box');
+  if(!box) return;
+  box.className = 'cb' + (val?' on':'');
   box.textContent = val ? '✓' : '';
 }
 
-// ── API ──────────────────────────────────────────────────────
-async function api(action, data) {
-  try {
-    // Usiamo il parametro nella URL per aggirare i problemi CORS su Firefox
-    const payload = JSON.stringify({ action, ...data });
-    const res = await fetch(API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain' }, // text/plain evita il preflight CORS
-      body: payload,
-      redirect: 'follow',
-    });
-    const text = await res.text();
-    try { return JSON.parse(text); }
-    catch(e) { return { ok: false, error: 'Risposta non valida dal server' }; }
-  } catch(e) {
-    return { ok: false, error: 'Errore di connessione. Controlla la rete e riprova.' };
-  }
-}
-
+// ── ERROR ────────────────────────────────────────────────────
 function showErr(id, msg) {
-  const el = document.getElementById(id);
-  if (!el) return;
+  var el = document.getElementById(id);
+  if(!el) return;
   el.textContent = msg;
   el.style.display = msg ? '' : 'none';
 }
 
+// ── API ───────────────────────────────────────────────────────
+async function api(action, data) {
+  try {
+    var res = await fetch(API, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify(Object.assign({action: action}, data||{})),
+      redirect: 'follow'
+    });
+    var text = await res.text();
+    try { return JSON.parse(text); }
+    catch(e) { return {ok:false, error:'Risposta non valida'}; }
+  } catch(e) {
+    return {ok:false, error:'Errore di connessione. Controlla la rete.'};
+  }
+}
+
 // ── LOGIN ────────────────────────────────────────────────────
 async function doLogin() {
-  const email = document.getElementById('login-email').value.trim();
-  const pwd   = document.getElementById('login-pwd').value;
-  showErr('login-error', '');
-  if (!email || !pwd) { showErr('login-error', 'Email e password obbligatorie'); return; }
-
-  const btn = document.getElementById('login-btn');
+  var email = document.getElementById('acc-email').value.trim();
+  var pwd   = document.getElementById('acc-pwd').value;
+  showErr('acc-err', '');
+  if(!email || !pwd) { showErr('acc-err', 'Email e password obbligatorie'); return; }
+  var btn = document.getElementById('acc-btn');
   btn.textContent = 'Accesso in corso...'; btn.disabled = true;
-  const res = await api('login', { email, password: pwd });
+  var res = await api('login', {email:email, password:pwd});
   btn.textContent = 'Accedi'; btn.disabled = false;
-
-  if (res.ok) {
-    state.token = res.token; state.user = res;
-    if (checks['remember-login']) {
-      localStorage.setItem('asppi_remember', JSON.stringify({ email, pwd }));
+  if(res.ok) {
+    if(checks['rem-acc']) {
+      localStorage.setItem('asppi_remember', JSON.stringify({email:email, pwd:pwd}));
     } else {
       localStorage.removeItem('asppi_remember');
     }
-    localStorage.setItem('asppi_session', JSON.stringify({ token: res.token, user: res }));
+    localStorage.setItem('asppi_session', JSON.stringify({token:res.token, user:res}));
     window.location.href = 'socio.html';
   } else {
-    showErr('login-error', res.error || 'Credenziali non valide');
+    showErr('acc-err', res.error || 'Credenziali non valide');
   }
 }
 
 // ── REGISTER ─────────────────────────────────────────────────
 async function doRegister() {
-  const nome    = document.getElementById('reg-nome').value.trim();
-  const cognome = document.getElementById('reg-cognome').value.trim();
-  const tel     = document.getElementById('reg-tel').value.trim();
-  const email   = document.getElementById('reg-email').value.trim();
-  const pwd     = document.getElementById('reg-pwd').value;
-  showErr('reg-error', '');
-  if (!nome || !email || !pwd) { showErr('reg-error', 'Nome, email e password sono obbligatori'); return; }
-  if (pwd.length < 8) { showErr('reg-error', 'La password deve essere di almeno 8 caratteri'); return; }
-
-  const res = await api('register', { nome, cognome, telefono: tel, email, password: pwd });
-  if (res.ok) {
-    state.token = res.token; state.user = res;
-    if (checks['remember-reg']) {
-      localStorage.setItem('asppi_remember', JSON.stringify({ email, pwd }));
+  var nome  = document.getElementById('reg-nome').value.trim();
+  var cog   = document.getElementById('reg-cog').value.trim();
+  var tel   = document.getElementById('reg-tel').value.trim();
+  var email = document.getElementById('reg-email').value.trim();
+  var pwd   = document.getElementById('reg-pwd').value;
+  showErr('reg-err', '');
+  if(!nome || !email || !pwd) { showErr('reg-err', 'Nome, email e password sono obbligatori'); return; }
+  if(pwd.length < 8) { showErr('reg-err', 'La password deve essere di almeno 8 caratteri'); return; }
+  var res = await api('register', {nome:nome, cognome:cog, telefono:tel, email:email, password:pwd});
+  if(res.ok) {
+    if(checks['rem-reg']) {
+      localStorage.setItem('asppi_remember', JSON.stringify({email:email, pwd:pwd}));
     }
-    localStorage.setItem('asppi_session', JSON.stringify({ token: res.token, user: res }));
+    localStorage.setItem('asppi_session', JSON.stringify({token:res.token, user:res}));
     window.location.href = 'socio.html';
   } else {
-    showErr('reg-error', res.error || 'Errore registrazione. Riprova.');
+    showErr('reg-err', res.error || 'Errore registrazione. Riprova.');
   }
 }
 
-function showSocio(user) {
-  document.getElementById('socio-nome').textContent        = user.nome || 'Socio';
-  document.getElementById('socio-nome-header').textContent = user.nome || 'Portale Soci';
-  document.getElementById('socio-email').textContent       = user.email || '—';
-  show('screen-socio');
-}
-
-function doLogout() {
-  state.token = null; state.user = null;
-  localStorage.removeItem('asppi_session');
-  show('screen-choose');
-}
-
-// ── ADMIN LOGIN ──────────────────────────────────────────────
+// ── ADMIN LOGIN ───────────────────────────────────────────────
 function doAdminLogin() {
-  const pwd = document.getElementById('admin-pwd').value;
-  const savedPwd = localStorage.getItem('asppi_admin_custom_pwd') || ADMIN_PWD_DEFAULT;
-  showErr('admin-error', '');
-  if (pwd === savedPwd) {
-    if (checks['remember-admin']) {
+  var pwd = document.getElementById('adm-pwd').value;
+  var cur = localStorage.getItem('asppi_admin_custom_pwd') || ADM_PWD_DEFAULT;
+  showErr('adm-err', '');
+  if(pwd === cur) {
+    if(checks['rem-adm']) {
       localStorage.setItem('asppi_admin_pwd', pwd);
     } else {
       localStorage.removeItem('asppi_admin_pwd');
@@ -470,102 +338,57 @@ function doAdminLogin() {
     localStorage.setItem('asppi_admin_ok', 'yes');
     window.location.href = 'admin.html';
   } else {
-    showErr('admin-error', 'Password non corretta');
+    showErr('adm-err', 'Password non corretta');
   }
 }
 
-function doAdminLogout() {
-  show('screen-choose');
-}
+// ── RECUPERO PASSWORD ─────────────────────────────────────────
+var fpCode = null, fpEmail = null;
 
-// ── RECUPERO PASSWORD ────────────────────────────────────────
-function showForgotStep(n) {
-  [1,2,3,4].forEach(i => {
-    document.getElementById('forgot-step' + i).style.display = i === n ? '' : 'none';
+function fpReset() {
+  ['fp-s1','fp-s2','fp-s3','fp-s4'].forEach(function(id){
+    document.getElementById(id).style.display = 'none';
   });
+  document.getElementById('fp-s1').style.display = '';
 }
 
-async function doForgotStep1() {
-  const email = document.getElementById('forgot-email').value.trim();
-  showErr('forgot-error', '');
-  if (!email) { showErr('forgot-error', 'Inserisci la tua email'); return; }
-  const res = await api('requestPasswordReset', { email });
-  if (res.ok) {
-    state.forgotCode  = res.codice;
-    state.forgotEmail = email;
-    document.getElementById('forgot-email-sent').textContent =
-      '✅ Codice inviato a ' + email + '. Controlla la casella (anche spam).';
-    showForgotStep(2);
+async function fpStep1() {
+  var email = document.getElementById('fp-email').value.trim();
+  showErr('fp-err1', '');
+  if(!email) { showErr('fp-err1', 'Inserisci la tua email'); return; }
+  var res = await api('requestPasswordReset', {email:email});
+  if(res.ok) {
+    fpCode = res.codice; fpEmail = email;
+    document.getElementById('fp-sent').textContent = '✅ Codice inviato a ' + email + '. Controlla anche lo spam.';
+    document.getElementById('fp-s1').style.display = 'none';
+    document.getElementById('fp-s2').style.display = '';
   } else {
-    showErr('forgot-error', res.error || 'Email non trovata');
+    showErr('fp-err1', res.error || 'Email non trovata');
   }
 }
 
-function doForgotStep2() {
-  const code = document.getElementById('forgot-code').value.trim();
-  showErr('forgot-error2', '');
-  if (!code) { showErr('forgot-error2', 'Inserisci il codice'); return; }
-  if (code !== state.forgotCode) { showErr('forgot-error2', 'Codice non corretto. Controlla la email.'); return; }
-  showForgotStep(3);
+function fpStep2() {
+  var code = document.getElementById('fp-code').value.trim();
+  showErr('fp-err2', '');
+  if(!code) { showErr('fp-err2', 'Inserisci il codice'); return; }
+  if(code !== fpCode) { showErr('fp-err2', 'Codice non corretto. Controlla la email.'); return; }
+  document.getElementById('fp-s2').style.display = 'none';
+  document.getElementById('fp-s3').style.display = '';
 }
 
-async function doForgotStep3() {
-  const p1 = document.getElementById('forgot-newpwd').value;
-  const p2 = document.getElementById('forgot-newpwd2').value;
-  showErr('forgot-error3', '');
-  if (!p1 || p1.length < 8) { showErr('forgot-error3', 'La password deve essere di almeno 8 caratteri'); return; }
-  if (p1 !== p2) { showErr('forgot-error3', 'Le due password non coincidono'); return; }
-  const res = await api('resetPassword', { email: state.forgotEmail, codice: state.forgotCode, newPassword: p1 });
-  if (res.ok) {
-    showForgotStep(4);
+async function fpStep3() {
+  var p1 = document.getElementById('fp-p1').value;
+  var p2 = document.getElementById('fp-p2').value;
+  showErr('fp-err3', '');
+  if(!p1 || p1.length < 8) { showErr('fp-err3', 'Minimo 8 caratteri'); return; }
+  if(p1 !== p2) { showErr('fp-err3', 'Le due password non coincidono'); return; }
+  var res = await api('resetPassword', {email:fpEmail, codice:fpCode, newPassword:p1});
+  if(res.ok) {
+    document.getElementById('fp-s3').style.display = 'none';
+    document.getElementById('fp-s4').style.display = '';
   } else {
-    showErr('forgot-error3', res.error || 'Errore. Riprova.');
+    showErr('fp-err3', res.error || 'Errore. Riprova.');
   }
-}
-
-// ── CAMBIA PASSWORD SOCIO ────────────────────────────────────
-async function doCambiaPwd() {
-  const old  = document.getElementById('cp-old').value;
-  const np   = document.getElementById('cp-new').value;
-  const np2  = document.getElementById('cp-new2').value;
-  showErr('cp-error', '');
-  document.getElementById('cp-ok').style.display = 'none';
-  if (!old || !np || !np2) { showErr('cp-error', 'Tutti i campi sono obbligatori'); return; }
-  if (np.length < 8) { showErr('cp-error', 'La nuova password deve essere di almeno 8 caratteri'); return; }
-  if (np !== np2) { showErr('cp-error', 'Le due password non coincidono'); return; }
-  const res = await api('changePassword', { token: state.token, oldPassword: old, newPassword: np });
-  if (res.ok) {
-    document.getElementById('cp-ok').style.display = '';
-    document.getElementById('cp-old').value = '';
-    document.getElementById('cp-new').value = '';
-    document.getElementById('cp-new2').value = '';
-    // Aggiorna remember
-    try {
-      const rem = JSON.parse(localStorage.getItem('asppi_remember') || 'null');
-      if (rem) { rem.pwd = np; localStorage.setItem('asppi_remember', JSON.stringify(rem)); }
-    } catch(e) {}
-  } else {
-    showErr('cp-error', res.error || 'Password attuale non corretta');
-  }
-}
-
-// ── CAMBIA PASSWORD ADMIN ────────────────────────────────────
-function doAdminCambiaPwd() {
-  const old = document.getElementById('acp-old').value;
-  const np  = document.getElementById('acp-new').value;
-  const np2 = document.getElementById('acp-new2').value;
-  showErr('acp-error', '');
-  document.getElementById('acp-ok').style.display = 'none';
-  const currentPwd = localStorage.getItem('asppi_admin_custom_pwd') || ADMIN_PWD_DEFAULT;
-  if (old !== currentPwd) { showErr('acp-error', 'Password attuale non corretta'); return; }
-  if (np.length < 8) { showErr('acp-error', 'La nuova password deve essere di almeno 8 caratteri'); return; }
-  if (np !== np2) { showErr('acp-error', 'Le due password non coincidono'); return; }
-  localStorage.setItem('asppi_admin_custom_pwd', np);
-  if (localStorage.getItem('asppi_admin_pwd')) localStorage.setItem('asppi_admin_pwd', np);
-  document.getElementById('acp-ok').style.display = '';
-  document.getElementById('acp-old').value = '';
-  document.getElementById('acp-new').value = '';
-  document.getElementById('acp-new2').value = '';
 }
 </script>
 </body>
