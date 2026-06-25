@@ -4,1319 +4,564 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="theme-color" content="#E8631A"/>
-  <meta name="description" content="Portale soci ASPPI L'Aquila"/>
   <link rel="manifest" href="manifest.json"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <meta name="apple-mobile-web-app-title" content="ASPPI Aquila"/>
   <title>ASPPI L'Aquila</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:#F8F7F5;-webkit-font-smoothing:antialiased;overscroll-behavior:none;}
-    #root{min-height:100vh;}
-    #splash{position:fixed;inset:0;background:#1A1A1A;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.4s;}
-    #splash.hidden{opacity:0;pointer-events:none;}
-    #splash-logo{width:80px;height:80px;border-radius:20px;background:#E8631A;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:20px;}
-    #splash h1{color:#fff;font-size:22px;font-weight:800;margin-bottom:6px;}
-    #splash p{color:#8A8A8A;font-size:13px;}
-    #splash-bar{width:120px;height:3px;background:#333;border-radius:3px;margin-top:32px;overflow:hidden;}
-    #splash-progress{height:100%;background:#E8631A;border-radius:3px;animation:load 1.8s ease-in-out forwards;}
-    @keyframes load{from{width:0%}to{width:100%}}
-    #install-banner{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:400px;background:#1A1A1A;color:#fff;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.3);z-index:1000;}
-    #install-banner.hidden{display:none;}
-    #install-btn{background:#E8631A;color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;}
-    #close-banner{background:none;border:none;color:#8A8A8A;font-size:20px;cursor:pointer;padding:0 4px;flex-shrink:0;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F8F7F5;min-height:100vh;}
+    .screen{display:none;max-width:430px;margin:0 auto;min-height:100vh;}
+    .screen.active{display:flex;flex-direction:column;}
+    /* Header */
+    .header{padding:48px 28px 32px;background:#1A1A1A;color:#fff;}
+    .header-label{font-size:11px;font-weight:700;color:#E8631A;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;}
+    .header h1{font-size:24px;font-weight:800;line-height:1.1;}
+    .header p{font-size:13px;color:#A0A0A0;margin-top:6px;}
+    .header-navy{background:#0D1B2A;}
+    /* Body */
+    .body{padding:28px 24px;flex:1;}
+    /* Tabs */
+    .tabs{display:flex;background:#F8F7F5;border-radius:10px;padding:4px;margin-bottom:24px;}
+    .tab{flex:1;padding:9px 0;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:#8A8A8A;transition:all .2s;}
+    .tab.active{background:#fff;color:#1A1A1A;box-shadow:0 1px 4px rgba(0,0,0,.1);}
+    /* Form */
+    label{display:block;font-size:11px;font-weight:600;color:#8A8A8A;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
+    input[type=email],input[type=password],input[type=text],input[type=tel]{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #E5E5E5;font-size:15px;color:#1A1A1A;background:#fff;margin-bottom:14px;outline:none;font-family:inherit;}
+    input:focus{border-color:#E8631A;}
+    /* Buttons */
+    .btn-primary{width:100%;padding:14px 0;border-radius:12px;border:none;background:#E8631A;color:#fff;font-size:15px;font-weight:700;cursor:pointer;}
+    .btn-primary:hover{background:#C94F0F;}
+    .btn-primary.navy{background:#0D1B2A;}
+    .btn-secondary{width:100%;padding:12px 0;border-radius:12px;border:1.5px solid #E5E5E5;background:#fff;color:#1A1A1A;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;}
+    .btn-link{width:100%;background:none;border:none;color:#E8631A;font-size:13px;font-weight:600;cursor:pointer;padding:10px 0;margin-top:4px;}
+    /* Error */
+    .error{background:#FDEEEC;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#C0392B;}
+    .info{background:#FDF0E8;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#4A4A4A;line-height:1.6;}
+    .info-blue{background:#EBF2FB;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#1A5FA8;line-height:1.6;}
+    .success{background:#EBF5F0;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#2D7A4F;}
+    /* Check */
+    .check-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;cursor:pointer;}
+    .check-box{width:20px;height:20px;border-radius:6px;border:2px solid #E5E5E5;background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+    .check-box.checked{border-color:#E8631A;background:#E8631A;color:#fff;font-size:11px;font-weight:700;}
+    /* Splash */
+    #splash{position:fixed;inset:0;background:#1A1A1A;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;}
+    #splash.hide{opacity:0;pointer-events:none;transition:opacity .4s;}
+    .splash-logo{width:80px;height:80px;border-radius:20px;background:#E8631A;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:20px;}
+    .splash-bar{width:120px;height:3px;background:#333;border-radius:3px;margin-top:28px;overflow:hidden;}
+    .splash-fill{height:100%;background:#E8631A;border-radius:3px;animation:fill 1.8s ease forwards;}
+    @keyframes fill{from{width:0}to{width:100%}}
+    /* Choose */
+    .choose-btn{width:100%;max-width:280px;padding:14px 0;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;}
+    /* Code input */
+    .code-input{width:100%;padding:14px;border-radius:10px;border:1.5px solid #E5E5E5;font-size:28px;letter-spacing:.3em;text-align:center;font-family:monospace;color:#1A1A1A;margin-bottom:12px;outline:none;}
+    .code-input:focus{border-color:#E8631A;}
+    /* Center */
+    .center{text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:32px;}
+    .emoji-big{font-size:60px;margin-bottom:16px;}
+    /* Steps indicator */
+    .steps{display:flex;gap:4px;margin-bottom:20px;}
+    .step-dot{flex:1;height:4px;border-radius:4px;background:#E5E5E5;}
+    .step-dot.done{background:#2D7A4F;}
+    .step-dot.active{background:#E8631A;}
   </style>
 </head>
 <body>
-  <div id="splash">
-    <div id="splash-logo">🏛️</div>
-    <h1>ASPPI L'Aquila</h1>
-    <p>Portale Soci</p>
-    <div id="splash-bar"><div id="splash-progress"></div></div>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">🏛️</div>
+  <h1 style="color:#fff;font-size:22px;font-weight:800;margin-bottom:6px">ASPPI L'Aquila</h1>
+  <p style="color:#8A8A8A;font-size:13px">Portale Soci</p>
+  <div class="splash-bar"><div class="splash-fill"></div></div>
+</div>
+
+<!-- SCHERMATA SCELTA -->
+<div id="screen-choose" class="screen active">
+  <div class="header" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 32px;">
+    <div style="font-size:56px;margin-bottom:20px">🏛️</div>
+    <div class="header-label">Portale</div>
+    <h1 style="font-size:26px;margin-bottom:6px">ASPPI L'Aquila</h1>
+    <p>Associazione Piccoli Proprietari Immobiliari</p>
   </div>
-  <div id="install-banner" class="hidden">
-    <div style="font-size:28px;flex-shrink:0">📲</div>
-    <div style="flex:1"><strong style="display:block;font-size:13px;margin-bottom:2px">Installa l'app</strong><span style="font-size:11px;color:#8A8A8A">Aggiungila alla schermata Home</span></div>
-    <button id="install-btn">Installa</button>
-    <button id="close-banner">✕</button>
+  <div class="body" style="display:flex;flex-direction:column;align-items:center;background:#fff;">
+    <button class="btn-primary choose-btn" onclick="show('screen-login')">📱 Accesso Soci</button>
+    <button class="btn-secondary choose-btn" style="max-width:280px" onclick="show('screen-admin-login')">🔧 Admin — Simeoni</button>
+    <p style="font-size:11px;color:#8A8A8A;margin-top:16px;text-align:center;max-width:260px;line-height:1.6">
+      Portale riservato ai soci ASPPI L'Aquila<br>
+      C.so Vittorio Emanuele 9 · +39 392 519 1490
+    </p>
   </div>
-  <div id="root"></div>
+</div>
 
-  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
-  <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<!-- LOGIN SOCI -->
+<div id="screen-login" class="screen">
+  <div class="header">
+    <div class="header-label">ASPPI L'Aquila</div>
+    <h1>Portale Soci</h1>
+    <p>Accedi al tuo account</p>
+  </div>
+  <div class="body">
+    <div class="tabs">
+      <button class="tab active" id="tab-login" onclick="switchTab('login')">Accedi</button>
+      <button class="tab" id="tab-register" onclick="switchTab('register')">Registrati</button>
+    </div>
 
-  <script type="text/babel" data-presets="react">
-const { useState } = React;
+    <!-- ACCEDI -->
+    <div id="form-login">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="mario.rossi@email.com"/>
+      <label>Password</label>
+      <input type="password" id="login-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <div id="login-error" class="error" style="display:none"></div>
+      <div class="check-row" onclick="toggleCheck('remember-login')">
+        <div class="check-box" id="remember-login-box"></div>
+        <span style="font-size:13px;color:#1A1A1A">Ricorda email e password</span>
+      </div>
+      <button class="btn-primary" onclick="doLogin()" id="login-btn">Accedi</button>
+      <button class="btn-link" onclick="show('screen-forgot')">Password dimenticata?</button>
+      <button class="btn-secondary" onclick="show('screen-choose')" style="margin-top:8px">← Indietro</button>
+    </div>
 
+    <!-- REGISTRATI -->
+    <div id="form-register" style="display:none">
+      <label>Nome *</label>
+      <input type="text" id="reg-nome" placeholder="Mario"/>
+      <label>Cognome</label>
+      <input type="text" id="reg-cognome" placeholder="Rossi"/>
+      <label>Telefono</label>
+      <input type="tel" id="reg-tel" placeholder="+39 333 000 0000"/>
+      <label>Email *</label>
+      <input type="email" id="reg-email" placeholder="mario.rossi@email.com"/>
+      <label>Password * (min. 8 caratteri)</label>
+      <input type="password" id="reg-pwd" placeholder="••••••••"/>
+      <div id="reg-error" class="error" style="display:none"></div>
+      <div class="check-row" onclick="toggleCheck('remember-reg')">
+        <div class="check-box" id="remember-reg-box"></div>
+        <span style="font-size:13px;color:#1A1A1A">Ricorda email e password</span>
+      </div>
+      <button class="btn-primary" onclick="doRegister()">Crea account</button>
+      <button class="btn-secondary" onclick="show('screen-choose')" style="margin-top:8px">← Indietro</button>
+    </div>
+  </div>
+</div>
 
+<!-- RECUPERO PASSWORD -->
+<div id="screen-forgot" class="screen">
+  <div class="header">
+    <div class="header-label">ASPPI L'Aquila</div>
+    <h1>Recupero password</h1>
+  </div>
+  <div class="body">
+    <div id="forgot-step1">
+      <div class="info">📧 Inserisci la tua email. Ti invieremo un codice di 6 cifre per reimpostare la password.</div>
+      <label>La tua email</label>
+      <input type="email" id="forgot-email" placeholder="mario.rossi@email.com"/>
+      <div id="forgot-error" class="error" style="display:none"></div>
+      <button class="btn-primary" onclick="doForgotStep1()">Invia codice via email</button>
+      <button class="btn-secondary" onclick="show('screen-login')">← Torna al login</button>
+    </div>
+    <div id="forgot-step2" style="display:none">
+      <div class="success" id="forgot-email-sent"></div>
+      <label>Codice di verifica (6 cifre)</label>
+      <input type="text" class="code-input" id="forgot-code" placeholder="000000" maxlength="6"/>
+      <div id="forgot-error2" class="error" style="display:none"></div>
+      <button class="btn-primary" onclick="doForgotStep2()">Verifica codice</button>
+      <button class="btn-secondary" onclick="showForgotStep(1)">← Cambia email</button>
+    </div>
+    <div id="forgot-step3" style="display:none">
+      <div class="info">🔑 Codice verificato! Ora scegli una nuova password.</div>
+      <label>Nuova password (min. 8 caratteri)</label>
+      <input type="password" id="forgot-newpwd" placeholder="••••••••"/>
+      <label>Conferma nuova password</label>
+      <input type="password" id="forgot-newpwd2" placeholder="••••••••"/>
+      <div id="forgot-error3" class="error" style="display:none"></div>
+      <button class="btn-primary" onclick="doForgotStep3()">Salva nuova password</button>
+    </div>
+    <div id="forgot-step4" style="display:none" class="center">
+      <div class="emoji-big">✅</div>
+      <h2 style="font-size:20px;font-weight:800;color:#1A1A1A;margin-bottom:8px">Password aggiornata!</h2>
+      <p style="font-size:13px;color:#8A8A8A;margin-bottom:24px">Ora puoi accedere con la nuova password.</p>
+      <button class="btn-primary" style="width:200px;border-radius:12px" onclick="show('screen-login')">Vai al login</button>
+    </div>
+  </div>
+</div>
 
-// ============================================================
-// BACKEND URL
-// ============================================================
-const API_URL = "https://script.google.com/macros/s/AKfycbz6rc5F8qiVgzuVtZeEQtYm9RVwenjKCX1KEFOEAJawJ6juNGfbz6aQpqv4U-lv697e/exec";
-const ADMIN_TOKEN = "ASPPI_ADMIN_asppi2025laquila";
+<!-- ADMIN LOGIN -->
+<div id="screen-admin-login" class="screen">
+  <div class="header header-navy">
+    <div class="header-label">ASPPI L'Aquila · Admin</div>
+    <h1>Accesso riservato</h1>
+    <p>Solo personale autorizzato</p>
+  </div>
+  <div class="body">
+    <div class="info-blue">🔒 Pannello riservato a Simeoni Maurizio — ASPPI L'Aquila</div>
+    <label>Password amministratore</label>
+    <input type="password" id="admin-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+    <div id="admin-error" class="error" style="display:none"></div>
+    <div class="check-row" onclick="toggleCheck('remember-admin')">
+      <div class="check-box" id="remember-admin-box"></div>
+      <span style="font-size:13px;color:#1A1A1A">Ricorda password su questo dispositivo</span>
+    </div>
+    <button class="btn-primary navy" onclick="doAdminLogin()">Accedi al pannello</button>
+    <button class="btn-secondary" onclick="show('screen-choose')">← Indietro</button>
+    <p style="font-size:11px;color:#8A8A8A;text-align:center;margin-top:20px">
+      Per assistenza: centroserviziasppiaq@asppi.it
+    </p>
+  </div>
+</div>
 
-async function api(action, data={}, token=null) {
+<!-- SOCIO HOME (placeholder — si espanderà) -->
+<div id="screen-socio" class="screen">
+  <div style="background:#1A1A1A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.1em">ASPPI L'AQUILA</div>
+      <div style="color:#fff;font-size:15px;font-weight:700" id="socio-nome-header">Portale Soci</div>
+    </div>
+    <button onclick="doLogout()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer">Esci</button>
+  </div>
+  <div style="padding:20px;flex:1">
+    <div style="font-size:12px;color:#8A8A8A;margin-bottom:4px">Benvenuto,</div>
+    <div style="font-size:22px;font-weight:800;color:#1A1A1A;margin-bottom:24px" id="socio-nome">Socio</div>
+    <div class="info-blue">✅ Login effettuato con successo! L'app completa sarà disponibile a breve.</div>
+    <div style="background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <div style="font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #E5E5E5">IL TUO ACCOUNT</div>
+      <div style="font-size:13px;color:#8A8A8A;margin-bottom:4px">Email</div>
+      <div style="font-size:14px;font-weight:600;color:#1A1A1A;margin-bottom:12px" id="socio-email">—</div>
+      <button onclick="show('screen-cambia-pwd')" style="background:none;border:1px solid #E5E5E5;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:#1A1A1A">🔑 Cambia password</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN HOME (placeholder) -->
+<div id="screen-admin" class="screen">
+  <div style="background:#0D1B2A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.1em">ASPPI L'AQUILA · ADMIN</div>
+      <div style="color:#fff;font-size:15px;font-weight:700">Simeoni Maurizio</div>
+    </div>
+    <button onclick="doAdminLogout()" style="background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer">Esci</button>
+  </div>
+  <div style="padding:20px;flex:1">
+    <div class="info-blue">✅ Accesso admin effettuato! Il pannello completo sarà disponibile a breve.</div>
+    <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <div style="font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #E5E5E5">IMPOSTAZIONI ADMIN</div>
+      <button onclick="show('screen-admin-cambia-pwd')" style="background:none;border:1px solid #E5E5E5;border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:#1A1A1A">🔑 Cambia password admin</button>
+    </div>
+  </div>
+</div>
+
+<!-- CAMBIA PASSWORD SOCIO -->
+<div id="screen-cambia-pwd" class="screen">
+  <div style="background:#1A1A1A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.1em">ASPPI L'AQUILA</div>
+      <div style="color:#fff;font-size:15px;font-weight:700">Cambia password</div>
+    </div>
+    <button onclick="show('screen-socio')" style="background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer">← Indietro</button>
+  </div>
+  <div class="body">
+    <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <div style="font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #E5E5E5">MODIFICA PASSWORD</div>
+      <label>Password attuale</label>
+      <input type="password" id="cp-old" placeholder="••••••••"/>
+      <label>Nuova password (min. 8 caratteri)</label>
+      <input type="password" id="cp-new" placeholder="••••••••"/>
+      <label>Conferma nuova password</label>
+      <input type="password" id="cp-new2" placeholder="••••••••"/>
+      <div id="cp-error" class="error" style="display:none"></div>
+      <div id="cp-ok" class="success" style="display:none">✅ Password aggiornata con successo!</div>
+      <button class="btn-primary" onclick="doCambiaPwd()">Salva nuova password</button>
+    </div>
+  </div>
+</div>
+
+<!-- CAMBIA PASSWORD ADMIN -->
+<div id="screen-admin-cambia-pwd" class="screen">
+  <div style="background:#0D1B2A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.1em">ADMIN</div>
+      <div style="color:#fff;font-size:15px;font-weight:700">Cambia password admin</div>
+    </div>
+    <button onclick="show('screen-admin')" style="background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer">← Indietro</button>
+  </div>
+  <div class="body">
+    <div style="background:#fff;border-radius:14px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <label>Password attuale</label>
+      <input type="password" id="acp-old" placeholder="••••••••"/>
+      <label>Nuova password (min. 8 caratteri)</label>
+      <input type="password" id="acp-new" placeholder="••••••••"/>
+      <label>Conferma nuova password</label>
+      <input type="password" id="acp-new2" placeholder="••••••••"/>
+      <div id="acp-error" class="error" style="display:none"></div>
+      <div id="acp-ok" class="success" style="display:none">✅ Password aggiornata!</div>
+      <button class="btn-primary navy" onclick="doAdminCambiaPwd()">Aggiorna password</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbz6rc5F8qiVgzuVtZeEQtYm9RVwenjKCX1KEFOEAJawJ6juNGfbz6aQpqv4U-lv697e/exec";
+const ADMIN_PWD_DEFAULT = "Asppi2025!";
+
+// ── STATO ────────────────────────────────────────────────────
+let state = { token: null, user: null, forgotCode: null, forgotEmail: null };
+let checks = { 'remember-login': false, 'remember-reg': false, 'remember-admin': false };
+
+// ── INIT ─────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const s = document.getElementById('splash');
+    s.classList.add('hide');
+    setTimeout(() => s.remove(), 400);
+  }, 1800);
+
+  // Ripristina sessione salvata
   try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action, token, ...data }),
+    const saved = JSON.parse(localStorage.getItem('asppi_session') || 'null');
+    if (saved && saved.token && saved.user) {
+      state.token = saved.token;
+      state.user  = saved.user;
+      showSocio(saved.user);
+      return;
+    }
+    // Pre-compila credenziali
+    const rem = JSON.parse(localStorage.getItem('asppi_remember') || 'null');
+    if (rem) {
+      document.getElementById('login-email').value = rem.email || '';
+      document.getElementById('login-pwd').value   = rem.pwd   || '';
+      setCheck('remember-login', true);
+    }
+    // Admin remember
+    const adminPwd = localStorage.getItem('asppi_admin_pwd');
+    if (adminPwd) {
+      document.getElementById('admin-pwd').value = adminPwd;
+      setCheck('remember-admin', true);
+    }
+  } catch(e) {}
+});
+
+// ── NAVIGATION ───────────────────────────────────────────────
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function switchTab(tab) {
+  document.getElementById('form-login').style.display    = tab === 'login'    ? '' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none';
+  document.getElementById('tab-login').classList.toggle('active',    tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+}
+
+// ── CHECKBOX ─────────────────────────────────────────────────
+function toggleCheck(id) {
+  checks[id] = !checks[id];
+  setCheck(id, checks[id]);
+}
+function setCheck(id, val) {
+  checks[id] = val;
+  const box = document.getElementById(id + '-box');
+  if (!box) return;
+  box.classList.toggle('checked', val);
+  box.textContent = val ? '✓' : '';
+}
+
+// ── API ──────────────────────────────────────────────────────
+async function api(action, data) {
+  try {
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, ...data })
     });
     return await res.json();
   } catch(e) {
-    return { ok: false, error: "Errore di connessione. Controlla la tua rete." };
+    return { ok: false, error: 'Errore di connessione. Controlla la rete.' };
   }
 }
 
-// Token salvato in localStorage
-function getToken()  { try { return localStorage.getItem("asppi_token"); } catch(e) { return null; } }
-function saveToken(t){ try { localStorage.setItem("asppi_token", t); } catch(e) {} }
-function clearToken(){ try { localStorage.removeItem("asppi_token"); localStorage.removeItem("asppi_user"); } catch(e) {} }
-function getUser()   { try { return JSON.parse(localStorage.getItem("asppi_user")||"null"); } catch(e) { return null; } }
-function saveUser(u) { try { localStorage.setItem("asppi_user", JSON.stringify(u)); } catch(e) {} }
-
-const or="#E8631A",dk="#1A1A1A",st="#8A8A8A",bd="#E5E5E5",bg="#F8F7F5",wh="#FFFFFF",gn="#2D7A4F",bl="#1A5FA8",rd="#C0392B";
-const ol="#FDF0E8",gl="#EBF5F0",rl="#FDEEEC",bl2="#EBF2FB",nv="#0D1B2A";
-
-const inp={display:"block",width:"100%",padding:"11px 13px",borderRadius:10,border:`1.5px solid ${bd}`,fontSize:14,marginBottom:12,boxSizing:"border-box",outline:"none",fontFamily:"inherit",backgroundColor:wh,color:dk};
-const lbl={display:"block",fontSize:11,fontWeight:600,color:st,marginBottom:4,textTransform:"uppercase",letterSpacing:"0.04em"};
-const card={backgroundColor:wh,borderRadius:14,padding:16,marginBottom:12,boxShadow:"0 1px 4px rgba(0,0,0,0.07)"};
-const sec={fontSize:10,fontWeight:700,color:or,letterSpacing:"0.12em",textTransform:"uppercase",paddingBottom:8,borderBottom:`1px solid ${bd}`,marginBottom:14};
-const btnP={width:"100%",padding:"14px 0",borderRadius:12,border:"none",backgroundColor:or,color:wh,fontSize:15,fontWeight:700,cursor:"pointer"};
-const btnS={width:"100%",padding:"12px 0",borderRadius:12,border:`1.5px solid ${bd}`,backgroundColor:wh,color:dk,fontSize:14,fontWeight:600,cursor:"pointer",marginTop:8};
-
-// ── COMPONENTI BASE ──────────────────────────────────────────────────────────
-const Inp=({label,ph,mono,opt})=>(
-  <div><label style={lbl}>{label}{opt?" (opz.)":""}</label>
-  <input placeholder={ph||""} style={{...inp,fontFamily:mono?"monospace":"inherit"}}/></div>
-);
-const Box=({title,children})=>(
-  <div style={card}>{title&&<div style={sec}>{title}</div>}{children}</div>
-);
-const Badge=({c,bg:b,children})=>(
-  <span style={{display:"inline-flex",padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,color:c,backgroundColor:b}}>{children}</span>
-);
-const Info=({blue,children})=>(
-  <div style={{backgroundColor:blue?bl2:ol,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:12,color:blue?bl:"#4A4A4A",lineHeight:1.6}}>{children}</div>
-);
-const CardRow=({accent,title,sub,right,badge,onClick})=>(
-  <div style={{...card,display:"flex",cursor:onClick?"pointer":"default",marginBottom:10}} onClick={onClick}>
-    <div style={{width:4,backgroundColor:accent||or,flexShrink:0}}/>
-    <div style={{flex:1,padding:"14px"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-        <div style={{fontSize:14,fontWeight:700,color:dk}}>{title}</div>
-        {right&&<div style={{fontSize:13,fontWeight:800,color:or}}>{right}</div>}
-      </div>
-      {sub&&<div style={{fontSize:12,color:st,marginTop:2}}>{sub}</div>}
-      {badge&&<div style={{marginTop:6}}>{badge}</div>}
-    </div>
-    {onClick&&<div style={{display:"flex",alignItems:"center",paddingRight:14,color:st}}>›</div>}
-  </div>
-);
-
-// ── DATI MOCK ────────────────────────────────────────────────────────────────
-const PRENOTAZIONI=[
-  {id:"P001",nome:"Mario Rossi",tel:"333 111 2222",data:"Lun 30 Giu",ora:"09:30",motivo:"Contratto locazione"},
-  {id:"P002",nome:"Anna Conti",tel:"347 222 3333",data:"Lun 30 Giu",ora:"11:00",motivo:"Consulenza affitto"},
-  {id:"P003",nome:"Luca Ferrari",tel:"320 333 4444",data:"Lun 30 Giu",ora:"15:00",motivo:"Rinnovo contratto"},
-  {id:"P004",nome:"Carlo Bianchi",tel:"333 555 6666",data:"Mar 1 Lug",ora:"10:00",motivo:"Contratto locazione"},
-];
-const PRATICHE=[
-  {id:"#2401",nome:"Mario Rossi",tipo:"Tipo A – 3+2",stato:"chat",statoL:"In chat",
-   loc:{nome:"Mario Rossi",cf:"RSSMRA70A01G878X",res:"Via Roma 1, L'Aquila"},
-   con:{nome:"Luigi Verdi",cf:"VRDLGU90A01H501Z",res:"Via Milano 5, L'Aquila"},
-   imm:{ind:"Via Garibaldi 15 int.3, L'Aquila",cat:"A/2",rendita:"€450,00"},
-   cnt:{canone:"€580/mese",dal:"01/09/2025",deposito:"€1.160,00"},
-   chat:[{m:false,t:"Ho ricevuto la richiesta. Manca il numero APE dell'immobile.",h:"10:15"},{m:true,t:"Buongiorno, il numero è AQ-2024-001234.",h:"10:45"},{m:false,t:"Grazie. Ha anche la classe energetica?",h:"10:47"}]},
-  {id:"#2400",nome:"Carla Mancini",tipo:"Tipo C – Studenti",stato:"ok",statoL:"Dati completi",
-   loc:{nome:"Carla Mancini",cf:"MNCCRLA75C41G878Z",res:"Corso Umberto 8, L'Aquila"},
-   con:{nome:"Alessandro Fontana",cf:"FNTALX00A01G878K",res:"Via Napoli 3, L'Aquila"},
-   imm:{ind:"Via dei Mille 22 int.1, L'Aquila",cat:"A/3",rendita:"€280,00"},
-   cnt:{canone:"€350/mese",dal:"01/10/2025",deposito:"€700,00"},
-   chat:[{m:false,t:"Tutti i dati ricevuti. Sto preparando il contratto.",h:"09:30"}]},
-  {id:"#2399",nome:"Roberto Esposito",tipo:"Tipo A – 4+4",stato:"archiviato",statoL:"Completato",
-   loc:{nome:"Roberto Esposito",cf:"SPTRBT68D01G878W",res:"Via Strinella 10, L'Aquila"},
-   con:{nome:"Francesca Lalli",cf:"LLLFNC90E41G878V",res:"Via XX Settembre 4, L'Aquila"},
-   imm:{ind:"Via Pescara 7 int.2, L'Aquila",cat:"A/2",rendita:"€520,00"},
-   cnt:{canone:"€650/mese",dal:"01/07/2025",deposito:"€1.950,00"},
-   chat:[{m:false,t:"Contratto completato e consegnato.",h:"14:00"}]},
-];
-const APPARTAMENTI=[
-  {id:"apt1",nome:"Casa Garibaldi",ind:"Via Garibaldi 15, int.3 – L'Aquila",cat:"A/2",mq:"75",piano:"2°",
-   loc:{nome:"Mario Rossi",cf:"RSSMRA70A01G878X"},
-   contratti:[
-     {id:"#2401",taj:"AQ2024A12345",con:"Luigi Verdi",tipo:"Tipo A – 3+2",canone:"€580/mese",dal:"01/09/2024",al:"31/08/2027",stato:"attivo",adempimenti:[{tipo:"proroga",data:"15/03/2025"}]},
-     {id:"#2356",taj:"AQ2021A98765",con:"Francesca Lalli",tipo:"Tipo A – 3+2",canone:"€550/mese",dal:"01/09/2021",al:"31/08/2024",stato:"scaduto",adempimenti:[]},
-   ]},
-  {id:"apt2",nome:"Bilocale Stazione",ind:"Via XX Settembre 4, int.1 – L'Aquila",cat:"A/3",mq:"45",piano:"1°",
-   loc:{nome:"Anna Conti",cf:"CNTANNA68A41G878Y"},
-   contratti:[
-     {id:"#2398",taj:"AQ2024B55432",con:"Alessandro Fontana",tipo:"Tipo C – Studenti",canone:"€350/mese",dal:"01/10/2024",al:"31/03/2025",stato:"scaduto",adempimenti:[]},
-   ]},
-];
-const statoClr={chat:[or,ol],ok:[gn,gl],attivo:[gn,gl],archiviato:[st,bg],scaduto:[st,bg]};
-
-// ══════════════════════════════════════════════════════════════════════════════
-// SEZIONE CLIENTE
-// ══════════════════════════════════════════════════════════════════════════════
-const CSTEPS=["Tipo","Durata","Canone","Immobile","Locatori","Conduttori","Garanti","Note","Privacy"];
-
-function Persona({tipo,n,onRemove,showMotivo}){
-  return(
-    <div style={{backgroundColor:bg,borderRadius:12,padding:14,marginBottom:12}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-        <span style={{fontSize:11,fontWeight:700,color:or}}>{tipo} {n}</span>
-        <button onClick={onRemove} style={{background:"none",border:"none",color:rd,fontSize:20,cursor:"pointer",padding:0,lineHeight:1}}>✕</button>
-      </div>
-      <Inp label="Cognome" ph="ROSSI"/><Inp label="Nome" ph="MARIO"/>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 10px"}}>
-        <Inp label="Luogo nascita" ph="L'AQUILA (AQ)"/><Inp label="Data nascita" ph="01/01/1980"/>
-      </div>
-      <Inp label="Codice Fiscale" ph="RSSMRA80A01G878X" mono/>
-      <Inp label="Comune residenza" ph="L'AQUILA"/><Inp label="Via e n° civico" ph="VIA ROMA 1"/>
-      {tipo==="LOCATORE"&&<>
-        <Inp label="Titolo di proprietà" ph="Proprietario / Usufruttuario"/>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 10px"}}>
-          <Inp label="Quota %" ph="es. 100"/>
-          <div><label style={lbl}>Cedolare secca</label>
-            <div style={{display:"flex",gap:6,marginBottom:12}}>
-              {["Sì","No"].map(v=><button key={v} style={{flex:1,padding:"9px 0",borderRadius:10,border:`1.5px solid ${bd}`,background:wh,fontSize:13,fontWeight:600,cursor:"pointer"}}>{v}</button>)}
-            </div>
-          </div>
-        </div>
-      </>}
-      {tipo==="CONDUTTORE"&&<>
-        <Inp label="Stanza assegnata mq" ph="es. 18" opt/>
-        {showMotivo&&<Inp label="Motivo transitorietà / Facoltà e matricola" ph="es. Ingegneria 123456" opt/>}
-      </>}
-      {tipo==="GARANTE"&&<Inp label="Conduttore di riferimento" ph="es. Mario Rossi"/>}
-    </div>
-  );
+function showErr(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = msg ? '' : 'none';
 }
 
-function ClienteApp({onExit}){
-  const [scr,setScr]=useState("home");
-  const [apt,setApt]=useState(null);
-  const [cnt,setCnt]=useState(null);
-  const [adTipo,setAdTipo]=useState(null);
-  const [nuovoForm,setNuovoForm]=useState(false);
-  const [adOk,setAdOk]=useState(false);
-  const [day,setDay]=useState(null);
-  const [slot,setSlot]=useState(null);
-  const [conf,setConf]=useState(false);
-  const [motivo,setMotivo]=useState("");
-  const [aptList,setAptList]=useState(APPARTAMENTI);
-  const [nuovoApt,setNuovoApt]=useState(false);
-  const [aptStep,setAptStep]=useState(0);
-  const [aptNome,setAptNome]=useState("");
+// ── LOGIN ────────────────────────────────────────────────────
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pwd   = document.getElementById('login-pwd').value;
+  showErr('login-error', '');
+  if (!email || !pwd) { showErr('login-error', 'Email e password obbligatorie'); return; }
 
-  const Nav=()=>(
-    <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:430,backgroundColor:wh,borderTop:`1px solid ${bd}`,display:"flex",padding:"8px 0 16px"}}>
-      {[["🏠","Home","home"],["🏢","Immobili","apartments"],["📅","Prenota","prenota"],["💬","Chat","chat"]].map(([ic,lb,id])=>(
-        <button key={id} onClick={()=>setScr(id)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,border:"none",backgroundColor:"transparent",cursor:"pointer",padding:"6px 0"}}>
-          <span style={{fontSize:20,opacity:scr===id?1:0.35}}>{ic}</span>
-          <span style={{fontSize:10,fontWeight:scr===id?700:500,color:scr===id?or:st}}>{lb}</span>
-        </button>
-      ))}
-    </div>
-  );
+  const btn = document.getElementById('login-btn');
+  btn.textContent = 'Accesso in corso...'; btn.disabled = true;
+  const res = await api('login', { email, password: pwd });
+  btn.textContent = 'Accedi'; btn.disabled = false;
 
-  const TopBar=({title,back})=>(
-    <div style={{backgroundColor:dk,padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-      <div><div style={{color:or,fontSize:10,fontWeight:700,letterSpacing:"0.1em"}}>ASPPI L'AQUILA</div>
-      <div style={{color:wh,fontSize:15,fontWeight:700}}>{title}</div></div>
-      {back?<button onClick={back} style={{background:"none",border:"1px solid #fff4",color:wh,borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer"}}>← Indietro</button>
-      :<div style={{width:34,height:34,borderRadius:17,backgroundColor:or,display:"flex",alignItems:"center",justifyContent:"center",color:wh,fontWeight:800,fontSize:13}}>MR</div>}
-    </div>
-  );
-
-  if(nuovoApt) return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-      <div style={{backgroundColor:dk,padding:"14px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:10}}>
-        <div><div style={{color:or,fontSize:10,fontWeight:700,letterSpacing:"0.1em"}}>ASPPI L'AQUILA</div>
-        <div style={{color:wh,fontSize:15,fontWeight:700}}>Nuovo immobile · {aptStep+1}/3</div></div>
-        {aptStep>0
-          ?<button onClick={()=>setAptStep(s=>s-1)} style={{background:"none",border:"1px solid #fff4",color:wh,borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer"}}>← Indietro</button>
-          :<button onClick={()=>setNuovoApt(false)} style={{background:"none",border:"1px solid #fff4",color:wh,borderRadius:8,padding:"6px 10px",fontSize:11,cursor:"pointer"}}>✕ Annulla</button>}
-      </div>
-      <div style={{display:"flex",gap:3,padding:"10px 14px",backgroundColor:wh,borderBottom:`1px solid ${bd}`}}>
-        {[0,1,2].map(i=><div key={i} style={{flex:1,height:4,borderRadius:4,backgroundColor:i<aptStep?gn:i===aptStep?or:bd}}/>)}
-      </div>
-      <div style={{padding:"14px 14px 100px"}}>
-        {aptStep===0&&(
-          <div style={card}>
-            <div style={sec}>NOME IMMOBILE</div>
-            <div style={{backgroundColor:ol,borderRadius:10,padding:"10px 14px",marginBottom:14,fontSize:12,color:"#4A4A4A",lineHeight:1.6}}>
-              💡 Scegli un nome facile da ricordare solo per te.<br/>Es. "Casa Garibaldi", "Bilocale centro", "App. mamma"
-            </div>
-            <label style={lbl}>Nome immobile</label>
-            <input value={aptNome} onChange={e=>setAptNome(e.target.value)} placeholder='es. "Casa Garibaldi"' style={{...inp}}/>
-          </div>
-        )}
-        {aptStep===1&&(
-          <div style={card}>
-            <div style={sec}>DATI IMMOBILE</div>
-            <Inp label="Comune / Frazione" ph="L'AQUILA"/>
-            <Inp label="Via e n° civico" ph="VIA GARIBALDI 15"/>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 10px"}}>
-              <Inp label="Piano" ph="2°"/><Inp label="Scala" ph="A" opt/>
-            </div>
-            <Inp label="Interno" ph="es. 3"/>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 10px"}}>
-              <Inp label="Categoria catastale" ph="A/2"/><Inp label="Rendita €" ph="450,00"/>
-              <Inp label="Foglio" ph="45"/><Inp label="Particella" ph="123"/>
-              <Inp label="Subalterno" ph="4"/>
-            </div>
-          </div>
-        )}
-        {aptStep===2&&(
-          <div style={card}>
-            <div style={sec}>LOCATORE (PROPRIETARIO)</div>
-            <div style={{backgroundColor:bg,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:12,color:st}}>
-              Se sei tu il proprietario compila con i tuoi dati. Se gestisci per conto di altri, usa i loro dati.
-            </div>
-            <Inp label="Nome e Cognome" ph="MARIO ROSSI"/>
-            <Inp label="Codice Fiscale" ph="RSSMRA70A01G878X" mono/>
-            <Inp label="Indirizzo residenza" ph="VIA ROMA 1, L'AQUILA"/>
-            <Inp label="Telefono" ph="+39 333 111 2222"/>
-          </div>
-        )}
-      </div>
-      <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:430,backgroundColor:wh,borderTop:`1px solid ${bd}`,padding:"12px 16px 20px"}}>
-        {aptStep<2
-          ?<button
-              disabled={aptStep===0&&!aptNome.trim()}
-              onClick={()=>setAptStep(s=>s+1)}
-              style={{...btnP,opacity:aptStep===0&&!aptNome.trim()?0.4:1}}>
-              {aptStep===0?"Avanti: Dati immobile →":"Avanti: Locatore →"}
-            </button>
-          :<button onClick={()=>{
-              setAptList(l=>[...l,{id:"apt_"+Date.now(),nome:aptNome,ind:"Da completare",cat:"—",mq:"—",piano:"—",loc:{nome:"—",cf:"—"},contratti:[]}]);
-              setNuovoApt(false);
-              setScr("apartments");
-            }} style={btnP}>Salva immobile ✓</button>}
-      </div>
-    </div>
-  );
-
-  if(nuovoForm) return <FormContratto apt={apt} onBack={()=>setNuovoForm(false)}/>;
-
-  if(scr==="home") return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-      <TopBar title="Portale Soci"/>
-      <div style={{padding:"16px 16px 90px"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20}}>
-          <div><div style={{fontSize:12,color:st}}>Benvenuto,</div><div style={{fontSize:20,fontWeight:800,color:dk}}>{user?.nome||"Socio"}</div></div>
-          <button onClick={onCambioPwd} style={{background:"none",border:`1px solid ${bd}`,borderRadius:10,padding:"6px 12px",fontSize:11,fontWeight:600,color:st,cursor:"pointer"}}>🔑 Password</button>
-        </div>
-        <div style={{display:"flex",gap:10,marginBottom:20}}>
-          <button onClick={()=>setScr("apartments")} style={{flex:1,border:"none",borderRadius:16,padding:"20px 14px",cursor:"pointer",background:`linear-gradient(135deg,${or},#C94F0F)`,color:wh,textAlign:"left"}}>
-            <div style={{fontSize:26,marginBottom:8}}>🏢</div><div style={{fontSize:14,fontWeight:800}}>Immobili</div><div style={{fontSize:11,opacity:0.8}}>e contratti</div>
-          </button>
-          <button onClick={()=>setScr("prenota")} style={{flex:1,border:"none",borderRadius:16,padding:"20px 14px",cursor:"pointer",backgroundColor:dk,color:wh,textAlign:"left"}}>
-            <div style={{fontSize:26,marginBottom:8}}>📅</div><div style={{fontSize:14,fontWeight:800}}>Prenota</div><div style={{fontSize:11,opacity:0.6}}>Appuntamento</div>
-          </button>
-        </div>
-        <div style={{fontSize:14,fontWeight:800,color:dk,marginBottom:10}}>I tuoi immobili</div>
-        {aptList.map((a,i)=>{
-          const att=a.contratti.find(c=>c.stato==="attivo");
-          return <CardRow key={i} accent={att?gn:st} title={a.nome} sub={a.ind} right={att?"Attivo":"Libero"} onClick={()=>{setApt(a);setScr("aptDetail")}}/>;
-        })}
-      </div>
-      <Nav/>
-    </div>
-  );
-
-  if(scr==="apartments") return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-      <TopBar title="I miei immobili"/>
-      <div style={{padding:"16px 16px 90px"}}>
-        {aptList.map((a,i)=>{
-          const att=a.contratti.find(c=>c.stato==="attivo");
-          return(
-            <div key={i} style={{...card,display:"flex",cursor:"pointer",marginBottom:10}} onClick={()=>{setApt(a);setScr("aptDetail")}}>
-              <div style={{width:4,backgroundColor:att?gn:st,flexShrink:0}}/>
-              <div style={{flex:1,padding:14}}>
-                <div style={{display:"flex",justifyContent:"space-between"}}>
-                  <div style={{fontSize:15,fontWeight:800,color:dk}}>{a.nome}</div>
-                  <Badge c={att?gn:st} bg={att?gl:bg}>{att?"Attivo":"Libero"}</Badge>
-                </div>
-                <div style={{fontSize:12,color:st,marginTop:2}}>{a.ind}</div>
-                <div style={{fontSize:11,color:dk,marginTop:4}}>{a.mq} mq · {a.cat} · Piano {a.piano}</div>
-                <div style={{fontSize:11,color:st,marginTop:2}}>{a.contratti.length} contratti · Loc.: {a.loc.nome}</div>
-              </div>
-              <div style={{display:"flex",alignItems:"center",paddingRight:14,color:st}}>›</div>
-            </div>
-          );
-        })}
-        <button onClick={()=>{setNuovoApt(true);setAptStep(0);setAptNome("");}} style={{width:"100%",padding:"14px 0",borderRadius:14,border:`2px dashed ${bd}`,backgroundColor:"transparent",color:st,fontSize:13,fontWeight:600,cursor:"pointer"}}>＋ Aggiungi nuovo immobile</button>
-      </div>
-      <Nav/>
-    </div>
-  );
-
-  if(scr==="aptDetail"&&apt) return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-      <TopBar title={apt.nome} back={()=>setScr("apartments")}/>
-      <div style={{padding:"16px 16px 90px"}}>
-        <Box title="DATI IMMOBILE">
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 16px"}}>
-            {[["Categoria",apt.cat],["Superficie",apt.mq+" mq"],["Piano",apt.piano]].map(([l,v])=>(
-              <div key={l}><div style={{fontSize:11,color:st}}>{l}</div><div style={{fontSize:14,fontWeight:600,color:dk,marginBottom:10}}>{v}</div></div>
-            ))}
-          </div>
-          <div style={{fontSize:11,color:st,backgroundColor:bg,borderRadius:8,padding:"8px 10px"}}>🔒 Dati fissi. Per modifiche contatta lo studio.</div>
-        </Box>
-        <Box title="LOCATORE">
-          <div style={{fontSize:14,fontWeight:600,color:dk}}>{apt.loc.nome}</div>
-          <div style={{fontSize:12,color:st}}>{apt.loc.cf}</div>
-        </Box>
-        <div style={{fontSize:14,fontWeight:800,color:dk,marginBottom:10}}>Contratti</div>
-        {apt.contratti.map((c,i)=>(
-          <div key={i} style={{...card,display:"flex",cursor:"pointer",marginBottom:10}} onClick={()=>{setCnt(c);setScr("cntDetail")}}>
-            <div style={{width:4,backgroundColor:c.stato==="attivo"?gn:st,flexShrink:0}}/>
-            <div style={{flex:1,padding:14}}>
-              <div style={{display:"flex",justifyContent:"space-between"}}>
-                <div style={{fontSize:13,fontWeight:700,color:dk}}>{c.con}</div>
-                <Badge c={c.stato==="attivo"?gn:st} bg={c.stato==="attivo"?gl:bg}>{c.stato==="attivo"?"Attivo":"Scaduto"}</Badge>
-              </div>
-              <div style={{fontSize:12,color:st}}>{c.tipo} · {c.canone}</div>
-              <div style={{fontSize:11,color:st,marginTop:2}}>{c.dal} → {c.al}</div>
-              {c.adempimenti.length>0&&<div style={{marginTop:4}}><Badge c={st} bg={bg}>🔄 {c.adempimenti[0].tipo}</Badge></div>}
-            </div>
-            <div style={{display:"flex",alignItems:"center",paddingRight:14,color:st}}>›</div>
-          </div>
-        ))}
-        <button onClick={()=>setNuovoForm(true)} style={{...btnP,marginTop:4}}>＋ Nuovo contratto</button>
-      </div>
-      <Nav/>
-    </div>
-  );
-
-  if(scr==="cntDetail"&&cnt) return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-      <TopBar title={"Contratto "+cnt.id} back={()=>setScr("aptDetail")}/>
-      <div style={{padding:"16px 16px 90px"}}>
-        <Box>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
-            <div><div style={{fontSize:11,color:or,fontWeight:700}}>CONTRATTO {cnt.id}</div>
-            <div style={{fontSize:18,fontWeight:800,color:dk,marginTop:2}}>{cnt.con}</div></div>
-            <Badge c={cnt.stato==="attivo"?gn:st} bg={cnt.stato==="attivo"?gl:bg}>{cnt.stato==="attivo"?"Attivo":"Scaduto"}</Badge>
-          </div>
-          <div style={{fontSize:12,color:st}}>{cnt.tipo} · {cnt.canone}</div>
-          <div style={{fontSize:12,color:st,marginTop:2}}>{cnt.dal} → {cnt.al}</div>
-        </Box>
-        <Box title="CODICE TAJ (DA RICEVUTA)">
-          <div style={{fontSize:11,color:st,marginBottom:6}}>Inserito dal locatore dalla ricevuta di registrazione</div>
-          <div style={{fontSize:16,fontWeight:800,color:dk,fontFamily:"monospace",letterSpacing:"0.06em"}}>{cnt.taj}</div>
-        </Box>
-        {cnt.adempimenti.length>0&&(
-          <Box title="ADEMPIMENTI REGISTRATI">
-            {cnt.adempimenti.map((a,i)=>(
-              <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0"}}>
-                <span style={{fontSize:18}}>🔄</span>
-                <div><div style={{fontSize:13,fontWeight:700,color:dk}}>{a.tipo}</div><div style={{fontSize:11,color:st}}>{a.data}</div></div>
-                <Badge c={gn} bg={gl} style={{marginLeft:"auto"}}>Fatto</Badge>
-              </div>
-            ))}
-          </Box>
-        )}
-        <div style={{fontSize:14,fontWeight:800,color:dk,marginBottom:10}}>Richiedi un adempimento</div>
-        {[{id:"proroga",ic:"🔄",l:"Proroga",d:"Estendi la durata del contratto"},{id:"subentro",ic:"👤",l:"Subentro",d:"Nuovo conduttore subentra"},{id:"cessione",ic:"📤",l:"Cessione",d:"Il conduttore cede il contratto"}].map(a=>(
-          <CardRow key={a.id} accent={or} title={a.l} sub={a.d} onClick={()=>{setAdTipo(a.id);setScr("adempimento")}}/>
-        ))}
-      </div>
-      <Nav/>
-    </div>
-  );
-
-  if(scr==="adempimento"&&cnt&&adTipo){
-    const cfg={proroga:{ic:"🔄",l:"Proroga",fields:[{l:"TAJ contratto",ph:cnt.taj,mono:true},{l:"Nuova data scadenza",ph:"gg/mm/aaaa"}]},subentro:{ic:"👤",l:"Subentro",fields:[{l:"TAJ contratto",ph:cnt.taj,mono:true},{l:"Nome e Cognome nuovo conduttore",ph:"BIANCHI MARCO"},{l:"Codice Fiscale nuovo conduttore",ph:"BNCMRC85A01G878Z",mono:true},{l:"Data del subentro",ph:"gg/mm/aaaa"}]},cessione:{ic:"📤",l:"Cessione",fields:[{l:"TAJ contratto",ph:cnt.taj,mono:true},{l:"Data della cessione",ph:"gg/mm/aaaa"},{l:"Nome cessionario",ph:"NERI LAURA"},{l:"CF cessionario",ph:"NRELRA90B41G878K",mono:true}]}};
-    const c=cfg[adTipo];
-    if(adOk) return(
-      <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",padding:32}}>
-        <div style={{fontSize:56,marginBottom:16}}>{c.ic}</div>
-        <div style={{fontSize:20,fontWeight:800,color:dk,marginBottom:8}}>Richiesta {c.l} inviata!</div>
-        <div style={{fontSize:13,color:st,maxWidth:260,lineHeight:1.7,marginBottom:24}}>Lo studio ASPPI provvederà all'adempimento per il contratto <strong>{cnt.id}</strong>.</div>
-        <button onClick={()=>setScr("cntDetail")} style={{...btnP,width:220,borderRadius:12}}>Torna al contratto</button>
-      </div>
-    );
-    return(
-      <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-        <TopBar title={c.l} back={()=>setScr("cntDetail")}/>
-        <div style={{padding:"16px 16px 20px"}}>
-          <Info>{c.ic} Contratto {cnt.id} · {cnt.con}</Info>
-          {c.fields.map((f,i)=><Inp key={i} label={f.l} ph={f.ph} mono={f.mono}/>)}
-          <button onClick={()=>setAdOk(true)} style={btnP}>Invia richiesta {c.l} →</button>
-          <button onClick={()=>setScr("cntDetail")} style={btnS}>Annulla</button>
-        </div>
-      </div>
-    );
+  if (res.ok) {
+    state.token = res.token; state.user = res;
+    if (checks['remember-login']) {
+      localStorage.setItem('asppi_remember', JSON.stringify({ email, pwd }));
+    } else {
+      localStorage.removeItem('asppi_remember');
+    }
+    localStorage.setItem('asppi_session', JSON.stringify({ token: res.token, user: res }));
+    showSocio(res);
+  } else {
+    showErr('login-error', res.error || 'Credenziali non valide');
   }
+}
 
-  if(scr==="prenota"){
-    const GIORNI=["L","M","M","G","V","S","D"];
-    const DISP=[3,5,7,10,12,14,17,19,21,24,26,28];
-    const SLOT=["09:00","09:30","10:00","10:30","11:00","11:30","15:00","15:30","16:00","16:30","17:00"];
-    const BUSY=["09:00","10:30","15:30"];
-    if(conf) return(
-      <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-        <TopBar title="Prenotazione confermata"/>
-        <div style={{padding:"16px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",paddingTop:80}}>
-          <div style={{fontSize:56,marginBottom:16}}>✅</div>
-          <div style={{fontSize:20,fontWeight:800,color:dk,marginBottom:8}}>Appuntamento confermato!</div>
-          <div style={{fontSize:15,color:st,marginBottom:6}}>{day} Luglio 2025</div>
-          <div style={{fontSize:24,fontWeight:800,color:or,marginBottom:16}}>ore {slot}</div>
-          <div style={{backgroundColor:ol,borderRadius:12,padding:"14px 20px",marginBottom:10,fontSize:13,color:dk}}>
-            <div style={{fontWeight:700,marginBottom:4}}>📋 {motivo}</div>
-            <div style={{fontSize:12,color:st}}>📍 ASPPI L'Aquila · Corso Vittorio Emanuele 9</div>
-          </div>
-          <button onClick={()=>{setConf(false);setDay(null);setSlot(null);setMotivo("");}} style={{...btnS,marginTop:20,width:200}}>Torna alla home</button>
-        </div>
-        <Nav/>
-      </div>
-    );
-    return(
-      <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-        <TopBar title="Prenota appuntamento"/>
-        <div style={{padding:"16px 16px 90px"}}>
-          <div style={{fontSize:13,fontWeight:700,color:dk,marginBottom:12}}>Luglio 2025</div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:4,marginBottom:20}}>
-            {GIORNI.map((g,i)=><div key={i} style={{textAlign:"center",fontSize:11,fontWeight:600,color:st,padding:"6px 0"}}>{g}</div>)}
-            <div/>
-            {Array.from({length:30},(_,i)=>i+1).map(d=>{
-              const av=DISP.includes(d),sel=day===d,tod=d===24;
-              return(
-                <div key={d} onClick={()=>{if(av){setDay(d);setSlot(null);}}} style={{aspectRatio:"1",display:"flex",alignItems:"center",justifyContent:"center",borderRadius:10,fontSize:13,fontWeight:sel?800:tod?700:500,cursor:av?"pointer":"default",backgroundColor:sel?or:tod?"#FDF0E8":"transparent",color:sel?wh:av?dk:bd,border:tod&&!sel?`1.5px solid ${or}`:"none"}}>{d}</div>
-              );
-            })}
-          </div>
-          {day&&<>
-            <div style={{fontSize:13,fontWeight:700,color:dk,marginBottom:10}}>Orari · {day} Luglio</div>
-            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:20}}>
-              {SLOT.map(s=>{
-                const busy=BUSY.includes(s),sel2=slot===s;
-                return(
-                  <div key={s} onClick={()=>{if(!busy)setSlot(s);}} style={{padding:"10px 0",textAlign:"center",borderRadius:10,fontSize:13,fontWeight:600,cursor:busy?"default":"pointer",backgroundColor:sel2?or:busy?bg:wh,color:sel2?wh:busy?bd:dk,border:`1.5px solid ${busy?bd:bd}`,textDecoration:busy?"line-through":"none"}}>{s}</div>
-                );
-              })}
-            </div>
-          </>}
-          {day&&slot&&(
-            <div style={{backgroundColor:ol,borderRadius:14,padding:16}}>
-              <div style={{fontSize:12,color:st,marginBottom:4}}>Riepilogo</div>
-              <div style={{fontSize:15,fontWeight:800,color:dk}}>{day} Luglio · ore {slot}</div>
-              <div style={{fontSize:12,color:dk,marginTop:2}}>30 minuti · ASPPI L'Aquila</div>
-              <div style={{marginTop:14}}>
-                <label style={{display:"block",fontSize:11,fontWeight:700,color:"#4A4A4A",marginBottom:6,textTransform:"uppercase",letterSpacing:"0.04em"}}>Motivo della visita *</label>
-                <select value={motivo} onChange={e=>setMotivo(e.target.value)}
-                  style={{width:"100%",padding:"11px 13px",borderRadius:10,border:`1.5px solid ${motivo?or:bd}`,fontSize:14,backgroundColor:wh,color:dk,marginBottom:4,outline:"none",cursor:"pointer"}}>
-                  <option value="">-- Seleziona --</option>
-                  <option value="Nuovo contratto di locazione">Nuovo contratto di locazione</option>
-                  <option value="Rinnovo / proroga contratto">Rinnovo / proroga contratto</option>
-                  <option value="Subentro o cessione contratto">Subentro o cessione contratto</option>
-                  <option value="Consulenza affitto">Consulenza affitto</option>
-                  <option value="Registrazione contratto">Registrazione contratto</option>
-                  <option value="Ritiro documenti">Ritiro documenti</option>
-                  <option value="Altro">Altro (specificare nelle note)</option>
-                </select>
-                {motivo==="Altro"&&<input placeholder="Specifica il motivo..." style={{width:"100%",padding:"11px 13px",borderRadius:10,border:`1.5px solid ${bd}`,fontSize:14,marginTop:8,boxSizing:"border-box",outline:"none"}}/>}
-              </div>
-              <button
-                disabled={!motivo}
-                onClick={()=>setConf(true)}
-                style={{...btnP,marginTop:12,borderRadius:10,opacity:motivo?1:0.4}}>
-                Conferma appuntamento
-              </button>
-            </div>
-          )}
-        </div>
-        <Nav/>
-      </div>
-    );
+// ── REGISTER ─────────────────────────────────────────────────
+async function doRegister() {
+  const nome    = document.getElementById('reg-nome').value.trim();
+  const cognome = document.getElementById('reg-cognome').value.trim();
+  const tel     = document.getElementById('reg-tel').value.trim();
+  const email   = document.getElementById('reg-email').value.trim();
+  const pwd     = document.getElementById('reg-pwd').value;
+  showErr('reg-error', '');
+  if (!nome || !email || !pwd) { showErr('reg-error', 'Nome, email e password sono obbligatori'); return; }
+  if (pwd.length < 8) { showErr('reg-error', 'La password deve essere di almeno 8 caratteri'); return; }
+
+  const res = await api('register', { nome, cognome, telefono: tel, email, password: pwd });
+  if (res.ok) {
+    state.token = res.token; state.user = res;
+    if (checks['remember-reg']) {
+      localStorage.setItem('asppi_remember', JSON.stringify({ email, pwd }));
+    }
+    localStorage.setItem('asppi_session', JSON.stringify({ token: res.token, user: res }));
+    showSocio(res);
+  } else {
+    showErr('reg-error', res.error || 'Errore registrazione. Riprova.');
   }
-
-  if(scr==="chat") return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-      <TopBar title="Chat"/>
-      <div style={{padding:"16px 16px 90px"}}>
-        {PRATICHE.filter(p=>p.stato==="chat").map((p,i)=>(
-          <CardRow key={i} accent={or} title={p.nome} sub={"Pratica "+p.id+" · In attesa risposta"} badge={<Badge c={or} bg={ol}>1 messaggio non letto</Badge>} onClick={()=>{}}/>
-        ))}
-      </div>
-      <Nav/>
-    </div>
-  );
-
-  return null;
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// FORM CONTRATTO
-// ══════════════════════════════════════════════════════════════════════════════
-function FormContratto({apt,onBack}){
-  const [step,setStep]=useState(0);
-  const [tipo,setTipo]=useState("");
-  const [locs,setLocs]=useState([1]);
-  const [cons,setCons]=useState([1]);
-  const [gars,setGars]=useState([]);
-  const [gdpr,setGdpr]=useState([false,false,false,false]);
-  const [sent,setSent]=useState(false);
-
-  if(sent) return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",padding:32}}>
-      <div style={{fontSize:56,marginBottom:16}}>📨</div>
-      <div style={{fontSize:20,fontWeight:800,color:dk,marginBottom:8}}>Richiesta inviata!</div>
-      <div style={{fontSize:13,color:st,maxWidth:260,lineHeight:1.7,marginBottom:24}}>Lo studio ASPPI riceverà i dati e vi contatterà via chat.</div>
-      <button onClick={onBack} style={{...btnP,width:220,borderRadius:12}}>Torna agli immobili</button>
-    </div>
-  );
-
-  const canNext=step!==0||!!tipo;
-  const aptN=apt?apt.nome:"Casa Garibaldi";
-
-  return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-      <div style={{backgroundColor:dk,padding:"14px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:10}}>
-        <div><div style={{color:or,fontSize:10,fontWeight:700,letterSpacing:"0.1em"}}>ASPPI · {aptN}</div>
-        <div style={{color:wh,fontSize:15,fontWeight:700}}>{CSTEPS[step]} · {step+1}/{CSTEPS.length}</div></div>
-        {step>0?<button onClick={()=>setStep(s=>s-1)} style={{background:"none",border:"1px solid #fff4",color:wh,borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer"}}>← Indietro</button>
-        :<button onClick={onBack} style={{background:"none",border:"1px solid #fff4",color:wh,borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer"}}>✕</button>}
-      </div>
-      <div style={{display:"flex",gap:3,padding:"10px 14px",backgroundColor:wh,borderBottom:`1px solid ${bd}`}}>
-        {CSTEPS.map((_,i)=><div key={i} style={{flex:1,height:4,borderRadius:4,backgroundColor:i<step?gn:i===step?or:bd}}/>)}
-      </div>
-      <div style={{padding:"14px 14px 110px"}}>
-        {step===0&&<Box title="0 — TIPO DI CONTRATTO">
-          {[{id:"Tipo A",desc:"Locazione agevolata · 3+2 anni"},{id:"Tipo B",desc:"Transitorio lavoratori · 30gg–18 mesi"},{id:"Tipo C",desc:"Transitorio studenti · 6–18 mesi+18 mesi"}].map(t=>(
-            <div key={t.id} onClick={()=>setTipo(t.id)} style={{borderRadius:12,padding:"14px 16px",marginBottom:8,cursor:"pointer",border:`2px solid ${tipo===t.id?or:bd}`,backgroundColor:tipo===t.id?ol:wh,display:"flex",alignItems:"center",gap:12}}>
-              <div style={{width:20,height:20,borderRadius:10,flexShrink:0,border:`2px solid ${tipo===t.id?or:bd}`,backgroundColor:tipo===t.id?or:"transparent"}}/>
-              <div><div style={{fontSize:14,fontWeight:800,color:dk}}>{t.id}</div><div style={{fontSize:12,color:st}}>{t.desc}</div></div>
-            </div>
-          ))}
-        </Box>}
-        {step===1&&<Box title="1 — DURATA CONTRATTUALE"><Inp label="Data inizio locazione" ph="gg/mm/aaaa"/><Inp label="Data fine locazione" ph="gg/mm/aaaa"/><Inp label="Numero di mensilità" ph="es. 36"/></Box>}
-        {step===2&&<><Box title="2 — CANONE"><Inp label="Canone mensile €" ph="es. 580,00"/><Inp label="Canone annuale / periodo €" ph="es. 6.960,00"/><Inp label="IBAN locatore" ph="IT60 X054 2811 1010 0000 0123 456" mono/></Box>
-          <Box title="3 — DEPOSITO CAUZIONALE"><Inp label="Importo deposito €" ph="es. 1.160,00"/><Inp label="N° mensilità corrispondenti" ph="es. 2"/></Box>
-          <Box title="4 — ONERI ACCESSORI"><Info blue>💡 Se sconosciuti lasciare vuoto: clausola conguaglio automatica.</Info><Inp label="Oneri mensili €" ph="es. 50,00" opt/><Inp label="IBAN condominio" ph="IT60 X054..." mono opt/></Box></>}
-        {step===3&&<><Box title="5 — INDIRIZZO IMMOBILE"><Inp label="Comune / Frazione" ph="L'AQUILA"/><Inp label="Via e n° civico" ph="VIA GARIBALDI 15"/>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 10px"}}><Inp label="Piano" ph="2°"/><Inp label="Scala" ph="A" opt/></div><Inp label="Interno" ph="es. 3"/></Box>
-          <Box title="DATI CATASTALI IMMOBILE PRINCIPALE"><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 10px"}}><Inp label="Sezione" ph="AQ" opt/><Inp label="Foglio" ph="45"/><Inp label="Particella" ph="123"/><Inp label="Subalterno" ph="4"/><Inp label="Categoria" ph="A/2"/><Inp label="Rendita €" ph="450,00"/></div></Box>
-          <Box title="PERTINENZE — SE LOCATE"><Info>Compilare solo se incluse nella locazione.</Info>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 10px"}}><Inp label="Foglio pert.1" ph="45" opt/><Inp label="Particella pert.1" ph="124" opt/><Inp label="Sub pert.1" ph="1" opt/><Inp label="Cat. pert.1" ph="C/6" opt/></div><Inp label="Rendita pert.1 €" ph="20,00" opt/>
-            <div style={{borderTop:`1px solid ${bd}`,margin:"4px 0 12px"}}/>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 10px"}}><Inp label="Foglio pert.2" ph="45" opt/><Inp label="Particella pert.2" ph="125" opt/><Inp label="Sub pert.2" ph="2" opt/><Inp label="Cat. pert.2" ph="C/6" opt/></div><Inp label="Rendita pert.2 €" ph="20,00" opt/></Box>
-          <Box title="CERTIFICATO APE"><Inp label="Numero certificato APE" ph="es. AQ-2024-0012345"/><Inp label="Classe energetica" ph="es. D"/></Box>
-          <Box title="COMPOSIZIONE UNITÀ IMMOBILIARE"><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 10px"}}><Inp label="Camere/Soggiorno" ph="3"/><Inp label="Cucina" ph="Abitabile"/><Inp label="Bagni" ph="1"/><Inp label="Balconi" ph="2" opt/><Inp label="Terrazzi" ph="1" opt/><Inp label="Verde privato" ph="Sì/No" opt/></div></Box>
-          <Box title="TABELLE MILLESIMALI"><Info blue>💡 Dal regolamento condominiale. Lasciare vuoto se non applicabile.</Info>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"0 10px"}}><Inp label="Proprietà mm" ph="12,50" opt/><Inp label="Scale mm" ph="8,20" opt/><Inp label="Ascensore mm" ph="10,00" opt/><Inp label="Riscaldamento mm" ph="15,30" opt/></div><Inp label="Altro mm" ph="es. Piscina 5,00" opt/></Box></>}
-        {step===4&&<Box title="5 — LOCATORI">
-          <Info>Inserire tutti i comproprietari con quota e cedolare secca.</Info>
-          {locs.map((_,i)=><Persona key={i} tipo="LOCATORE" n={i+1} onRemove={()=>setLocs(a=>a.filter((_,j)=>j!==i))}/>)}
-          <button onClick={()=>setLocs(a=>[...a,a.length+1])} style={{width:"100%",padding:"10px 0",borderRadius:10,border:`2px dashed ${bd}`,backgroundColor:"transparent",color:st,fontSize:13,fontWeight:600,cursor:"pointer",marginBottom:8}}>＋ Aggiungi locatore</button>
-          <div style={{fontSize:11,color:st}}>N.B.: allegare documento d'identità di ogni locatore.</div>
-        </Box>}
-        {step===5&&<Box title="6 — CONDUTTORI">
-          {tipo==="Tipo B"&&<Info blue>📋 Tipo B: indicare il motivo della transitorietà.</Info>}
-          {tipo==="Tipo C"&&<Info blue>📋 Tipo C: indicare facoltà universitaria e n° matricola.</Info>}
-          {cons.map((_,i)=><Persona key={i} tipo="CONDUTTORE" n={i+1} showMotivo={tipo==="Tipo B"||tipo==="Tipo C"} onRemove={()=>setCons(a=>a.filter((_,j)=>j!==i))}/>)}
-          <button onClick={()=>setCons(a=>[...a,a.length+1])} style={{width:"100%",padding:"10px 0",borderRadius:10,border:`2px dashed ${bd}`,backgroundColor:"transparent",color:st,fontSize:13,fontWeight:600,cursor:"pointer",marginBottom:8}}>＋ Aggiungi conduttore</button>
-          <div style={{fontSize:11,color:st}}>N.B.: allegare documento d'identità di ogni conduttore.</div>
-        </Box>}
-        {step===6&&<Box title="7 — GARANTI (OPZIONALI)">
-          <Info>Il garante è opzionale (es. genitore che garantisce per il figlio).</Info>
-          {gars.length===0?<button onClick={()=>setGars([1])} style={{width:"100%",padding:"10px 0",borderRadius:10,border:`2px dashed ${bd}`,backgroundColor:"transparent",color:st,fontSize:13,fontWeight:600,cursor:"pointer",marginBottom:8}}>＋ Aggiungi garante</button>
-          :<>{gars.map((_,i)=><Persona key={i} tipo="GARANTE" n={i+1} onRemove={()=>setGars(a=>a.filter((_,j)=>j!==i))}/>)}
-          <button onClick={()=>setGars(a=>[...a,a.length+1])} style={{width:"100%",padding:"10px 0",borderRadius:10,border:`2px dashed ${bd}`,backgroundColor:"transparent",color:st,fontSize:13,fontWeight:600,cursor:"pointer",marginBottom:8}}>＋ Aggiungi altro garante</button></>}
-        </Box>}
-        {step===7&&<Box title="8 — NOTE AGGIUNTIVE"><Info blue>Clausole particolari o richieste. Il modello ministeriale non può essere stravolto.</Info>
-          <label style={lbl}>Note</label><textarea placeholder="Es. L'immobile è dotato di box auto..." style={{...inp,minHeight:120,resize:"vertical",lineHeight:1.6}}/></Box>}
-        {step===8&&<>
-          <Box title="9 — CONSENSO DATI (GDPR)">
-            <div style={{fontSize:12,color:st,lineHeight:1.7,marginBottom:14}}>Titolare del trattamento: <strong>PRO DOMO SUA – ASPPI L'Aquila</strong>, C.so Vittorio Emanuele 9, L'Aquila.</div>
-            {["Dichiaro di aver ricevuto e compreso l'informativa (art. 13 GDPR).","Presto il consenso al trattamento tramite intelligenza artificiale.","Dichiaro di essere legittimato/a a fornire i dati di tutti i soggetti indicati.","Presto il consenso al trasferimento dati verso paesi extra-UE (artt. 44-49 GDPR)."].map((t,i)=>(
-              <div key={i} onClick={()=>setGdpr(g=>g.map((v,j)=>j===i?!v:v))} style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:12,cursor:"pointer"}}>
-                <div style={{width:20,height:20,borderRadius:6,flexShrink:0,marginTop:1,border:`2px solid ${gdpr[i]?or:bd}`,backgroundColor:gdpr[i]?or:"transparent",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                  {gdpr[i]&&<span style={{color:wh,fontSize:11,fontWeight:700}}>✓</span>}
-                </div>
-                <div style={{fontSize:13,color:"#4A4A4A",lineHeight:1.5}}>{t}</div>
-              </div>
-            ))}
-          </Box>
-          <Box title="RIEPILOGO">
-            {[["Tipo",tipo||"—"],["Locatori",locs.length],["Conduttori",cons.length],["Garanti",gars.length||"Nessuno"]].map(([l,v])=>(
-              <div key={l} style={{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:`1px solid ${bd}`}}>
-                <span style={{fontSize:12,color:st}}>{l}</span><span style={{fontSize:13,fontWeight:700,color:dk}}>{v}</span>
-              </div>
-            ))}
-          </Box>
-          <button disabled={!gdpr.every(Boolean)} onClick={()=>setSent(true)} style={{...btnP,opacity:gdpr.every(Boolean)?1:0.4}}>Invia richiesta contratto ✓</button>
-          {!gdpr.every(Boolean)&&<div style={{fontSize:11,color:st,textAlign:"center",marginTop:8}}>Tutti e 4 i consensi sono obbligatori.</div>}
-        </>}
-      </div>
-      {step<CSTEPS.length-1&&(
-        <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:430,backgroundColor:wh,borderTop:`1px solid ${bd}`,padding:"12px 16px 20px"}}>
-          <button disabled={!canNext} onClick={()=>setStep(s=>s+1)} style={{...btnP,opacity:canNext?1:0.4}}>
-            {!tipo&&step===0?"Seleziona un tipo per continuare":`Avanti: ${CSTEPS[step+1]} →`}
-          </button>
-        </div>
-      )}
-    </div>
-  );
+function showSocio(user) {
+  document.getElementById('socio-nome').textContent        = user.nome || 'Socio';
+  document.getElementById('socio-nome-header').textContent = user.nome || 'Portale Soci';
+  document.getElementById('socio-email').textContent       = user.email || '—';
+  show('screen-socio');
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// SEZIONE ADMIN
-// ══════════════════════════════════════════════════════════════════════════════
-function AdminApp({onExit}){
-  const [scr,setScr]=useState("home");
-  // Inizializzazione diretta da localStorage — nessun hook condizionale
-  const [adminAuth,setAdminAuth]=useState(()=>{
-    try { return localStorage.getItem("asppi_admin_auth")==="true"; } catch(e){ return false; }
+function doLogout() {
+  state.token = null; state.user = null;
+  localStorage.removeItem('asppi_session');
+  show('screen-choose');
+}
+
+// ── ADMIN LOGIN ──────────────────────────────────────────────
+function doAdminLogin() {
+  const pwd = document.getElementById('admin-pwd').value;
+  const savedPwd = localStorage.getItem('asppi_admin_custom_pwd') || ADMIN_PWD_DEFAULT;
+  showErr('admin-error', '');
+  if (pwd === savedPwd) {
+    if (checks['remember-admin']) {
+      localStorage.setItem('asppi_admin_pwd', pwd);
+    } else {
+      localStorage.removeItem('asppi_admin_pwd');
+    }
+    show('screen-admin');
+  } else {
+    showErr('admin-error', 'Password non corretta');
+  }
+}
+
+function doAdminLogout() {
+  show('screen-choose');
+}
+
+// ── RECUPERO PASSWORD ────────────────────────────────────────
+function showForgotStep(n) {
+  [1,2,3,4].forEach(i => {
+    document.getElementById('forgot-step' + i).style.display = i === n ? '' : 'none';
   });
-  const [adminPwd,setAdminPwd]=useState(()=>{
-    try { return localStorage.getItem("asppi_admin_pwd")||""; } catch(e){ return ""; }
-  });
-  const [adminErr,setAdminErr]=useState("");
-  const [adminRicorda,setAdminRicorda]=useState(()=>{
-    try { return !!localStorage.getItem("asppi_admin_pwd"); } catch(e){ return false; }
-  });
+}
 
-  const adminLogin=()=>{
-    if(adminPwd==="Asppi2025!"){
-      setAdminAuth(true);
-      setAdminErr("");
-      if(adminRicorda){
-        localStorage.setItem("asppi_admin_auth","true");
-        localStorage.setItem("asppi_admin_pwd",adminPwd);
-      } else {
-        localStorage.removeItem("asppi_admin_auth");
-        localStorage.removeItem("asppi_admin_pwd");
-      }
-    } else {
-      setAdminErr("Password non corretta");
-    }
-  };
-
-  if(!adminAuth) return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:wh,minHeight:"100vh",display:"flex",flexDirection:"column"}}>
-      <div style={{backgroundColor:nv,padding:"48px 32px 36px"}}>
-        <div style={{color:or,fontSize:11,fontWeight:700,letterSpacing:"0.12em",marginBottom:8}}>ASPPI L'AQUILA · ADMIN</div>
-        <div style={{color:wh,fontSize:24,fontWeight:800}}>Accesso riservato</div>
-        <div style={{color:"#A0A0A0",fontSize:13,marginTop:6}}>Solo personale autorizzato</div>
-      </div>
-      <div style={{padding:"32px 24px",flex:1}}>
-        <div style={{backgroundColor:"#EBF2FB",borderRadius:12,padding:"12px 16px",marginBottom:24,fontSize:12,color:bl}}>
-          🔒 Pannello riservato a Simeoni Maurizio — ASPPI L'Aquila
-        </div>
-        <label style={lbl}>Password amministratore</label>
-        <input
-          type="password"
-          value={adminPwd}
-          onChange={e=>setAdminPwd(e.target.value)}
-          onKeyDown={e=>e.key==="Enter"&&adminLogin()}
-          placeholder="••••••••"
-          style={inp}
-        />
-        {adminErr&&<div style={{backgroundColor:rl,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:13,color:rd}}>{adminErr}</div>}
-        <div onClick={()=>setAdminRicorda(v=>!v)} style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,cursor:"pointer"}}>
-          <div style={{width:20,height:20,borderRadius:6,border:`2px solid ${adminRicorda?or:bd}`,backgroundColor:adminRicorda?or:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-            {adminRicorda&&<span style={{color:wh,fontSize:11,fontWeight:700}}>✓</span>}
-          </div>
-          <span style={{fontSize:13,color:dk}}>Ricorda password su questo dispositivo</span>
-        </div>
-        <button onClick={adminLogin} style={{...btnP,backgroundColor:nv}}>Accedi al pannello</button>
-        <button onClick={onExit} style={btnS}>← Torna alla home</button>
-        <div style={{fontSize:11,color:st,textAlign:"center",marginTop:20}}>
-          Per assistenza: centroserviziasppiaq@asppi.it
-        </div>
-      </div>
-    </div>
-  );
-  const [sel,setSel]=useState(null);
-  const [chatMsgs,setChatMsgs]=useState({});
-  const [msg,setMsg]=useState("");
-  const [tab,setTab]=useState("dati");
-  const [adOk,setAdOk]=useState(false);
-  const [en,setEn]=useState({Lun:true,Mar:true,Mer:false,Gio:true,Ven:true,Sab:false});
-  const [act,setAct]=useState(new Set(["09:00","09:30","10:00","10:30","11:00","11:30","15:00","15:30","16:00","16:30","17:00"]));
-  const [chiusure,setChiusure]=useState([{id:1,label:"Ferie estive",dal:"04/08/2025",al:"22/08/2025"}]);
-  const [addC,setAddC]=useState(false);
-  const [nc,setNc]=useState({label:"",dal:"",al:""});
-  const [bloccati,setBloccati]=useState(["25/07/2025"]);
-  const [ng,setNg]=useState("");
-  const [saved,setSaved]=useState(false);
-
-  const Nav=()=>(
-    <div style={{position:"fixed",bottom:0,left:"50%",transform:"translateX(-50%)",width:430,backgroundColor:wh,borderTop:`1px solid ${bd}`,display:"flex",padding:"8px 0 16px"}}>
-      {[["📊","Home","home"],["📅","Prenotaz.","prenotazioni"],["📋","Pratiche","pratiche"],["💬","Chat","chat"],["🗓️","Slot","slot"]].map(([ic,lb,id])=>(
-        <button key={id} onClick={()=>setScr(id)} style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:3,border:"none",backgroundColor:"transparent",cursor:"pointer",padding:"4px 0"}}>
-          <span style={{fontSize:18,opacity:scr===id?1:0.35}}>{ic}</span>
-          <span style={{fontSize:9,fontWeight:scr===id?700:500,color:scr===id?or:st}}>{lb}</span>
-        </button>
-      ))}
-    </div>
-  );
-
-  const TopBar=({title,back})=>(
-    <div style={{backgroundColor:nv,padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-      <div><div style={{color:or,fontSize:10,fontWeight:700,letterSpacing:"0.1em"}}>ASPPI L'AQUILA · ADMIN</div>
-      <div style={{color:wh,fontSize:15,fontWeight:700}}>{title}</div></div>
-      {back?<button onClick={back} style={{background:"none",border:"1px solid #fff4",color:wh,borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer"}}>← Indietro</button>
-      :<button onClick={()=>{localStorage.removeItem("asppi_admin_auth");onExit();}} style={{background:"none",border:"1px solid #fff4",color:wh,borderRadius:8,padding:"6px 10px",fontSize:11,cursor:"pointer"}}>← Esci</button>}
-    </div>
-  );
-
-  if(scr==="home") return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-      <TopBar title="Simeoni Maurizio"/>
-      <div style={{padding:"16px 16px 90px"}}>
-        <div style={{display:"flex",gap:8,marginBottom:20}}>
-          {[{n:PRENOTAZIONI.filter(p=>p.data==="Lun 30 Giu").length,l:"Oggi",c:or},{n:PRATICHE.filter(p=>p.stato==="chat").length,l:"In chat",c:or},{n:PRATICHE.length,l:"Pratiche",c:gn}].map((s,i)=>(
-            <div key={i} style={{flex:1,backgroundColor:wh,borderRadius:12,padding:"14px 8px",textAlign:"center",boxShadow:"0 1px 4px rgba(0,0,0,0.06)"}}>
-              <div style={{fontSize:26,fontWeight:800,color:s.c,lineHeight:1}}>{s.n}</div>
-              <div style={{fontSize:10,color:st,marginTop:4}}>{s.l}</div>
-            </div>
-          ))}
-        </div>
-        <div style={{fontSize:14,fontWeight:800,color:dk,marginBottom:10}}>📅 Appuntamenti oggi</div>
-        {PRENOTAZIONI.filter(p=>p.data==="Lun 30 Giu").map((p,i)=>(
-          <CardRow key={i} accent={or} title={p.nome} sub={p.motivo} right={p.ora} onClick={()=>{setSel(p);setScr("detailBook")}}/>
-        ))}
-        <div style={{fontSize:14,fontWeight:800,color:dk,margin:"16px 0 10px"}}>📝 Pratiche recenti</div>
-        {PRATICHE.slice(0,2).map((p,i)=>(
-          <CardRow key={i} accent={p.stato==="chat"?or:p.stato==="ok"?gn:st} title={p.nome} sub={p.tipo}
-            badge={<Badge c={statoClr[p.stato][0]} bg={statoClr[p.stato][1]}>{p.statoL}</Badge>}
-            onClick={()=>{setSel(p);setScr("detailPratica")}}/>
-        ))}
-      </div>
-      <Nav/>
-    </div>
-  );
-
-  if(scr==="prenotazioni") return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-      <TopBar title="Prenotazioni"/>
-      <div style={{padding:"16px 16px 90px"}}>
-        {["Lun 30 Giu","Mar 1 Lug"].map(data=>(
-          <div key={data}>
-            <div style={{fontSize:12,fontWeight:700,color:st,marginBottom:8,marginTop:8}}>{data.toUpperCase()}</div>
-            {PRENOTAZIONI.filter(p=>p.data===data).map((p,i)=>(
-              <CardRow key={i} accent={or} title={p.nome} sub={p.motivo} right={p.ora} onClick={()=>{setSel(p);setScr("detailBook")}}/>
-            ))}
-          </div>
-        ))}
-      </div>
-      <Nav/>
-    </div>
-  );
-
-  if(scr==="detailBook"&&sel) return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-      <TopBar title="Appuntamento" back={()=>setScr("prenotazioni")}/>
-      <div style={{padding:"16px"}}>
-        <Box>
-          <div style={{fontSize:22,fontWeight:800,color:dk,marginBottom:2}}>{sel.ora}</div>
-          <div style={{fontSize:14,color:st,marginBottom:12}}>{sel.data}</div>
-          <Badge c={gn} bg={gl}>● Confermato</Badge>
-        </Box>
-        <Box title="DATI SOCIO">
-          {[["Nome",sel.nome],["Telefono",sel.tel],["Motivo",sel.motivo]].map(([l,v])=>(
-            <div key={l}><div style={{fontSize:11,color:st}}>{l}</div><div style={{fontSize:14,fontWeight:600,color:dk,marginBottom:10}}>{v}</div></div>
-          ))}
-        </Box>
-        <button style={btnP} onClick={()=>setScr("prenotazioni")}>← Torna alle prenotazioni</button>
-        <button style={{...btnS,color:rd,borderColor:"#FDEEEC"}} onClick={()=>setScr("prenotazioni")}>Cancella appuntamento</button>
-      </div>
-      <Nav/>
-    </div>
-  );
-
-  if(scr==="pratiche") return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-      <TopBar title="Pratiche contratto"/>
-      <div style={{padding:"16px 16px 90px"}}>
-        {PRATICHE.map((p,i)=>(
-          <CardRow key={i} accent={p.stato==="chat"?or:p.stato==="ok"?gn:st} title={p.nome} sub={`${p.tipo} · ${p.id}`}
-            badge={<Badge c={statoClr[p.stato][0]} bg={statoClr[p.stato][1]}>{p.statoL}</Badge>}
-            onClick={()=>{setSel(p);setScr("detailPratica")}}/>
-        ))}
-      </div>
-      <Nav/>
-    </div>
-  );
-
-  if(scr==="detailPratica"&&sel){
-    const msgs=chatMsgs[sel.id]||sel.chat;
-    const send=()=>{if(!msg.trim())return;setChatMsgs(c=>({...c,[sel.id]:[...(c[sel.id]||sel.chat),{m:false,t:msg,h:"ora"}]}));setMsg("");};
-    return(
-      <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-        <TopBar title={sel.nome+" · "+sel.id} back={()=>setScr("pratiche")}/>
-        <div style={{display:"flex",backgroundColor:wh,borderBottom:`1px solid ${bd}`,padding:"0 16px"}}>
-          {[["dati","📋 Dati"],["chat","💬 Chat"]].map(([v,l])=>(
-            <button key={v} onClick={()=>setTab(v)} style={{flex:1,padding:"12px 0",border:"none",backgroundColor:"transparent",fontSize:13,fontWeight:700,cursor:"pointer",color:tab===v?or:st,borderBottom:`3px solid ${tab===v?or:"transparent"}`}}>{l}</button>
-          ))}
-        </div>
-        {tab==="dati"?(
-          <div style={{padding:"16px 16px 90px"}}>
-            <Box title="LOCATORE">{Object.entries(sel.loc).map(([k,v])=><div key={k}><div style={{fontSize:11,color:st,textTransform:"uppercase"}}>{k}</div><div style={{fontSize:14,fontWeight:600,color:dk,marginBottom:10}}>{v}</div></div>)}</Box>
-            <Box title="CONDUTTORE">{Object.entries(sel.con).map(([k,v])=><div key={k}><div style={{fontSize:11,color:st,textTransform:"uppercase"}}>{k}</div><div style={{fontSize:14,fontWeight:600,color:dk,marginBottom:10}}>{v}</div></div>)}</Box>
-            <Box title="IMMOBILE">{Object.entries(sel.imm).map(([k,v])=><div key={k}><div style={{fontSize:11,color:st,textTransform:"uppercase"}}>{k}</div><div style={{fontSize:14,fontWeight:600,color:dk,marginBottom:10}}>{v}</div></div>)}</Box>
-            <Box title="CONTRATTO">{Object.entries(sel.cnt).map(([k,v])=><div key={k}><div style={{fontSize:11,color:st,textTransform:"uppercase"}}>{k}</div><div style={{fontSize:14,fontWeight:600,color:dk,marginBottom:10}}>{v}</div></div>)}</Box>
-            <button style={btnP}>📄 Genera contratto DOCX</button>
-          </div>
-        ):(
-          <div style={{display:"flex",flexDirection:"column",height:"calc(100vh - 130px)"}}>
-            <div style={{flex:1,overflowY:"auto",padding:"16px",display:"flex",flexDirection:"column",gap:4}}>
-              {msgs.map((m,i)=>(
-                <div key={i} style={{display:"flex",flexDirection:"column"}}>
-                  <div style={{maxWidth:"78%",padding:"10px 14px",borderRadius:m.m?"4px 16px 16px 16px":"16px 4px 16px 16px",backgroundColor:m.m?wh:or,color:m.m?dk:wh,fontSize:14,lineHeight:1.5,alignSelf:m.m?"flex-start":"flex-end",border:m.m?`1px solid ${bd}`:"none"}}>{m.t}</div>
-                  <div style={{fontSize:10,color:st,alignSelf:m.m?"flex-start":"flex-end",margin:"2px 4px 8px"}}>{m.m?sel.nome.split(" ")[0]:"Tu"} · {m.h}</div>
-                </div>
-              ))}
-            </div>
-            <div style={{display:"flex",gap:8,padding:"12px 16px",backgroundColor:wh,borderTop:`1px solid ${bd}`}}>
-              <input value={msg} onChange={e=>setMsg(e.target.value)} onKeyDown={e=>e.key==="Enter"&&send()} placeholder={`Rispondi a ${sel.nome.split(" ")[0]}...`} style={{...inp,flex:1,marginBottom:0,fontSize:13}}/>
-              <button onClick={send} style={{width:44,height:44,borderRadius:22,border:"none",backgroundColor:or,color:wh,fontSize:20,cursor:"pointer",flexShrink:0}}>›</button>
-            </div>
-          </div>
-        )}
-        <Nav/>
-      </div>
-    );
+async function doForgotStep1() {
+  const email = document.getElementById('forgot-email').value.trim();
+  showErr('forgot-error', '');
+  if (!email) { showErr('forgot-error', 'Inserisci la tua email'); return; }
+  const res = await api('requestPasswordReset', { email });
+  if (res.ok) {
+    state.forgotCode  = res.codice;
+    state.forgotEmail = email;
+    document.getElementById('forgot-email-sent').textContent =
+      '✅ Codice inviato a ' + email + '. Controlla la casella (anche spam).';
+    showForgotStep(2);
+  } else {
+    showErr('forgot-error', res.error || 'Email non trovata');
   }
+}
 
-  if(scr==="chat") return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-      <TopBar title="Chat"/>
-      <div style={{padding:"16px 16px 90px"}}>
-        {PRATICHE.map((p,i)=>{
-          const msgs=chatMsgs[p.id]||p.chat;
-          const last=msgs[msgs.length-1];
-          return(
-            <div key={i} style={{...card,display:"flex",cursor:"pointer",marginBottom:10}} onClick={()=>{setSel(p);setScr("detailPratica");}}>
-              <div style={{width:4,backgroundColor:p.stato==="chat"?or:st,flexShrink:0}}/>
-              <div style={{flex:1,padding:"14px",display:"flex",alignItems:"center",gap:12}}>
-                <div style={{width:40,height:40,borderRadius:20,backgroundColor:p.stato==="chat"?or:bg,display:"flex",alignItems:"center",justifyContent:"center",color:p.stato==="chat"?wh:st,fontWeight:800,fontSize:14,flexShrink:0}}>
-                  {p.nome.split(" ").map(n=>n[0]).join("").slice(0,2)}
-                </div>
-                <div style={{flex:1,minWidth:0}}>
-                  <div style={{display:"flex",justifyContent:"space-between"}}>
-                    <div style={{fontSize:14,fontWeight:p.stato==="chat"?800:600,color:dk}}>{p.nome}</div>
-                    <div style={{fontSize:10,color:st}}>{last.h}</div>
-                  </div>
-                  <div style={{fontSize:12,color:st,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{last.t}</div>
-                </div>
-                {p.stato==="chat"&&<div style={{width:8,height:8,borderRadius:4,backgroundColor:or,flexShrink:0}}/>}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      <Nav/>
-    </div>
-  );
+function doForgotStep2() {
+  const code = document.getElementById('forgot-code').value.trim();
+  showErr('forgot-error2', '');
+  if (!code) { showErr('forgot-error2', 'Inserisci il codice'); return; }
+  if (code !== state.forgotCode) { showErr('forgot-error2', 'Codice non corretto. Controlla la email.'); return; }
+  showForgotStep(3);
+}
 
-  if(scr==="slot"){
-    const giorni=["Lun","Mar","Mer","Gio","Ven","Sab"];
-    const allSlots=["08:30","09:00","09:30","10:00","10:30","11:00","11:30","15:00","15:30","16:00","16:30","17:00","17:30"];
-    const tog=s=>{const n=new Set(act);n.has(s)?n.delete(s):n.add(s);setAct(n);};
-    return(
-      <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-        <TopBar title="Disponibilità"/>
-        <div style={{padding:"16px 16px 90px"}}>
-          <Box title="GIORNI DI RICEVIMENTO">
-            <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-              {giorni.map(g=><button key={g} onClick={()=>setEn(e=>({...e,[g]:!e[g]}))} style={{padding:"8px 14px",borderRadius:20,border:"none",cursor:"pointer",fontWeight:700,fontSize:13,backgroundColor:en[g]?or:bg,color:en[g]?wh:st}}>{g}</button>)}
-            </div>
-            <div style={{fontSize:11,color:st,marginTop:10}}>I giorni attivi si ripetono ogni settimana, salvo chiusure.</div>
-          </Box>
-          <Box title="ORARI (ogni 30 min)">
-            <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
-              {allSlots.map(s=><button key={s} onClick={()=>tog(s)} style={{padding:"10px 0",textAlign:"center",borderRadius:10,border:"none",cursor:"pointer",fontSize:13,fontWeight:600,backgroundColor:act.has(s)?or:bg,color:act.has(s)?wh:st}}>{s}</button>)}
-            </div>
-          </Box>
-          <Box title="PERIODI DI CHIUSURA">
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-              <div style={{fontSize:12,color:st}}>{chiusure.length} periodo/i impostato/i</div>
-              <button onClick={()=>setAddC(v=>!v)} style={{backgroundColor:or,color:wh,border:"none",borderRadius:16,padding:"4px 12px",fontSize:12,fontWeight:700,cursor:"pointer"}}>＋</button>
-            </div>
-            {chiusure.map(c=>(
-              <div key={c.id} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderBottom:`1px solid ${bd}`}}>
-                <span style={{fontSize:18}}>🏖️</span>
-                <div style={{flex:1}}><div style={{fontSize:13,fontWeight:700,color:dk}}>{c.label}</div><div style={{fontSize:11,color:st}}>dal {c.dal} al {c.al}</div></div>
-                <button onClick={()=>setChiusure(ch=>ch.filter(x=>x.id!==c.id))} style={{background:"none",border:"none",cursor:"pointer",color:rd,fontSize:18}}>✕</button>
-              </div>
-            ))}
-            {addC&&(
-              <div style={{marginTop:12,padding:14,backgroundColor:bg,borderRadius:12}}>
-                <input placeholder='Descrizione es. "Ferie agosto"' value={nc.label} onChange={e=>setNc(n=>({...n,label:e.target.value}))} style={{...inp,marginBottom:8}}/>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
-                  <div><div style={{fontSize:10,color:st,marginBottom:4}}>DAL</div><input placeholder="gg/mm/aaaa" value={nc.dal} onChange={e=>setNc(n=>({...n,dal:e.target.value}))} style={inp}/></div>
-                  <div><div style={{fontSize:10,color:st,marginBottom:4}}>AL</div><input placeholder="gg/mm/aaaa" value={nc.al} onChange={e=>setNc(n=>({...n,al:e.target.value}))} style={inp}/></div>
-                </div>
-                <div style={{display:"flex",gap:8}}>
-                  <button onClick={()=>setAddC(false)} style={{flex:1,padding:"9px 0",borderRadius:10,border:`1px solid ${bd}`,backgroundColor:wh,cursor:"pointer",fontSize:13}}>Annulla</button>
-                  <button onClick={()=>{setChiusure(c=>[...c,{id:Date.now(),...nc}]);setNc({label:"",dal:"",al:""});setAddC(false);}} style={{flex:2,padding:"9px 0",borderRadius:10,border:"none",backgroundColor:or,color:wh,fontWeight:700,cursor:"pointer",fontSize:13}}>Conferma</button>
-                </div>
-              </div>
-            )}
-          </Box>
-          <Box title="GIORNI SINGOLI BLOCCATI">
-            <div style={{fontSize:11,color:st,marginBottom:10}}>Blocca un giorno singolo (es. convegno, visita medica...)</div>
-            {bloccati.map((g,i)=>(
-              <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:`1px solid ${bd}`}}>
-                <span>🚫</span><div style={{flex:1,fontSize:13,fontWeight:600,color:dk}}>{g}</div>
-                <button onClick={()=>setBloccati(b=>b.filter((_,j)=>j!==i))} style={{background:"none",border:"none",cursor:"pointer",color:rd,fontSize:18}}>✕</button>
-              </div>
-            ))}
-            <div style={{display:"flex",gap:8,marginTop:12}}>
-              <input placeholder="gg/mm/aaaa" value={ng} onChange={e=>setNg(e.target.value)} style={{...inp,flex:1,marginBottom:0}}/>
-              <button onClick={()=>{if(ng){setBloccati(b=>[...b,ng]);setNg("");}}} style={{padding:"0 16px",borderRadius:10,border:"none",backgroundColor:or,color:wh,fontWeight:700,cursor:"pointer",fontSize:13,flexShrink:0}}>＋</button>
-            </div>
-          </Box>
-          <div style={{backgroundColor:ol,borderRadius:12,padding:12,marginBottom:14,fontSize:12,color:"#4A4A4A"}}>
-            ⚡️ Le prenotazioni già confermate non vengono cancellate automaticamente.
-          </div>
-          <button onClick={()=>{setSaved(true);setTimeout(()=>setSaved(false),2000);}} style={btnP}>{saved?"✓ Salvato!":"Salva tutte le impostazioni"}</button>
-        </div>
-        <Nav/>
-      </div>
-    );
+async function doForgotStep3() {
+  const p1 = document.getElementById('forgot-newpwd').value;
+  const p2 = document.getElementById('forgot-newpwd2').value;
+  showErr('forgot-error3', '');
+  if (!p1 || p1.length < 8) { showErr('forgot-error3', 'La password deve essere di almeno 8 caratteri'); return; }
+  if (p1 !== p2) { showErr('forgot-error3', 'Le due password non coincidono'); return; }
+  const res = await api('resetPassword', { email: state.forgotEmail, codice: state.forgotCode, newPassword: p1 });
+  if (res.ok) {
+    showForgotStep(4);
+  } else {
+    showErr('forgot-error3', res.error || 'Errore. Riprova.');
   }
-
-  return null;
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// ROOT
-// ══════════════════════════════════════════════════════════════════════════════
-// ── SCHERMATA RECUPERO PASSWORD ──────────────────────────────
-function ForgotPassword({onBack}){
-  const [step,setStep]=useState(1);
-  const [email,setEmail]=useState("");
-  const [codice,setCodice]=useState("");
-  const [newPwd,setNewPwd]=useState("");
-  const [newPwd2,setNewPwd2]=useState("");
-  const [loading,setLoading]=useState(false);
-  const [error,setError]=useState("");
-  const [codiceSent,setCodiceSent]=useState("");
-
-  const inviaEmail = async () => {
-    if(!email){ setError("Inserisci la tua email"); return; }
-    setLoading(true); setError("");
-    const res = await api("requestPasswordReset", {email});
-    setLoading(false);
-    if(res.ok){
-      setCodiceSent(res.codice||"");
-      setStep(2);
-    } else {
-      setError(res.error||"Email non trovata nel sistema");
-    }
-  };
-
-  const verificaCodice = () => {
-    if(!codice){ setError("Inserisci il codice ricevuto"); return; }
-    if(codice !== codiceSent){ setError("Codice non corretto. Controlla la email."); return; }
-    setError("");
-    setStep(3);
-  };
-
-  const cambiaPassword = async () => {
-    if(!newPwd||newPwd.length<8){ setError("La password deve essere di almeno 8 caratteri"); return; }
-    if(newPwd!==newPwd2){ setError("Le due password non coincidono"); return; }
-    setLoading(true); setError("");
-    const res = await api("resetPassword", {email, codice, newPassword: newPwd});
-    setLoading(false);
-    if(res.ok){
-      setStep(4);
-    } else {
-      setError(res.error||"Errore. Riprova.");
-    }
-  };
-
-  return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:wh,minHeight:"100vh",display:"flex",flexDirection:"column"}}>
-      <div style={{backgroundColor:dk,padding:"48px 32px 36px"}}>
-        <div style={{color:or,fontSize:11,fontWeight:700,letterSpacing:"0.12em",marginBottom:8}}>ASPPI L'AQUILA</div>
-        <div style={{color:wh,fontSize:22,fontWeight:800}}>Recupero password</div>
-      </div>
-      <div style={{padding:"32px 24px",flex:1}}>
-
-        {/* Step 1 - Inserisci email */}
-        {step===1&&<>
-          <div style={{backgroundColor:ol,borderRadius:12,padding:"12px 16px",marginBottom:20,fontSize:12,color:"#4A4A4A",lineHeight:1.6}}>
-            📧 Inserisci la tua email. Ti invieremo un codice per reimpostare la password.
-          </div>
-          <label style={lbl}>La tua email</label>
-          <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="mario.rossi@email.com" style={inp}/>
-          {error&&<div style={{backgroundColor:rl,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:13,color:rd}}>{error}</div>}
-          <button onClick={inviaEmail} disabled={loading} style={{...btnP,opacity:loading?0.6:1}}>
-            {loading?"Invio in corso...":"Invia codice via email"}
-          </button>
-          <button onClick={onBack} style={btnS}>← Torna al login</button>
-        </>}
-
-        {/* Step 2 - Inserisci codice */}
-        {step===2&&<>
-          <div style={{backgroundColor:gl,borderRadius:12,padding:"12px 16px",marginBottom:20,fontSize:12,color:gn,lineHeight:1.6}}>
-            ✅ Abbiamo inviato un codice a <strong>{email}</strong>. Controlla la casella email (anche spam).
-          </div>
-          <label style={lbl}>Codice di verifica (6 cifre)</label>
-          <input value={codice} onChange={e=>setCodice(e.target.value)} placeholder="es. 123456" maxLength={6}
-            style={{...inp,fontSize:24,letterSpacing:"0.3em",textAlign:"center",fontFamily:"monospace"}}/>
-          {error&&<div style={{backgroundColor:rl,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:13,color:rd}}>{error}</div>}
-          <button onClick={verificaCodice} style={btnP}>Verifica codice</button>
-          <button onClick={()=>{setStep(1);setError("");}} style={btnS}>← Cambia email</button>
-        </>}
-
-        {/* Step 3 - Nuova password */}
-        {step===3&&<>
-          <div style={{backgroundColor:ol,borderRadius:12,padding:"12px 16px",marginBottom:20,fontSize:12,color:"#4A4A4A",lineHeight:1.6}}>
-            🔑 Codice verificato! Ora scegli una nuova password.
-          </div>
-          <label style={lbl}>Nuova password (min. 8 caratteri)</label>
-          <input value={newPwd} onChange={e=>setNewPwd(e.target.value)} type="password" placeholder="••••••••" style={inp}/>
-          <label style={lbl}>Conferma nuova password</label>
-          <input value={newPwd2} onChange={e=>setNewPwd2(e.target.value)} type="password" placeholder="••••••••" style={inp}/>
-          {error&&<div style={{backgroundColor:rl,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:13,color:rd}}>{error}</div>}
-          <button onClick={cambiaPassword} disabled={loading} style={{...btnP,opacity:loading?0.6:1}}>
-            {loading?"Salvataggio...":"Salva nuova password"}
-          </button>
-        </>}
-
-        {/* Step 4 - Successo */}
-        {step===4&&<div style={{textAlign:"center",paddingTop:40}}>
-          <div style={{fontSize:56,marginBottom:16}}>✅</div>
-          <div style={{fontSize:20,fontWeight:800,color:dk,marginBottom:8}}>Password aggiornata!</div>
-          <div style={{fontSize:13,color:st,marginBottom:24}}>Ora puoi accedere con la nuova password.</div>
-          <button onClick={onBack} style={{...btnP,width:200,borderRadius:12}}>Vai al login</button>
-        </div>}
-
-      </div>
-    </div>
-  );
-}
-
-// ── SCHERMATA CAMBIO PASSWORD (SOCI) ─────────────────────────
-function CambioPassword({onBack}){
-  const [vecchia,setVecchia]=useState("");
-  const [nuova,setNuova]=useState("");
-  const [nuova2,setNuova2]=useState("");
-  const [loading,setLoading]=useState(false);
-  const [error,setError]=useState("");
-  const [ok,setOk]=useState(false);
-
-  const salva = async () => {
-    if(!vecchia||!nuova||!nuova2){ setError("Tutti i campi sono obbligatori"); return; }
-    if(nuova.length<8){ setError("La nuova password deve essere di almeno 8 caratteri"); return; }
-    if(nuova!==nuova2){ setError("Le due password non coincidono"); return; }
-    setLoading(true); setError("");
-    const res = await api("changePassword", {oldPassword:vecchia, newPassword:nuova}, getToken());
-    setLoading(false);
-    if(res.ok){
-      // Aggiorna remember se attivo
-      try {
-        const saved=JSON.parse(localStorage.getItem("asppi_remember")||"null");
-        if(saved){ saved.password=nuova; localStorage.setItem("asppi_remember",JSON.stringify(saved)); }
-      } catch(e){}
-      setOk(true);
-    } else {
-      setError(res.error||"Password attuale non corretta");
-    }
-  };
-
-  if(ok) return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",padding:32}}>
-      <div style={{fontSize:56,marginBottom:16}}>✅</div>
-      <div style={{fontSize:20,fontWeight:800,color:dk,marginBottom:8}}>Password aggiornata!</div>
-      <div style={{fontSize:13,color:st,marginBottom:24}}>La tua nuova password è attiva.</div>
-      <button onClick={onBack} style={{...btnP,width:200,borderRadius:12}}>Torna al profilo</button>
-    </div>
-  );
-
-  return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
-      <div style={{backgroundColor:dk,padding:"14px 18px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-        <div><div style={{color:or,fontSize:10,fontWeight:700,letterSpacing:"0.1em"}}>ASPPI L'AQUILA</div>
-        <div style={{color:wh,fontSize:15,fontWeight:700}}>Cambia password</div></div>
-        <button onClick={onBack} style={{background:"none",border:"1px solid #fff4",color:wh,borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer"}}>← Indietro</button>
-      </div>
-      <div style={{padding:"24px 20px"}}>
-        <div style={card}>
-          <div style={sec}>MODIFICA PASSWORD</div>
-          <label style={lbl}>Password attuale</label>
-          <input value={vecchia} onChange={e=>setVecchia(e.target.value)} type="password" placeholder="••••••••" style={inp}/>
-          <label style={lbl}>Nuova password (min. 8 caratteri)</label>
-          <input value={nuova} onChange={e=>setNuova(e.target.value)} type="password" placeholder="••••••••" style={inp}/>
-          <label style={lbl}>Conferma nuova password</label>
-          <input value={nuova2} onChange={e=>setNuova2(e.target.value)} type="password" placeholder="••••••••" style={inp}/>
-          {error&&<div style={{backgroundColor:rl,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:13,color:rd}}>{error}</div>}
-          <button onClick={salva} disabled={loading} style={{...btnP,opacity:loading?0.6:1}}>
-            {loading?"Salvataggio...":"Salva nuova password"}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── SCHERMATA LOGIN/REGISTRAZIONE ────────────────────────────
-function AuthScreen({onLogin,onForgot}){
-  const [tab,setTab]=useState("login");
-  const [email,setEmail]=useState("");
-  const [password,setPassword]=useState("");
-  const [nome,setNome]=useState("");
-  const [cognome,setCognome]=useState("");
-  const [tel,setTel]=useState("");
-  const [loading,setLoading]=useState(false);
-  const [error,setError]=useState("");
-
-  const [ricorda,setRicorda]=useState(true);
-
-  // Pre-compila se salvato
-  useState(()=>{
+// ── CAMBIA PASSWORD SOCIO ────────────────────────────────────
+async function doCambiaPwd() {
+  const old  = document.getElementById('cp-old').value;
+  const np   = document.getElementById('cp-new').value;
+  const np2  = document.getElementById('cp-new2').value;
+  showErr('cp-error', '');
+  document.getElementById('cp-ok').style.display = 'none';
+  if (!old || !np || !np2) { showErr('cp-error', 'Tutti i campi sono obbligatori'); return; }
+  if (np.length < 8) { showErr('cp-error', 'La nuova password deve essere di almeno 8 caratteri'); return; }
+  if (np !== np2) { showErr('cp-error', 'Le due password non coincidono'); return; }
+  const res = await api('changePassword', { token: state.token, oldPassword: old, newPassword: np });
+  if (res.ok) {
+    document.getElementById('cp-ok').style.display = '';
+    document.getElementById('cp-old').value = '';
+    document.getElementById('cp-new').value = '';
+    document.getElementById('cp-new2').value = '';
+    // Aggiorna remember
     try {
-      const saved = JSON.parse(localStorage.getItem("asppi_remember")||"null");
-      if(saved) { setEmail(saved.email||""); setPassword(saved.password||""); setRicorda(true); }
-    } catch(e){}
-  });
-
-  const submit = async () => {
-    if(!email||!password) { setError("Email e password obbligatorie"); return; }
-    if(tab==="register"&&!nome) { setError("Il nome è obbligatorio"); return; }
-    setLoading(true); setError("");
-    const res = await api(tab==="login"?"login":"register", {email,password,nome,cognome,telefono:tel});
-    setLoading(false);
-    if(res.ok) {
-      saveToken(res.token);
-      saveUser({nome:res.nome, email:res.email, userId:res.userId});
-      if(ricorda) {
-        localStorage.setItem("asppi_remember", JSON.stringify({email,password}));
-      } else {
-        localStorage.removeItem("asppi_remember");
-      }
-      onLogin(res);
-    } else {
-      setError(res.error||"Errore. Riprova.");
-    }
-  };
-
-  return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:wh,minHeight:"100vh",display:"flex",flexDirection:"column"}}>
-      <div style={{backgroundColor:dk,padding:"48px 32px 36px"}}>
-        <div style={{color:or,fontSize:11,fontWeight:700,letterSpacing:"0.12em",marginBottom:8}}>ASPPI L'AQUILA</div>
-        <div style={{color:wh,fontSize:26,fontWeight:800,lineHeight:1.1}}>Portale Soci</div>
-        <div style={{color:"#A0A0A0",fontSize:13,marginTop:6}}>Corso Vittorio Emanuele 9 · L'Aquila</div>
-      </div>
-      <div style={{padding:"32px 24px",flex:1}}>
-        <div style={{display:"flex",backgroundColor:bg,borderRadius:10,padding:4,marginBottom:24}}>
-          {[["login","Accedi"],["register","Registrati"]].map(([v,l])=>(
-            <button key={v} onClick={()=>{setTab(v);setError("");}} style={{flex:1,padding:"9px 0",border:"none",borderRadius:8,fontSize:13,fontWeight:600,cursor:"pointer",backgroundColor:tab===v?wh:"transparent",color:tab===v?dk:st,boxShadow:tab===v?"0 1px 4px rgba(0,0,0,0.10)":"none"}}>{l}</button>
-          ))}
-        </div>
-        {tab==="register"&&<>
-          <label style={lbl}>Nome *</label>
-          <input value={nome} onChange={e=>setNome(e.target.value)} placeholder="Mario" style={inp}/>
-          <label style={lbl}>Cognome</label>
-          <input value={cognome} onChange={e=>setCognome(e.target.value)} placeholder="Rossi" style={inp}/>
-          <label style={lbl}>Telefono</label>
-          <input value={tel} onChange={e=>setTel(e.target.value)} placeholder="+39 333 000 0000" style={inp}/>
-        </>}
-        <label style={lbl}>Email *</label>
-        <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="mario.rossi@email.com" style={inp}/>
-        <label style={lbl}>Password *</label>
-        <input value={password} onChange={e=>setPassword(e.target.value)} type="password" placeholder="••••••••" style={inp}/>
-        {error&&<div style={{backgroundColor:rl,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:13,color:rd}}>{error}</div>}
-        <div onClick={()=>setRicorda(v=>!v)} style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,cursor:"pointer"}}>
-          <div style={{width:20,height:20,borderRadius:6,border:`2px solid ${ricorda?or:bd}`,backgroundColor:ricorda?or:"transparent",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
-            {ricorda&&<span style={{color:wh,fontSize:11,fontWeight:700}}>✓</span>}
-          </div>
-          <span style={{fontSize:13,color:dk}}>Ricorda email e password</span>
-        </div>
-        <button onClick={submit} disabled={loading} style={{...btnP,opacity:loading?0.6:1}}>
-          {loading?"Attendere...":tab==="login"?"Accedi":"Crea account"}
-        </button>
-        {tab==="login"&&<button onClick={()=>onForgot()} style={{width:"100%",background:"none",border:"none",color:or,fontSize:13,fontWeight:600,cursor:"pointer",marginTop:12,padding:"8px 0"}}>
-          Password dimenticata?
-        </button>}
-        <div style={{fontSize:11,color:st,textAlign:"center",marginTop:12,lineHeight:1.6}}>
-          Accesso riservato ai soci ASPPI L'Aquila.<br/>
-          Per assistenza: <span style={{color:or}}>+39 392 519 1490</span>
-        </div>
-      </div>
-    </div>
-  );
+      const rem = JSON.parse(localStorage.getItem('asppi_remember') || 'null');
+      if (rem) { rem.pwd = np; localStorage.setItem('asppi_remember', JSON.stringify(rem)); }
+    } catch(e) {}
+  } else {
+    showErr('cp-error', res.error || 'Password attuale non corretta');
+  }
 }
 
-function App(){
-  const [mode,setMode]=useState("choose");
-  const [user,setUser]=useState(null);
-
-  // Check token salvato
-  useState(()=>{
-    const t=getToken(); const u=getUser();
-    if(t&&u) { setUser(u); setMode("client"); }
-  });
-
-  if(mode==="choose") return(
-    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",padding:32}}>
-      <div style={{fontSize:48,marginBottom:16}}>🏛️</div>
-      <div style={{fontSize:10,fontWeight:700,color:or,letterSpacing:"0.12em",marginBottom:8}}>PROTOTIPO COMPLETO</div>
-      <div style={{fontSize:22,fontWeight:800,color:dk,marginBottom:4}}>ASPPI L'Aquila</div>
-      <div style={{fontSize:13,color:st,marginBottom:36}}>Scegli la vista da esplorare</div>
-      <button onClick={()=>setMode("auth")} style={{...btnP,marginBottom:12,borderRadius:14,maxWidth:260}}>📱 Accesso Soci</button>
-      <button onClick={()=>setMode("client")} style={{...btnP,marginBottom:12,borderRadius:14,maxWidth:260,backgroundColor:"#4A4A4A"}}>👁️ Demo Socio</button>
-      <button onClick={()=>setMode("admin")} style={{...btnS,maxWidth:260,borderRadius:14,marginTop:0}}>🔧 Admin (Simeoni)</button>
-      <div style={{fontSize:11,color:st,marginTop:24,maxWidth:280,lineHeight:1.6}}>
-        <strong style={{color:or}}>Accesso Soci</strong> = login reale con database<br/>
-        <strong style={{color:"#4A4A4A"}}>Demo</strong> = prototipo con dati finti
-      </div>
-    </div>
-  );
-  if(mode==="auth") return <AuthScreen onLogin={u=>{setUser(u);setMode("client");}} onForgot={()=>setMode("forgot")}/>;
-  if(mode==="forgot") return <ForgotPassword onBack={()=>setMode("auth")}/>;
-  if(mode==="client") return <ClienteApp onExit={()=>{clearToken();setMode("choose");}} onCambioPwd={()=>setMode("cambioPwd")} user={user}/>;
-  if(mode==="cambioPwd") return <CambioPassword onBack={()=>setMode("client")}/>;
-  if(mode==="admin") return <AdminApp onExit={()=>setMode("choose")}/>;
+// ── CAMBIA PASSWORD ADMIN ────────────────────────────────────
+function doAdminCambiaPwd() {
+  const old = document.getElementById('acp-old').value;
+  const np  = document.getElementById('acp-new').value;
+  const np2 = document.getElementById('acp-new2').value;
+  showErr('acp-error', '');
+  document.getElementById('acp-ok').style.display = 'none';
+  const currentPwd = localStorage.getItem('asppi_admin_custom_pwd') || ADMIN_PWD_DEFAULT;
+  if (old !== currentPwd) { showErr('acp-error', 'Password attuale non corretta'); return; }
+  if (np.length < 8) { showErr('acp-error', 'La nuova password deve essere di almeno 8 caratteri'); return; }
+  if (np !== np2) { showErr('acp-error', 'Le due password non coincidono'); return; }
+  localStorage.setItem('asppi_admin_custom_pwd', np);
+  if (localStorage.getItem('asppi_admin_pwd')) localStorage.setItem('asppi_admin_pwd', np);
+  document.getElementById('acp-ok').style.display = '';
+  document.getElementById('acp-old').value = '';
+  document.getElementById('acp-new').value = '';
+  document.getElementById('acp-new2').value = '';
 }
-
-
-const domContainer = document.getElementById('root');
-const reactRoot = ReactDOM.createRoot(domContainer);
-reactRoot.render(React.createElement(App));
-  </script>
-
-  <script>
-    window.addEventListener("load",()=>{
-      setTimeout(()=>{
-        const s=document.getElementById("splash");
-        if(s){s.classList.add("hidden");setTimeout(()=>s.remove(),400);}
-      },2000);
-    });
-    if("serviceWorker" in navigator){
-      window.addEventListener("load",()=>{
-        navigator.serviceWorker.register("sw.js").catch(()=>{});
-      });
-    }
-    let deferredPrompt=null;
-    const banner=document.getElementById("install-banner");
-    window.addEventListener("beforeinstallprompt",e=>{
-      e.preventDefault();deferredPrompt=e;
-      setTimeout(()=>banner.classList.remove("hidden"),3000);
-    });
-    document.getElementById("install-btn").addEventListener("click",async()=>{
-      if(!deferredPrompt)return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt=null;banner.classList.add("hidden");
-    });
-    document.getElementById("close-banner").addEventListener("click",()=>{
-      banner.classList.add("hidden");
-    });
-  </script>
+</script>
 </body>
 </html>
