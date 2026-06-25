@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="theme-color" content="#0D1B2A"/>
+  <title>ASPPI Admin</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#F8F7F5;min-height:100vh;padding-bottom:80px;}
+    .topbar{background:#0D1B2A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;}
+    .topbar-label{color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+    .topbar-title{color:#fff;font-size:15px;font-weight:700;}
+    .btn-exit{background:none;border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer;}
+    /* Bottom nav */
+    .bottomnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #E5E5E5;display:flex;padding:8px 0 16px;z-index:100;}
+    .navbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:transparent;cursor:pointer;padding:6px 0;}
+    .navbtn .icon{font-size:20px;opacity:.35;}
+    .navbtn .lbl{font-size:9px;font-weight:500;color:#8A8A8A;}
+    .navbtn.active .icon{opacity:1;}
+    .navbtn.active .lbl{color:#E8631A;font-weight:700;}
+    /* Screens */
+    .screen{display:none;padding:16px;}
+    .screen.active{display:block;}
+    /* Cards */
+    .card{background:#fff;border-radius:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;}
+    .card-body{padding:14px;}
+    .card-row{display:flex;border-left:4px solid #E8631A;}
+    .card-row .card-body{flex:1;}
+    .card-row .card-arrow{display:flex;align-items:center;padding-right:14px;color:#8A8A8A;font-size:16px;}
+    .card-title{font-size:14px;font-weight:700;color:#1A1A1A;}
+    .card-sub{font-size:12px;color:#8A8A8A;margin-top:2px;}
+    .sec-title{font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.12em;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid #E5E5E5;margin-bottom:14px;}
+    .badge{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
+    .badge-orange{color:#E8631A;background:#FDF0E8;}
+    .badge-green{color:#2D7A4F;background:#EBF5F0;}
+    .badge-gray{color:#8A8A8A;background:#F8F7F5;}
+    .stat-row{display:flex;gap:8px;margin-bottom:20px;}
+    .stat-box{flex:1;background:#fff;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+    .stat-num{font-size:26px;font-weight:800;line-height:1;}
+    .stat-lbl{font-size:10px;color:#8A8A8A;margin-top:4px;line-height:1.3;}
+    /* Form elements */
+    label{display:block;font-size:11px;font-weight:600;color:#8A8A8A;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
+    input,select,textarea{width:100%;padding:11px 13px;border-radius:10px;border:1.5px solid #E5E5E5;font-size:14px;color:#1A1A1A;background:#fff;margin-bottom:12px;outline:none;font-family:inherit;}
+    input:focus,select:focus,textarea:focus{border-color:#E8631A;}
+    .btn-primary{width:100%;padding:13px 0;border-radius:12px;border:none;background:#E8631A;color:#fff;font-size:14px;font-weight:700;cursor:pointer;}
+    .btn-secondary{width:100%;padding:11px 0;border-radius:12px;border:1.5px solid #E5E5E5;background:#fff;color:#1A1A1A;font-size:13px;font-weight:600;cursor:pointer;margin-top:8px;}
+    .btn-small{padding:6px 14px;border-radius:16px;border:none;font-size:12px;font-weight:700;cursor:pointer;}
+    .btn-small-orange{background:#E8631A;color:#fff;}
+    .btn-small-gray{background:#F8F7F5;color:#8A8A8A;}
+    .info{background:#FDF0E8;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#4A4A4A;line-height:1.6;}
+    .info-blue{background:#EBF2FB;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#1A5FA8;line-height:1.6;}
+    .success{background:#EBF5F0;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#2D7A4F;}
+    .error{background:#FDEEEC;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#C0392B;}
+    /* Slot grid */
+    .slot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+    .slot-btn{padding:10px 0;text-align:center;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;}
+    .slot-btn.on{background:#E8631A;color:#fff;}
+    .slot-btn.off{background:#F8F7F5;color:#8A8A8A;}
+    /* Chat */
+    .chat-area{display:flex;flex-direction:column;gap:4px;padding:16px 0;min-height:300px;}
+    .bubble{max-width:78%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.5;}
+    .bubble-socio{background:#fff;color:#1A1A1A;border:1px solid #E5E5E5;align-self:flex-start;border-radius:4px 16px 16px 16px;}
+    .bubble-admin{background:#E8631A;color:#fff;align-self:flex-end;border-radius:16px 4px 16px 16px;}
+    .bubble-time{font-size:10px;color:#8A8A8A;margin-bottom:10px;}
+    .chat-input-row{display:flex;gap:8px;padding:12px 0;border-top:1px solid #E5E5E5;position:sticky;bottom:80px;background:#F8F7F5;}
+    .chat-input-row input{flex:1;margin-bottom:0;}
+    .chat-send{width:44px;height:44px;border-radius:22px;border:none;background:#E8631A;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;}
+    /* Giorni */
+    .giorni-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+    .giorno-btn{padding:8px 14px;border-radius:20px;border:none;font-weight:700;font-size:13px;cursor:pointer;}
+    /* List item */
+    .list-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #E5E5E5;}
+    .list-item:last-child{border-bottom:none;}
+    /* Detail overlay */
+    .overlay{display:none;position:fixed;inset:0;background:#F8F7F5;z-index:200;overflow-y:auto;padding-bottom:80px;}
+    .overlay.active{display:block;}
+    .overlay-header{background:#0D1B2A;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;}
+    .field-label{font-size:11px;color:#8A8A8A;text-transform:uppercase;margin-bottom:3px;}
+    .field-value{font-size:14px;font-weight:600;color:#1A1A1A;margin-bottom:12px;}
+    .tab-row{display:flex;border-bottom:1px solid #E5E5E5;background:#fff;padding:0 16px;}
+    .tab-btn{flex:1;padding:12px 0;border:none;background:transparent;font-size:13px;font-weight:700;cursor:pointer;color:#8A8A8A;border-bottom:3px solid transparent;}
+    .tab-btn.active{color:#E8631A;border-bottom-color:#E8631A;}
+    /* Prenotazioni filtro */
+    .filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;}
+    .filter-btn{flex-shrink:0;padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer;}
+    .filter-btn.active{background:#E8631A;color:#fff;}
+    .filter-btn.inactive{background:#fff;color:#8A8A8A;}
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-label">ASPPI L'Aquila · Admin</div>
+    <div class="topbar-title">Simeoni Maurizio</div>
+  </div>
+  <button class="btn-exit" onclick="esci()">Esci</button>
+</div>
+
+<!-- SCREENS -->
+<div id="s-home" class="screen active">
+  <div class="stat-row">
+    <div class="stat-box"><div class="stat-num" style="color:#E8631A" id="stat-oggi">—</div><div class="stat-lbl">Appuntamenti oggi</div></div>
+    <div class="stat-box"><div class="stat-num" style="color:#E8631A" id="stat-chat">—</div><div class="stat-lbl">Pratiche in attesa</div></div>
+    <div class="stat-box"><div class="stat-num" style="color:#2D7A4F" id="stat-soci">—</div><div class="stat-lbl">Soci registrati</div></div>
+  </div>
+  <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin-bottom:10px">📅 Appuntamenti oggi</div>
+  <div id="home-prenotazioni"><div class="info">Caricamento...</div></div>
+  <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin:16px 0 10px">📝 Pratiche recenti</div>
+  <div id="home-pratiche"><div class="info">Caricamento...</div></div>
+</div>
+
+<div id="s-prenotazioni" class="screen">
+  <div class="filter-row">
+    <button class="filter-btn active" id="f-tutte" onclick="filterPren('tutte')">Tutte</button>
+    <button class="filter-btn inactive" id="f-oggi" onclick="filterPren('oggi')">Oggi</button>
+    <button class="filter-btn inactive" id="f-domani" onclick="filterPren('domani')">Domani</button>
+    <button class="filter-btn inactive" id="f-cancellate" onclick="filterPren('cancellate')">Cancellate</button>
+  </div>
+  <div id="lista-prenotazioni"><div class="info">Caricamento...</div></div>
+</div>
+
+<div id="s-pratiche" class="screen">
+  <div class="filter-row">
+    <button class="filter-btn active" id="fp-tutte" onclick="filterPrat('tutte')">Tutte</button>
+    <button class="filter-btn inactive" id="fp-richiesta" onclick="filterPrat('richiesta')">In attesa</button>
+    <button class="filter-btn inactive" id="fp-completato" onclick="filterPrat('completato')">Completate</button>
+  </div>
+  <div id="lista-pratiche"><div class="info">Caricamento...</div></div>
+</div>
+
+<div id="s-chat" class="screen">
+  <div id="lista-chat"><div class="info">Caricamento...</div></div>
+</div>
+
+<div id="s-slot" class="screen">
+  <div class="card">
+    <div class="card-body">
+      <div class="sec-title">GIORNI DI RICEVIMENTO</div>
+      <div class="giorni-row" id="giorni-row"></div>
+      <div style="font-size:11px;color:#8A8A8A">I giorni attivi si ripetono ogni settimana, salvo chiusure.</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <div class="sec-title">ORARI (ogni 30 min)</div>
+      <div class="slot-grid" id="orari-grid"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <div class="sec-title">PERIODI DI CHIUSURA</div>
+      <div id="chiusure-list"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input type="text" id="ch-label" placeholder='Descrizione es. "Ferie agosto"' style="flex:2;margin-bottom:0"/>
+        <input type="text" id="ch-dal" placeholder="dal gg/mm/aa" style="flex:1;margin-bottom:0"/>
+        <input type="text" id="ch-al" placeholder="al gg/mm/aa" style="flex:1;margin-bottom:0"/>
+      </div>
+      <button class="btn-small btn-small-orange" style="margin-top:8px;padding:8px 16px" onclick="addChiusura()">＋ Aggiungi chiusura</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <div class="sec-title">GIORNI SINGOLI BLOCCATI</div>
+      <div id="bloccati-list"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <input type="text" id="blocco-data" placeholder="gg/mm/aaaa" style="flex:1;margin-bottom:0"/>
+        <button class="btn-small btn-small-orange" onclick="addBlocco()">＋</button>
+      </div>
+    </div>
+  </div>
+  <div class="info" style="margin-top:8px">⚡️ Le prenotazioni già confermate non vengono cancellate automaticamente.</div>
+  <button class="btn-primary" style="margin-top:4px" onclick="saveSlot()">Salva tutte le impostazioni</button>
+  <div id="slot-ok" class="success" style="display:none;margin-top:8px">✅ Impostazioni salvate!</div>
+</div>
+
+<!-- OVERLAY DETTAGLIO PRENOTAZIONE -->
+<div id="overlay-pren" class="overlay">
+  <div class="overlay-header">
+    <div>
+      <div style="color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.1em">APPUNTAMENTO</div>
+      <div style="color:#fff;font-size:15px;font-weight:700" id="op-title">—</div>
+    </div>
+    <button class="btn-exit" onclick="closeOverlay('overlay-pren')">← Chiudi</button>
+  </div>
+  <div style="padding:16px">
+    <div class="card"><div class="card-body">
+      <div class="sec-title">DATI APPUNTAMENTO</div>
+      <div class="field-label">Data e ora</div><div class="field-value" id="op-data">—</div>
+      <div class="field-label">Stato</div><div class="field-value" id="op-stato">—</div>
+    </div></div>
+    <div class="card"><div class="card-body">
+      <div class="sec-title">DATI SOCIO</div>
+      <div class="field-label">Nome</div><div class="field-value" id="op-nome">—</div>
+      <div class="field-label">Email</div><div class="field-value" id="op-email">—</div>
+      <div class="field-label">Telefono</div><div class="field-value" id="op-tel">—</div>
+      <div class="field-label">Motivo</div><div class="field-value" id="op-motivo">—</div>
+    </div></div>
+    <button class="btn-primary" style="background:#C0392B" onclick="cancelPren()">Cancella appuntamento</button>
+    <div id="op-ok" class="success" style="display:none;margin-top:8px">✅ Appuntamento cancellato</div>
+  </div>
+</div>
+
+<!-- OVERLAY DETTAGLIO PRATICA -->
+<div id="overlay-prat" class="overlay">
+  <div class="overlay-header">
+    <div>
+      <div style="color:#E8631A;font-size:10px;font-weight:700;letter-spacing:.1em" id="pp-id">PRATICA</div>
+      <div style="color:#fff;font-size:15px;font-weight:700" id="pp-nome">—</div>
+    </div>
+    <button class="btn-exit" onclick="closeOverlay('overlay-prat')">← Chiudi</button>
+  </div>
+  <div class="tab-row">
+    <button class="tab-btn active" id="tab-dati" onclick="switchPratTab('dati')">📋 Dati</button>
+    <button class="tab-btn" id="tab-chat-prat" onclick="switchPratTab('chat')">💬 Chat</button>
+  </div>
+  <div id="pp-dati" style="padding:16px">
+    <div class="card"><div class="card-body">
+      <div class="sec-title">TIPO CONTRATTO</div>
+      <div class="field-value" id="pp-tipo">—</div>
+      <div class="field-label">Stato</div><div class="field-value" id="pp-stato">—</div>
+    </div></div>
+    <div class="card"><div class="card-body">
+      <div class="sec-title">LOCATORI</div>
+      <div id="pp-locatori">—</div>
+    </div></div>
+    <div class="card"><div class="card-body">
+      <div class="sec-title">CONDUTTORI</div>
+      <div id="pp-conduttori">—</div>
+    </div></div>
+    <div class="card"><div class="card-body">
+      <div class="sec-title">DURATA E CANONE</div>
+      <div class="field-label">Dal</div><div class="field-value" id="pp-dal">—</div>
+      <div class="field-label">Al</div><div class="field-value" id="pp-al">—</div>
+      <div class="field-label">Canone mensile</div><div class="field-value" id="pp-canone">—</div>
+      <div class="field-label">Deposito</div><div class="field-value" id="pp-deposito">—</div>
+    </div></div>
+    <div class="card"><div class="card-body">
+      <div class="sec-title">AGGIORNA STATO</div>
+      <select id="pp-stato-select"><option value="richiesta">In attesa</option><option value="lavorazione">In lavorazione</option><option value="completato">Completato</option></select>
+      <button class="btn-primary" onclick="updateStatoPratica()">Aggiorna stato</button>
+      <div id="pp-ok" class="success" style="display:none;margin-top:8px">✅ Stato aggiornato!</div>
+    </div></div>
+  </div>
+  <div id="pp-chat" style="display:none;padding:16px">
+    <div class="chat-area" id="pp-chat-msgs"></div>
+    <div class="chat-input-row">
+      <input type="text" id="pp-chat-input" placeholder="Rispondi al socio..." onkeydown="if(event.key==='Enter')sendChatMsg()"/>
+      <button class="chat-send" onclick="sendChatMsg()">›</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottomnav">
+  <button class="navbtn active" id="nav-home" onclick="showScreen('home')">
+    <span class="icon">📊</span><span class="lbl">Home</span>
+  </button>
+  <button class="navbtn" id="nav-prenotazioni" onclick="showScreen('prenotazioni')">
+    <span class="icon">📅</span><span class="lbl">Prenotaz.</span>
+  </button>
+  <button class="navbtn" id="nav-pratiche" onclick="showScreen('pratiche')">
+    <span class="icon">📋</span><span class="lbl">Pratiche</span>
+  </button>
+  <button class="navbtn" id="nav-chat" onclick="showScreen('chat')">
+    <span class="icon">💬</span><span class="lbl">Chat</span>
+  </button>
+  <button class="navbtn" id="nav-slot" onclick="showScreen('slot')">
+    <span class="icon">🗓️</span><span class="lbl">Slot</span>
+  </button>
+</div>
+
+<script>
+const API = "https://script.google.com/macros/s/AKfycbz6rc5F8qiVgzuVtZeEQtYm9RVwenjKCX1KEFOEAJawJ6juNGfbz6aQpqv4U-lv697e/exec";
+const ADMIN_TOKEN = "ASPPI_ADMIN_asppi2025laquila";
+
+let DATA = { prenotazioni:[], contratti:[], utenti:[], chat:[], chiusure:[], slot:{giorni:[],orari:[]} };
+let currentPratId = null;
+let currentPrenId = null;
+let slotGiorni = new Set(['Lun','Mar','Gio','Ven']);
+let slotOrari  = new Set(['09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00']);
+let bloccati   = [];
+
+// ── INIT ─────────────────────────────────────────────────────
+window.addEventListener('load', async () => {
+  // Verifica auth
+  const adminPwd = localStorage.getItem('asppi_admin_custom_pwd') || 'Asppi2025!';
+  const stored   = localStorage.getItem('asppi_admin_ok');
+  if (stored !== 'yes') { window.location.href = 'index.html'; return; }
+  await loadAll();
+  initSlot();
+});
+
+async function api(action, data) {
+  try {
+    const res = await fetch(API, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({action, token: ADMIN_TOKEN, ...data})
+    });
+    return await res.json();
+  } catch(e) { return {ok:false, error:'Errore connessione'}; }
+}
+
+async function loadAll() {
+  const res = await api('adminGetAll');
+  if (!res.ok) { console.error(res.error); return; }
+  DATA = res;
+  renderHome();
+  renderPrenotazioni('tutte');
+  renderPratiche('tutte');
+  renderChat();
+  loadSlot();
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.navbtn').forEach(b => b.classList.remove('active'));
+  document.getElementById('s-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+}
+
+function closeOverlay(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+function openOverlay(id) {
+  document.getElementById(id).classList.add('active');
+  document.getElementById(id).scrollTop = 0;
+}
+
+function esci() {
+  localStorage.removeItem('asppi_admin_ok');
+  window.location.href = 'index.html';
+}
+
+// ── HOME ─────────────────────────────────────────────────────
+function oggi() {
+  return new Date().toLocaleDateString('it-IT',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'});
+}
+
+function renderHome() {
+  const oggiStr = oggi();
+  const preOggi = DATA.prenotazioni.filter(p => p.data && p.stato === 'confermata');
+  const inAttesa = DATA.contratti.filter(c => c.stato === 'richiesta');
+  document.getElementById('stat-oggi').textContent  = preOggi.length;
+  document.getElementById('stat-chat').textContent  = inAttesa.length;
+  document.getElementById('stat-soci').textContent  = DATA.utenti.length;
+
+  // Prenotazioni oggi
+  const hp = document.getElementById('home-prenotazioni');
+  if (!preOggi.length) { hp.innerHTML = '<div class="info">Nessun appuntamento oggi.</div>'; }
+  else hp.innerHTML = preOggi.slice(0,3).map(p => cardPren(p)).join('');
+
+  // Pratiche recenti
+  const hpr = document.getElementById('home-pratiche');
+  if (!DATA.contratti.length) { hpr.innerHTML = '<div class="info">Nessuna pratica ancora.</div>'; }
+  else hpr.innerHTML = DATA.contratti.slice(0,3).map(c => cardPrat(c)).join('');
+}
+
+// ── PRENOTAZIONI ─────────────────────────────────────────────
+function cardPren(p) {
+  const color = p.stato==='confermata' ? '#2D7A4F' : '#8A8A8A';
+  return `<div class="card card-row" onclick="openPren('${p.id}')" style="border-left-color:${color};cursor:pointer">
+    <div class="card-body">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="card-title">${p.nomeUtente||'—'}</div>
+        <div style="font-size:15px;font-weight:800;color:#E8631A">${p.ora||'—'}</div>
+      </div>
+      <div class="card-sub">${p.motivo||''} · ${p.data||''}</div>
+    </div>
+    <div class="card-arrow">›</div>
+  </div>`;
+}
+
+function renderPrenotazioni(filtro) {
+  let list = DATA.prenotazioni || [];
+  if (filtro === 'oggi')      list = list.filter(p => p.stato === 'confermata');
+  if (filtro === 'cancellate') list = list.filter(p => p.stato === 'cancellata');
+  const el = document.getElementById('lista-prenotazioni');
+  if (!list.length) { el.innerHTML = '<div class="info">Nessuna prenotazione trovata.</div>'; return; }
+  el.innerHTML = list.map(p => cardPren(p)).join('');
+}
+
+function filterPren(f) {
+  ['tutte','oggi','domani','cancellate'].forEach(x => {
+    document.getElementById('f-'+x).className = 'filter-btn ' + (x===f?'active':'inactive');
+  });
+  renderPrenotazioni(f);
+}
+
+function openPren(id) {
+  const p = DATA.prenotazioni.find(x => x.id === id);
+  if (!p) return;
+  currentPrenId = id;
+  document.getElementById('op-title').textContent  = p.nomeUtente || '—';
+  document.getElementById('op-data').textContent   = (p.data||'—') + ' ore ' + (p.ora||'—');
+  document.getElementById('op-stato').textContent  = p.stato || '—';
+  document.getElementById('op-nome').textContent   = p.nomeUtente || '—';
+  document.getElementById('op-email').textContent  = p.emailUtente || '—';
+  document.getElementById('op-tel').textContent    = p.telUtente || '—';
+  document.getElementById('op-motivo').textContent = p.motivo || '—';
+  document.getElementById('op-ok').style.display   = 'none';
+  openOverlay('overlay-pren');
+}
+
+async function cancelPren() {
+  if (!currentPrenId) return;
+  const res = await api('cancelPrenotazione', {id: currentPrenId});
+  if (res.ok) {
+    document.getElementById('op-ok').style.display = '';
+    await loadAll();
+  }
+}
+
+// ── PRATICHE ─────────────────────────────────────────────────
+function statoColor(s) {
+  if (s==='richiesta')   return '#E8631A';
+  if (s==='lavorazione') return '#1A5FA8';
+  if (s==='completato')  return '#2D7A4F';
+  return '#8A8A8A';
+}
+function statoLabel(s) {
+  if (s==='richiesta')   return 'In attesa';
+  if (s==='lavorazione') return 'In lavorazione';
+  if (s==='completato')  return 'Completato';
+  return s;
+}
+
+function cardPrat(c) {
+  const color = statoColor(c.stato);
+  const nomeLocatore = (() => { try { const l=JSON.parse(c.locatoriJSON||'[]'); return l[0]?l[0].nome+' '+l[0].cognome:'—'; } catch(e){return '—';} })();
+  return `<div class="card card-row" onclick="openPrat('${c.id}')" style="border-left-color:${color};cursor:pointer">
+    <div class="card-body">
+      <div style="display:flex;justify-content:space-between">
+        <div class="card-title">${nomeLocatore}</div>
+        <span class="badge" style="color:${color};background:${color}22">${statoLabel(c.stato)}</span>
+      </div>
+      <div class="card-sub">${c.tipo||'—'} · ${c.dataRichiesta?c.dataRichiesta.substring(0,10):''}</div>
+    </div>
+    <div class="card-arrow">›</div>
+  </div>`;
+}
+
+function renderPratiche(filtro) {
+  let list = DATA.contratti || [];
+  if (filtro !== 'tutte') list = list.filter(c => c.stato === filtro);
+  const el = document.getElementById('lista-pratiche');
+  if (!list.length) { el.innerHTML = '<div class="info">Nessuna pratica trovata.</div>'; return; }
+  el.innerHTML = list.map(c => cardPrat(c)).join('');
+}
+
+function filterPrat(f) {
+  ['tutte','richiesta','completato'].forEach(x => {
+    document.getElementById('fp-'+x).className = 'filter-btn ' + (x===f?'active':'inactive');
+  });
+  renderPratiche(f);
+}
+
+function parsePeople(json) {
+  try {
+    const arr = JSON.parse(json || '[]');
+    if (!arr.length) return '<div class="field-value">—</div>';
+    return arr.map((p,i) => `
+      <div style="background:#F8F7F5;border-radius:10px;padding:12px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:6px">N° ${i+1}</div>
+        <div class="field-label">Nome</div><div class="field-value">${p.nome||''} ${p.cognome||''}</div>
+        <div class="field-label">CF</div><div class="field-value" style="font-family:monospace">${p.cf||'—'}</div>
+        ${p.quota?`<div class="field-label">Quota</div><div class="field-value">${p.quota}%</div>`:''}
+      </div>`).join('');
+  } catch(e) { return '<div class="field-value">—</div>'; }
+}
+
+function openPrat(id) {
+  const c = DATA.contratti.find(x => x.id === id);
+  if (!c) return;
+  currentPratId = id;
+  document.getElementById('pp-id').textContent    = 'PRATICA ' + id;
+  document.getElementById('pp-nome').textContent  = (() => { try{const l=JSON.parse(c.locatoriJSON||'[]');return l[0]?l[0].nome+' '+l[0].cognome:'—';}catch(e){return '—';}})();
+  document.getElementById('pp-tipo').textContent  = c.tipo || '—';
+  document.getElementById('pp-stato').textContent = statoLabel(c.stato);
+  document.getElementById('pp-locatori').innerHTML   = parsePeople(c.locatoriJSON);
+  document.getElementById('pp-conduttori').innerHTML = parsePeople(c.conduttoriJSON);
+  document.getElementById('pp-dal').textContent     = c.duraDal || '—';
+  document.getElementById('pp-al').textContent      = c.duraAl  || '—';
+  document.getElementById('pp-canone').textContent  = c.canoneMensile ? '€ ' + c.canoneMensile + '/mese' : '—';
+  document.getElementById('pp-deposito').textContent = c.depositoImporto ? '€ ' + c.depositoImporto : '—';
+  document.getElementById('pp-stato-select').value  = c.stato || 'richiesta';
+  document.getElementById('pp-ok').style.display    = 'none';
+  // Reset tab
+  switchPratTab('dati');
+  openOverlay('overlay-prat');
+}
+
+function switchPratTab(tab) {
+  document.getElementById('pp-dati').style.display      = tab==='dati' ? '' : 'none';
+  document.getElementById('pp-chat').style.display      = tab==='chat' ? '' : 'none';
+  document.getElementById('tab-dati').classList.toggle('active', tab==='dati');
+  document.getElementById('tab-chat-prat').classList.toggle('active', tab==='chat');
+  if (tab==='chat') loadPratChat();
+}
+
+async function loadPratChat() {
+  const msgs = (DATA.chat||[]).filter(m => m.contrattoId === currentPratId);
+  const el = document.getElementById('pp-chat-msgs');
+  if (!msgs.length) { el.innerHTML = '<div class="info">Nessun messaggio ancora.</div>'; return; }
+  el.innerHTML = msgs.map(m => `
+    <div class="${m.mittente==='socio'?'bubble bubble-socio':'bubble bubble-admin'}">${m.testo}</div>
+    <div class="bubble-time" style="align-self:${m.mittente==='socio'?'flex-start':'flex-end'}">${m.nomeUtente||''} · ${m.timestamp?m.timestamp.substring(11,16):''}</div>
+  `).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendChatMsg() {
+  const testo = document.getElementById('pp-chat-input').value.trim();
+  if (!testo || !currentPratId) return;
+  document.getElementById('pp-chat-input').value = '';
+  const res = await api('sendMessage', { contrattoId: currentPratId, testo });
+  if (res.ok) { await loadAll(); loadPratChat(); }
+}
+
+async function updateStatoPratica() {
+  const stato = document.getElementById('pp-stato-select').value;
+  const c = DATA.contratti.find(x => x.id === currentPratId);
+  if (!c) return;
+  c.stato = stato;
+  const res = await api('saveContratto', { data: c });
+  if (res.ok) {
+    document.getElementById('pp-ok').style.display = '';
+    document.getElementById('pp-stato').textContent = statoLabel(stato);
+    await loadAll();
+  }
+}
+
+// ── CHAT LIST ─────────────────────────────────────────────────
+function renderChat() {
+  const el = document.getElementById('lista-chat');
+  const contratti = DATA.contratti || [];
+  if (!contratti.length) { el.innerHTML = '<div class="info">Nessuna conversazione ancora.</div>'; return; }
+  el.innerHTML = contratti.map(c => {
+    const msgs = (DATA.chat||[]).filter(m => m.contrattoId === c.id);
+    const last = msgs[msgs.length-1];
+    const unread = msgs.filter(m => m.mittente==='socio' && !m.letto).length;
+    const nomeLocatore = (() => { try{const l=JSON.parse(c.locatoriJSON||'[]');return l[0]?l[0].nome+' '+l[0].cognome:'—';}catch(e){return '—';}})();
+    return `<div class="card card-row" onclick="openChatFromList('${c.id}')" style="cursor:pointer">
+      <div class="card-body" style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:20px;background:${unread?'#E8631A':'#F8F7F5'};display:flex;align-items:center;justify-content:center;color:${unread?'#fff':'#8A8A8A'};font-weight:800;font-size:13px;flex-shrink:0">
+          ${nomeLocatore.split(' ').map(n=>n[0]).join('').slice(0,2)}
+        </div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between">
+            <div class="card-title">${nomeLocatore}</div>
+            ${unread?`<div style="width:8px;height:8px;border-radius:4px;background:#E8631A;flex-shrink:0;margin-top:4px"></div>`:''}
+          </div>
+          <div class="card-sub" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${last?last.testo:'Nessun messaggio'}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openChatFromList(id) {
+  currentPratId = id;
+  const c = DATA.contratti.find(x => x.id === id);
+  if (!c) return;
+  const nomeLocatore = (() => { try{const l=JSON.parse(c.locatoriJSON||'[]');return l[0]?l[0].nome+' '+l[0].cognome:'—';}catch(e){return '—';}})();
+  document.getElementById('pp-id').textContent   = 'PRATICA ' + id;
+  document.getElementById('pp-nome').textContent = nomeLocatore;
+  switchPratTab('chat');
+  openOverlay('overlay-prat');
+}
+
+// ── SLOT ─────────────────────────────────────────────────────
+const TUTTI_GIORNI = ['Lun','Mar','Mer','Gio','Ven','Sab'];
+const TUTTI_ORARI  = ['08:30','09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00','17:30'];
+
+function initSlot() {
+  // Giorni
+  const gr = document.getElementById('giorni-row');
+  gr.innerHTML = TUTTI_GIORNI.map(g => `
+    <button class="giorno-btn" id="g-${g}" onclick="toggleGiorno('${g}')"
+      style="background:${slotGiorni.has(g)?'#E8631A':'#F8F7F5'};color:${slotGiorni.has(g)?'#fff':'#8A8A8A'}">${g}</button>
+  `).join('');
+  // Orari
+  const og = document.getElementById('orari-grid');
+  og.innerHTML = TUTTI_ORARI.map(o => `
+    <button class="slot-btn ${slotOrari.has(o)?'on':'off'}" id="o-${o.replace(':','-')}" onclick="toggleOrario('${o}')">${o}</button>
+  `).join('');
+  renderChiusure();
+  renderBloccati();
+}
+
+async function loadSlot() {
+  const res = await api('getSlot');
+  if (res.ok) {
+    slotGiorni = new Set(res.giorni || []);
+    slotOrari  = new Set(res.orari  || []);
+  }
+  const res2 = await api('getChiusure');
+  if (res2.ok) DATA.chiusure = res2.data || [];
+  initSlot();
+}
+
+function toggleGiorno(g) {
+  if (slotGiorni.has(g)) slotGiorni.delete(g); else slotGiorni.add(g);
+  const btn = document.getElementById('g-'+g);
+  btn.style.background = slotGiorni.has(g)?'#E8631A':'#F8F7F5';
+  btn.style.color      = slotGiorni.has(g)?'#fff':'#8A8A8A';
+}
+
+function toggleOrario(o) {
+  if (slotOrari.has(o)) slotOrari.delete(o); else slotOrari.add(o);
+  const btn = document.getElementById('o-'+o.replace(':','-'));
+  btn.className = 'slot-btn ' + (slotOrari.has(o)?'on':'off');
+}
+
+function renderChiusure() {
+  const el = document.getElementById('chiusure-list');
+  if (!DATA.chiusure.length) { el.innerHTML = '<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessuna chiusura impostata</div>'; return; }
+  el.innerHTML = DATA.chiusure.map(c => `
+    <div class="list-item">
+      <span style="font-size:18px">🏖️</span>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;color:#1A1A1A">${c.label}</div>
+        <div style="font-size:11px;color:#8A8A8A">dal ${c.dal} al ${c.al}</div>
+      </div>
+      <button onclick="delChiusura('${c.id}')" style="background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px">✕</button>
+    </div>`).join('');
+}
+
+function renderBloccati() {
+  const el = document.getElementById('bloccati-list');
+  if (!bloccati.length) { el.innerHTML = '<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessun giorno bloccato</div>'; return; }
+  el.innerHTML = bloccati.map((b,i) => `
+    <div class="list-item">
+      <span>🚫</span>
+      <div style="flex:1;font-size:13px;font-weight:600;color:#1A1A1A">${b}</div>
+      <button onclick="bloccati.splice(${i},1);renderBloccati()" style="background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px">✕</button>
+    </div>`).join('');
+}
+
+async function addChiusura() {
+  const label = document.getElementById('ch-label').value.trim();
+  const dal   = document.getElementById('ch-dal').value.trim();
+  const al    = document.getElementById('ch-al').value.trim();
+  if (!label||!dal||!al) { alert('Compila tutti i campi chiusura'); return; }
+  const res = await api('saveChiusura', {label,dal,al});
+  if (res.ok) {
+    DATA.chiusure.push({id:res.id,label,dal,al});
+    renderChiusure();
+    document.getElementById('ch-label').value='';
+    document.getElementById('ch-dal').value='';
+    document.getElementById('ch-al').value='';
+  }
+}
+
+async function delChiusura(id) {
+  const res = await api('deleteChiusura', {id});
+  if (res.ok) { DATA.chiusure = DATA.chiusure.filter(c=>c.id!==id); renderChiusure(); }
+}
+
+function addBlocco() {
+  const d = document.getElementById('blocco-data').value.trim();
+  if (!d) return;
+  bloccati.push(d);
+  document.getElementById('blocco-data').value='';
+  renderBloccati();
+}
+
+async function saveSlot() {
+  const res = await api('saveSlot', {
+    giorni: [...slotGiorni],
+    orari:  [...slotOrari],
+    durata: 30
+  });
+  const ok = document.getElementById('slot-ok');
+  ok.style.display = '';
+  setTimeout(()=>ok.style.display='none', 3000);
+}
+</script>
+</body>
+</html>

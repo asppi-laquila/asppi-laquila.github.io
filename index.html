@@ -463,7 +463,8 @@ function doAdminLogin() {
     } else {
       localStorage.removeItem('asppi_admin_pwd');
     }
-    show('screen-admin');
+    localStorage.setItem('asppi_admin_ok', 'yes');
+    window.location.href = 'admin.html';
   } else {
     showErr('admin-error', 'Password non corretta');
   }
