@@ -363,16 +363,24 @@ const MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','
 
 // ── INIT ─────────────────────────────────────────────────────
 window.onload = async function() {
-  try { S = JSON.parse(localStorage.getItem('asppi_session')||'null'); } catch(e){}
-  if (!S||!S.token||!S.user) { 
+  try { S = JSON.parse(localStorage.getItem('asppi_session')||'null'); } catch(e){ S=null; }
+  if (!S || !S.token) { 
     localStorage.removeItem('asppi_session');
     window.location.replace('index.html'); 
     return; 
   }
-  document.getElementById('tnome').textContent  = S.user.nome||'Socio';
-  document.getElementById('hnome').textContent  = S.user.nome||'Socio';
-  document.getElementById('pr-nome').textContent = (S.user.nome||'')+' '+(S.user.cognome||'');
-  document.getElementById('pr-email').textContent = S.user.email||'—';
+  // Assicura che user esista
+  if(!S.user) S.user = {};
+  // Normalizza userId
+  S.user.userId = S.user.userId || S.user.id || '';
+  
+  try {
+    document.getElementById('tnome').textContent   = S.user.nome||'Socio';
+    document.getElementById('hnome').textContent   = S.user.nome||'Socio';
+    document.getElementById('pr-nome').textContent = ((S.user.nome||'')+' '+(S.user.cognome||'')).trim()||'—';
+    document.getElementById('pr-email').textContent= S.user.email||'—';
+  } catch(e){}
+  
   await carica();
   initCal();
 };
@@ -434,7 +442,8 @@ async function carica() {
   if(p.ok)  D.prenotazioni = p.data||[];
   if(sl.ok) D.slot         = sl.orari||[];
   // Carica anche messaggi free chat per badge
-  const fc = await call('getChat', {contrattoId: 'FREE_'+S.user.userId});
+  const chatId = 'FREE_'+(S.user.userId||S.user.id||'guest');
+  const fc = await call('getChat', {contrattoId: chatId});
   D.chat = fc.ok ? (fc.data||[]) : [];
   renderHome(); renderImmobili();
 }
@@ -1037,10 +1046,12 @@ function nomeContratto(d) {
 }
 
 // ── CHAT LIBERA ───────────────────────────────────────────────
-const FREE_CHAT_ID = 'FREE_'+S?.user?.userId||'free';
+// FREE_CHAT_ID calcolato dinamicamente
 
 async function loadFreeChat() {
-  const r = await call('getChat', {contrattoId: 'FREE_'+S.user.userId});
+  if(!S||!S.user) return;
+  const chatId = 'FREE_'+(S.user.userId||S.user.id||'guest');
+  const r = await call('getChat', {contrattoId: chatId});
   const msgs = r.ok?(r.data||[]):[];
   const el = document.getElementById('lchat-msgs');
   if(!msgs.length) { el.innerHTML='<div class="info">Nessun messaggio ancora. Scrivi liberamente allo studio!</div>'; return; }
@@ -1054,9 +1065,10 @@ async function loadFreeChat() {
 
 async function sendFreeMsg() {
   const t = document.getElementById('chat-free-inp').value.trim();
-  if(!t) return;
+  if(!t||!S||!S.user) return;
   document.getElementById('chat-free-inp').value = '';
-  const r = await call('sendMessage', {contrattoId: 'FREE_'+S.user.userId, testo: t});
+  const chatId = 'FREE_'+(S.user.userId||S.user.id||'guest');
+  const r = await call('sendMessage', {contrattoId: chatId, testo: t});
   if(r.ok) await loadFreeChat();
 }
 
