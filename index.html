@@ -318,13 +318,10 @@ window.addEventListener('load', () => {
 
   // Ripristina sessione salvata
   try {
-    // NON fare mai auto-login - cancella sempre la sessione all'avvio
-    // La sessione viene mantenuta SOLO se "Ricordami" era spuntato
-    const rem = JSON.parse(localStorage.getItem('asppi_remember') || 'null');
-    if (!rem) {
-      // Nessun "ricordami" attivo - cancella tutto
-      localStorage.removeItem('asppi_session');
-    }
+    // SEMPRE cancella la sessione all'apertura della pagina di login
+    // L'utente DEVE sempre fare il login manualmente
+    localStorage.removeItem('asppi_session');
+    localStorage.removeItem('asppi_admin_ok');
     // Pre-compila credenziali
     const rem = JSON.parse(localStorage.getItem('asppi_remember') || 'null');
     if (rem) {
