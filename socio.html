@@ -364,7 +364,11 @@ const MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','
 // ── INIT ─────────────────────────────────────────────────────
 window.onload = async function() {
   try { S = JSON.parse(localStorage.getItem('asppi_session')||'null'); } catch(e){}
-  if (!S||!S.token) { window.location.replace('index.html'); return; }
+  if (!S||!S.token||!S.user) { 
+    localStorage.removeItem('asppi_session');
+    window.location.replace('index.html'); 
+    return; 
+  }
   document.getElementById('tnome').textContent  = S.user.nome||'Socio';
   document.getElementById('hnome').textContent  = S.user.nome||'Socio';
   document.getElementById('pr-nome').textContent = (S.user.nome||'')+' '+(S.user.cognome||'');
@@ -383,6 +387,31 @@ async function call(action, data) {
     const t = await r.text();
     try { return JSON.parse(t); } catch(e) { return {ok:false,error:'Risposta non valida'}; }
   } catch(e) { return {ok:false,error:'Errore connessione: '+e.message}; }
+}
+
+function aggiornaChtatBadge() {
+  // Controlla messaggi admin non letti
+  const chatMsgs = D.chat || [];
+  const unread = chatMsgs.filter(function(m){ return m.mittente==='admin' && !m.letto; }).length;
+  const btn = document.getElementById('nb-chat');
+  if(!btn) return;
+  const lbl = btn.querySelector('span:last-child');
+  if(unread > 0) {
+    btn.style.position = 'relative';
+    // Aggiungi pallino rosso
+    let dot = document.getElementById('chat-unread-dot');
+    if(!dot) {
+      dot = document.createElement('div');
+      dot.id = 'chat-unread-dot';
+      dot.style.cssText = 'position:absolute;top:4px;right:12px;width:8px;height:8px;border-radius:50%;background:#C0392B;';
+      btn.appendChild(dot);
+    }
+    if(lbl) lbl.style.color = '#C0392B';
+  } else {
+    const dot = document.getElementById('chat-unread-dot');
+    if(dot) dot.remove();
+    if(lbl) lbl.style.color = '';
+  }
 }
 
 function fmtDate(d) {
@@ -404,7 +433,10 @@ async function carica() {
   if(c.ok)  D.contratti    = c.data||[];
   if(p.ok)  D.prenotazioni = p.data||[];
   if(sl.ok) D.slot         = sl.orari||[];
-  renderHome(); renderImmobili(); renderChat();
+  // Carica anche messaggi free chat per badge
+  const fc = await call('getChat', {contrattoId: 'FREE_'+S.user.userId});
+  D.chat = fc.ok ? (fc.data||[]) : [];
+  renderHome(); renderImmobili();
 }
 
 // ── NAVIGATION ────────────────────────────────────────────────
@@ -618,23 +650,34 @@ function initCal() {
 }
 
 function renderCal() {
-  const now=new Date(), y=now.getFullYear(), m=now.getMonth();
-  document.getElementById('cal-mese-lbl').textContent=MESI[m]+' '+y;
-  const offset=((new Date(y,m,1).getDay()||7)-1);
-  const days=new Date(y,m+1,0).getDate();
-  const occ=D.prenotazioni.filter(p=>p.stato==='confermata').map(p=>p.data);
-  let h=Array(offset).fill('<div></div>').join('');
-  for(let d=1;d<=days;d++){
-    const ds=d.toString().padStart(2,'0')+'/'+(m+1).toString().padStart(2,'0')+'/'+y;
-    const dw=new Date(y,m,d).getDay();
-    const past=new Date(y,m,d)<new Date(y,m,now.getDate());
-    const wknd=dw===0||dw===6;
-    const av=!past&&!wknd;
-    const sel=calDay===ds, tod=d===now.getDate();
-    let cls='cd'+(sel?' sel':tod&&av?' tod':av?' av':' un');
-    h+=`<div class="${cls}" ${av?`onclick="selDay('${ds}')"`:''}>${d}</div>`;
+  const now = new Date(), y = now.getFullYear(), m = now.getMonth();
+  document.getElementById('cal-mese-lbl').textContent = MESI[m] + ' ' + y;
+  const offset = ((new Date(y,m,1).getDay()||7) - 1);
+  const days = new Date(y,m+1,0).getDate();
+  const occ = D.prenotazioni.filter(function(p){ return p.stato==='confermata'; }).map(function(p){ return p.data; });
+  const container = document.getElementById('cal-days');
+  container.innerHTML = '';
+  // Celle vuote offset
+  for(let i=0; i<offset; i++) {
+    const empty = document.createElement('div');
+    container.appendChild(empty);
   }
-  document.getElementById('cal-days').innerHTML=h;
+  for(let d=1; d<=days; d++) {
+    const ds = String(d).padStart(2,'0') + '/' + String(m+1).padStart(2,'0') + '/' + y;
+    const dw = new Date(y,m,d).getDay();
+    const past = new Date(y,m,d) < new Date(y,m,now.getDate());
+    const wknd = dw===0 || dw===6;
+    const av = !past && !wknd;
+    const sel = calDay===ds;
+    const tod = d===now.getDate();
+    const div = document.createElement('div');
+    div.className = 'cd' + (sel?' sel': tod&&av?' tod': av?' av': ' un');
+    div.textContent = d;
+    if(av) {
+      div.addEventListener('click', (function(day){ return function(){ selDay(day); }; })(ds));
+    }
+    container.appendChild(div);
+  }
 }
 
 function selDay(ds) {

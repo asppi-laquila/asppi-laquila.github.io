@@ -318,10 +318,12 @@ window.addEventListener('load', () => {
 
   // Ripristina sessione salvata
   try {
-    const saved = JSON.parse(localStorage.getItem('asppi_session') || 'null');
-    if (saved && saved.token && saved.user) {
-      window.location.href = 'socio.html';
-      return;
+    // NON fare mai auto-login - cancella sempre la sessione all'avvio
+    // La sessione viene mantenuta SOLO se "Ricordami" era spuntato
+    const rem = JSON.parse(localStorage.getItem('asppi_remember') || 'null');
+    if (!rem) {
+      // Nessun "ricordami" attivo - cancella tutto
+      localStorage.removeItem('asppi_session');
     }
     // Pre-compila credenziali
     const rem = JSON.parse(localStorage.getItem('asppi_remember') || 'null');
@@ -330,12 +332,14 @@ window.addEventListener('load', () => {
       document.getElementById('login-pwd').value   = rem.pwd   || '';
       setCheck('remember-login', true);
     }
-    // Admin remember
+    // Admin remember - pre-compila solo se ricordami era attivo
     const adminPwd = localStorage.getItem('asppi_admin_pwd');
     if (adminPwd) {
       document.getElementById('admin-pwd').value = adminPwd;
       setCheck('remember-admin', true);
     }
+    // Assicurati che l'admin non sia auto-loggato senza password
+    localStorage.removeItem('asppi_admin_ok');
   } catch(e) {}
 });
 

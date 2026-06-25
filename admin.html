@@ -308,8 +308,8 @@ async function carica(){
 }
 
 function nav(id){
-  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.pg').forEach(function(p){ p.classList.remove('on'); });
+  document.querySelectorAll('.nb').forEach(function(b){ b.classList.remove('on'); });
   document.getElementById('p-'+id).classList.add('on');
   document.getElementById('nb-'+id).classList.add('on');
   window.scrollTo(0,0);
@@ -488,37 +488,52 @@ function renderChat(){
   // Include free chats too
   const allChats = [...D.contratti];
   if(!allChats.length){el.innerHTML='<div class="info">Nessuna conversazione ancora.</div>';return;}
-  el.innerHTML=allChats.map(c=>{
-    const msgs=D.chat.filter(m=>m.contrattoId===c.id);
-    const last=msgs[msgs.length-1];
-    const unread=msgs.filter(m=>m.mittente==='socio'&&!m.letto).length;
-    let nome='—';
-    try{const l=JSON.parse(c.locatoriJSON||'[]');if(l[0])nome=(l[0].cognome||'')+' '+(l[0].nome||'');}catch(e){}
-    return `<div class="row" onclick="apriChatAdmin('${c.id}')">
-      <div class="bar" style="background:${unread?'#E8631A':'#8A8A8A'}"></div>
-      <div class="rb" style="display:flex;align-items:center;gap:12px">
-        <div style="width:40px;height:40px;border-radius:20px;background:${unread?'#E8631A':'#F8F7F5'};display:flex;align-items:center;justify-content:center;color:${unread?'#fff':'#8A8A8A'};font-weight:800;font-size:13px;flex-shrink:0">
-          ${nome.split(' ').map(n=>n[0]||'').join('').slice(0,2).toUpperCase()}
-        </div>
-        <div style="flex:1;min-width:0">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div class="rt">${nomeContratto(c)||nome}</div>
-            ${unread?`<div style="width:8px;height:8px;border-radius:4px;background:#E8631A;flex-shrink:0"></div>`:''}
-          </div>
-          <div class="rs" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${last?last.testo:'Nessun messaggio'}</div>
-        </div>
-      </div>
-    </div>`;
+  el.innerHTML=allChats.map(function(c){
+    const msgs = D.chat.filter(function(m){ return m.contrattoId===c.id; });
+    const last = msgs[msgs.length-1];
+    const unread = msgs.filter(function(m){ return m.mittente==='socio' && !m.letto; }).length;
+    // Nome socio: cerca dall'ultimo messaggio del socio
+    let nomeSocio = '—';
+    const msgSocio = msgs.find(function(m){ return m.mittente==='socio'; });
+    if(msgSocio && msgSocio.nomeUtente && msgSocio.nomeUtente.trim()) {
+      nomeSocio = msgSocio.nomeUtente;
+    } else {
+      // Fallback: cerca nell'utenti
+      const utente = D.utenti.find(function(u){ return u.id === c.userId; });
+      if(utente) nomeSocio = (utente.nome||'') + ' ' + (utente.cognome||'');
+    }
+    nomeSocio = nomeSocio.trim() || '—';
+    const iniziali = nomeSocio.split(' ').map(function(n){ return n[0]||''; }).join('').slice(0,2).toUpperCase();
+    const titolo = nomeContratto(c);
+    return '<div class="row" onclick="apriChatAdmin(''+c.id+'')">'
+      + '<div class="bar" style="background:'+(unread?'#E8631A':'#8A8A8A')+'"></div>'
+      + '<div class="rb" style="display:flex;align-items:center;gap:12px">'
+      + '<div style="width:40px;height:40px;border-radius:20px;background:'+(unread?'#E8631A':'#F8F7F5')+';display:flex;align-items:center;justify-content:center;color:'+(unread?'#fff':'#8A8A8A')+';font-weight:800;font-size:13px;flex-shrink:0">'+iniziali+'</div>'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center">'
+      + '<div class="rt">'+titolo+'</div>'
+      + (unread?'<div style="width:8px;height:8px;border-radius:4px;background:#E8631A;flex-shrink:0"></div>':'')
+      + '</div>'
+      + '<div class="rs" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><strong style="color:#1A1A1A">'+nomeSocio+'</strong> · '+(last?last.testo:'Nessun messaggio')+'</div>'
+      + '</div></div></div>';
   }).join('');
 }
 
 function apriChatAdmin(id){
   curChatId=id; curPratId=id;
-  const c=D.contratti.find(x=>x.id===id);
-  let nome='—';
-  try{const l=JSON.parse(c?.locatoriJSON||'[]');if(l[0])nome=(l[0].cognome||'')+' '+(l[0].nome||'');}catch(e){}
-  document.getElementById('opr-lbl').textContent='CHAT · '+id;
-  document.getElementById('opr-ttl').textContent=nome;
+  const c=D.contratti.find(function(x){ return x.id===id; });
+  // Nome socio dall'utente o dai messaggi
+  let nomeSocio = '—';
+  const msgs = D.chat.filter(function(m){ return m.contrattoId===id && m.mittente==='socio'; });
+  if(msgs.length && msgs[0].nomeUtente && msgs[0].nomeUtente.trim()) {
+    nomeSocio = msgs[0].nomeUtente;
+  } else {
+    const utente = D.utenti.find(function(u){ return u.id===c?.userId; });
+    if(utente) nomeSocio = (utente.nome||'')+' '+(utente.cognome||'');
+  }
+  nomeSocio = nomeSocio.trim()||'—';
+  document.getElementById('opr-lbl').textContent='CHAT · '+nomeContratto(c||{id});
+  document.getElementById('opr-ttl').textContent=nomeSocio;
   // Render pratica dati minimali
   document.getElementById('opr-tipo').textContent=c?.tipo||'—';
   document.getElementById('opr-stato').textContent=statoLbl(c?.stato);
