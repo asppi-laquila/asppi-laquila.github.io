@@ -576,22 +576,22 @@ function apriChatAdmin(id){
   if(msgs.length && msgs[0].nomeUtente && msgs[0].nomeUtente.trim()) {
     nomeSocio = msgs[0].nomeUtente;
   } else {
-    const utente = D.utenti.find(function(u){ return u.id===c?.userId; });
+    const utente = D.utenti.find(function(u){ return u.id===c ? c.userId : null; });
     if(utente) nomeSocio = (utente.nome||'')+' '+(utente.cognome||'');
   }
   nomeSocio = nomeSocio.trim()||'—';
   document.getElementById('opr-lbl').textContent='CHAT · '+nomeContratto(c||{});
   document.getElementById('opr-ttl').textContent=nomeSocio;
   // Render pratica dati minimali
-  document.getElementById('opr-tipo').textContent=c?.tipo||'—';
-  document.getElementById('opr-stato').textContent=statoLbl(c?.stato);
-  document.getElementById('opr-stato-sel').value=c?.stato||'richiesta';
+  document.getElementById('opr-tipo').textContent=c ? c.tipo : ''||'—';
+  document.getElementById('opr-stato').textContent=statoLbl(c ? c.stato : '');
+  document.getElementById('opr-stato-sel').value=c ? c.stato : ''||'richiesta';
   document.getElementById('opr-dal').textContent=fmtDate(c?.duraDal);
   document.getElementById('opr-al').textContent=fmtDate(c?.duraAl);
   document.getElementById('opr-canone').textContent=c?.canoneMensile?'€ '+c.canoneMensile+'/mese':'—';
   document.getElementById('opr-dep').textContent=c?.depositoImporto?'€ '+c.depositoImporto:'—';
-  document.getElementById('opr-locs').innerHTML=parseLocs(c?.locatoriJSON);
-  document.getElementById('opr-cons').innerHTML=parseLocs(c?.conduttoriJSON);
+  document.getElementById('opr-locs').innerHTML=parseLocs(c ? c.locatoriJSON : null);
+  document.getElementById('opr-cons').innerHTML=parseLocs(c ? c.conduttoriJSON : null);
   document.getElementById('opr-ok').style.display='none';
   switchTab('chat');
   apri('ov-prat');
@@ -602,11 +602,19 @@ async function caricaMsgsAdmin(){
   const msgs=r.ok?(r.data||[]):[];
   const el=document.getElementById('admin-msgs');
   if(!msgs.length){el.innerHTML='<div class="info">Nessun messaggio ancora.</div>';return;}
-  el.innerHTML=msgs.map(m=>{
-    const mine=m.mittente==='admin';
-    return `<div class="bbl ${mine?'bm':'bo'}">${m.testo}</div>
-    <div class="bt" style="align-self:${mine?'flex-end':'flex-start'}">${mine?'Tu':m.nomeUtente||'Socio'} · ${m.timestamp?m.timestamp.substring(11,16):''}</div>`;
-  }).join('');
+  el.innerHTML = '';
+  msgs.forEach(function(m){
+    var mine = m.mittente==='admin';
+    var bbl = document.createElement('div');
+    bbl.className = 'bbl ' + (mine ? 'bm' : 'bo');
+    bbl.textContent = m.testo;
+    el.appendChild(bbl);
+    var bt = document.createElement('div');
+    bt.className = 'bt';
+    bt.style.alignSelf = mine ? 'flex-end' : 'flex-start';
+    bt.textContent = (mine ? 'Tu' : (m.nomeUtente||'Socio')) + ' · ' + (m.timestamp ? m.timestamp.substring(11,16) : '');
+    el.appendChild(bt);
+  });
   el.scrollTop=el.scrollHeight;
 }
 
@@ -710,7 +718,7 @@ async function addChiusura(){
 
 async function delChiusura(id){
   const r=await call('deleteChiusura',{id:id});
-  if(r.ok){D.chiusure=D.chiusure.filter(c=>c.id!==id);renderChiusure();}
+  if(r.ok){D.chiusure=D.chiusure.filter(function(ch){ return ch.id!==id; });renderChiusure();}
 }
 
 function addBlocco(){
