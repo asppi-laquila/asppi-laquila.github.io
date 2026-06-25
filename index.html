@@ -371,14 +371,19 @@ function setCheck(id, val) {
 // ── API ──────────────────────────────────────────────────────
 async function api(action, data) {
   try {
+    // Usiamo il parametro nella URL per aggirare i problemi CORS su Firefox
+    const payload = JSON.stringify({ action, ...data });
     const res = await fetch(API, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, ...data })
+      headers: { 'Content-Type': 'text/plain' }, // text/plain evita il preflight CORS
+      body: payload,
+      redirect: 'follow',
     });
-    return await res.json();
+    const text = await res.text();
+    try { return JSON.parse(text); }
+    catch(e) { return { ok: false, error: 'Risposta non valida dal server' }; }
   } catch(e) {
-    return { ok: false, error: 'Errore di connessione. Controlla la rete.' };
+    return { ok: false, error: 'Errore di connessione. Controlla la rete e riprova.' };
   }
 }
 

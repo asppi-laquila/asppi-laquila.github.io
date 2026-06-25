@@ -294,12 +294,19 @@ window.addEventListener('load', async () => {
 
 async function api(action, data) {
   try {
+    const payload = JSON.stringify({action, token: ADMIN_TOKEN, ...data});
     const res = await fetch(API, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({action, token: ADMIN_TOKEN, ...data})
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: payload,
+      redirect: 'follow',
     });
-    return await res.json();
-  } catch(e) { return {ok:false, error:'Errore connessione'}; }
+    const text = await res.text();
+    try { return JSON.parse(text); }
+    catch(e) { return {ok:false, error:'Risposta non valida dal server'}; }
+  } catch(e) {
+    return {ok:false, error:'Errore di connessione. Controlla la rete.'};
+  }
 }
 
 async function loadAll() {
