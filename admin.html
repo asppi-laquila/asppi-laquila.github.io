@@ -312,23 +312,32 @@ async function call(action,data){
 }
 
 async function carica(){
-  // Mostra stato caricamento
-  document.getElementById('h-prens').innerHTML='<div class="info">Connessione al server...</div>';
-  document.getElementById('h-prats').innerHTML='<div class="info">Connessione al server...</div>';
-  
-  const r=await call('adminGetAll');
-  if(!r.ok){
-    document.getElementById('h-prens').innerHTML='<div style="background:#FDEEEC;border-radius:10px;padding:10px 14px;font-size:12px;color:#C0392B">❌ Errore: '+r.error+'<br><button onclick="carica()" style="margin-top:8px;padding:6px 12px;background:#E8631A;color:#fff;border:none;border-radius:8px;cursor:pointer">Riprova</button></div>';
-    document.getElementById('h-prats').innerHTML='';
-    return;
+  document.getElementById('h-prens').innerHTML='<div class="info">Caricamento in corso...</div>';
+  document.getElementById('h-prats').innerHTML='<div class="info">Caricamento in corso...</div>';
+
+  // Carica tutto in parallelo con chiamate separate per evitare timeout
+  try {
+    const [rPren, rCnt, rUtenti, rChat, rChius, rSlot] = await Promise.all([
+      call('getPrenotazioni'),
+      call('getContratti'),
+      call('getUtenti'),
+      call('getAllChat'),
+      call('getChiusure'),
+      call('getSlot')
+    ]);
+
+    D.prenotazioni = rPren.ok  ? (rPren.data||[])   : [];
+    D.contratti    = rCnt.ok   ? (rCnt.data||[])    : [];
+    D.utenti       = rUtenti.ok? (rUtenti.data||[])  : [];
+    D.chat         = rChat.ok  ? (rChat.data||[])   : [];
+    D.chiusure     = rChius.ok ? (rChius.data||[])  : [];
+    if(rSlot.ok){ sGiorni=new Set(rSlot.giorni||[]); sOrari=new Set(rSlot.orari||[]); }
+
+    renderHome(); renderPren('tutte'); renderPrat('tutte'); renderChat();
+
+  } catch(e) {
+    document.getElementById('h-prens').innerHTML='<div style="background:#FDEEEC;border-radius:10px;padding:10px 14px;font-size:12px;color:#C0392B">❌ Errore: '+e.message+'<br><button onclick="carica()" style="margin-top:8px;padding:6px 12px;background:#E8631A;color:#fff;border:none;border-radius:8px;cursor:pointer">Riprova</button></div>';
   }
-  D.prenotazioni=r.prenotazioni||[];
-  D.contratti=r.contratti||[];
-  D.utenti=r.utenti||[];
-  D.chat=r.chat||[];
-  D.chiusure=r.chiusure||[];
-  if(r.slot){sGiorni=new Set(r.slot.giorni||[]);sOrari=new Set(r.slot.orari||[]);}
-  renderHome();renderPren('tutte');renderPrat('tutte');renderChat();
 }
 
 function nav(id){
