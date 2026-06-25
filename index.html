@@ -308,7 +308,10 @@ function ClienteApp({onExit}){
     <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
       <TopBar title="Portale Soci"/>
       <div style={{padding:"16px 16px 90px"}}>
-        <div style={{marginBottom:20}}><div style={{fontSize:12,color:st}}>Benvenuto,</div><div style={{fontSize:20,fontWeight:800,color:dk}}>Mario Rossi</div></div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:20}}>
+          <div><div style={{fontSize:12,color:st}}>Benvenuto,</div><div style={{fontSize:20,fontWeight:800,color:dk}}>{user?.nome||"Socio"}</div></div>
+          <button onClick={onCambioPwd} style={{background:"none",border:`1px solid ${bd}`,borderRadius:10,padding:"6px 12px",fontSize:11,fontWeight:600,color:st,cursor:"pointer"}}>🔑 Password</button>
+        </div>
         <div style={{display:"flex",gap:10,marginBottom:20}}>
           <button onClick={()=>setScr("apartments")} style={{flex:1,border:"none",borderRadius:16,padding:"20px 14px",cursor:"pointer",background:`linear-gradient(135deg,${or},#C94F0F)`,color:wh,textAlign:"left"}}>
             <div style={{fontSize:26,marginBottom:8}}>🏢</div><div style={{fontSize:14,fontWeight:800}}>Immobili</div><div style={{fontSize:11,opacity:0.8}}>e contratti</div>
@@ -996,8 +999,178 @@ function AdminApp({onExit}){
 // ══════════════════════════════════════════════════════════════════════════════
 // ROOT
 // ══════════════════════════════════════════════════════════════════════════════
+// ── SCHERMATA RECUPERO PASSWORD ──────────────────────────────
+function ForgotPassword({onBack}){
+  const [step,setStep]=useState(1);
+  const [email,setEmail]=useState("");
+  const [codice,setCodice]=useState("");
+  const [newPwd,setNewPwd]=useState("");
+  const [newPwd2,setNewPwd2]=useState("");
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState("");
+  const [codiceSent,setCodiceSent]=useState("");
+
+  const inviaEmail = async () => {
+    if(!email){ setError("Inserisci la tua email"); return; }
+    setLoading(true); setError("");
+    const res = await api("requestPasswordReset", {email});
+    setLoading(false);
+    if(res.ok){
+      setCodiceSent(res.codice||"");
+      setStep(2);
+    } else {
+      setError(res.error||"Email non trovata nel sistema");
+    }
+  };
+
+  const verificaCodice = () => {
+    if(!codice){ setError("Inserisci il codice ricevuto"); return; }
+    if(codice !== codiceSent){ setError("Codice non corretto. Controlla la email."); return; }
+    setError("");
+    setStep(3);
+  };
+
+  const cambiaPassword = async () => {
+    if(!newPwd||newPwd.length<8){ setError("La password deve essere di almeno 8 caratteri"); return; }
+    if(newPwd!==newPwd2){ setError("Le due password non coincidono"); return; }
+    setLoading(true); setError("");
+    const res = await api("resetPassword", {email, codice, newPassword: newPwd});
+    setLoading(false);
+    if(res.ok){
+      setStep(4);
+    } else {
+      setError(res.error||"Errore. Riprova.");
+    }
+  };
+
+  return(
+    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:wh,minHeight:"100vh",display:"flex",flexDirection:"column"}}>
+      <div style={{backgroundColor:dk,padding:"48px 32px 36px"}}>
+        <div style={{color:or,fontSize:11,fontWeight:700,letterSpacing:"0.12em",marginBottom:8}}>ASPPI L'AQUILA</div>
+        <div style={{color:wh,fontSize:22,fontWeight:800}}>Recupero password</div>
+      </div>
+      <div style={{padding:"32px 24px",flex:1}}>
+
+        {/* Step 1 - Inserisci email */}
+        {step===1&&<>
+          <div style={{backgroundColor:ol,borderRadius:12,padding:"12px 16px",marginBottom:20,fontSize:12,color:"#4A4A4A",lineHeight:1.6}}>
+            📧 Inserisci la tua email. Ti invieremo un codice per reimpostare la password.
+          </div>
+          <label style={lbl}>La tua email</label>
+          <input value={email} onChange={e=>setEmail(e.target.value)} placeholder="mario.rossi@email.com" style={inp}/>
+          {error&&<div style={{backgroundColor:rl,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:13,color:rd}}>{error}</div>}
+          <button onClick={inviaEmail} disabled={loading} style={{...btnP,opacity:loading?0.6:1}}>
+            {loading?"Invio in corso...":"Invia codice via email"}
+          </button>
+          <button onClick={onBack} style={btnS}>← Torna al login</button>
+        </>}
+
+        {/* Step 2 - Inserisci codice */}
+        {step===2&&<>
+          <div style={{backgroundColor:gl,borderRadius:12,padding:"12px 16px",marginBottom:20,fontSize:12,color:gn,lineHeight:1.6}}>
+            ✅ Abbiamo inviato un codice a <strong>{email}</strong>. Controlla la casella email (anche spam).
+          </div>
+          <label style={lbl}>Codice di verifica (6 cifre)</label>
+          <input value={codice} onChange={e=>setCodice(e.target.value)} placeholder="es. 123456" maxLength={6}
+            style={{...inp,fontSize:24,letterSpacing:"0.3em",textAlign:"center",fontFamily:"monospace"}}/>
+          {error&&<div style={{backgroundColor:rl,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:13,color:rd}}>{error}</div>}
+          <button onClick={verificaCodice} style={btnP}>Verifica codice</button>
+          <button onClick={()=>{setStep(1);setError("");}} style={btnS}>← Cambia email</button>
+        </>}
+
+        {/* Step 3 - Nuova password */}
+        {step===3&&<>
+          <div style={{backgroundColor:ol,borderRadius:12,padding:"12px 16px",marginBottom:20,fontSize:12,color:"#4A4A4A",lineHeight:1.6}}>
+            🔑 Codice verificato! Ora scegli una nuova password.
+          </div>
+          <label style={lbl}>Nuova password (min. 8 caratteri)</label>
+          <input value={newPwd} onChange={e=>setNewPwd(e.target.value)} type="password" placeholder="••••••••" style={inp}/>
+          <label style={lbl}>Conferma nuova password</label>
+          <input value={newPwd2} onChange={e=>setNewPwd2(e.target.value)} type="password" placeholder="••••••••" style={inp}/>
+          {error&&<div style={{backgroundColor:rl,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:13,color:rd}}>{error}</div>}
+          <button onClick={cambiaPassword} disabled={loading} style={{...btnP,opacity:loading?0.6:1}}>
+            {loading?"Salvataggio...":"Salva nuova password"}
+          </button>
+        </>}
+
+        {/* Step 4 - Successo */}
+        {step===4&&<div style={{textAlign:"center",paddingTop:40}}>
+          <div style={{fontSize:56,marginBottom:16}}>✅</div>
+          <div style={{fontSize:20,fontWeight:800,color:dk,marginBottom:8}}>Password aggiornata!</div>
+          <div style={{fontSize:13,color:st,marginBottom:24}}>Ora puoi accedere con la nuova password.</div>
+          <button onClick={onBack} style={{...btnP,width:200,borderRadius:12}}>Vai al login</button>
+        </div>}
+
+      </div>
+    </div>
+  );
+}
+
+// ── SCHERMATA CAMBIO PASSWORD (SOCI) ─────────────────────────
+function CambioPassword({onBack}){
+  const [vecchia,setVecchia]=useState("");
+  const [nuova,setNuova]=useState("");
+  const [nuova2,setNuova2]=useState("");
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState("");
+  const [ok,setOk]=useState(false);
+
+  const salva = async () => {
+    if(!vecchia||!nuova||!nuova2){ setError("Tutti i campi sono obbligatori"); return; }
+    if(nuova.length<8){ setError("La nuova password deve essere di almeno 8 caratteri"); return; }
+    if(nuova!==nuova2){ setError("Le due password non coincidono"); return; }
+    setLoading(true); setError("");
+    const res = await api("changePassword", {oldPassword:vecchia, newPassword:nuova}, getToken());
+    setLoading(false);
+    if(res.ok){
+      // Aggiorna remember se attivo
+      try {
+        const saved=JSON.parse(localStorage.getItem("asppi_remember")||"null");
+        if(saved){ saved.password=nuova; localStorage.setItem("asppi_remember",JSON.stringify(saved)); }
+      } catch(e){}
+      setOk(true);
+    } else {
+      setError(res.error||"Password attuale non corretta");
+    }
+  };
+
+  if(ok) return(
+    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",padding:32}}>
+      <div style={{fontSize:56,marginBottom:16}}>✅</div>
+      <div style={{fontSize:20,fontWeight:800,color:dk,marginBottom:8}}>Password aggiornata!</div>
+      <div style={{fontSize:13,color:st,marginBottom:24}}>La tua nuova password è attiva.</div>
+      <button onClick={onBack} style={{...btnP,width:200,borderRadius:12}}>Torna al profilo</button>
+    </div>
+  );
+
+  return(
+    <div style={{fontFamily:"sans-serif",maxWidth:430,margin:"0 auto",backgroundColor:bg,minHeight:"100vh"}}>
+      <div style={{backgroundColor:dk,padding:"14px 18px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div><div style={{color:or,fontSize:10,fontWeight:700,letterSpacing:"0.1em"}}>ASPPI L'AQUILA</div>
+        <div style={{color:wh,fontSize:15,fontWeight:700}}>Cambia password</div></div>
+        <button onClick={onBack} style={{background:"none",border:"1px solid #fff4",color:wh,borderRadius:8,padding:"6px 12px",fontSize:12,cursor:"pointer"}}>← Indietro</button>
+      </div>
+      <div style={{padding:"24px 20px"}}>
+        <div style={card}>
+          <div style={sec}>MODIFICA PASSWORD</div>
+          <label style={lbl}>Password attuale</label>
+          <input value={vecchia} onChange={e=>setVecchia(e.target.value)} type="password" placeholder="••••••••" style={inp}/>
+          <label style={lbl}>Nuova password (min. 8 caratteri)</label>
+          <input value={nuova} onChange={e=>setNuova(e.target.value)} type="password" placeholder="••••••••" style={inp}/>
+          <label style={lbl}>Conferma nuova password</label>
+          <input value={nuova2} onChange={e=>setNuova2(e.target.value)} type="password" placeholder="••••••••" style={inp}/>
+          {error&&<div style={{backgroundColor:rl,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:13,color:rd}}>{error}</div>}
+          <button onClick={salva} disabled={loading} style={{...btnP,opacity:loading?0.6:1}}>
+            {loading?"Salvataggio...":"Salva nuova password"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── SCHERMATA LOGIN/REGISTRAZIONE ────────────────────────────
-function AuthScreen({onLogin}){
+function AuthScreen({onLogin,onForgot}){
   const [tab,setTab]=useState("login");
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
@@ -1072,7 +1245,10 @@ function AuthScreen({onLogin}){
         <button onClick={submit} disabled={loading} style={{...btnP,opacity:loading?0.6:1}}>
           {loading?"Attendere...":tab==="login"?"Accedi":"Crea account"}
         </button>
-        <div style={{fontSize:11,color:st,textAlign:"center",marginTop:20,lineHeight:1.6}}>
+        {tab==="login"&&<button onClick={()=>onForgot()} style={{width:"100%",background:"none",border:"none",color:or,fontSize:13,fontWeight:600,cursor:"pointer",marginTop:12,padding:"8px 0"}}>
+          Password dimenticata?
+        </button>}
+        <div style={{fontSize:11,color:st,textAlign:"center",marginTop:12,lineHeight:1.6}}>
           Accesso riservato ai soci ASPPI L'Aquila.<br/>
           Per assistenza: <span style={{color:or}}>+39 392 519 1490</span>
         </div>
@@ -1106,8 +1282,10 @@ function App(){
       </div>
     </div>
   );
-  if(mode==="auth") return <AuthScreen onLogin={u=>{setUser(u);setMode("client");}} />;
-  if(mode==="client") return <ClienteApp onExit={()=>{clearToken();setMode("choose");}} user={user}/>;
+  if(mode==="auth") return <AuthScreen onLogin={u=>{setUser(u);setMode("client");}} onForgot={()=>setMode("forgot")}/>;
+  if(mode==="forgot") return <ForgotPassword onBack={()=>setMode("auth")}/>;
+  if(mode==="client") return <ClienteApp onExit={()=>{clearToken();setMode("choose");}} onCambioPwd={()=>setMode("cambioPwd")} user={user}/>;
+  if(mode==="cambioPwd") return <CambioPassword onBack={()=>setMode("client")}/>;
   if(mode==="admin") return <AdminApp onExit={()=>setMode("choose")}/>;
 }
 
