@@ -360,15 +360,46 @@ window.onload = function() {
   if (!S.user) S.user = {};
   S.user.userId = S.user.userId || S.user.id || '';
 
-  setText('tnome', S.user.nome || 'Socio');
-  setText('hnome', S.user.nome || 'Socio');
-  setText('pr-nome', (S.user.nome || '') + ' ' + (S.user.cognome || ''));
-  setText('pr-email', S.user.email || '');
-
   bindEvents();
   initCal();
-  carica();
+
+  // Se il nome non c'è, ricaricalo dal backend con una chiamata di verifica
+  if (!S.user.nome) {
+    // Prova a caricare i dati utente richiamando getAppartamenti
+    // che restituisce solo dati dell'utente autenticato
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', API, true);
+    xhr.setRequestHeader('Content-Type', 'text/plain');
+    xhr.timeout = 10000;
+    xhr.onload = function() {
+      try {
+        var r = JSON.parse(xhr.responseText);
+        if (!r.ok) {
+          // Token non valido - torna al login
+          localStorage.removeItem('asppi_session');
+          window.location.replace('index.html');
+          return;
+        }
+        // Token valido, continua
+        aggiornaInterfacciaUtente();
+        carica();
+      } catch(e) { aggiornaInterfacciaUtente(); carica(); }
+    };
+    xhr.onerror = function() { aggiornaInterfacciaUtente(); carica(); };
+    xhr.ontimeout = function() { aggiornaInterfacciaUtente(); carica(); };
+    xhr.send(JSON.stringify({action:'getAppartamenti', token:S.token}));
+  } else {
+    aggiornaInterfacciaUtente();
+    carica();
+  }
 };
+
+function aggiornaInterfacciaUtente() {
+  setText('tnome', S.user.nome || S.user.email || 'Socio');
+  setText('hnome', S.user.nome || S.user.email || 'Socio');
+  setText('pr-nome', ((S.user.nome || '') + ' ' + (S.user.cognome || '')).trim() || S.user.email || '—');
+  setText('pr-email', S.user.email || '—');
+}
 
 // ── HELPERS ───────────────────────────────────────────────────
 function setText(id, val) { var e = document.getElementById(id); if(e) e.textContent = val; }
@@ -498,7 +529,7 @@ function renderHome() {
   var el = document.getElementById('hpratiche');
   if (!el) return;
   el.innerHTML = '';
-  if (!D.contratti.length) {
+  if (!D.contratti || !D.contratti.length) {
     el.innerHTML = '<div class="info">Nessuna pratica ancora. Aggiungi un immobile per iniziare.</div>';
     return;
   }
