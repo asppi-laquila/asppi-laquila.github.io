@@ -105,6 +105,9 @@ input:focus{border-color:#E8631A;}
     <div id="form-reg" style="display:none">
       <label>Nome *</label><input type="text" id="reg-nome" placeholder="MARIO"/>
       <label>Cognome *</label><input type="text" id="reg-cog" placeholder="ROSSI"/>
+      <label>Nome visualizzato / Ragione sociale *</label>
+      <input type="text" id="reg-display" placeholder="es. Agenzia Rossi Immobiliare oppure Mario Rossi"/>
+      <div style="font-size:11px;color:#8A8A8A;margin-top:-8px;margin-bottom:8px">Questo è il nome che vedrà l'amministratore nelle liste</div>
       <label>Codice Fiscale *</label><input type="text" id="reg-cf" placeholder="RSSMRA70A01G878X" style="font-family:monospace;text-transform:uppercase" maxlength="16"/>
       <label>Data di nascita *</label><input type="text" id="reg-dtn" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDateReg(this)"/>
       <label>Luogo di nascita *</label><input type="text" id="reg-lng" placeholder="L'AQUILA"/>
@@ -113,7 +116,10 @@ input:focus{border-color:#E8631A;}
       <label>Telefono *</label><input type="text" id="reg-tel" placeholder="+39 333 000 0000"/>
       <label>Email *</label><input type="email" id="reg-email" placeholder="mario.rossi@email.com"/>
       <label>Password * (min. 8 caratteri)</label>
-      <input type="password" id="reg-pwd" placeholder="••••••••"/>
+      <div style="position:relative">
+        <input type="password" id="reg-pwd" placeholder="••••••••" style="padding-right:44px"/>
+        <button type="button" onclick="togglePwd('reg-pwd','eye-reg')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:#8A8A8A" id="eye-reg">&#128065;</button>
+      </div>
       <div class="err" id="reg-err"></div>
       <div class="cr" onclick="toggleRem('rem-reg')">
         <div class="cb" id="rem-reg-box"></div>
@@ -232,6 +238,19 @@ const ADM_PWD_DEFAULT = "Asppi2025!";
 })();
 
 // ── NAVIGATION ───────────────────────────────────────────────
+function togglePwd(inputId, btnId) {
+    var inp = document.getElementById(inputId);
+    var btn = document.getElementById(btnId);
+    if (!inp) return;
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      if (btn) btn.innerHTML = '&#128064;';
+    } else {
+      inp.type = 'password';
+      if (btn) btn.innerHTML = '&#128065;';
+    }
+  }
+
 function mostra(id) {
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); });
   document.getElementById(id).classList.add('on');

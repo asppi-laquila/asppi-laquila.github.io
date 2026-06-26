@@ -353,6 +353,10 @@ function nomeContratto(c) {
   catch(e){}
   return nome || c.nomeContratto || c.tipo || 'Contratto';
 }
+
+function nomeSocio(u) {
+  return u.displayName || ((u.nome||'')+' '+(u.cognome||'')).trim() || u.email || '—';
+}
 function parsePeople(json) {
   var arr = []; try { arr = JSON.parse(json||'[]'); } catch(e) {}
   if (!arr.length) return '<div class="val" style="color:#C0392B">Dati non inseriti</div>';
@@ -541,7 +545,7 @@ function carica() {
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome() {
   setText('sh-app', D.prenotazioni.filter(function(p){ return p.stato==='confermata'; }).length);
-  setText('sh-att', D.contratti.filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && c.eliminato!=='true'; }).length);
+  setText('sh-att', D.contratti.filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; }).length);
   // Prenotazioni
   var hp = document.getElementById('h-prens'); if(!hp) return;
   var prens = D.prenotazioni.filter(function(p){ return p.stato==='confermata'; }).slice(0,3);
@@ -563,7 +567,7 @@ function makePrenCard(p) {
   var bar = document.createElement('div'); bar.className='bar'; bar.style.background=col;
   var rb  = document.createElement('div'); rb.className='rb';
   var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
-  var rt = document.createElement('div'); rt.className='rt'; rt.textContent=p.nomeUtente||'—';
+  var rt = document.createElement('div'); rt.className='rt'; rt.textContent=p.displayName||p.nomeUtente||'—';
   var ora = document.createElement('div'); ora.style.cssText='font-size:15px;font-weight:800;color:#E8631A'; ora.textContent=p.ora||'—';
   var rs = document.createElement('div'); rs.className='rs'; rs.textContent=(p.motivo||'')+' - '+(p.data||'');
   var ra = document.createElement('div'); ra.className='ra'; ra.textContent='›';
@@ -969,7 +973,7 @@ function caricaSoci() {
         var bar = document.createElement('div'); bar.className='bar'; bar.style.background=haTessera?'#2D7A4F':'#E8631A';
         var rb  = document.createElement('div'); rb.className='rb';
         var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
-        var rt  = document.createElement('div'); rt.className='rt'; rt.textContent=(u.nome||'')+' '+(u.cognome||'');
+        var rt  = document.createElement('div'); rt.className='rt'; rt.textContent=u.displayName||((u.nome||'')+' '+(u.cognome||''));
         var bdg = document.createElement('span'); bdg.className='bdg';
         bdg.textContent = haTessera ? 'Tessera '+anno : 'Senza tessera';
         bdg.style.color = haTessera?'#2D7A4F':'#E8631A';
@@ -999,7 +1003,7 @@ function apriSocio(uid) {
   var anno = new Date().getFullYear();
   var tes  = (window._tessereData||[]).filter(function(t){ return t.userId===uid && String(t.anno)===String(anno); });
 
-  setText('os-ttl',   (u.nome||'')+' '+(u.cognome||''));
+  setText('os-ttl',   u.displayName||((u.nome||'')+' '+(u.cognome||'')));
   setText('os-nome',  (u.nome||'')+' '+(u.cognome||''));
   setText('os-cf',    u.cf||'—');
   setText('os-dtn',   u.dataNascita||'—');
