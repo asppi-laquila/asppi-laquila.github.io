@@ -347,34 +347,47 @@ var NLABELS = ['Tipo','Durata','Canone','Immobile','Locatori','Conduttori','Gara
 window.onload = function() {
   try { S = JSON.parse(localStorage.getItem('asppi_session') || 'null'); } catch(e) { S = null; }
   if (!S || !S.token) { window.location.replace('index.html'); return; }
+
+  // Normalizza struttura sessione
+  // index.html salva: {token: res.token, user: res}
+  // dove res = {ok:true, token:..., userId:..., nome:..., email:...}
   if (!S.user) S.user = {};
-
-  // Aggiorna interfaccia
+  // Se il nome è nella root della sessione (vecchio formato)
+  if (!S.user.nome && S.nome) S.user.nome = S.nome;
+  if (!S.user.email && S.email) S.user.email = S.email;
+  if (!S.user.userId && S.userId) S.user.userId = S.userId;
+  // Se user ha nome direttamente (nuovo formato da index.html)
+  // {token:..., user:{ok:true, token:..., userId:..., nome:..., email:...}}
   var nome = S.user.nome || '';
-  document.getElementById('tnome').textContent = nome || 'Socio';
-  document.getElementById('hnome').textContent = nome || 'Socio';
+  var email = S.user.email || '';
+
+  document.getElementById('tnome').textContent = nome || email || 'Socio';
+  document.getElementById('hnome').textContent = nome || email || 'Socio';
   document.getElementById('pr-nome').textContent = (nome + ' ' + (S.user.cognome||'')).trim() || '—';
-  document.getElementById('pr-email').textContent = S.user.email || '—';
+  document.getElementById('pr-email').textContent = email || '—';
 
-  // Bind eventi
   bindAll();
-
-  // Calendario
   initCal();
-
-  // Carica dati
   caricaDati();
 };
 
 function caricaDati() {
-  document.getElementById('hpratiche').innerHTML = '<div class="info">Caricamento...</div>';
-  document.getElementById('limm').innerHTML = '<div class="info">Caricamento...</div>';
+  var hprat = document.getElementById('hpratiche');
+  var limm  = document.getElementById('limm');
+  if(hprat) hprat.innerHTML = '<div class="info">Caricamento...</div>';
+  if(limm)  limm.innerHTML  = '<div class="info">Caricamento...</div>';
 
   api('getAppartamenti', {}, function(err, r) {
     if (!err && r && r.ok) {
       D.appartamenti = r.data || [];
     } else {
       D.appartamenti = [];
+      // Token scaduto - torna al login
+      if (r && r.error && r.error.indexOf('autorizzato') > -1) {
+        localStorage.removeItem('asppi_session');
+        window.location.replace('index.html');
+        return;
+      }
     }
     renderImmobili();
 
