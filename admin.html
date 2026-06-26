@@ -114,6 +114,78 @@ select.inp{cursor:pointer;}
   <div id="l-chat"><div class="info">Caricamento...</div></div>
 </div>
 
+<!-- SOCI E TESSERE -->
+<div id="p-soci" class="pg">
+  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Soci e Tessere</div>
+  <div class="frow" id="soci-filtri"></div>
+  <div id="l-soci"><div class="info">Caricamento...</div></div>
+</div>
+
+<!-- PAGAMENTI -->
+<div id="p-pag" class="pg">
+  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Gestione Pagamenti</div>
+  <div class="frow" id="pag-filtri"></div>
+  <div id="l-pag"><div class="info">Caricamento...</div></div>
+</div>
+
+<!-- OV DETTAGLIO SOCIO -->
+<div id="ov-socio" class="ov">
+  <div class="oh">
+    <div><div class="ohlbl">SOCIO</div><div class="ohttl" id="os-ttl"></div></div>
+    <button class="exbtn" id="btn-chiudi-socio">&#8592; Chiudi</button>
+  </div>
+  <div style="padding:16px">
+    <div class="card"><div class="cb">
+      <div class="sec">DATI ANAGRAFICI</div>
+      <div class="lbl">Nome e Cognome</div><div class="val" id="os-nome"></div>
+      <div class="lbl">Codice Fiscale</div><div class="val" id="os-cf" style="font-family:monospace"></div>
+      <div class="lbl">Data di nascita</div><div class="val" id="os-dtn"></div>
+      <div class="lbl">Luogo di nascita</div><div class="val" id="os-lng"></div>
+      <div class="lbl">Comune residenza</div><div class="val" id="os-res"></div>
+      <div class="lbl">Via e n. civico</div><div class="val" id="os-via"></div>
+      <div class="lbl">Telefono</div><div class="val" id="os-tel"></div>
+      <div class="lbl">Email</div><div class="val" id="os-email"></div>
+      <div class="lbl">Registrato il</div><div class="val" id="os-data"></div>
+    </div></div>
+    <div class="card"><div class="cb">
+      <div class="sec">TESSERA ASPPI</div>
+      <div id="os-tessera-info" class="info">Nessuna tessera assegnata</div>
+      <label class="lbl">Numero tessera</label>
+      <input type="text" class="inp" id="os-tes-num" placeholder="es. ASPPI-2026-00001" style="font-family:monospace"/>
+      <label class="lbl">Anno validita</label>
+      <input type="text" class="inp" id="os-tes-anno" placeholder="2026"/>
+      <div class="infog" id="os-tes-ok" style="display:none">&#9989; Tessera salvata!</div>
+      <button class="bp" id="btn-salva-tessera">Salva tessera</button>
+    </div></div>
+    <div class="card"><div class="cb">
+      <div class="sec">SITUAZIONE ECONOMICA</div>
+      <div id="os-economia"><div class="info">Caricamento...</div></div>
+    </div></div>
+    <div class="card"><div class="cb">
+      <div class="sec">REGISTRA PAGAMENTO</div>
+      <label class="lbl">Tipo</label>
+      <select class="inp" id="os-pag-tipo">
+        <option value="tesseramento_nuovo">Primo tesseramento (€55)</option>
+        <option value="tesseramento_rinnovo">Rinnovo tessera (€50)</option>
+        <option value="contratto_extra">Contratto extra (€25)</option>
+        <option value="adempimento_extra">Adempimento extra (€15)</option>
+        <option value="altro">Altro importo</option>
+      </select>
+      <label class="lbl">Importo €</label>
+      <input type="text" class="inp" id="os-pag-importo" placeholder="55"/>
+      <label class="lbl">Metodo</label>
+      <select class="inp" id="os-pag-metodo">
+        <option value="contanti">Contanti</option>
+        <option value="bonifico">Bonifico confermato</option>
+      </select>
+      <label class="lbl">Data pagamento</label>
+      <input type="text" class="inp" id="os-pag-data" placeholder="gg/mm/aaaa"/>
+      <div class="infog" id="os-pag-ok" style="display:none">&#9989; Pagamento registrato!</div>
+      <button class="bp" id="btn-registra-pag">Registra pagamento</button>
+    </div></div>
+  </div>
+</div>
+
 <!-- SLOT -->
 <div id="p-slot" class="pg">
   <div class="card"><div class="cb">
@@ -200,7 +272,8 @@ select.inp{cursor:pointer;}
       <select class="inp" id="opr-stato-sel">
         <option value="richiesta">In attesa</option>
         <option value="lavorazione">In lavorazione</option>
-        <option value="completato">Completato</option>
+        <option value="da_firmare">Da firmare</option>
+        <option value="completato">&#9989; Completato (archivia)</option>
       </select>
       <button class="bp" id="btn-aggiorna-stato">Aggiorna stato</button>
       <div class="infog" id="opr-ok" style="display:none;margin-top:8px">&#9989; Stato aggiornato!</div>
@@ -228,10 +301,10 @@ select.inp{cursor:pointer;}
 
 <div class="nav">
   <button class="nb on" id="nb-home"><span class="ic">&#128202;</span><span class="lb">Home</span></button>
-  <button class="nb" id="nb-pren"><span class="ic">&#128197;</span><span class="lb">Prenotaz.</span></button>
   <button class="nb" id="nb-prat"><span class="ic">&#128203;</span><span class="lb">Pratiche</span></button>
-  <button class="nb" id="nb-chat"><span class="ic">&#128172;</span><span class="lb">Chat</span></button>
-  <button class="nb" id="nb-slot"><span class="ic">&#128197;</span><span class="lb">Slot</span></button>
+  <button class="nb" id="nb-soci"><span class="ic">&#128100;</span><span class="lb">Soci</span></button>
+  <button class="nb" id="nb-pag"><span class="ic">&#128176;</span><span class="lb">Pagamenti</span></button>
+  <button class="nb" id="nb-slot"><span class="ic">&#9881;</span><span class="lb">Impost.</span></button>
 </div>
 
 <script>
@@ -262,8 +335,16 @@ function fmtDate(d) {
   if (d.indexOf('T') > -1) { var p=d.substring(0,10).split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
   return d;
 }
-function statoLbl(s) { return s==='completato'?'Completato':s==='lavorazione'?'In lavorazione':'In attesa'; }
-function statoCol(s) { return s==='completato'?'#2D7A4F':s==='lavorazione'?'#1A5FA8':'#E8631A'; }
+function statoLbl(s) {
+  return s==='completato'  ? 'Completato' :
+         s==='lavorazione' ? 'In lavorazione' :
+         s==='da_firmare'  ? 'Da firmare' : 'In attesa';
+}
+function statoCol(s) {
+  return s==='completato'  ? '#2D7A4F' :
+         s==='lavorazione' ? '#1A5FA8' :
+         s==='da_firmare'  ? '#8B5CF6' : '#E8631A';
+}
 function nomeContratto(c) {
   var nome = '';
   try { var l=JSON.parse(c.locatoriJSON||'[]'); var cn=JSON.parse(c.conduttoriJSON||'[]');
@@ -338,10 +419,13 @@ function bindEvents() {
   document.getElementById('btn-esci').addEventListener('click', esci);
   // Nav
   document.getElementById('nb-home').addEventListener('click', function(){ navTo('home'); });
-  document.getElementById('nb-pren').addEventListener('click', function(){ navTo('pren'); });
   document.getElementById('nb-prat').addEventListener('click', function(){ navTo('prat'); });
-  document.getElementById('nb-chat').addEventListener('click', function(){ navTo('chat'); });
+  document.getElementById('nb-soci').addEventListener('click', function(){ navTo('soci'); caricaSoci(); });
+  document.getElementById('nb-pag').addEventListener('click',  function(){ navTo('pag');  caricaPagamenti(); });
   document.getElementById('nb-slot').addEventListener('click', function(){ navTo('slot'); });
+  document.getElementById('btn-chiudi-socio').addEventListener('click', function(){ chiudi('ov-socio'); });
+  document.getElementById('btn-salva-tessera').addEventListener('click', salvaTessera);
+  document.getElementById('btn-registra-pag').addEventListener('click', registraPagamento);
   // Overlay close
   document.getElementById('btn-chiudi-op').addEventListener('click', function(){ chiudi('ov-pren'); });
   document.getElementById('btn-chiudi-opr').addEventListener('click', function(){ chiudi('ov-prat'); });
@@ -363,7 +447,7 @@ function bindEvents() {
   document.getElementById('btn-cambia-pwd-admin').addEventListener('click', cambiaPwdAdmin);
   // Filtri prenotazioni
   makeFiltri('pren-filtri', ['tutte','confermata','cancellata'], ['Tutte','Confermate','Cancellate'], function(f){ prenFiltro=f; renderPren(); });
-  makeFiltri('prat-filtri', ['tutte','richiesta','lavorazione','completato'], ['Tutte','In attesa','In lavorazione','Completate'], function(f){ pratFiltro=f; renderPrat(); });
+  makeFiltri('prat-filtri', ['tutte','richiesta','lavorazione','da_firmare','completato'], ['Attive','In attesa','In lavorazione','Da firmare','Archivio'], function(f){ pratFiltro=f; renderPrat(); });
 }
 
 function makeFiltri(containerId, vals, labels, cb) {
@@ -405,7 +489,7 @@ function apiCall(action, data, cb) {
 
 // ── NAV ───────────────────────────────────────────────────────
 function navTo(id) {
-  var pages = ['home','pren','prat','chat','slot'];
+  var pages = ['home','pren','prat','chat','slot','soci','pag'];
   for (var i=0; i<pages.length; i++) {
     var pg = document.getElementById('p-'+pages[i]);
     var nb = document.getElementById('nb-'+pages[i]);
@@ -467,8 +551,9 @@ function renderHome() {
   // Pratiche
   var hpr = document.getElementById('h-prats'); if(!hpr) return;
   hpr.innerHTML = '';
-  if (!D.contratti.length) { hpr.innerHTML='<div class="info">Nessuna pratica ancora.</div>'; }
-  else { var list=D.contratti.slice(0,3); for(var j=0;j<list.length;j++) hpr.appendChild(makePratCard(list[j])); }
+  var pratAttive = D.contratti.filter(function(c){ return c.stato!=='completato' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; });
+  if (!pratAttive.length) { hpr.innerHTML='<div class="info">Nessuna pratica attiva.</div>'; }
+  else { var listP=pratAttive.slice(0,3); for(var j=0;j<listP.length;j++) hpr.appendChild(makePratCard(listP[j])); }
 }
 
 // ── PRENOTAZIONI ──────────────────────────────────────────────
@@ -556,7 +641,18 @@ function makePratCard(c) {
 function renderPrat() {
   var el = document.getElementById('l-prat'); if(!el) return;
   var list = D.contratti.filter(function(c){ return c.eliminato!==true && c.eliminato!=='true'; });
-  if (pratFiltro !== 'tutte') list = list.filter(function(c){ return c.stato===pratFiltro; });
+  if (pratFiltro === 'tutte') {
+    // Mostra tutto tranne completati (che sono in archivio)
+    // Ma se clicco filtro completato lo mostro
+  } else if (pratFiltro === 'completato') {
+    list = list.filter(function(c){ return c.stato==='completato'; });
+  } else {
+    list = list.filter(function(c){ return c.stato===pratFiltro && c.stato!=='completato'; });
+  }
+  // Di default (tutte) nascondi i completati
+  if (pratFiltro === 'tutte') {
+    list = list.filter(function(c){ return c.stato !== 'completato'; });
+  }
   el.innerHTML = '';
   if (!list.length) { el.innerHTML='<div class="info">Nessuna pratica trovata.</div>'; return; }
   for (var i=0; i<list.length; i++) el.appendChild(makePratCard(list[i]));
@@ -853,6 +949,199 @@ function salvaSlot() {
 }
 
 // ── CAMBIO PASSWORD ADMIN ─────────────────────────────────────
+// ── SOCI E TESSERE ───────────────────────────────────────────
+var curSocioId = null;
+
+function caricaSoci() {
+  makeFiltri('soci-filtri', ['tutti','con_tessera','senza_tessera'], ['Tutti','Con tessera','Senza tessera'], function(f){ filtraSoci(f); });
+  apiCall('getUtenti', {}, function(err, r) {
+    apiCall('getTessere', {}, function(err2, r2) {
+      var utenti  = (!err&&r&&r.ok) ? r.data||[] : [];
+      var tessere = (!err2&&r2&&r2.ok) ? r2.data||[] : [];
+      var anno = new Date().getFullYear();
+      var el = document.getElementById('l-soci'); if(!el) return;
+      el.innerHTML = '';
+      if (!utenti.length) { el.innerHTML='<div class="info">Nessun socio ancora.</div>'; return; }
+      utenti.forEach(function(u) {
+        var tes = tessere.filter(function(t){ return t.userId===u.id && String(t.anno)===String(anno); });
+        var haTessera = tes.length > 0;
+        var div = document.createElement('div'); div.className='row';
+        var bar = document.createElement('div'); bar.className='bar'; bar.style.background=haTessera?'#2D7A4F':'#E8631A';
+        var rb  = document.createElement('div'); rb.className='rb';
+        var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
+        var rt  = document.createElement('div'); rt.className='rt'; rt.textContent=(u.nome||'')+' '+(u.cognome||'');
+        var bdg = document.createElement('span'); bdg.className='bdg';
+        bdg.textContent = haTessera ? 'Tessera '+anno : 'Senza tessera';
+        bdg.style.color = haTessera?'#2D7A4F':'#E8631A';
+        bdg.style.background = haTessera?'#EBF5F0':'#FDF0E8';
+        var rs  = document.createElement('div'); rs.className='rs';
+        rs.textContent = (u.email||'') + (haTessera?' · '+tes[0].numeroTessera:'');
+        var arr = document.createElement('div'); arr.className='ra'; arr.textContent='›';
+        top.appendChild(rt); top.appendChild(bdg); rb.appendChild(top); rb.appendChild(rs);
+        div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
+        div.addEventListener('click', (function(uid){ return function(){ apriSocio(uid); }; })(u.id));
+        el.appendChild(div);
+      });
+      window._utentiData  = utenti;
+      window._tessereData = tessere;
+    });
+  });
+}
+
+function filtraSoci(f) {
+  // implementa filtro
+}
+
+function apriSocio(uid) {
+  curSocioId = uid;
+  var u = (window._utentiData||[]).filter(function(x){ return x.id===uid; })[0];
+  if (!u) return;
+  var anno = new Date().getFullYear();
+  var tes  = (window._tessereData||[]).filter(function(t){ return t.userId===uid && String(t.anno)===String(anno); });
+
+  setText('os-ttl',   (u.nome||'')+' '+(u.cognome||''));
+  setText('os-nome',  (u.nome||'')+' '+(u.cognome||''));
+  setText('os-cf',    u.cf||'—');
+  setText('os-dtn',   u.dataNascita||'—');
+  setText('os-lng',   u.luogoNascita||'—');
+  setText('os-res',   u.comuneResidenza||'—');
+  setText('os-via',   u.viaResidenza||'—');
+  setText('os-tel',   u.telefono||'—');
+  setText('os-email', u.email||'—');
+  setText('os-data',  u.dataRegistrazione?u.dataRegistrazione.substring(0,10):'—');
+
+  // Tessera
+  var tesInfo = document.getElementById('os-tessera-info');
+  var tesNum  = document.getElementById('os-tes-num');
+  var tesAnno = document.getElementById('os-tes-anno');
+  if (tes.length) {
+    if(tesInfo) tesInfo.innerHTML='<div class="infog">&#9989; Tessera '+anno+': <strong>'+tes[0].numeroTessera+'</strong></div>';
+    if(tesNum)  tesNum.value  = tes[0].numeroTessera||'';
+    if(tesAnno) tesAnno.value = tes[0].anno||anno;
+  } else {
+    if(tesInfo) tesInfo.innerHTML='<div class="info">Nessuna tessera per il '+anno+'</div>';
+    if(tesNum)  tesNum.value  = '';
+    if(tesAnno) tesAnno.value = anno;
+  }
+  hide('os-tes-ok');
+
+  // Situazione economica
+  var econ = document.getElementById('os-economia');
+  if(econ) econ.innerHTML='<div class="info">Caricamento...</div>';
+  apiCall('getStrategiaEconomica', {userId: uid}, function(err, r) {
+    if(!econ) return;
+    if(err||!r||!r.ok){ econ.innerHTML='<div class="info">Dati non disponibili.</div>'; return; }
+    var h='';
+    if(r.tesseramento && !r.tesseramento.hasTessera){
+      h+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee"><span class="lbl" style="margin:0">'+r.tesseramento.tipo+'</span><span style="font-weight:700;color:#E8631A">€'+r.tesseramento.dovuto+'</span></div>';
+    }
+    if(r.lavori&&r.lavori.dettaglio){
+      r.lavori.dettaglio.forEach(function(l){
+        h+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee"><span class="lbl" style="margin:0">'+l.tipo+'</span><span style="font-weight:700;color:'+(l.importo===0?'#2D7A4F':'#E8631A')+'">'+(l.importo===0?'Incluso':'€'+l.importo)+'</span></div>';
+      });
+    }
+    h+='<div style="display:flex;justify-content:space-between;padding:10px 0"><span style="font-weight:800">TOTALE DOVUTO</span><span style="font-size:18px;font-weight:800;color:#E8631A">€'+r.totaleDovuto+'</span></div>';
+    if(r.totalePagato>0){
+      h+='<div style="display:flex;justify-content:space-between"><span style="color:#2D7A4F">Pagato</span><span style="font-weight:700;color:#2D7A4F">€'+r.totalePagato+'</span></div>';
+      h+='<div style="display:flex;justify-content:space-between"><span style="font-weight:800">SALDO</span><span style="font-size:16px;font-weight:800;color:'+(r.saldo>0?'#C0392B':'#2D7A4F')+'">€'+r.saldo+'</span></div>';
+    }
+    econ.innerHTML = h||'<div class="infog">&#9989; Nessun importo dovuto</div>';
+    // Pre-compila importo pagamento
+    var impEl = document.getElementById('os-pag-importo');
+    if(impEl && r.saldo>0) impEl.value = r.saldo;
+  });
+
+  // Data oggi
+  var oggi = new Date();
+  var dataEl = document.getElementById('os-pag-data');
+  if(dataEl) dataEl.value = ('0'+oggi.getDate()).slice(-2)+'/'+('0'+(oggi.getMonth()+1)).slice(-2)+'/'+oggi.getFullYear();
+
+  hide('os-pag-ok');
+  apri('ov-socio');
+}
+
+function salvaTessera() {
+  var num  = (document.getElementById('os-tes-num')||{}).value||'';
+  var anno = (document.getElementById('os-tes-anno')||{}).value||new Date().getFullYear();
+  if(!num) { alert('Inserisci il numero tessera'); return; }
+  var tessere = (window._tessereData||[]).filter(function(t){ return t.userId===curSocioId&&String(t.anno)===String(anno); });
+  var obj = tessere.length ? tessere[0] : {};
+  obj.userId       = curSocioId;
+  obj.numeroTessera= num;
+  obj.anno         = anno;
+  obj.stato        = 'valida';
+  apiCall('saveTessera', {data:obj}, function(err,r){
+    if(!err&&r&&r.ok){ show('os-tes-ok'); caricaSoci(); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function registraPagamento() {
+  var tipo    = (document.getElementById('os-pag-tipo')||{}).value||'';
+  var importo = (document.getElementById('os-pag-importo')||{}).value||'';
+  var metodo  = (document.getElementById('os-pag-metodo')||{}).value||'contanti';
+  var data    = (document.getElementById('os-pag-data')||{}).value||'';
+  if(!importo||!data) { alert('Inserisci importo e data'); return; }
+  var obj = {
+    userId: curSocioId, tipo: tipo, importo: parseFloat(importo.replace(',','.')),
+    anno: new Date().getFullYear(), stato: 'confermato',
+    metodoPagamento: metodo, dataPagamento: data, _statoChanged: true
+  };
+  apiCall('savePagamento', {data:obj}, function(err,r){
+    if(!err&&r&&r.ok){ show('os-pag-ok'); apriSocio(curSocioId); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+// ── PAGAMENTI ─────────────────────────────────────────────────
+var pagFiltro = 'tutti';
+
+function caricaPagamenti() {
+  makeFiltri('pag-filtri',
+    ['tutti','da_pagare','bonifico_dichiarato','pagati'],
+    ['Tutti','Da pagare','Bonifico da verificare','Pagati'],
+    function(f){ pagFiltro=f; renderPagamenti(); }
+  );
+  apiCall('getStrategiaEconomica', {}, function(err, r) {
+    if(err||!r||!r.ok){ document.getElementById('l-pag').innerHTML='<div class="info">Errore caricamento.</div>'; return; }
+    window._econData = r.data || [];
+    renderPagamenti();
+  });
+}
+
+function renderPagamenti() {
+  var el = document.getElementById('l-pag'); if(!el) return;
+  var lista = window._econData || [];
+  if (pagFiltro === 'da_pagare')          lista = lista.filter(function(x){ return x.saldo>0; });
+  else if (pagFiltro === 'bonifico_dichiarato') lista = lista.filter(function(x){
+    return x.pagamenti && x.pagamenti.some(function(p){ return p.stato==='bonifico_dichiarato'; });
+  });
+  else if (pagFiltro === 'pagati')        lista = lista.filter(function(x){ return x.saldo===0 && x.totaleDovuto>0; });
+
+  el.innerHTML = '';
+  if (!lista.length) { el.innerHTML='<div class="info">Nessun risultato.</div>'; return; }
+
+  lista.forEach(function(item) {
+    var u = item.socio || {};
+    var col = item.saldo>0 ? '#C0392B' : '#2D7A4F';
+    var bonDichiarato = item.pagamenti && item.pagamenti.some(function(p){ return p.stato==='bonifico_dichiarato'; });
+    var div = document.createElement('div'); div.className='row';
+    var bar = document.createElement('div'); bar.className='bar'; bar.style.background=col;
+    var rb  = document.createElement('div'); rb.className='rb';
+    var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
+    var rt  = document.createElement('div'); rt.className='rt'; rt.textContent=(u.nome||'')+' '+(u.cognome||'');
+    var importoEl = document.createElement('span'); importoEl.style.cssText='font-size:15px;font-weight:800;color:'+col;
+    importoEl.textContent = item.saldo>0 ? '€'+item.saldo+' dovuti' : '✅ In regola';
+    var rs = document.createElement('div'); rs.className='rs';
+    rs.textContent = (u.email||'') + (bonDichiarato?' · ⚠️ Bonifico da verificare':'');
+    var arr = document.createElement('div'); arr.className='ra'; arr.textContent='›';
+    top.appendChild(rt); top.appendChild(importoEl); rb.appendChild(top); rb.appendChild(rs);
+    div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
+    div.addEventListener('click', (function(uid){ return function(){ apriSocio(uid); }; })(u.id));
+    el.appendChild(div);
+  });
+}
+
 function cambiaPwdAdmin() {
   var o=(document.getElementById('acp-old')||{}).value||'';
   var n=(document.getElementById('acp-new')||{}).value||'';

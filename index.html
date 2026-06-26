@@ -103,9 +103,14 @@ input:focus{border-color:#E8631A;}
 
     <!-- REGISTRATI -->
     <div id="form-reg" style="display:none">
-      <label>Nome *</label><input type="text" id="reg-nome" placeholder="Mario"/>
-      <label>Cognome</label><input type="text" id="reg-cog" placeholder="Rossi"/>
-      <label>Telefono</label><input type="text" id="reg-tel" placeholder="+39 333 000 0000"/>
+      <label>Nome *</label><input type="text" id="reg-nome" placeholder="MARIO"/>
+      <label>Cognome *</label><input type="text" id="reg-cog" placeholder="ROSSI"/>
+      <label>Codice Fiscale *</label><input type="text" id="reg-cf" placeholder="RSSMRA70A01G878X" style="font-family:monospace;text-transform:uppercase" maxlength="16"/>
+      <label>Data di nascita *</label><input type="text" id="reg-dtn" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDateReg(this)"/>
+      <label>Luogo di nascita *</label><input type="text" id="reg-lng" placeholder="L'AQUILA"/>
+      <label>Comune di residenza *</label><input type="text" id="reg-res" placeholder="L'AQUILA"/>
+      <label>Via e n. civico *</label><input type="text" id="reg-via" placeholder="VIA ROMA 1"/>
+      <label>Telefono *</label><input type="text" id="reg-tel" placeholder="+39 333 000 0000"/>
       <label>Email *</label><input type="email" id="reg-email" placeholder="mario.rossi@email.com"/>
       <label>Password * (min. 8 caratteri)</label>
       <input type="password" id="reg-pwd" placeholder="••••••••"/>

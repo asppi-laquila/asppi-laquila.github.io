@@ -175,16 +175,86 @@ textarea.inp{min-height:100px;resize:vertical;}
 <!-- PROFILO -->
 <div id="p-profilo" class="pg">
   <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Il mio profilo</div>
+  
+  <!-- Dati anagrafici -->
   <div class="card"><div class="cb">
-    <div class="sec">DATI ACCOUNT</div>
-    <div class="lbl">Nome</div><div class="val" id="pr-nome"></div>
+    <div class="sec">DATI PERSONALI</div>
+    <div class="lbl">Nome e Cognome</div><div class="val" id="pr-nome"></div>
+    <div class="lbl">Codice Fiscale</div><div class="val" id="pr-cf" style="font-family:monospace"></div>
+    <div class="lbl">Data di nascita</div><div class="val" id="pr-dtn"></div>
+    <div class="lbl">Luogo di nascita</div><div class="val" id="pr-lng"></div>
+    <div class="lbl">Comune di residenza</div><div class="val" id="pr-res"></div>
+    <div class="lbl">Via e n. civico</div><div class="val" id="pr-via"></div>
+    <div class="lbl">Telefono</div><div class="val" id="pr-tel"></div>
     <div class="lbl">Email</div><div class="val" id="pr-email"></div>
+    <button id="btn-modifica-anagrafica" style="width:100%;text-align:left;background:none;border:1px solid #e5e5e5;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;color:#1A5FA8;margin-top:8px">&#9998; Modifica dati personali</button>
   </div></div>
+
+  <!-- Tessera -->
+  <div class="card"><div class="cb">
+    <div class="sec">TESSERA ASPPI</div>
+    <div id="pr-tessera"><div class="info">Caricamento...</div></div>
+  </div></div>
+
+  <!-- Pagamenti -->
+  <div class="card"><div class="cb">
+    <div class="sec">PAGAMENTI</div>
+    <div id="pr-pagamenti"><div class="info">Caricamento...</div></div>
+    <button id="btn-dichiara-bonifico" style="display:none;width:100%;padding:11px;border-radius:10px;border:none;background:#2D7A4F;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">&#128197; Ho effettuato il bonifico</button>
+  </div></div>
+
+  <!-- Sicurezza -->
   <div class="card"><div class="cb">
     <div class="sec">SICUREZZA</div>
     <button id="btn-apri-pwd" style="width:100%;text-align:left;background:none;border:1px solid #e5e5e5;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;color:#1A1A1A">&#128273; Cambia password</button>
   </div></div>
   <button class="bs" id="btn-esci-profilo" style="color:#C0392B;border-color:#FDEEEC;margin-top:8px">Esci dall'account</button>
+</div>
+
+<!-- OV MODIFICA ANAGRAFICA -->
+<div id="ov-anagrafica" class="ov">
+  <div class="oh">
+    <div><div class="ohlbl">PROFILO</div><div class="ohttl">Modifica dati personali</div></div>
+    <button class="exbtn" id="btn-chiudi-anagrafica">&#8592; Indietro</button>
+  </div>
+  <div style="padding:16px">
+    <div class="card"><div class="cb">
+      <div class="sec">DATI ANAGRAFICI</div>
+      <div class="infob">Questi dati sono necessari per la tessera e le comunicazioni ufficiali.</div>
+      <label class="lbl">Nome *</label><input type="text" class="inp" id="an-nome"/>
+      <label class="lbl">Cognome *</label><input type="text" class="inp" id="an-cog"/>
+      <label class="lbl">Codice Fiscale *</label><input type="text" class="inp" id="an-cf" style="font-family:monospace;text-transform:uppercase" maxlength="16"/>
+      <label class="lbl">Data di nascita</label><input type="text" class="inp" id="an-dtn" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/>
+      <label class="lbl">Luogo di nascita</label><input type="text" class="inp" id="an-lng"/>
+      <label class="lbl">Comune di residenza</label><input type="text" class="inp" id="an-res"/>
+      <label class="lbl">Via e n. civico</label><input type="text" class="inp" id="an-via"/>
+      <label class="lbl">Telefono</label><input type="text" class="inp" id="an-tel"/>
+      <div class="errbox" id="an-err"></div>
+      <div class="infog" id="an-ok" style="display:none">&#9989; Dati aggiornati!</div>
+      <button class="bp" id="btn-salva-anagrafica">Salva dati</button>
+    </div></div>
+  </div>
+</div>
+
+<!-- OV DICHIARA BONIFICO -->
+<div id="ov-bonifico" class="ov">
+  <div class="oh">
+    <div><div class="ohlbl">PAGAMENTO</div><div class="ohttl">Dichiara bonifico</div></div>
+    <button class="exbtn" id="btn-chiudi-bonifico">&#8592; Indietro</button>
+  </div>
+  <div style="padding:16px">
+    <div class="card"><div class="cb">
+      <div class="sec">DATI BONIFICO</div>
+      <div class="infob">Effettua il bonifico a <strong>Pro Domo Sua</strong> e invia la ricevuta via email a centroserviziasppiaq@asppi.it</div>
+      <label class="lbl">Data bonifico *</label><input type="text" class="inp" id="bon-data" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/>
+      <label class="lbl">Importo € *</label><input type="text" class="inp" id="bon-importo" placeholder="es. 55,00"/>
+      <label class="lbl">Numero riferimento/CRO (opzionale)</label><input type="text" class="inp" id="bon-rif" placeholder="es. CRO123456789"/>
+      <label class="lbl">Note (opzionale)</label><input type="text" class="inp" id="bon-note" placeholder="es. Tesseramento 2026"/>
+      <div class="errbox" id="bon-err"></div>
+      <div class="infog" id="bon-ok" style="display:none">&#9989; Dichiarazione inviata! Lo studio verifichera il pagamento.</div>
+      <button class="bp" id="btn-invia-bonifico">Invia dichiarazione</button>
+    </div></div>
+  </div>
 </div>
 
 <!-- OV APPARTAMENTO -->
@@ -372,6 +442,12 @@ window.onload = function() {
   document.getElementById('hnome').textContent = nome || email || 'Socio';
   document.getElementById('pr-nome').textContent = (nome + ' ' + (S.user.cognome||'')).trim() || '—';
   document.getElementById('pr-email').textContent = email || '—';
+  document.getElementById('pr-cf').textContent  = S.user.cf  || '—';
+  document.getElementById('pr-dtn').textContent = S.user.dataNascita || '—';
+  document.getElementById('pr-lng').textContent = S.user.luogoNascita || '—';
+  document.getElementById('pr-res').textContent = S.user.comuneResidenza || '—';
+  document.getElementById('pr-via').textContent = S.user.viaResidenza || '—';
+  document.getElementById('pr-tel').textContent = S.user.telefono || '—';
 
   bindAll();
   initCal();
@@ -466,7 +542,7 @@ function bindAll() {
   T('nb-immobili').addEventListener('click', function(){ navTo('immobili'); });
   T('nb-prenota').addEventListener('click', function(){ navTo('prenota'); });
   T('nb-chat').addEventListener('click', function(){ navTo('chat'); caricaChatLibera(); });
-  T('nb-profilo').addEventListener('click', function(){ navTo('profilo'); });
+  T('nb-profilo').addEventListener('click', function(){ navTo('profilo'); caricaProfilo(); });
   // Home
   T('btn-prenota-home').addEventListener('click', function(){ navTo('prenota'); });
   T('btn-imm-home').addEventListener('click', function(){ navTo('immobili'); });
@@ -509,6 +585,12 @@ function bindAll() {
   T('btn-altra-pren').addEventListener('click', resetPren);
   // Password
   T('btn-apri-pwd').addEventListener('click', function(){ apriOv('ov-pwd'); });
+  T('btn-modifica-anagrafica').addEventListener('click', apriModificaAnagrafica);
+  T('btn-chiudi-anagrafica').addEventListener('click', function(){ chiudiOv('ov-anagrafica'); });
+  T('btn-salva-anagrafica').addEventListener('click', salvaAnagrafica);
+  T('btn-dichiara-bonifico').addEventListener('click', function(){ apriOv('ov-bonifico'); });
+  T('btn-chiudi-bonifico').addEventListener('click', function(){ chiudiOv('ov-bonifico'); });
+  T('btn-invia-bonifico').addEventListener('click', inviaDichiarazioneBonifico);
   T('btn-chiudi-pwd').addEventListener('click', function(){ chiudiOv('ov-pwd'); });
   T('btn-salva-pwd').addEventListener('click', cambiaPwd);
 }
@@ -527,6 +609,25 @@ function navTo(id) {
 
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome() {
+  // Controlla pagamenti sospesi per banner home
+  api('getStrategiaEconomica', {}, function(err, r) {
+    if (!err && r && r.ok && r.saldo > 0) {
+      var banner = document.createElement('div');
+      banner.style.cssText = 'background:#FDEEEC;border-radius:12px;padding:14px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer';
+      banner.innerHTML = '<div><div style="font-size:13px;font-weight:800;color:#C0392B">&#9888; Pagamento in sospeso</div>'
+        +'<div style="font-size:12px;color:#C0392B">Devi ancora € '+r.saldo+' per il '+r.anno+'</div></div>'
+        +'<div style="font-size:18px;color:#C0392B">&#8250;</div>';
+      banner.addEventListener('click', function(){ navTo('profilo'); caricaProfilo(); });
+      var home = T('p-home');
+      if (home) {
+        var existing = home.querySelector('.banner-pagamento');
+        if (existing) existing.remove();
+        banner.className = 'banner-pagamento';
+        home.insertBefore(banner, home.firstChild.nextSibling.nextSibling);
+      }
+    }
+  });
+
   var el = T('hpratiche');
   if (!el) return;
   el.innerHTML = '';
@@ -1220,6 +1321,130 @@ function resetPren() {
 }
 
 // ── PASSWORD ──────────────────────────────────────────────────
+function caricaProfilo() {
+  // Tessera
+  api('getTessere', {}, function(err, r) {
+    var el = T('pr-tessera'); if(!el) return;
+    var tessere = (!err&&r&&r.ok)?(r.data||[]):[];
+    var anno = new Date().getFullYear();
+    var tesAnno = tessere.filter(function(t){ return String(t.anno)===String(anno); });
+    if (tesAnno.length) {
+      el.innerHTML = '<div class="infog">&#9989; Tessera '+anno+' valida<br><strong style="font-size:18px;font-family:monospace">'+tesAnno[0].numeroTessera+'</strong></div>';
+    } else {
+      el.innerHTML = '<div class="info">Nessuna tessera per il '+anno+'. Contatta lo studio per il tesseramento.</div>';
+    }
+  });
+
+  // Situazione economica
+  api('getStrategiaEconomica', {}, function(err, r) {
+    var el = T('pr-pagamenti'); if(!el) return;
+    var btnBon = T('btn-dichiara-bonifico');
+    if (err||!r||!r.ok) { el.innerHTML='<div class="info">Dati non disponibili.</div>'; return; }
+    var h = '';
+    var anno = r.anno;
+
+    // Tesseramento
+    if (r.tesseramento && !r.tesseramento.hasTessera) {
+      h += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e5e5e5">'
+        +'<span class="lbl" style="margin:0">'+r.tesseramento.tipo+'</span>'
+        +'<span style="font-size:14px;font-weight:700;color:#E8631A">€ '+r.tesseramento.dovuto+'</span></div>';
+    }
+
+    // Lavori
+    if (r.lavori && r.lavori.dettaglio) {
+      r.lavori.dettaglio.forEach(function(l) {
+        var gratuito = l.importo === 0;
+        h += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e5e5e5">'
+          +'<span class="lbl" style="margin:0">'+l.tipo+'</span>'
+          +'<span style="font-size:14px;font-weight:700;color:'+(gratuito?'#2D7A4F':'#E8631A')+'">'+(gratuito?'Incluso':'€ '+l.importo)+'</span></div>';
+      });
+    }
+
+    // Totale
+    h += '<div style="display:flex;justify-content:space-between;padding:12px 0;margin-top:4px">'
+      +'<span style="font-size:14px;font-weight:800;color:#1A1A1A">TOTALE DOVUTO</span>'
+      +'<span style="font-size:18px;font-weight:800;color:#E8631A">€ '+r.totaleDovuto+'</span></div>';
+
+    if (r.totalePagato > 0) {
+      h += '<div style="display:flex;justify-content:space-between;padding:4px 0">'
+        +'<span style="font-size:13px;color:#2D7A4F">Pagato</span>'
+        +'<span style="font-size:14px;font-weight:700;color:#2D7A4F">€ '+r.totalePagato+'</span></div>';
+      h += '<div style="display:flex;justify-content:space-between;padding:4px 0">'
+        +'<span style="font-size:13px;font-weight:800">SALDO</span>'
+        +'<span style="font-size:16px;font-weight:800;color:'+(r.saldo>0?'#C0392B':'#2D7A4F')+'">€ '+r.saldo+'</span></div>';
+    }
+
+    el.innerHTML = h || '<div class="infog">&#9989; Nessun importo dovuto per il '+anno+'</div>';
+
+    // Mostra bottone bonifico se c'è saldo da pagare
+    if (btnBon) btnBon.style.display = r.saldo > 0 ? '' : 'none';
+  });
+}
+
+function apriModificaAnagrafica() {
+  var u = S.user || {};
+  var set = function(id, val) { var e=T(id); if(e) e.value=val||''; };
+  set('an-nome', u.nome);
+  set('an-cog',  u.cognome);
+  set('an-cf',   u.cf);
+  set('an-dtn',  u.dataNascita);
+  set('an-lng',  u.luogoNascita);
+  set('an-res',  u.comuneResidenza);
+  set('an-via',  u.viaResidenza);
+  set('an-tel',  u.telefono);
+  SH('an-ok', false);
+  var errEl=T('an-err'); if(errEl) errEl.style.display='none';
+  apriOv('ov-anagrafica');
+}
+
+function salvaAnagrafica() {
+  var get = function(id){ return (T(id)||{}).value||''; };
+  var nome = get('an-nome'), cog = get('an-cog'), cf = get('an-cf');
+  var errEl=T('an-err'); if(errEl) errEl.style.display='none';
+  SH('an-ok', false);
+  if(!nome||!cog) { if(errEl){errEl.textContent='Nome e cognome obbligatori';errEl.style.display='';} return; }
+  var dati = {
+    nome:nome, cognome:cog, cf:cf,
+    dataNascita:get('an-dtn'), luogoNascita:get('an-lng'),
+    comuneResidenza:get('an-res'), viaResidenza:get('an-via'), telefono:get('an-tel')
+  };
+  api('updateUtente', dati, function(err,r) {
+    if(!err&&r&&r.ok) {
+      // Aggiorna sessione locale
+      if(!S.user) S.user={};
+      for(var k in dati){ if(dati.hasOwnProperty(k)) S.user[k]=dati[k]; }
+      localStorage.setItem('asppi_session', JSON.stringify(S));
+      // Aggiorna display
+      ST('tnome', nome);
+      ST('hnome', nome);
+      ST('pr-nome', (nome+' '+cog).trim());
+      ST('pr-cf',  cf);
+      ST('pr-dtn', dati.dataNascita);
+      ST('pr-lng', dati.luogoNascita);
+      ST('pr-res', dati.comuneResidenza);
+      ST('pr-via', dati.viaResidenza);
+      ST('pr-tel', dati.telefono);
+      SH('an-ok', true);
+    } else { if(errEl){errEl.textContent=(r&&r.error)||err||'Errore';errEl.style.display='';} }
+  });
+}
+
+function inviaDichiarazioneBonifico() {
+  var data    = (T('bon-data')||{}).value||'';
+  var importo = (T('bon-importo')||{}).value||'';
+  var rif     = (T('bon-rif')||{}).value||'';
+  var note    = (T('bon-note')||{}).value||'';
+  var errEl   = T('bon-err'); if(errEl) errEl.style.display='none';
+  SH('bon-ok', false);
+  if(!data||!importo) { if(errEl){errEl.textContent='Data e importo obbligatori';errEl.style.display='';} return; }
+  api('dichiaraBonifico', {data:data, riferimento:rif, note:note}, function(err,r) {
+    if(!err&&r&&r.ok) {
+      SH('bon-ok', true);
+      var btn=T('btn-invia-bonifico'); if(btn) btn.style.display='none';
+    } else { if(errEl){errEl.textContent=(r&&r.error)||err||'Errore';errEl.style.display='';} }
+  });
+}
+
 function cambiaPwd() {
   var o=(T('cp-old')||{}).value||'', n=(T('cp-new')||{}).value||'', n2=(T('cp-new2')||{}).value||'';
   var errEl=T('cp-err'); if(errEl) errEl.style.display='none';
