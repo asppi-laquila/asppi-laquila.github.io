@@ -90,7 +90,10 @@ input:focus{border-color:#E8631A;}
       <label>Email</label>
       <input type="email" id="acc-email" placeholder="mario.rossi@email.com"/>
       <label>Password</label>
-      <input type="password" id="acc-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <div style="position:relative">
+        <input type="password" id="acc-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" style="padding-right:44px"/>
+        <button type="button" onclick="togglePwd('acc-pwd','eye-acc')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:#8A8A8A" id="eye-acc">&#128065;</button>
+      </div>
       <div class="err" id="acc-err"></div>
       <div class="cr" onclick="toggleRem('rem-acc')">
         <div class="cb" id="rem-acc-box"></div>
@@ -328,23 +331,37 @@ async function doLogin() {
 
 // ── REGISTER ─────────────────────────────────────────────────
 async function doRegister() {
-  var nome  = document.getElementById('reg-nome').value.trim();
-  var cog   = document.getElementById('reg-cog').value.trim();
-  var tel   = document.getElementById('reg-tel').value.trim();
-  var email = document.getElementById('reg-email').value.trim();
-  var pwd   = document.getElementById('reg-pwd').value;
+  var nome    = (document.getElementById('reg-nome')   ||{}).value||'';
+  var cog     = (document.getElementById('reg-cog')    ||{}).value||'';
+  var display = (document.getElementById('reg-display')||{}).value||'';
+  var cf      = (document.getElementById('reg-cf')     ||{}).value||'';
+  var dtn     = (document.getElementById('reg-dtn')    ||{}).value||'';
+  var lng     = (document.getElementById('reg-lng')    ||{}).value||'';
+  var res2    = (document.getElementById('reg-res')    ||{}).value||'';
+  var via     = (document.getElementById('reg-via')    ||{}).value||'';
+  var tel     = (document.getElementById('reg-tel')    ||{}).value||'';
+  var email   = (document.getElementById('reg-email')  ||{}).value||'';
+  var pwd     = (document.getElementById('reg-pwd')    ||{}).value||'';
   showErr('reg-err', '');
-  if(!nome || !email || !pwd) { showErr('reg-err', 'Nome, email e password sono obbligatori'); return; }
+  if(!nome || !cog || !display || !email || !pwd) {
+    showErr('reg-err', 'Compila tutti i campi obbligatori');
+    return;
+  }
   if(pwd.length < 8) { showErr('reg-err', 'La password deve essere di almeno 8 caratteri'); return; }
-  var res = await api('register', {nome:nome, cognome:cog, telefono:tel, email:email, password:pwd});
-  if(res.ok) {
+  var r = await api('register', {
+    nome:nome, cognome:cog, displayName:display,
+    cf:cf, dataNascita:dtn, luogoNascita:lng,
+    comuneResidenza:res2, viaResidenza:via,
+    telefono:tel, email:email, password:pwd
+  });
+  if(r.ok) {
     if(checks['rem-reg']) {
       localStorage.setItem('asppi_remember', JSON.stringify({email:email, pwd:pwd}));
     }
-    localStorage.setItem('asppi_session', JSON.stringify({token:res.token, user:res}));
+    localStorage.setItem('asppi_session', JSON.stringify({token:r.token, user:r}));
     window.location.href = 'socio.html';
   } else {
-    showErr('reg-err', res.error || 'Errore registrazione. Riprova.');
+    showErr('reg-err', r.error || 'Errore registrazione. Riprova.');
   }
 }
 
