@@ -127,7 +127,11 @@ textarea.inp{min-height:100px;resize:vertical;}
     <button class="bs" id="btn-altra-pren" style="width:200px;margin:0 auto">Prenota un altro</button>
   </div>
   <div id="p-cal-form">
-    <div style="font-size:13px;font-weight:700;color:#1A1A1A;margin-bottom:10px" id="cal-mese-lbl"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <button onclick="calPrev()" style="background:none;border:1px solid #e5e5e5;border-radius:8px;padding:4px 12px;cursor:pointer;font-size:16px">&#8249;</button>
+    <div style="font-size:13px;font-weight:700;color:#1A1A1A" id="cal-mese-lbl"></div>
+    <button onclick="calNext()" style="background:none;border:1px solid #e5e5e5;border-radius:8px;padding:4px 12px;cursor:pointer;font-size:16px">&#8250;</button>
+  </div>
     <div class="cg" id="cal-lbl-row"></div>
     <div class="cg" id="cal-days"></div>
     <div id="p-slot-sec" style="display:none">
@@ -340,7 +344,7 @@ var API = "https://rough-resonance-cba6.asppilaquila.workers.dev";
 var S = null;
 var D = {appartamenti:[], contratti:[], prenotazioni:[], slot:[], chat:[]};
 var curApt = null, curCnt = null, curChatId = null;
-var calDay = null, calSlot = null;
+var calDay = null, calSlot = null, calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
 var naptStep = 0, naptD = {};
 var ncntStep = 0, ncntD = {};
 var MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
@@ -526,7 +530,7 @@ function renderHome() {
   var el = T('hpratiche');
   if (!el) return;
   el.innerHTML = '';
-  var cntAttivi = D.contratti.filter(function(c){ return c.eliminato!==true && c.eliminato!=='true'; });
+  var cntAttivi = D.contratti.filter(function(c){ var e=c.eliminato; return !e || String(e).toLowerCase()==='false' || e===0; });
   if (!cntAttivi.length) {
     el.innerHTML = '<div class="info">Nessuna pratica ancora. Aggiungi un immobile per iniziare.</div>';
     return;
@@ -567,14 +571,14 @@ function renderImmobili() {
   var el = T('limm');
   if (!el) return;
   el.innerHTML = '';
-  var lista = D.appartamenti.filter(function(a){ return !a.rimosso; });
+  var lista = D.appartamenti.filter(function(a){ var r=a.rimosso; return !r || String(r).toLowerCase()==='false' || r===0; });
   if (!lista.length) {
     el.innerHTML = '<div class="info">Nessun immobile ancora.</div>';
     return;
   }
   for (var i=0; i<lista.length; i++) {
     var a = lista[i];
-    var cnts = D.contratti.filter(function(c){ return c.appartamentoId===a.id && c.eliminato!==true && c.eliminato!=='true'; });
+    var cnts = D.contratti.filter(function(c){ var e=c.eliminato; return c.appartamentoId===a.id && (!e || String(e).toLowerCase()==='false' || e===0); });
     var att = cnts.filter(function(c){ return c.stato!=='completato'; }).length > 0;
     var col = att ? '#2D7A4F' : '#8A8A8A';
     var div = document.createElement('div'); div.className='row';
@@ -1078,26 +1082,42 @@ function initCal() {
 
 function renderCal() {
   var el=T('cal-days'); if(!el) return;
-  var now=new Date(), y=now.getFullYear(), m=now.getMonth();
+  var now=new Date(), y=calYear, m=calMonth;
   ST('cal-mese-lbl', MESI[m]+' '+y);
   var offset=(new Date(y,m,1).getDay()||7)-1;
   var days=new Date(y,m+1,0).getDate();
   el.innerHTML='';
   for(var i=0;i<offset;i++){var emp=document.createElement('div');el.appendChild(emp);}
-  var today=now.getDate();
+  var today=now.getDate(), todayY=now.getFullYear(), todayM=now.getMonth();
   for(var d=1;d<=days;d++){
     var ds=pad(d)+'/'+pad(m+1)+'/'+y;
     var dw=new Date(y,m,d).getDay();
-    var past=new Date(y,m,d)<new Date(y,m,today);
+    var past=new Date(y,m,d)<new Date(todayY,todayM,today);
     var wknd=dw===0||dw===6;
     var av=!past&&!wknd;
     var div=document.createElement('div');
-    var sel=calDay===ds, tod=d===today;
+    var sel=calDay===ds, tod=(d===today&&y===todayY&&m===todayM);
     div.className='cd'+(sel?' sel':tod&&av?' tod':av?' av':' un');
     div.textContent=d;
     if(av) div.addEventListener('click',(function(day){return function(){selDay(day);};})(ds));
     el.appendChild(div);
   }
+}
+
+function calPrev() {
+  calMonth--;
+  if(calMonth<0){calMonth=11;calYear--;}
+  calDay=null; calSlot=null;
+  renderCal();
+  SH('p-slot-sec',false); SH('p-rie',false);
+}
+
+function calNext() {
+  calMonth++;
+  if(calMonth>11){calMonth=0;calYear++;}
+  calDay=null; calSlot=null;
+  renderCal();
+  SH('p-slot-sec',false); SH('p-rie',false);
 }
 
 function selDay(ds) {
