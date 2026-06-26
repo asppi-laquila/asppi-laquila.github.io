@@ -13,20 +13,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tt{color:#fff;font-size:15px;font-weight:700;}
 .nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e5e5;display:flex;padding:8px 0 16px;z-index:100;}
 .nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:transparent;cursor:pointer;padding:6px 0;}
-.nb span:first-child{font-size:18px;opacity:.35;}
-.nb span:last-child{font-size:9px;color:#8A8A8A;}
-.nb.on span:first-child{opacity:1;}
-.nb.on span:last-child{color:#E8631A;font-weight:700;}
+.nb .ic{font-size:18px;opacity:.35;}
+.nb .lb{font-size:9px;color:#8A8A8A;}
+.nb.on .ic{opacity:1;}
+.nb.on .lb{color:#E8631A;font-weight:700;}
 .pg{display:none;padding:16px;}
 .pg.on{display:block;}
 .card{background:#fff;border-radius:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);}
 .cb{padding:16px;}
-.row{display:flex;overflow:hidden;border-radius:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);cursor:pointer;}
-.bar{width:4px;flex-shrink:0;background:#E8631A;}
+.row{display:flex;overflow:hidden;border-radius:14px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);cursor:pointer;background:#fff;}
+.bar{width:4px;flex-shrink:0;}
 .rb{flex:1;padding:14px;}
 .rt{font-size:14px;font-weight:700;color:#1A1A1A;}
 .rs{font-size:12px;color:#8A8A8A;margin-top:2px;}
-.ra{display:flex;align-items:center;padding-right:14px;color:#8A8A8A;}
+.ra{display:flex;align-items:center;padding-right:14px;color:#8A8A8A;font-size:18px;}
 .sec{font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.12em;text-transform:uppercase;padding-bottom:8px;border-bottom:1px solid #e5e5e5;margin-bottom:14px;}
 .lbl{display:block;font-size:11px;font-weight:600;color:#8A8A8A;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
 .val{font-size:14px;font-weight:600;color:#1A1A1A;margin-bottom:12px;}
@@ -38,9 +38,10 @@ select.inp{cursor:pointer;}
 .info{background:#FDF0E8;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#4A4A4A;line-height:1.6;}
 .infob{background:#EBF2FB;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#1A5FA8;line-height:1.6;}
 .infog{background:#EBF5F0;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#2D7A4F;line-height:1.6;}
+.infor{background:#FDEEEC;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#C0392B;}
 .bdg{display:inline-flex;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;}
 .stat{display:flex;gap:8px;margin-bottom:20px;}
-.sb{flex:1;background:#fff;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.sb2{flex:1;background:#fff;border-radius:12px;padding:14px 8px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06);}
 .sn{font-size:26px;font-weight:800;line-height:1;}
 .sl{font-size:10px;color:#8A8A8A;margin-top:4px;line-height:1.3;}
 .frow{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;}
@@ -73,46 +74,38 @@ select.inp{cursor:pointer;}
 .ci{display:flex;gap:8px;padding:12px 16px;background:#fff;border-top:1px solid #e5e5e5;position:sticky;bottom:0;}
 .ci input{flex:1;margin-bottom:0;}
 .cs{width:44px;height:44px;border-radius:22px;border:none;background:#E8631A;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;}
+.exbtn{background:none;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer;}
 </style>
 </head>
 <body>
 
 <div class="top">
-  <div><div class="tl">ASPPI L'Aquila · Admin</div><div class="tt">Simeoni Maurizio</div></div>
-  <button style="background:none;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer" onclick="esci()">Esci</button>
+  <div><div class="tl">ASPPI L'Aquila - Admin</div><div class="tt">Simeoni Maurizio</div></div>
+  <button class="exbtn" id="btn-esci">Esci</button>
 </div>
 
 <!-- HOME -->
 <div id="p-home" class="pg on">
   <div class="stat">
-    <div class="sb"><div class="sn" style="color:#E8631A" id="sh-app">—</div><div class="sl">Appuntamenti</div></div>
-    <div class="sb"><div class="sn" style="color:#E8631A" id="sh-att">—</div><div class="sl">In attesa</div></div>
-    <div class="sb"><div class="sn" style="color:#2D7A4F" id="sh-soc">—</div><div class="sl">Soci</div></div>
+    <div class="sb2"><div class="sn" style="color:#E8631A" id="sh-app">—</div><div class="sl">Appuntamenti</div></div>
+    <div class="sb2"><div class="sn" style="color:#E8631A" id="sh-att">—</div><div class="sl">In attesa</div></div>
+    <div class="sb2"><div class="sn" style="color:#2D7A4F" id="sh-soc">—</div><div class="sl">Soci</div></div>
   </div>
-  <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin-bottom:10px">📅 Prossimi appuntamenti</div>
+  <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin-bottom:10px">Prossimi appuntamenti</div>
   <div id="h-prens"><div class="info">Caricamento...</div></div>
-  <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin:16px 0 10px">📝 Pratiche recenti</div>
+  <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin:16px 0 10px">Pratiche recenti</div>
   <div id="h-prats"><div class="info">Caricamento...</div></div>
 </div>
 
 <!-- PRENOTAZIONI -->
 <div id="p-pren" class="pg">
-  <div class="frow">
-    <button class="fb on" id="f-tutte" onclick="filtraPren('tutte')">Tutte</button>
-    <button class="fb off" id="f-conf" onclick="filtraPren('confermata')">Confermate</button>
-    <button class="fb off" id="f-canc" onclick="filtraPren('cancellata')">Cancellate</button>
-  </div>
+  <div class="frow" id="pren-filtri"></div>
   <div id="l-pren"><div class="info">Caricamento...</div></div>
 </div>
 
 <!-- PRATICHE -->
 <div id="p-prat" class="pg">
-  <div class="frow">
-    <button class="fb on" id="fp-tutte" onclick="filtraPrat('tutte')">Tutte</button>
-    <button class="fb off" id="fp-rich" onclick="filtraPrat('richiesta')">In attesa</button>
-    <button class="fb off" id="fp-lav" onclick="filtraPrat('lavorazione')">In lavorazione</button>
-    <button class="fb off" id="fp-comp" onclick="filtraPrat('completato')">Completate</button>
-  </div>
+  <div class="frow" id="prat-filtri"></div>
   <div id="l-prat"><div class="info">Caricamento...</div></div>
 </div>
 
@@ -126,7 +119,6 @@ select.inp{cursor:pointer;}
   <div class="card"><div class="cb">
     <div class="sec">GIORNI DI RICEVIMENTO</div>
     <div class="grow" id="slot-giorni"></div>
-    <div style="font-size:11px;color:#8A8A8A">I giorni attivi si ripetono ogni settimana, salvo chiusure.</div>
   </div></div>
   <div class="card"><div class="cb">
     <div class="sec">ORARI (ogni 30 min)</div>
@@ -137,9 +129,9 @@ select.inp{cursor:pointer;}
     <div id="slot-chiusure"></div>
     <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
       <input type="text" class="inp" id="ch-lbl" placeholder="Descrizione" style="flex:3;margin-bottom:0"/>
-      <input type="text" class="inp" id="ch-dal" placeholder="dal gg/mm/aa" style="flex:2;margin-bottom:0"/>
-      <input type="text" class="inp" id="ch-al" placeholder="al gg/mm/aa" style="flex:2;margin-bottom:0"/>
-      <button onclick="addChiusura()" style="flex-shrink:0;padding:8px 14px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">＋</button>
+      <input type="text" class="inp" id="ch-dal" placeholder="dal gg/mm/aaaa" style="flex:2;margin-bottom:0"/>
+      <input type="text" class="inp" id="ch-al"  placeholder="al gg/mm/aaaa"  style="flex:2;margin-bottom:0"/>
+      <button id="btn-add-ch" style="padding:8px 14px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">+</button>
     </div>
   </div></div>
   <div class="card"><div class="cb">
@@ -147,28 +139,28 @@ select.inp{cursor:pointer;}
     <div id="slot-bloccati"></div>
     <div style="display:flex;gap:8px;margin-top:8px">
       <input type="text" class="inp" id="blocco-d" placeholder="gg/mm/aaaa" style="flex:1;margin-bottom:0"/>
-      <button onclick="addBlocco()" style="padding:8px 14px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">＋</button>
+      <button id="btn-add-blocco" style="padding:8px 14px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">+</button>
     </div>
   </div></div>
-  <div class="info">⚡️ Le prenotazioni già confermate non vengono cancellate automaticamente.</div>
-  <button class="bp" onclick="salvaSlot()" style="margin-top:4px">Salva tutte le impostazioni</button>
-  <div class="infog" id="slot-ok" style="display:none;margin-top:8px">✅ Impostazioni salvate!</div>
+  <div class="info">Le prenotazioni gia confermate non vengono cancellate automaticamente.</div>
+  <button class="bp" id="btn-salva-slot">Salva tutte le impostazioni</button>
+  <div class="infog" id="slot-ok" style="display:none;margin-top:8px">&#9989; Impostazioni salvate!</div>
   <div class="card" style="margin-top:16px"><div class="cb">
-    <div class="sec">🔑 CAMBIO PASSWORD ADMIN</div>
-    <label class="lbl">Password attuale</label><input type="password" class="inp" id="acp-old" placeholder="••••••••"/>
-    <label class="lbl">Nuova password (min. 8 caratteri)</label><input type="password" class="inp" id="acp-new" placeholder="••••••••"/>
-    <label class="lbl">Conferma nuova password</label><input type="password" class="inp" id="acp-new2" placeholder="••••••••"/>
-    <div style="background:#FDEEEC;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#C0392B;display:none" id="acp-err"></div>
-    <div class="infog" id="acp-ok" style="display:none">✅ Password aggiornata!</div>
-    <button class="bp" style="background:#0D1B2A" onclick="cambiaPwdAdmin()">Aggiorna password admin</button>
+    <div class="sec">CAMBIO PASSWORD ADMIN</div>
+    <label class="lbl">Password attuale</label><input type="password" class="inp" id="acp-old" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"/>
+    <label class="lbl">Nuova password (min. 8 caratteri)</label><input type="password" class="inp" id="acp-new" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"/>
+    <label class="lbl">Conferma nuova password</label><input type="password" class="inp" id="acp-new2" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"/>
+    <div class="infor" id="acp-err" style="display:none"></div>
+    <div class="infog" id="acp-ok" style="display:none">&#9989; Password aggiornata!</div>
+    <button class="bp" id="btn-cambia-pwd-admin" style="background:#0D1B2A">Aggiorna password</button>
   </div></div>
 </div>
 
-<!-- OV: DETTAGLIO PRENOTAZIONE -->
+<!-- OV PRENOTAZIONE -->
 <div id="ov-pren" class="ov">
   <div class="oh">
     <div><div class="ohlbl">APPUNTAMENTO</div><div class="ohttl" id="op-ttl"></div></div>
-    <button style="background:none;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer" onclick="chiudi('ov-pren')">← Chiudi</button>
+    <button class="exbtn" id="btn-chiudi-op">&#8592; Chiudi</button>
   </div>
   <div style="padding:16px">
     <div class="card"><div class="cb">
@@ -180,42 +172,38 @@ select.inp{cursor:pointer;}
       <div class="sec">DATI SOCIO</div>
       <div class="lbl">Nome</div><div class="val" id="op-nome"></div>
       <div class="lbl">Email</div><div class="val" id="op-email"></div>
-      <div class="lbl">Telefono</div><div class="val" id="op-tel"></div>
       <div class="lbl">Motivo</div><div class="val" id="op-motivo"></div>
     </div></div>
-    <div class="infog" id="op-ok" style="display:none">✅ Appuntamento cancellato</div>
-    <button class="bp" style="background:#C0392B" id="op-canc-btn" onclick="cancellaPren()">Cancella appuntamento</button>
+    <div class="infog" id="op-ok" style="display:none">&#9989; Appuntamento cancellato</div>
+    <button class="bp" id="btn-cancella-pren" style="background:#C0392B">Cancella appuntamento</button>
   </div>
 </div>
 
-<!-- OV: DETTAGLIO PRATICA -->
+<!-- OV PRATICA -->
 <div id="ov-prat" class="ov">
   <div class="oh">
     <div><div class="ohlbl" id="opr-lbl">PRATICA</div><div class="ohttl" id="opr-ttl"></div></div>
-    <button style="background:none;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer" onclick="chiudi('ov-prat')">← Chiudi</button>
+    <button class="exbtn" id="btn-chiudi-opr">&#8592; Chiudi</button>
   </div>
   <div class="tabrow">
-    <button class="tabbtn on" id="tab-dati" onclick="switchTab('dati')">📋 Dati</button>
-    <button class="tabbtn" id="tab-chat" onclick="switchTab('chat')">💬 Chat</button>
+    <button class="tabbtn on" id="tab-dati">&#128203; Dati</button>
+    <button class="tabbtn" id="tab-chat">&#128172; Chat</button>
   </div>
-  <!-- TAB DATI -->
   <div id="tab-dati-body" style="padding:16px">
+    <div id="opr-modificato" class="infor" style="display:none">&#9888; Questo contratto e stato modificato dal socio il <span id="opr-data-mod"></span></div>
     <div class="card"><div class="cb">
-      <div class="sec">TIPO E STATO</div>
-      <div id="opr-modificato" style="display:none;background:#FDF0E8;border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:13px;color:#E8631A;font-weight:700">
-        ⚠️ Questo contratto è stato modificato dal socio il <span id="opr-data-mod"></span>
-      </div>
-      <div class="lbl">Nome contratto</div><div class="val" id="opr-nome-cnt" style="font-family:monospace;font-size:13px"></div>
+      <div class="sec">NOME CONTRATTO</div>
+      <div class="val" id="opr-nome-cnt" style="font-family:monospace"></div>
       <div class="lbl">Tipo</div><div class="val" id="opr-tipo"></div>
-      <div class="lbl">Stato attuale</div><div class="val" id="opr-stato"></div>
+      <div class="lbl">Stato</div><div class="val" id="opr-stato"></div>
       <label class="lbl">Aggiorna stato</label>
       <select class="inp" id="opr-stato-sel">
         <option value="richiesta">In attesa</option>
         <option value="lavorazione">In lavorazione</option>
         <option value="completato">Completato</option>
       </select>
-      <button class="bp" onclick="aggiornaPrat()">Aggiorna stato</button>
-      <div class="infog" id="opr-ok" style="display:none;margin-top:8px">✅ Stato aggiornato!</div>
+      <button class="bp" id="btn-aggiorna-stato">Aggiorna stato</button>
+      <div class="infog" id="opr-ok" style="display:none;margin-top:8px">&#9989; Stato aggiornato!</div>
     </div></div>
     <div class="card"><div class="cb">
       <div class="sec">DURATA E CANONE</div>
@@ -224,528 +212,584 @@ select.inp{cursor:pointer;}
       <div class="lbl">Canone mensile</div><div class="val" id="opr-canone"></div>
       <div class="lbl">Deposito</div><div class="val" id="opr-dep"></div>
     </div></div>
-    <div class="card"><div class="cb">
-      <div class="sec">LOCATORI</div>
-      <div id="opr-locs"></div>
-    </div></div>
-    <div class="card"><div class="cb">
-      <div class="sec">CONDUTTORI</div>
-      <div id="opr-cons"></div>
-    </div></div>
+    <div class="card"><div class="cb"><div class="sec">LOCATORI</div><div id="opr-locs"></div></div></div>
+    <div class="card"><div class="cb"><div class="sec">CONDUTTORI</div><div id="opr-cons"></div></div></div>
   </div>
-  <!-- TAB CHAT -->
   <div id="tab-chat-body" style="display:none">
     <div class="cms" id="admin-msgs"></div>
     <div class="ci">
-      <input type="text" class="inp" id="admin-chat-inp" placeholder="Rispondi al socio..." style="margin-bottom:0" onkeydown="if(event.key==='Enter')adminSendMsg()"/>
-      <button class="cs" onclick="adminSendMsg()">›</button>
+      <input type="text" class="inp" id="admin-chat-inp" placeholder="Rispondi al socio..." style="margin-bottom:0"/>
+      <button class="cs" id="btn-admin-send">&#8250;</button>
     </div>
   </div>
 </div>
 
-<!-- BOTTOM NAV -->
 <div class="nav">
-  <button class="nb on" id="nb-home" onclick="nav('home')"><span>📊</span><span>Home</span></button>
-  <button class="nb" id="nb-pren" onclick="nav('pren')"><span>📅</span><span>Prenotaz.</span></button>
-  <button class="nb" id="nb-prat" onclick="nav('prat')"><span>📋</span><span>Pratiche</span></button>
-  <button class="nb" id="nb-chat" onclick="nav('chat')"><span>💬</span><span>Chat</span></button>
-  <button class="nb" id="nb-slot" onclick="nav('slot')"><span>🗓️</span><span>Slot</span></button>
+  <button class="nb on" id="nb-home"><span class="ic">&#128202;</span><span class="lb">Home</span></button>
+  <button class="nb" id="nb-pren"><span class="ic">&#128197;</span><span class="lb">Prenotaz.</span></button>
+  <button class="nb" id="nb-prat"><span class="ic">&#128203;</span><span class="lb">Pratiche</span></button>
+  <button class="nb" id="nb-chat"><span class="ic">&#128172;</span><span class="lb">Chat</span></button>
+  <button class="nb" id="nb-slot"><span class="ic">&#128197;</span><span class="lb">Slot</span></button>
 </div>
 
 <script>
-const API = "https://rough-resonance-cba6.asppilaquila.workers.dev";
+var API = "https://rough-resonance-cba6.asppilaquila.workers.dev";
+var ATOKEN = "ASPPI_ADMIN_asppi2025laquila";
+var D = {prenotazioni:[], contratti:[], utenti:[], chat:[], chiusure:[]};
+var curPrenId = null, curPratId = null, curChatId = null;
+var sGiorni = ['Lun','Mar','Gio','Ven'];
+var sOrari  = ['09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00'];
+var bloccati = [];
+var TGIORNI = ['Lun','Mar','Mer','Gio','Ven','Sab'];
+var TORARI  = ['08:30','09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00','17:30'];
+var prenFiltro = 'tutte', pratFiltro = 'tutte';
 
-function fmtDate(d) {
-  if(!d) return '—';
-  if(d.includes('T')) {
-    const parts = d.substring(0,10).split('-');
-    return parts[2]+'/'+parts[1]+'/'+parts[0];
-  }
-  return d;
-}
-
-function nomeContratto(c) {
-  if(c.nomeContratto) return c.nomeContratto;
-  try {
-    const locs = JSON.parse(c.locatoriJSON||'[]');
-    const cons  = JSON.parse(c.conduttoriJSON||'[]');
-    const cogL = locs[0]?.cognome||locs[0]?.nome||'Locatore';
-    const cogC = cons[0]?.cognome||cons[0]?.nome||'Conduttore';
-    return 'CNT_'+cogL+'_'+cogC;
-  } catch(e) { return c.tipo||'Contratto'; }
-}
-const ATOKEN = "ASPPI_ADMIN_asppi2025laquila";
-let D = {prenotazioni:[],contratti:[],utenti:[],chat:[],chiusure:[],slot:{giorni:[],orari:[]}};
-let curPrenId = null, curPratId = null, curChatId = null;
-let sGiorni = new Set(['Lun','Mar','Gio','Ven']);
-let sOrari = new Set(['09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00']);
-let bloccati = [];
-
-window.onload = async function() {
-  if(localStorage.getItem('asppi_admin_ok')!=='yes'){
-    window.location.replace('index.html');
-    return;
-  }
-  // Carica dati
-  await carica();
-  initSlot();
+// ── INIT ──────────────────────────────────────────────────────
+window.onload = function() {
+  if (localStorage.getItem('asppi_admin_ok') !== 'yes') { window.location.replace('index.html'); return; }
+  bindEvents();
+  carica();
 };
 
-async function call(action,data){
-  try{
-    const controller = new AbortController();
-    const timeout = setTimeout(function(){ controller.abort(); }, 15000);
-    const r=await fetch(API,{
-      method:'POST',
-      headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify(Object.assign({action:action,token:ATOKEN},data||{})),
-      redirect:'follow',
-      signal: controller.signal
-    });
-    clearTimeout(timeout);
-    const t=await r.text();
-    try{return JSON.parse(t);}catch(e){return{ok:false,error:'Risposta non valida'};}
-  }catch(e){
-    if(e.name==='AbortError') return{ok:false,error:'Timeout - il server non risponde. Riprova.'};
-    return{ok:false,error:'Errore connessione: '+e.message};
+// ── HELPERS ───────────────────────────────────────────────────
+function setText(id, val) { var e=document.getElementById(id); if(e) e.textContent=val||''; }
+function show(id) { var e=document.getElementById(id); if(e) e.style.display=''; }
+function hide(id) { var e=document.getElementById(id); if(e) e.style.display='none'; }
+function fmtDate(d) {
+  if (!d) return '—';
+  if (d.indexOf('T') > -1) { var p=d.substring(0,10).split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+  return d;
+}
+function statoLbl(s) { return s==='completato'?'Completato':s==='lavorazione'?'In lavorazione':'In attesa'; }
+function statoCol(s) { return s==='completato'?'#2D7A4F':s==='lavorazione'?'#1A5FA8':'#E8631A'; }
+function nomeContratto(c) {
+  var nome = '';
+  try { var l=JSON.parse(c.locatoriJSON||'[]'); var cn=JSON.parse(c.conduttoriJSON||'[]');
+    var cl=(l[0]&&(l[0].cognome||l[0].nome))||''; var cc=(cn[0]&&(cn[0].cognome||cn[0].nome))||'';
+    if(cl&&cc) nome='CNT_'+cl+'_'+cc; }
+  catch(e){}
+  return nome || c.nomeContratto || c.tipo || 'Contratto';
+}
+function parsePeople(json) {
+  var arr = []; try { arr = JSON.parse(json||'[]'); } catch(e) {}
+  if (!arr.length) return '<div class="val">—</div>';
+  var h = '';
+  for (var i=0; i<arr.length; i++) {
+    var p = arr[i];
+    h += '<div style="background:#F8F7F5;border-radius:10px;padding:12px;margin-bottom:8px">'
+      + '<div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:6px">N.'+(i+1)+'</div>'
+      + '<div class="lbl">Nome</div><div class="val">'+(p.cognome||'')+' '+(p.nome||'')+'</div>'
+      + '<div class="lbl">CF</div><div class="val" style="font-family:monospace">'+(p.cf||'—')+'</div>'
+      + (p.quota ? '<div class="lbl">Quota</div><div class="val">'+p.quota+'%</div>' : '')
+      + '</div>';
+  }
+  return h;
+}
+
+// ── EVENTS ────────────────────────────────────────────────────
+function bindEvents() {
+  document.getElementById('btn-esci').addEventListener('click', esci);
+  // Nav
+  document.getElementById('nb-home').addEventListener('click', function(){ navTo('home'); });
+  document.getElementById('nb-pren').addEventListener('click', function(){ navTo('pren'); });
+  document.getElementById('nb-prat').addEventListener('click', function(){ navTo('prat'); });
+  document.getElementById('nb-chat').addEventListener('click', function(){ navTo('chat'); });
+  document.getElementById('nb-slot').addEventListener('click', function(){ navTo('slot'); });
+  // Overlay close
+  document.getElementById('btn-chiudi-op').addEventListener('click', function(){ chiudi('ov-pren'); });
+  document.getElementById('btn-chiudi-opr').addEventListener('click', function(){ chiudi('ov-prat'); });
+  // Pren
+  document.getElementById('btn-cancella-pren').addEventListener('click', cancellaPren);
+  // Prat
+  document.getElementById('btn-aggiorna-stato').addEventListener('click', aggiornaPrat);
+  document.getElementById('tab-dati').addEventListener('click', function(){ switchTab('dati'); });
+  document.getElementById('tab-chat').addEventListener('click', function(){ switchTab('chat'); });
+  // Chat
+  document.getElementById('btn-admin-send').addEventListener('click', adminSendMsg);
+  document.getElementById('admin-chat-inp').addEventListener('keydown', function(e){ if(e.key==='Enter') adminSendMsg(); });
+  // Slot
+  document.getElementById('btn-add-ch').addEventListener('click', addChiusura);
+  document.getElementById('btn-add-blocco').addEventListener('click', addBlocco);
+  document.getElementById('btn-salva-slot').addEventListener('click', salvaSlot);
+  // Pwd admin
+  document.getElementById('btn-cambia-pwd-admin').addEventListener('click', cambiaPwdAdmin);
+  // Filtri prenotazioni
+  makeFiltri('pren-filtri', ['tutte','confermata','cancellata'], ['Tutte','Confermate','Cancellate'], function(f){ prenFiltro=f; renderPren(); });
+  makeFiltri('prat-filtri', ['tutte','richiesta','lavorazione','completato'], ['Tutte','In attesa','In lavorazione','Completate'], function(f){ pratFiltro=f; renderPrat(); });
+}
+
+function makeFiltri(containerId, vals, labels, cb) {
+  var el = document.getElementById(containerId); if(!el) return;
+  el.innerHTML = '';
+  for (var i=0; i<vals.length; i++) {
+    var btn = document.createElement('button');
+    btn.className = 'fb ' + (i===0?'on':'off');
+    btn.textContent = labels[i];
+    btn.dataset.val = vals[i];
+    btn.addEventListener('click', (function(v, container){
+      return function() {
+        var all = document.getElementById(container).querySelectorAll('.fb');
+        for (var j=0; j<all.length; j++) all[j].className='fb off';
+        this.className='fb on';
+        cb(v);
+      };
+    })(vals[i], containerId));
+    el.appendChild(btn);
   }
 }
 
-async function carica(){
-  document.getElementById('h-prens').innerHTML='<div class="info">Caricamento in corso...</div>';
-  document.getElementById('h-prats').innerHTML='<div class="info">Caricamento in corso...</div>';
-
-  // Carica tutto in parallelo con chiamate separate per evitare timeout
-  try {
-    const [rPren, rCnt, rUtenti, rChat, rChius, rSlot] = await Promise.all([
-      call('getPrenotazioni'),
-      call('getContratti'),
-      call('getUtenti'),
-      call('getAllChat'),
-      call('getChiusure'),
-      call('getSlot')
-    ]);
-
-    D.prenotazioni = rPren.ok  ? (rPren.data||[])   : [];
-    D.contratti    = rCnt.ok   ? (rCnt.data||[])    : [];
-    D.utenti       = rUtenti.ok? (rUtenti.data||[])  : [];
-    D.chat         = rChat.ok  ? (rChat.data||[])   : [];
-    D.chiusure     = rChius.ok ? (rChius.data||[])  : [];
-    if(rSlot.ok){ sGiorni=new Set(rSlot.giorni||[]); sOrari=new Set(rSlot.orari||[]); }
-
-    renderHome(); renderPren('tutte'); renderPrat('tutte'); renderChat();
-
-  } catch(e) {
-    document.getElementById('h-prens').innerHTML='<div style="background:#FDEEEC;border-radius:10px;padding:10px 14px;font-size:12px;color:#C0392B">❌ Errore: '+e.message+'<br><button onclick="carica()" style="margin-top:8px;padding:6px 12px;background:#E8631A;color:#fff;border:none;border-radius:8px;cursor:pointer">Riprova</button></div>';
-  }
+// ── API ───────────────────────────────────────────────────────
+function apiCall(action, data, cb) {
+  var payload = {action: action, token: ATOKEN};
+  if (data) { for (var k in data) { if (data.hasOwnProperty(k)) payload[k] = data[k]; } }
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', API, true);
+  xhr.setRequestHeader('Content-Type', 'text/plain');
+  xhr.timeout = 25000;
+  xhr.onload = function() {
+    try { cb(null, JSON.parse(xhr.responseText)); }
+    catch(e) { cb('Risposta non valida: ' + xhr.responseText.substring(0,100)); }
+  };
+  xhr.onerror = function() { cb('Errore connessione'); };
+  xhr.ontimeout = function() { cb('Timeout - riprova'); };
+  xhr.send(JSON.stringify(payload));
 }
 
-function nav(id){
-  document.querySelectorAll('.pg').forEach(function(p){ p.classList.remove('on'); });
-  document.querySelectorAll('.nb').forEach(function(b){ b.classList.remove('on'); });
-  document.getElementById('p-'+id).classList.add('on');
-  document.getElementById('nb-'+id).classList.add('on');
+// ── NAV ───────────────────────────────────────────────────────
+function navTo(id) {
+  var pages = ['home','pren','prat','chat','slot'];
+  for (var i=0; i<pages.length; i++) {
+    var pg = document.getElementById('p-'+pages[i]);
+    var nb = document.getElementById('nb-'+pages[i]);
+    if (pg) pg.className = pages[i]===id ? 'pg on' : 'pg';
+    if (nb) nb.className = pages[i]===id ? 'nb on' : 'nb';
+  }
   window.scrollTo(0,0);
 }
+function apri(id) { var e=document.getElementById(id); if(e){ e.className='ov on'; e.scrollTop=0; } }
+function chiudi(id) { var e=document.getElementById(id); if(e) e.className='ov'; }
+function esci() { localStorage.removeItem('asppi_admin_ok'); localStorage.removeItem('asppi_admin_pwd'); window.location.replace('index.html'); }
 
-function apri(id){document.getElementById(id).classList.add('on');document.getElementById(id).scrollTop=0;}
-function chiudi(id){document.getElementById(id).classList.remove('on');}
-
-function esci(){
-  localStorage.removeItem('asppi_admin_ok');
-  localStorage.removeItem('asppi_admin_pwd');
-  window.location.replace('index.html');
+// ── CARICA ────────────────────────────────────────────────────
+function carica() {
+  setText('h-prens', ''); document.getElementById('h-prens').innerHTML='<div class="info">Caricamento...</div>';
+  // Chiamate separate per evitare timeout
+  apiCall('getPrenotazioni', {}, function(err, r) {
+    D.prenotazioni = (!err && r && r.ok) ? (r.data||[]) : [];
+    renderHome();
+    renderPren();
+  });
+  apiCall('getContratti', {}, function(err, r) {
+    D.contratti = (!err && r && r.ok) ? (r.data||[]) : [];
+    renderHome();
+    renderPrat();
+    renderChat();
+  });
+  apiCall('getUtenti', {}, function(err, r) {
+    D.utenti = (!err && r && r.ok) ? (r.data||[]) : [];
+    setText('sh-soc', D.utenti.length);
+  });
+  apiCall('getAllChat', {}, function(err, r) {
+    D.chat = (!err && r && r.ok) ? (r.data||[]) : [];
+    renderChat();
+  });
+  apiCall('getChiusure', {}, function(err, r) {
+    D.chiusure = (!err && r && r.ok) ? (r.data||[]) : [];
+    renderChiusure();
+  });
+  apiCall('getSlot', {}, function(err, r) {
+    if (!err && r && r.ok) {
+      if (r.giorni && r.giorni.length) sGiorni = r.giorni;
+      if (r.orari  && r.orari.length)  sOrari  = r.orari;
+    }
+    initSlot();
+  });
 }
 
-function statoLbl(s){return s==='completato'?'Completato':s==='lavorazione'?'In lavorazione':'In attesa';}
-function statoCol(s){return s==='completato'?'#2D7A4F':s==='lavorazione'?'#1A5FA8':'#E8631A';}
-
 // ── HOME ──────────────────────────────────────────────────────
-function renderHome(){
-  document.getElementById('sh-app').textContent=D.prenotazioni.filter(p=>p.stato==='confermata').length;
-  document.getElementById('sh-att').textContent=D.contratti.filter(c=>c.stato==='richiesta').length;
-  document.getElementById('sh-soc').textContent=D.utenti.length;
-
-  const hp=document.getElementById('h-prens');
+function renderHome() {
+  setText('sh-app', D.prenotazioni.filter(function(p){ return p.stato==='confermata'; }).length);
+  setText('sh-att', D.contratti.filter(function(c){ return c.stato==='richiesta'; }).length);
+  // Prenotazioni
+  var hp = document.getElementById('h-prens'); if(!hp) return;
   var prens = D.prenotazioni.filter(function(p){ return p.stato==='confermata'; }).slice(0,3);
   hp.innerHTML = '';
-  if(!prens.length){ hp.innerHTML='<div class="info">Nessun appuntamento confermato.</div>'; }
-  else { prens.forEach(function(p){ hp.appendChild(cardPren(p)); }); }
-
-  var hpr=document.getElementById('h-prats');
+  if (!prens.length) { hp.innerHTML='<div class="info">Nessun appuntamento confermato.</div>'; }
+  else { for(var i=0;i<prens.length;i++) hp.appendChild(makePrenCard(prens[i])); }
+  // Pratiche
+  var hpr = document.getElementById('h-prats'); if(!hpr) return;
   hpr.innerHTML = '';
-  if(!D.contratti.length){ hpr.innerHTML='<div class="info">Nessuna pratica ancora.</div>'; }
-  else { D.contratti.slice(0,3).forEach(function(c){ hpr.appendChild(cardPrat(c)); }); }
+  if (!D.contratti.length) { hpr.innerHTML='<div class="info">Nessuna pratica ancora.</div>'; }
+  else { var list=D.contratti.slice(0,3); for(var j=0;j<list.length;j++) hpr.appendChild(makePratCard(list[j])); }
 }
 
 // ── PRENOTAZIONI ──────────────────────────────────────────────
-function cardPren(p){
+function makePrenCard(p) {
   var col = p.stato==='cancellata' ? '#8A8A8A' : '#2D7A4F';
-  var div = document.createElement('div');
-  div.className = 'row';
+  var div = document.createElement('div'); div.className='row';
+  var bar = document.createElement('div'); bar.className='bar'; bar.style.background=col;
+  var rb  = document.createElement('div'); rb.className='rb';
+  var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
+  var rt = document.createElement('div'); rt.className='rt'; rt.textContent=p.nomeUtente||'—';
+  var ora = document.createElement('div'); ora.style.cssText='font-size:15px;font-weight:800;color:#E8631A'; ora.textContent=p.ora||'—';
+  var rs = document.createElement('div'); rs.className='rs'; rs.textContent=(p.motivo||'')+' - '+(p.data||'');
+  var ra = document.createElement('div'); ra.className='ra'; ra.textContent='›';
+  top.appendChild(rt); top.appendChild(ora); rb.appendChild(top); rb.appendChild(rs);
+  div.appendChild(bar); div.appendChild(rb); div.appendChild(ra);
   div.addEventListener('click', (function(id){ return function(){ apriPren(id); }; })(p.id));
-  div.innerHTML = '<div class="bar" style="background:'+col+'"></div>'
-    + '<div class="rb">'
-    + '<div style="display:flex;justify-content:space-between;align-items:center">'
-    + '<div class="rt">'+(p.nomeUtente||'—')+'</div>'
-    + '<div style="font-size:15px;font-weight:800;color:#E8631A">'+(p.ora||'—')+'</div>'
-    + '</div>'
-    + '<div class="rs">'+(p.motivo||'')+' &middot; '+(p.data||'')+'</div>'
-    + '</div><div class="ra">&#8250;</div>';
   return div;
 }
 
-function renderPren(f){
-  var list = D.prenotazioni.slice();
-  if(f!=='tutte') list = list.filter(function(p){ return p.stato===f; });
-  var el = document.getElementById('l-pren');
+function renderPren() {
+  var el = document.getElementById('l-pren'); if(!el) return;
+  var list = D.prenotazioni;
+  if (prenFiltro !== 'tutte') list = list.filter(function(p){ return p.stato===prenFiltro; });
   el.innerHTML = '';
-  if(!list.length){ el.innerHTML='<div class="info">Nessuna prenotazione.</div>'; return; }
-  list.forEach(function(p){ el.appendChild(cardPren(p)); });
+  if (!list.length) { el.innerHTML='<div class="info">Nessuna prenotazione trovata.</div>'; return; }
+  for (var i=0; i<list.length; i++) el.appendChild(makePrenCard(list[i]));
 }
 
-function filtraPren(f){
-  ['tutte','conf','canc'].forEach(x=>document.getElementById('f-'+x).className='fb off');
-  document.getElementById('f-'+f).className='fb on';
-  const map={'tutte':'tutte','conf':'confermata','canc':'cancellata'};
-  renderPren(map[f]||f);
-}
-
-function apriPren(id){
-  const p=D.prenotazioni.find(x=>x.id===id);if(!p)return;
-  curPrenId=id;
-  document.getElementById('op-ttl').textContent=p.nomeUtente||'—';
-  document.getElementById('op-data').textContent=(p.data||'—')+' ore '+(p.ora||'—');
-  document.getElementById('op-stato').textContent=p.stato==='confermata'?'✅ Confermata':'❌ Cancellata';
-  document.getElementById('op-nome').textContent=p.nomeUtente||'—';
-  document.getElementById('op-email').textContent=p.emailUtente||'—';
-  document.getElementById('op-tel').textContent=p.telUtente||'—';
-  document.getElementById('op-motivo').textContent=p.motivo||'—';
-  document.getElementById('op-ok').style.display='none';
-  document.getElementById('op-canc-btn').style.display=p.stato==='cancellata'?'none':'';
+function apriPren(id) {
+  var p = null; for(var i=0;i<D.prenotazioni.length;i++){ if(D.prenotazioni[i].id===id){p=D.prenotazioni[i];break;} }
+  if (!p) return;
+  curPrenId = id;
+  setText('op-ttl', p.nomeUtente||'—');
+  setText('op-data', fmtDate(p.data)+' ore '+(p.ora||'—'));
+  setText('op-stato', p.stato==='confermata'?'Confermata':'Cancellata');
+  setText('op-nome', p.nomeUtente||'—');
+  setText('op-email', p.emailUtente||'—');
+  setText('op-motivo', p.motivo||'—');
+  hide('op-ok');
+  var btn = document.getElementById('btn-cancella-pren');
+  if (btn) btn.style.display = p.stato==='cancellata' ? 'none' : '';
   apri('ov-pren');
 }
 
-async function cancellaPren(){
-  const r=await call('cancelPrenotazione',{id:curPrenId});
-  if(r.ok){document.getElementById('op-ok').style.display='';document.getElementById('op-canc-btn').style.display='none';await carica();}
-  else alert('Errore: '+r.error);
+function cancellaPren() {
+  apiCall('cancelPrenotazione', {id: curPrenId}, function(err, r) {
+    if (!err && r && r.ok) { show('op-ok'); hide('btn-cancella-pren'); carica(); }
+    else alert('Errore: '+((r&&r.error)||err||'Riprova'));
+  });
 }
 
 // ── PRATICHE ─────────────────────────────────────────────────
-function parseLocs(json){
-  try{
-    const a=JSON.parse(json||'[]');
-    if(!a.length)return '<div class="val">—</div>';
-    return a.map(function(p,i){
-      var quota = p.quota ? '<div class="lbl">Quota</div><div class="val">'+p.quota+'%</div>' : '';
-      return '<div style="background:#F8F7F5;border-radius:10px;padding:12px;margin-bottom:8px">'
-        + '<div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:6px">N°'+(i+1)+'</div>'
-        + '<div class="lbl">Nome</div><div class="val">'+(p.cognome||'')+' '+(p.nome||'')+'</div>'
-        + '<div class="lbl">CF</div><div class="val" style="font-family:monospace">'+(p.cf||'—')+'</div>'
-        + quota
-        + '</div>';
-    }).join('');
-  }catch(e){return '<div class="val">—</div>';}
-}
-
-function cardPrat(c){
+function makePratCard(c) {
   var col = statoCol(c.stato);
-  var nome = '—';
-  try{ var l=JSON.parse(c.locatoriJSON||'[]'); if(l[0]) nome=(l[0].cognome||'')+' '+(l[0].nome||''); }catch(e){}
-  var div = document.createElement('div');
-  div.className = 'row';
+  var nome = nomeContratto(c);
+  var div = document.createElement('div'); div.className='row';
+  var bar = document.createElement('div'); bar.className='bar'; bar.style.background=col;
+  var rb  = document.createElement('div'); rb.className='rb';
+  var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between';
+  var rt = document.createElement('div'); rt.className='rt'; rt.textContent=nome;
+  var bdg = document.createElement('span'); bdg.className='bdg'; bdg.textContent=statoLbl(c.stato);
+  bdg.style.color=col; bdg.style.background=col+'22';
+  var rs = document.createElement('div'); rs.className='rs'; rs.textContent=(c.dataRichiesta?c.dataRichiesta.substring(0,10):'');
+  var ra = document.createElement('div'); ra.className='ra'; ra.textContent='›';
+  top.appendChild(rt); top.appendChild(bdg); rb.appendChild(top); rb.appendChild(rs);
+  div.appendChild(bar); div.appendChild(rb); div.appendChild(ra);
   div.addEventListener('click', (function(id){ return function(){ apriPrat(id); }; })(c.id));
-  div.innerHTML = '<div class="bar" style="background:'+col+'"></div>'
-    + '<div class="rb">'
-    + '<div style="display:flex;justify-content:space-between">'
-    + '<div class="rt">'+nome+'</div>'
-    + '<span class="bdg" style="color:'+col+';background:'+col+'22">'+statoLbl(c.stato)+'</span>'
-    + '</div>'
-    + '<div class="rs">'+nomeContratto(c)+' &middot; '+(c.dataRichiesta?c.dataRichiesta.substring(0,10):'')+'</div>'
-    + '</div><div class="ra">&#8250;</div>';
   return div;
 }
 
-function renderPrat(f){
-  let list=D.contratti;
-  if(f!=='tutte') list=list.filter(c=>c.stato===f);
-  document.getElementById('l-prat').innerHTML=!list.length?'<div class="info">Nessuna pratica trovata.</div>':list.map(c=>cardPrat(c)).join('');
+function renderPrat() {
+  var el = document.getElementById('l-prat'); if(!el) return;
+  var list = D.contratti;
+  if (pratFiltro !== 'tutte') list = list.filter(function(c){ return c.stato===pratFiltro; });
+  el.innerHTML = '';
+  if (!list.length) { el.innerHTML='<div class="info">Nessuna pratica trovata.</div>'; return; }
+  for (var i=0; i<list.length; i++) el.appendChild(makePratCard(list[i]));
 }
 
-function filtraPrat(f){
-  ['tutte','rich','lav','comp'].forEach(x=>document.getElementById('fp-'+x).className='fb off');
-  const map={tutte:'fp-tutte',richiesta:'fp-rich',lavorazione:'fp-lav',completato:'fp-comp'};
-  if(map[f]) document.getElementById(map[f]).className='fb on';
-  renderPrat(f);
-}
-
-function apriPrat(id){
-  const c=D.contratti.find(x=>x.id===id);if(!c)return;
-  curPratId=id; curChatId=id;
-  let nome='—';
-  try{const l=JSON.parse(c.locatoriJSON||'[]');if(l[0])nome=(l[0].cognome||'')+' '+(l[0].nome||'');}catch(e){}
-  document.getElementById('opr-lbl').textContent='PRATICA '+id;
-  document.getElementById('opr-ttl').textContent=nomeContratto(c);
-  document.getElementById('opr-nome-cnt').textContent=nomeContratto(c);
-  document.getElementById('opr-tipo').textContent=c.tipo||'—';
-  document.getElementById('opr-stato').textContent=statoLbl(c.stato);
-  // Mostra avviso se modificato
-  const modDiv = document.getElementById('opr-modificato');
-  if(c.modificato) {
-    const dataM = fmtDate(c.modificato);
-    document.getElementById('opr-data-mod').textContent = dataM;
-    modDiv.style.display = '';
+function apriPrat(id) {
+  var c = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===id){c=D.contratti[i];break;} }
+  if (!c) return;
+  curPratId = id; curChatId = id;
+  setText('opr-lbl', 'PRATICA '+id);
+  setText('opr-ttl', nomeContratto(c));
+  setText('opr-nome-cnt', nomeContratto(c));
+  setText('opr-tipo', c.tipo||'—');
+  setText('opr-stato', statoLbl(c.stato));
+  var sel = document.getElementById('opr-stato-sel'); if(sel) sel.value=c.stato||'richiesta';
+  setText('opr-dal', fmtDate(c.duraDal));
+  setText('opr-al', fmtDate(c.duraAl));
+  setText('opr-canone', c.canoneMensile?'€ '+c.canoneMensile+'/mese':'—');
+  setText('opr-dep', c.depositoImporto?'€ '+c.depositoImporto:'—');
+  document.getElementById('opr-locs').innerHTML = parsePeople(c.locatoriJSON);
+  document.getElementById('opr-cons').innerHTML = parsePeople(c.conduttoriJSON);
+  hide('opr-ok');
+  var modDiv = document.getElementById('opr-modificato');
+  if (c.modificato) {
+    setText('opr-data-mod', fmtDate(c.modificato));
+    if (modDiv) modDiv.style.display='';
   } else {
-    modDiv.style.display = 'none';
+    if (modDiv) modDiv.style.display='none';
   }
-  document.getElementById('opr-stato-sel').value=c.stato||'richiesta';
-  document.getElementById('opr-dal').textContent=fmtDate(c.duraDal);
-  document.getElementById('opr-al').textContent=fmtDate(c.duraAl);
-  document.getElementById('opr-canone').textContent=c.canoneMensile?'€ '+c.canoneMensile+'/mese':'—';
-  document.getElementById('opr-dep').textContent=c.depositoImporto?'€ '+c.depositoImporto:'—';
-  document.getElementById('opr-locs').innerHTML=parseLocs(c.locatoriJSON);
-  document.getElementById('opr-cons').innerHTML=parseLocs(c.conduttoriJSON);
-  document.getElementById('opr-ok').style.display='none';
   switchTab('dati');
   apri('ov-prat');
 }
 
-function switchTab(t){
-  document.getElementById('tab-dati-body').style.display=t==='dati'?'':'none';
-  document.getElementById('tab-chat-body').style.display=t==='chat'?'':'none';
-  document.getElementById('tab-dati').classList.toggle('on',t==='dati');
-  document.getElementById('tab-chat').classList.toggle('on',t==='chat');
-  if(t==='chat') caricaMsgsAdmin();
+function switchTab(t) {
+  var datiBody = document.getElementById('tab-dati-body');
+  var chatBody = document.getElementById('tab-chat-body');
+  var tDati = document.getElementById('tab-dati');
+  var tChat = document.getElementById('tab-chat');
+  if (datiBody) datiBody.style.display = t==='dati' ? '' : 'none';
+  if (chatBody) chatBody.style.display = t==='chat' ? '' : 'none';
+  if (tDati) tDati.className = 'tabbtn ' + (t==='dati'?'on':'');
+  if (tChat) tChat.className = 'tabbtn ' + (t==='chat'?'on':'');
+  if (t==='chat') caricaMsgsAdmin();
 }
 
-async function aggiornaPrat(){
-  const c=D.contratti.find(x=>x.id===curPratId);if(!c)return;
-  c.stato=document.getElementById('opr-stato-sel').value;
-  const r=await call('saveContratto',{data:c});
-  if(r.ok){document.getElementById('opr-ok').style.display='';document.getElementById('opr-stato').textContent=statoLbl(c.stato);await carica();}
-  else alert('Errore: '+r.error);
-}
-
-// ── CHAT ─────────────────────────────────────────────────────
-function renderChat(){
-  const el=document.getElementById('l-chat');
-  // Include free chats too
-  const allChats = [...D.contratti];
-  if(!allChats.length){el.innerHTML='<div class="info">Nessuna conversazione ancora.</div>';return;}
-  el.innerHTML = '';
-  allChats.forEach(function(cItem) {
-    var msgs = D.chat.filter(function(m){ return m.contrattoId===cItem.id; });
-    var last = msgs[msgs.length-1];
-    var unread = msgs.filter(function(m){ return m.mittente==='socio' && !m.letto; }).length;
-    var nomeSocio = 'Socio';
-    var msgSocio = msgs.find(function(m){ return m.mittente==='socio'; });
-    if(msgSocio && msgSocio.nomeUtente) {
-      nomeSocio = msgSocio.nomeUtente.trim() || nomeSocio;
-    } else {
-      var utente = D.utenti.find(function(u){ return u.id === cItem.userId; });
-      if(utente) nomeSocio = ((utente.nome||'') + ' ' + (utente.cognome||'')).trim() || nomeSocio;
-    }
-    var iniziali = nomeSocio.split(' ').map(function(n){ return n[0]||''; }).join('').slice(0,2).toUpperCase() || 'S';
-    var titolo = nomeContratto(cItem);
-    var barColor = unread ? '#E8631A' : '#8A8A8A';
-    var div = document.createElement('div');
-    div.className = 'row';
-    div.style.cursor = 'pointer';
-    div.addEventListener('click', (function(id){ return function(){ apriChatAdmin(id); }; })(cItem.id));
-    div.innerHTML = '<div class="bar" style="background:'+barColor+'"></div>'
-      + '<div class="rb" style="display:flex;align-items:center;gap:12px">'
-      + '<div style="width:40px;height:40px;border-radius:20px;background:'+(unread?'#E8631A':'#F8F7F5')+';display:flex;align-items:center;justify-content:center;color:'+(unread?'#fff':'#8A8A8A')+';font-weight:800;font-size:13px;flex-shrink:0">'+iniziali+'</div>'
-      + '<div style="flex:1;min-width:0">'
-      + '<div style="display:flex;justify-content:space-between;align-items:center">'
-      + '<div class="rt">'+titolo+'</div>'
-      + (unread ? '<div style="width:8px;height:8px;border-radius:4px;background:#E8631A;flex-shrink:0"></div>' : '')
-      + '</div>'
-      + '<div class="rs" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><strong style="color:#1A1A1A">'+nomeSocio+'</strong> - '+(last?last.testo:'Nessun messaggio')+'</div>'
-      + '</div></div>';
-    el.appendChild(div);
+function aggiornaPrat() {
+  var c = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){c=D.contratti[i];break;} }
+  if (!c) return;
+  var sel = document.getElementById('opr-stato-sel'); if(!sel) return;
+  c.stato = sel.value;
+  apiCall('saveContratto', {data: c}, function(err, r) {
+    if (!err && r && r.ok) {
+      show('opr-ok');
+      setText('opr-stato', statoLbl(c.stato));
+      carica();
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
   });
 }
 
-function apriChatAdmin(id){
-  curChatId=id; curPratId=id;
-  const c=D.contratti.find(function(x){ return x.id===id; });
-  // Nome socio dall'utente o dai messaggi
-  let nomeSocio = '—';
-  const msgs = D.chat.filter(function(m){ return m.contrattoId===id && m.mittente==='socio'; });
-  if(msgs.length && msgs[0].nomeUtente && msgs[0].nomeUtente.trim()) {
-    nomeSocio = msgs[0].nomeUtente;
-  } else {
-    const utente = D.utenti.find(function(u){ return u.id===c ? c.userId : null; });
-    if(utente) nomeSocio = (utente.nome||'')+' '+(utente.cognome||'');
+// ── CHAT ─────────────────────────────────────────────────────
+function renderChat() {
+  var el = document.getElementById('l-chat'); if(!el) return;
+  el.innerHTML = '';
+  if (!D.contratti.length) { el.innerHTML='<div class="info">Nessuna conversazione ancora.</div>'; return; }
+  for (var i=0; i<D.contratti.length; i++) {
+    el.appendChild(makeChatCard(D.contratti[i]));
   }
-  nomeSocio = nomeSocio.trim()||'—';
-  document.getElementById('opr-lbl').textContent='CHAT · '+nomeContratto(c||{});
-  document.getElementById('opr-ttl').textContent=nomeSocio;
-  // Render pratica dati minimali
-  document.getElementById('opr-tipo').textContent=c ? c.tipo : ''||'—';
-  document.getElementById('opr-stato').textContent=statoLbl(c ? c.stato : '');
-  document.getElementById('opr-stato-sel').value=c ? c.stato : ''||'richiesta';
-  document.getElementById('opr-dal').textContent=fmtDate(c?.duraDal);
-  document.getElementById('opr-al').textContent=fmtDate(c?.duraAl);
-  document.getElementById('opr-canone').textContent=c?.canoneMensile?'€ '+c.canoneMensile+'/mese':'—';
-  document.getElementById('opr-dep').textContent=c?.depositoImporto?'€ '+c.depositoImporto:'—';
-  document.getElementById('opr-locs').innerHTML=parseLocs(c ? c.locatoriJSON : null);
-  document.getElementById('opr-cons').innerHTML=parseLocs(c ? c.conduttoriJSON : null);
-  document.getElementById('opr-ok').style.display='none';
+}
+
+function makeChatCard(c) {
+  var msgs = D.chat.filter(function(m){ return m.contrattoId===c.id; });
+  var last = msgs.length ? msgs[msgs.length-1] : null;
+  var unread = msgs.filter(function(m){ return m.mittente==='socio' && !m.letto; }).length;
+  var nomeSocio = 'Socio';
+  var msgSocio = null; for(var i=0;i<msgs.length;i++){ if(msgs[i].mittente==='socio'){msgSocio=msgs[i];break;} }
+  if (msgSocio && msgSocio.nomeUtente) nomeSocio = msgSocio.nomeUtente.trim() || nomeSocio;
+  else {
+    var ut = null; for(var j=0;j<D.utenti.length;j++){ if(D.utenti[j].id===c.userId){ut=D.utenti[j];break;} }
+    if (ut) nomeSocio = ((ut.nome||'')+' '+(ut.cognome||'')).trim() || nomeSocio;
+  }
+  var iniziali = '';
+  var parts = nomeSocio.split(' ');
+  for (var k=0; k<Math.min(parts.length,2); k++) if(parts[k]) iniziali += parts[k][0].toUpperCase();
+  var titolo = nomeContratto(c);
+  var col = unread ? '#E8631A' : '#8A8A8A';
+  var div = document.createElement('div'); div.className='row';
+  var bar = document.createElement('div'); bar.className='bar'; bar.style.background=col;
+  var rb  = document.createElement('div'); rb.className='rb'; rb.style.cssText='display:flex;align-items:center;gap:12px';
+  var av  = document.createElement('div');
+  av.style.cssText='width:40px;height:40px;border-radius:20px;background:'+(unread?'#E8631A':'#F8F7F5')+';display:flex;align-items:center;justify-content:center;color:'+(unread?'#fff':'#8A8A8A')+';font-weight:800;font-size:13px;flex-shrink:0';
+  av.textContent = iniziali || 'S';
+  var info = document.createElement('div'); info.style.cssText='flex:1;min-width:0';
+  var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
+  var rt = document.createElement('div'); rt.className='rt'; rt.textContent=titolo;
+  var rs = document.createElement('div'); rs.className='rs'; rs.style.cssText='overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+  rs.textContent = nomeSocio + ' - ' + (last ? last.testo : 'Nessun messaggio');
+  top.appendChild(rt);
+  if (unread) {
+    var dot = document.createElement('div');
+    dot.style.cssText='width:8px;height:8px;border-radius:4px;background:#E8631A;flex-shrink:0';
+    top.appendChild(dot);
+  }
+  info.appendChild(top); info.appendChild(rs);
+  rb.appendChild(av); rb.appendChild(info);
+  div.appendChild(bar); div.appendChild(rb);
+  div.addEventListener('click', (function(id){ return function(){ apriChatAdmin(id); }; })(c.id));
+  return div;
+}
+
+function apriChatAdmin(id) {
+  curChatId = id; curPratId = id;
+  var c = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===id){c=D.contratti[i];break;} }
+  var msgs = D.chat.filter(function(m){ return m.contrattoId===id && m.mittente==='socio'; });
+  var nomeSocio = 'Socio';
+  if (msgs.length && msgs[0].nomeUtente) nomeSocio = msgs[0].nomeUtente.trim() || nomeSocio;
+  else {
+    var ut = null; for(var j=0;j<D.utenti.length;j++){ if(D.utenti[j].id===(c?c.userId:null)){ut=D.utenti[j];break;} }
+    if (ut) nomeSocio = ((ut.nome||'')+' '+(ut.cognome||'')).trim() || nomeSocio;
+  }
+  setText('opr-lbl', 'CHAT - '+nomeContratto(c||{}));
+  setText('opr-ttl', nomeSocio);
+  // Popola anche dati pratica per tab
+  if (c) {
+    setText('opr-nome-cnt', nomeContratto(c));
+    setText('opr-tipo', c.tipo||'—');
+    setText('opr-stato', statoLbl(c.stato));
+    var sel=document.getElementById('opr-stato-sel'); if(sel) sel.value=c.stato||'richiesta';
+    setText('opr-dal', fmtDate(c.duraDal));
+    setText('opr-al', fmtDate(c.duraAl));
+    setText('opr-canone', c.canoneMensile?'€ '+c.canoneMensile+'/mese':'—');
+    setText('opr-dep', c.depositoImporto?'€ '+c.depositoImporto:'—');
+    document.getElementById('opr-locs').innerHTML=parsePeople(c.locatoriJSON);
+    document.getElementById('opr-cons').innerHTML=parsePeople(c.conduttoriJSON);
+    hide('opr-ok');
+    var modDiv=document.getElementById('opr-modificato');
+    if(c.modificato){setText('opr-data-mod',fmtDate(c.modificato));if(modDiv)modDiv.style.display='';}
+    else{if(modDiv)modDiv.style.display='none';}
+  }
   switchTab('chat');
   apri('ov-prat');
 }
 
-async function caricaMsgsAdmin(){
-  const r=await call('getChat',{contrattoId:curChatId});
-  const msgs=r.ok?(r.data||[]):[];
-  const el=document.getElementById('admin-msgs');
-  if(!msgs.length){el.innerHTML='<div class="info">Nessun messaggio ancora.</div>';return;}
-  el.innerHTML = '';
-  msgs.forEach(function(m){
-    var mine = m.mittente==='admin';
-    var bbl = document.createElement('div');
-    bbl.className = 'bbl ' + (mine ? 'bm' : 'bo');
-    bbl.textContent = m.testo;
-    el.appendChild(bbl);
-    var bt = document.createElement('div');
-    bt.className = 'bt';
-    bt.style.alignSelf = mine ? 'flex-end' : 'flex-start';
-    bt.textContent = (mine ? 'Tu' : (m.nomeUtente||'Socio')) + ' · ' + (m.timestamp ? m.timestamp.substring(11,16) : '');
-    el.appendChild(bt);
+function caricaMsgsAdmin() {
+  apiCall('getChat', {contrattoId: curChatId}, function(err, r) {
+    var msgs = (!err && r && r.ok) ? (r.data||[]) : [];
+    var el = document.getElementById('admin-msgs'); if(!el) return;
+    el.innerHTML = '';
+    if (!msgs.length) { el.innerHTML='<div class="info">Nessun messaggio ancora.</div>'; return; }
+    for (var i=0; i<msgs.length; i++) {
+      var m = msgs[i];
+      var mine = m.mittente==='admin';
+      var bbl = document.createElement('div'); bbl.className='bbl '+(mine?'bm':'bo'); bbl.textContent=m.testo; el.appendChild(bbl);
+      var bt = document.createElement('div'); bt.className='bt'; bt.style.alignSelf=mine?'flex-end':'flex-start';
+      bt.textContent=(mine?'Tu':(m.nomeUtente||'Socio'))+' - '+(m.timestamp?m.timestamp.substring(11,16):''); el.appendChild(bt);
+    }
+    el.scrollTop = el.scrollHeight;
   });
-  el.scrollTop=el.scrollHeight;
 }
 
-async function adminSendMsg(){
-  const t=document.getElementById('admin-chat-inp').value.trim();if(!t||!curChatId)return;
-  document.getElementById('admin-chat-inp').value='';
-  const r=await call('sendMessage',{contrattoId:curChatId,testo:t});
-  if(r.ok){await caricaMsgsAdmin();await carica();}
+function adminSendMsg() {
+  var inp = document.getElementById('admin-chat-inp'); if(!inp) return;
+  var t = inp.value.trim(); if(!t||!curChatId) return;
+  inp.value = '';
+  apiCall('sendMessage', {contrattoId: curChatId, testo: t}, function(err, r) {
+    if (!err && r && r.ok) { caricaMsgsAdmin(); carica(); }
+  });
 }
 
 // ── SLOT ─────────────────────────────────────────────────────
-const TGIORNI=['Lun','Mar','Mer','Gio','Ven','Sab'];
-const TORARI=['08:30','09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00','17:30'];
-
-function initSlot(){
-  var gContainer = document.getElementById('slot-giorni');
-  gContainer.innerHTML = '';
-  TGIORNI.forEach(function(g){
+function initSlot() {
+  var gEl = document.getElementById('slot-giorni'); if(!gEl) return;
+  gEl.innerHTML = '';
+  for (var i=0; i<TGIORNI.length; i++) {
+    var g = TGIORNI[i];
+    var inSet = sGiorni.indexOf(g) > -1;
     var btn = document.createElement('button');
-    btn.className = 'gbtn ' + (sGiorni.has(g)?'on':'off');
+    btn.className = 'gbtn ' + (inSet?'on':'off');
     btn.id = 'sg-'+g;
     btn.textContent = g;
-    btn.addEventListener('click', (function(day){ return function(){ togGiorno(day); }; })(g));
-    gContainer.appendChild(btn);
-  });
-  var oContainer = document.getElementById('slot-orari');
-  oContainer.innerHTML = '';
-  TORARI.forEach(function(o){
-    var btn = document.createElement('button');
-    btn.className = 'sbt ' + (sOrari.has(o)?'on':'off');
-    btn.id = 'so-'+o.replace(':','-');
-    btn.textContent = o;
-    btn.addEventListener('click', (function(ora){ return function(){ togOrario(ora); }; })(o));
-    oContainer.appendChild(btn);
-  });
-  renderChiusure(); renderBloccati();
+    btn.addEventListener('click', (function(gg){ return function(){ togGiorno(gg); }; })(g));
+    gEl.appendChild(btn);
+  }
+  var oEl = document.getElementById('slot-orari'); if(!oEl) return;
+  oEl.innerHTML = '';
+  for (var j=0; j<TORARI.length; j++) {
+    var o = TORARI[j];
+    var inSet2 = sOrari.indexOf(o) > -1;
+    var btn2 = document.createElement('button');
+    btn2.className = 'sbt ' + (inSet2?'on':'off');
+    btn2.id = 'so-'+o.replace(':','-');
+    btn2.textContent = o;
+    btn2.addEventListener('click', (function(oo){ return function(){ togOrario(oo); }; })(o));
+    oEl.appendChild(btn2);
+  }
+  renderChiusure();
+  renderBloccati();
 }
 
-function togGiorno(g){
-  if(sGiorni.has(g))sGiorni.delete(g);else sGiorni.add(g);
-  const b=document.getElementById('sg-'+g);
-  b.className='gbtn '+(sGiorni.has(g)?'on':'off');
+function togGiorno(g) {
+  var idx = sGiorni.indexOf(g);
+  if (idx > -1) sGiorni.splice(idx,1); else sGiorni.push(g);
+  var btn = document.getElementById('sg-'+g); if(btn) btn.className='gbtn '+(sGiorni.indexOf(g)>-1?'on':'off');
+}
+function togOrario(o) {
+  var idx = sOrari.indexOf(o);
+  if (idx > -1) sOrari.splice(idx,1); else sOrari.push(o);
+  var btn = document.getElementById('so-'+o.replace(':','-')); if(btn) btn.className='sbt '+(sOrari.indexOf(o)>-1?'on':'off');
 }
 
-function togOrario(o){
-  if(sOrari.has(o))sOrari.delete(o);else sOrari.add(o);
-  const b=document.getElementById('so-'+o.replace(':','-'));
-  b.className='sbt '+(sOrari.has(o)?'on':'off');
-}
-
-function renderChiusure(){
-  const el=document.getElementById('slot-chiusure');
-  if(!D.chiusure.length){el.innerHTML='<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessuna chiusura impostata</div>';return;}
+function renderChiusure() {
+  var el = document.getElementById('slot-chiusure'); if(!el) return;
   el.innerHTML = '';
-  D.chiusure.forEach(function(ch){
-    var div = document.createElement('div');
-    div.className = 'li';
-    div.innerHTML = '<span style="font-size:18px">🏖️</span>'
-      + '<div style="flex:1"><div style="font-size:13px;font-weight:700;color:#1A1A1A">'+ch.label+'</div>'
-      + '<div style="font-size:11px;color:#8A8A8A">dal '+ch.dal+' al '+ch.al+'</div></div>';
-    var btn = document.createElement('button');
-    btn.style.cssText = 'background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px';
-    btn.textContent = '✕';
+  if (!D.chiusure.length) { el.innerHTML='<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessuna chiusura impostata</div>'; return; }
+  for (var i=0; i<D.chiusure.length; i++) {
+    var ch = D.chiusure[i];
+    var div = document.createElement('div'); div.className='li';
+    var ico = document.createElement('span'); ico.style.fontSize='18px'; ico.textContent='🏖';
+    var info = document.createElement('div'); info.style.flex='1';
+    var t1 = document.createElement('div'); t1.style.cssText='font-size:13px;font-weight:700;color:#1A1A1A'; t1.textContent=ch.label;
+    var t2 = document.createElement('div'); t2.style.cssText='font-size:11px;color:#8A8A8A'; t2.textContent='dal '+ch.dal+' al '+ch.al;
+    info.appendChild(t1); info.appendChild(t2);
+    var btn = document.createElement('button'); btn.style.cssText='background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px'; btn.textContent='✕';
     btn.addEventListener('click', (function(id){ return function(){ delChiusura(id); }; })(ch.id));
-    div.appendChild(btn);
+    div.appendChild(ico); div.appendChild(info); div.appendChild(btn);
     el.appendChild(div);
-  });
-}
-
-function renderBloccati(){
-  const el=document.getElementById('slot-bloccati');
-  if(!bloccati.length){el.innerHTML='<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessun giorno bloccato</div>';return;}
-  el.innerHTML = '';
-  bloccati.forEach(function(b, i){
-    var div = document.createElement('div');
-    div.className = 'li';
-    div.innerHTML = '<span>🚫</span><div style="flex:1;font-size:13px;font-weight:600;color:#1A1A1A">'+b+'</div>';
-    var btn = document.createElement('button');
-    btn.style.cssText = 'background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px';
-    btn.textContent = '✕';
-    btn.addEventListener('click', (function(idx){ return function(){ bloccati.splice(idx,1); renderBloccati(); }; })(i));
-    div.appendChild(btn);
-    el.appendChild(div);
-  });
-}
-
-async function addChiusura(){
-  var label=document.getElementById('ch-lbl').value.trim();
-  var dal=document.getElementById('ch-dal').value.trim();
-  var al=document.getElementById('ch-al').value.trim();
-  if(!label||!dal||!al){alert('Compila tutti i campi chiusura');return;}
-  var r=await call('saveChiusura',{label:label,dal:dal,al:al});
-  if(r.ok){
-    D.chiusure.push({id:r.id,label:label,dal:dal,al:al});
-    renderChiusure();
-    document.getElementById('ch-lbl').value='';
-    document.getElementById('ch-dal').value='';
-    document.getElementById('ch-al').value='';
   }
 }
 
-async function delChiusura(id){
-  const r=await call('deleteChiusura',{id:id});
-  if(r.ok){D.chiusure=D.chiusure.filter(function(ch){ return ch.id!==id; });renderChiusure();}
+function renderBloccati() {
+  var el = document.getElementById('slot-bloccati'); if(!el) return;
+  el.innerHTML = '';
+  if (!bloccati.length) { el.innerHTML='<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessun giorno bloccato</div>'; return; }
+  for (var i=0; i<bloccati.length; i++) {
+    var div = document.createElement('div'); div.className='li';
+    var ico = document.createElement('span'); ico.textContent='🚫';
+    var t = document.createElement('div'); t.style.cssText='flex:1;font-size:13px;font-weight:600;color:#1A1A1A'; t.textContent=bloccati[i];
+    var btn = document.createElement('button'); btn.style.cssText='background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px'; btn.textContent='✕';
+    btn.addEventListener('click', (function(idx){ return function(){ bloccati.splice(idx,1); renderBloccati(); }; })(i));
+    div.appendChild(ico); div.appendChild(t); div.appendChild(btn);
+    el.appendChild(div);
+  }
 }
 
-function addBlocco(){
-  const d=document.getElementById('blocco-d').value.trim();if(!d)return;
-  bloccati.push(d);document.getElementById('blocco-d').value='';renderBloccati();
+function addChiusura() {
+  var label=(document.getElementById('ch-lbl')||{}).value||'';
+  var dal=(document.getElementById('ch-dal')||{}).value||'';
+  var al=(document.getElementById('ch-al')||{}).value||'';
+  if(!label||!dal||!al){alert('Compila tutti i campi chiusura');return;}
+  apiCall('saveChiusura',{label:label,dal:dal,al:al},function(err,r){
+    if(!err&&r&&r.ok){
+      D.chiusure.push({id:r.id,label:label,dal:dal,al:al});
+      renderChiusure();
+      document.getElementById('ch-lbl').value='';
+      document.getElementById('ch-dal').value='';
+      document.getElementById('ch-al').value='';
+    } else alert('Errore: '+((r&&r.error)||err||'Riprova'));
+  });
 }
 
-async function salvaSlot(){
-  const r=await call('saveSlot',{giorni:[...sGiorni],orari:[...sOrari],durata:30});
-  const ok=document.getElementById('slot-ok');
-  ok.style.display='';setTimeout(()=>ok.style.display='none',3000);
+function delChiusura(id) {
+  apiCall('deleteChiusura',{id:id},function(err,r){
+    if(!err&&r&&r.ok){
+      var newList=[]; for(var i=0;i<D.chiusure.length;i++){if(D.chiusure[i].id!==id)newList.push(D.chiusure[i]);}
+      D.chiusure=newList; renderChiusure();
+    }
+  });
+}
+
+function addBlocco() {
+  var d=(document.getElementById('blocco-d')||{}).value||'';
+  if(!d)return;
+  bloccati.push(d); document.getElementById('blocco-d').value=''; renderBloccati();
+}
+
+function salvaSlot() {
+  apiCall('saveSlot',{giorni:sGiorni,orari:sOrari,durata:30},function(err,r){
+    var ok=document.getElementById('slot-ok');
+    if(ok){ok.style.display='';setTimeout(function(){ok.style.display='none';},3000);}
+  });
 }
 
 // ── CAMBIO PASSWORD ADMIN ─────────────────────────────────────
-function cambiaPwdAdmin(){
-  const o=document.getElementById('acp-old').value;
-  const n=document.getElementById('acp-new').value;
-  const n2=document.getElementById('acp-new2').value;
-  const errEl=document.getElementById('acp-err');
-  errEl.style.display='none';document.getElementById('acp-ok').style.display='none';
-  const cur=localStorage.getItem('asppi_admin_custom_pwd')||'Asppi2025!';
-  if(o!==cur){errEl.textContent='Password attuale non corretta';errEl.style.display='';return;}
-  if(n.length<8){errEl.textContent='Minimo 8 caratteri';errEl.style.display='';return;}
-  if(n!==n2){errEl.textContent='Le due password non coincidono';errEl.style.display='';return;}
+function cambiaPwdAdmin() {
+  var o=(document.getElementById('acp-old')||{}).value||'';
+  var n=(document.getElementById('acp-new')||{}).value||'';
+  var n2=(document.getElementById('acp-new2')||{}).value||'';
+  var errEl=document.getElementById('acp-err'); if(errEl){errEl.style.display='none';}
+  hide('acp-ok');
+  var cur=localStorage.getItem('asppi_admin_custom_pwd')||'Asppi2025!';
+  if(o!==cur){if(errEl){errEl.textContent='Password attuale non corretta';errEl.style.display='';}return;}
+  if(n.length<8){if(errEl){errEl.textContent='Minimo 8 caratteri';errEl.style.display='';}return;}
+  if(n!==n2){if(errEl){errEl.textContent='Le due password non coincidono';errEl.style.display='';}return;}
   localStorage.setItem('asppi_admin_custom_pwd',n);
   if(localStorage.getItem('asppi_admin_pwd'))localStorage.setItem('asppi_admin_pwd',n);
-  document.getElementById('acp-ok').style.display='';
+  show('acp-ok');
   document.getElementById('acp-old').value='';
   document.getElementById('acp-new').value='';
   document.getElementById('acp-new2').value='';
