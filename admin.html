@@ -215,6 +215,7 @@ select.inp{cursor:pointer;}
     </div></div>
     <div class="card"><div class="cb"><div class="sec">LOCATORI</div><div id="opr-locs"></div></div></div>
     <div class="card"><div class="cb"><div class="sec">CONDUTTORI</div><div id="opr-cons"></div></div></div>
+    <div class="card"><div class="cb"><div class="sec">ALTRI DATI CONTRATTO</div><div id="opr-extra"></div></div></div>
   </div>
   <div id="tab-chat-body" style="display:none">
     <div class="cms" id="admin-msgs"></div>
@@ -273,16 +274,61 @@ function nomeContratto(c) {
 }
 function parsePeople(json) {
   var arr = []; try { arr = JSON.parse(json||'[]'); } catch(e) {}
-  if (!arr.length) return '<div class="val">—</div>';
+  if (!arr.length) return '<div class="val" style="color:#C0392B">Dati non inseriti</div>';
   var h = '';
   for (var i=0; i<arr.length; i++) {
     var p = arr[i];
-    h += '<div style="background:#F8F7F5;border-radius:10px;padding:12px;margin-bottom:8px">'
-      + '<div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:6px">N.'+(i+1)+'</div>'
-      + '<div class="lbl">Nome</div><div class="val">'+(p.cognome||'')+' '+(p.nome||'')+'</div>'
-      + '<div class="lbl">CF</div><div class="val" style="font-family:monospace">'+(p.cf||'—')+'</div>'
-      + (p.quota ? '<div class="lbl">Quota</div><div class="val">'+p.quota+'%</div>' : '')
-      + '</div>';
+    // Anagrafica
+    var cognome = p.cognome||'';
+    var nome    = p.nome||'';
+    var cf      = p.cf||'';
+    var luogo   = p.luogoNascita||'';
+    var dataN   = p.dataNascita||'';
+    var res     = p.comuneResidenza||'';
+    var via     = p.viaResidenza||p.via||'';
+    // Ruolo
+    var titolo  = p.titolo||'';
+    var quota   = p.quota||'';
+    var ced     = p.cedolare||'';
+    var mot     = p.mot||p.motivoTransitorieta||'';
+    var cr2     = p.cr2||'';
+    // Documento
+    var docTipo = p.docTipo||p.doctipo||'';
+    var docNum  = p.docNum||p.docnum||'';
+    var docRil  = p.docRilascio||p.docril||'';
+    var docSca  = p.docScadenza||p.docsca||'';
+    var docEnte = p.docEnte||p.docente||'';
+
+    h += '<div style="background:#F8F7F5;border-radius:10px;padding:14px;margin-bottom:10px">';
+    h += '<div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:10px">SOGGETTO N.'+(i+1)+'</div>';
+
+    // Sempre visibili anche se vuoti
+    h += '<div class="lbl">Cognome</div><div class="val">'+(cognome||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Nome</div><div class="val">'+(nome||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Codice Fiscale</div><div class="val" style="font-family:monospace">'+(cf||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Luogo di nascita</div><div class="val">'+(luogo||'<span style="color:#8A8A8A">—</span>')+'</div>';
+    h += '<div class="lbl">Data di nascita</div><div class="val">'+(dataN||'<span style="color:#8A8A8A">—</span>')+'</div>';
+    h += '<div class="lbl">Comune di residenza</div><div class="val">'+(res||'<span style="color:#8A8A8A">—</span>')+'</div>';
+    h += '<div class="lbl">Via e n. civico</div><div class="val">'+(via||'<span style="color:#8A8A8A">—</span>')+'</div>';
+
+    if (titolo||quota||ced) {
+      h += '<div style="font-size:10px;font-weight:700;color:#1A5FA8;margin:10px 0 6px;text-transform:uppercase">RUOLO</div>';
+      if (titolo) h += '<div class="lbl">Titolo proprieta</div><div class="val">'+titolo+'</div>';
+      if (quota)  h += '<div class="lbl">Quota</div><div class="val">'+quota+'%</div>';
+      if (ced)    h += '<div class="lbl">Cedolare secca</div><div class="val">'+ced+'</div>';
+    }
+    if (mot) h += '<div class="lbl">Motivo transitorieta</div><div class="val">'+mot+'</div>';
+    if (cr2) h += '<div class="lbl">Conduttore riferimento</div><div class="val">'+cr2+'</div>';
+
+    // Documento
+    h += '<div style="font-size:10px;font-weight:700;color:#1A5FA8;margin:10px 0 6px;text-transform:uppercase">DOCUMENTO DI RICONOSCIMENTO</div>';
+    h += '<div class="lbl">Tipo</div><div class="val">'+(docTipo||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Numero</div><div class="val" style="font-family:monospace">'+(docNum||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Data rilascio</div><div class="val">'+(docRil||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Data scadenza</div><div class="val">'+(docSca||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Rilasciato da</div><div class="val">'+(docEnte||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+
+    h += '</div>';
   }
   return h;
 }
@@ -532,6 +578,20 @@ function apriPrat(id) {
   setText('opr-dep', c.depositoImporto?'€ '+c.depositoImporto:'—');
   document.getElementById('opr-locs').innerHTML = parsePeople(c.locatoriJSON);
   document.getElementById('opr-cons').innerHTML = parsePeople(c.conduttoriJSON);
+  // Mostra dati aggiuntivi se presenti
+  var extra = document.getElementById('opr-extra');
+  if (extra) {
+    var eh = '';
+    if (c.apeClasse)       eh += '<div class="lbl">Classe APE</div><div class="val">'+c.apeClasse+'</div>';
+    if (c.apeNumero)       eh += '<div class="lbl">N. Certificato APE</div><div class="val">'+c.apeNumero+'</div>';
+    if (c.canoneIBAN)      eh += '<div class="lbl">IBAN Locatore</div><div class="val" style="font-family:monospace">'+c.canoneIBAN+'</div>';
+    if (c.depositoMesi)    eh += '<div class="lbl">Deposito (mesi)</div><div class="val">'+c.depositoMesi+'</div>';
+    if (c.oneriMensili)    eh += '<div class="lbl">Oneri mensili</div><div class="val">€ '+c.oneriMensili+'</div>';
+    if (c.note)            eh += '<div class="lbl">Note</div><div class="val">'+c.note+'</div>';
+    if (c.taj)             eh += '<div class="lbl">TAJ</div><div class="val" style="font-family:monospace">'+c.taj+'</div>';
+    if (c.nomeContratto)   eh += '<div class="lbl">Nome file contratto</div><div class="val" style="font-family:monospace">'+c.nomeContratto+'</div>';
+    extra.innerHTML = eh || '<div class="val">—</div>';
+  }
   hide('opr-ok');
   var modDiv = document.getElementById('opr-modificato');
   if (c.modificato) {

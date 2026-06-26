@@ -1001,7 +1001,13 @@ function pbBlock(t,i) {
     +'<div><label class="lbl">Data nascita</label><input type="text" class="inp pb-dtn" placeholder="01/01/1980"/></div></div>'
     +'<label class="lbl">Codice Fiscale</label><input type="text" class="inp pb-cf" placeholder="RSSMRA80A01G878X" style="font-family:monospace"/>'
     +'<label class="lbl">Comune residenza</label><input type="text" class="inp pb-res" placeholder="L\'AQUILA"/>'
-    +'<label class="lbl">Via e n. civico</label><input type="text" class="inp pb-via" placeholder="VIA ROMA 1"/>';
+    +'<label class="lbl">Via e n. civico</label><input type="text" class="inp pb-via" placeholder="VIA ROMA 1"/>'
+    +'<div class="sec" style="margin-top:4px;margin-bottom:8px">DOCUMENTO DI RICONOSCIMENTO</div>'
+    +'<label class="lbl">Tipo documento</label><select class="inp pb-doctipo"><option value="">-- Seleziona --</option><option>Carta di identita</option><option>Passaporto</option><option>Patente di guida</option></select>'
+    +'<label class="lbl">Numero documento</label><input type="text" class="inp pb-docnum" placeholder="CA00000AA"/>'
+    +'<div class="g2"><div><label class="lbl">Data rilascio</label><input type="text" class="inp pb-docril" placeholder="gg/mm/aaaa"/></div>'
+    +'<div><label class="lbl">Data scadenza</label><input type="text" class="inp pb-docsca" placeholder="gg/mm/aaaa"/></div></div>'
+    +'<label class="lbl">Rilasciato da</label><input type="text" class="inp pb-docente" placeholder="Comune di L'AQUILA"/>';
   if(isL) h+='<label class="lbl">Titolo</label><input type="text" class="inp pb-tit" placeholder="Proprietario"/>'
     +'<div class="g2"><div><label class="lbl">Quota %</label><input type="text" class="inp pb-quo" placeholder="100"/></div>'
     +'<div><label class="lbl">Cedolare</label><select class="inp pb-ced"><option>Si</option><option>No</option></select></div></div>';
