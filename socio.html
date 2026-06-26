@@ -998,15 +998,15 @@ function pbBlock(t,i) {
     +'<label class="lbl">Cognome</label><input type="text" class="inp pb-cog" placeholder="ROSSI"/>'
     +'<label class="lbl">Nome</label><input type="text" class="inp pb-nom" placeholder="MARIO"/>'
     +'<div class="g2"><div><label class="lbl">Luogo nascita</label><input type="text" class="inp pb-lng" placeholder="L AQUILA"/></div>'
-    +'<div><label class="lbl">Data nascita</label><input type="text" class="inp pb-dtn" placeholder="01/01/1980"/></div></div>'
+    +'<div><label class="lbl">Data nascita</label><input type="text" class="inp pb-dtn" placeholder="01/01/1980" maxlength="10" oninput="autoDate(this)"/></div></div>'
     +'<label class="lbl">Codice Fiscale</label><input type="text" class="inp pb-cf" placeholder="RSSMRA80A01G878X" style="font-family:monospace"/>'
     +'<label class="lbl">Comune residenza</label><input type="text" class="inp pb-res" placeholder="L AQUILA"/>'
     +'<label class="lbl">Via e n. civico</label><input type="text" class="inp pb-via" placeholder="VIA ROMA 1"/>'
     +'<div class="sec" style="margin-top:4px;margin-bottom:8px">DOCUMENTO DI RICONOSCIMENTO</div>'
     +'<label class="lbl">Tipo documento</label><select class="inp pb-doctipo"><option value="">-- Seleziona --</option><option>Carta di identita</option><option>Passaporto</option><option>Patente di guida</option></select>'
     +'<label class="lbl">Numero documento</label><input type="text" class="inp pb-docnum" placeholder="CA00000AA"/>'
-    +'<div class="g2"><div><label class="lbl">Data rilascio</label><input type="text" class="inp pb-docril" placeholder="gg/mm/aaaa"/></div>'
-    +'<div><label class="lbl">Data scadenza</label><input type="text" class="inp pb-docsca" placeholder="gg/mm/aaaa"/></div></div>'
+    +'<div class="g2"><div><label class="lbl">Data rilascio</label><input type="text" class="inp pb-docril" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/></div>'
+    +'<div><label class="lbl">Data scadenza</label><input type="text" class="inp pb-docsca" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/></div></div>'
     +'<label class="lbl">Rilasciato da</label><input type="text" class="inp pb-docente" placeholder="Comune di L&apos;AQUILA"/>';
   if(isL) h+='<label class="lbl">Titolo</label><input type="text" class="inp pb-tit" placeholder="Proprietario"/>'
     +'<div class="g2"><div><label class="lbl">Quota %</label><input type="text" class="inp pb-quo" placeholder="100"/></div>'
@@ -1057,11 +1057,55 @@ function calcAnn() {
   if(m>0&&v>0){var a=(v*m).toFixed(2).replace('.',',');var el=T('c2b');if(el)el.value=a;ncntD.canoneAnnuale=a;}
 }
 
+function leggiPersone(t) {
+  var map = {l:'nlocs', c:'ncons', g:'ngars'};
+  var arr = t==='l' ? ncntD.locatori : t==='c' ? ncntD.conduttori : ncntD.garanti;
+  var container = T(map[t]);
+  if (!container) return;
+  var blocks = container.querySelectorAll('.pb');
+  for (var i=0; i<blocks.length && i<arr.length; i++) {
+    var b = blocks[i];
+    var get = function(cls){ var el=b.querySelector('.'+cls); return el?el.value||'':''; };
+    arr[i].cognome       = get('pb-cog');
+    arr[i].nome          = get('pb-nom');
+    arr[i].luogoNascita  = get('pb-lng');
+    arr[i].dataNascita   = get('pb-dtn');
+    arr[i].cf            = get('pb-cf');
+    arr[i].comuneResidenza = get('pb-res');
+    arr[i].viaResidenza  = get('pb-via');
+    // Documento
+    var docTipoEl = b.querySelector('.pb-doctipo');
+    arr[i].docTipo    = docTipoEl ? docTipoEl.value||'' : '';
+    arr[i].docNum     = get('pb-docnum');
+    arr[i].docRilascio= get('pb-docril');
+    arr[i].docScadenza= get('pb-docsca');
+    arr[i].docEnte    = get('pb-docente');
+    // Locatore specifico
+    if (t==='l') {
+      arr[i].titolo   = get('pb-tit');
+      arr[i].quota    = get('pb-quo');
+      var cedEl = b.querySelector('.pb-ced');
+      arr[i].cedolare = cedEl ? cedEl.value||'' : '';
+    }
+    // Conduttore specifico
+    if (t==='c') {
+      arr[i].mot = get('pb-mot');
+    }
+    // Garante specifico
+    if (t==='g') {
+      arr[i].cr2 = get('pb-cr2');
+    }
+  }
+}
+
 function ncntAvanti() {
   if(ncntStep===0){ncntD.tipo=(document.querySelector('input[name="ntipo"]:checked')||{}).value||'';if(!ncntD.tipo){alert('Seleziona il tipo');return;}}
   if(ncntStep===1){ncntD.duraDal=(T('c1a')||{}).value||'';ncntD.duraAl=(T('c1b')||{}).value||'';ncntD.duraMesi=(T('c1c')||{}).value||'';if(!ncntD.duraDal||!ncntD.duraAl){alert('Inserisci le date');return;}}
   if(ncntStep===2){ncntD.canoneMensile=(T('c2a')||{}).value||'';ncntD.canoneAnnuale=(T('c2b')||{}).value||'';ncntD.canoneIBAN=(T('c2c')||{}).value||'';ncntD.depositoImporto=(T('c2d')||{}).value||'';ncntD.depositoMesi=(T('c2e')||{}).value||'';ncntD.oneriMensili=(T('c2f')||{}).value||'';if(!ncntD.canoneMensile){alert('Inserisci il canone');return;}}
   if(ncntStep===3){ncntD.apeNumero=(T('c3a')||{}).value||'';ncntD.apeClasse=(T('c3b')||{}).value||'';ncntD.compCamere=(T('c3c')||{}).value||'';ncntD.compCucina=(T('c3d')||{}).value||'';ncntD.compBagni=(T('c3e')||{}).value||'';ncntD.compBalconi=(T('c3f')||{}).value||'';}
+  if(ncntStep===4){ leggiPersone('l'); }
+  if(ncntStep===5){ leggiPersone('c'); }
+  if(ncntStep===6){ leggiPersone('g'); }
   if(ncntStep===7){ncntD.note=(T('c7a')||{}).value||'';}
   if(ncntStep===8){
     if(!ncntD.g1||!ncntD.g2||!ncntD.g3||!ncntD.g4){alert('Devi accettare tutti e 4 i consensi GDPR');return;}
