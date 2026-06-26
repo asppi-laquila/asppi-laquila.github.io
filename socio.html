@@ -858,7 +858,7 @@ function apriNuovoCnt() {
 
 function eliminaCnt() {
   if (!curCnt) return;
-  if (!confirm('Sei sicuro di voler eliminare questa pratica? L'operazione non e' reversibile.')) return;
+  if (!confirm('Sei sicuro di voler eliminare questa pratica? Operazione non reversibile.')) return;
   curCnt.eliminato = true;
   api('saveContratto', {data: curCnt}, function(err, r) {
     if (!err && r && r.ok) {
