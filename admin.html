@@ -204,6 +204,7 @@ select.inp{cursor:pointer;}
       </select>
       <button class="bp" id="btn-aggiorna-stato">Aggiorna stato</button>
       <div class="infog" id="opr-ok" style="display:none;margin-top:8px">&#9989; Stato aggiornato!</div>
+      <button class="bs" id="btn-elimina-prat" style="color:#C0392B;border-color:#FDEEEC;margin-top:8px">&#128465; Elimina pratica</button>
     </div></div>
     <div class="card"><div class="cb">
       <div class="sec">DURATA E CANONE</div>
@@ -302,6 +303,7 @@ function bindEvents() {
   document.getElementById('btn-cancella-pren').addEventListener('click', cancellaPren);
   // Prat
   document.getElementById('btn-aggiorna-stato').addEventListener('click', aggiornaPrat);
+  document.getElementById('btn-elimina-prat').addEventListener('click', eliminaPrat);
   document.getElementById('tab-dati').addEventListener('click', function(){ switchTab('dati'); });
   document.getElementById('tab-chat').addEventListener('click', function(){ switchTab('chat'); });
   // Chat
@@ -409,7 +411,7 @@ function carica() {
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome() {
   setText('sh-app', D.prenotazioni.filter(function(p){ return p.stato==='confermata'; }).length);
-  setText('sh-att', D.contratti.filter(function(c){ return c.stato==='richiesta'; }).length);
+  setText('sh-att', D.contratti.filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && c.eliminato!=='true'; }).length);
   // Prenotazioni
   var hp = document.getElementById('h-prens'); if(!hp) return;
   var prens = D.prenotazioni.filter(function(p){ return p.stato==='confermata'; }).slice(0,3);
@@ -472,6 +474,20 @@ function cancellaPren() {
   });
 }
 
+function eliminaPrat() {
+  var c2 = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){c2=D.contratti[i];break;} }
+  if (!c2) return;
+  if (!confirm('Eliminare definitivamente questa pratica?')) return;
+  c2.eliminato = true;
+  apiCall('saveContratto', {data: c2}, function(err, r) {
+    if (!err && r && r.ok) {
+      chiudi('ov-prat');
+      carica();
+      alert('Pratica eliminata.');
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
 // ── PRATICHE ─────────────────────────────────────────────────
 function makePratCard(c) {
   var col = statoCol(c.stato);
@@ -493,7 +509,7 @@ function makePratCard(c) {
 
 function renderPrat() {
   var el = document.getElementById('l-prat'); if(!el) return;
-  var list = D.contratti;
+  var list = D.contratti.filter(function(c){ return c.eliminato!==true && c.eliminato!=='true'; });
   if (pratFiltro !== 'tutte') list = list.filter(function(c){ return c.stato===pratFiltro; });
   el.innerHTML = '';
   if (!list.length) { el.innerHTML='<div class="info">Nessuna pratica trovata.</div>'; return; }

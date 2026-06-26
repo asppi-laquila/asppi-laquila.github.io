@@ -49,14 +49,14 @@ textarea.inp{min-height:100px;resize:vertical;}
 .prog{display:flex;gap:4px;padding:10px 16px;background:#fff;border-bottom:1px solid #e5e5e5;}
 .pd{flex:1;height:4px;border-radius:4px;}
 .snav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid #e5e5e5;padding:12px 16px 20px;}
-.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px;}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px;max-width:420px;}
 .cl{text-align:center;font-size:11px;font-weight:600;color:#8A8A8A;padding:6px 0;}
 .cd{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:13px;}
 .cd.av{color:#1A1A1A;font-weight:600;cursor:pointer;}
 .cd.un{color:#e5e5e5;}
 .cd.sel{background:#E8631A;color:#fff;font-weight:800;}
 .cd.tod{border:1.5px solid #E8631A;color:#E8631A;font-weight:700;}
-.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;max-width:420px;}
 .sb{padding:10px 0;text-align:center;border-radius:10px;border:1.5px solid #e5e5e5;font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:#1A1A1A;}
 .sb.sel{background:#E8631A;color:#fff;border-color:#E8631A;}
 .sb.bsy{background:#F8F7F5;color:#e5e5e5;border-color:#e5e5e5;text-decoration:line-through;cursor:not-allowed;}
@@ -118,6 +118,7 @@ textarea.inp{min-height:100px;resize:vertical;}
 <div id="p-prenota" class="pg">
   <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:4px">Prenota appuntamento</div>
   <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px">Scegli giorno e orario</div>
+  <div style="max-width:500px">
   <div id="p-cal-ok" style="display:none;text-align:center;padding:40px 20px">
     <div style="font-size:56px;margin-bottom:16px">&#9989;</div>
     <div style="font-size:20px;font-weight:800;color:#1A1A1A;margin-bottom:8px">Appuntamento confermato!</div>
@@ -152,6 +153,7 @@ textarea.inp{min-height:100px;resize:vertical;}
         <button class="bp" id="btn-conf-pren">Conferma appuntamento</button>
       </div></div>
     </div>
+  </div>
   </div>
 </div>
 
@@ -241,6 +243,7 @@ textarea.inp{min-height:100px;resize:vertical;}
     <div class="row" id="btn-cessione"><div class="bar"></div><div class="rb"><div class="rt">&#128228; Cessione</div><div class="rs">Cede il contratto a terzi</div></div><div style="display:flex;align-items:center;padding-right:14px;color:#8A8A8A">&#8250;</div></div>
     <button class="bs" id="btn-chat-cnt">&#128172; Chat con lo studio</button>
     <button class="bs" id="btn-modifica-cnt" style="color:#1A5FA8;border-color:#EBF2FB">&#9998; Modifica contratto</button>
+    <button class="bs" id="btn-elimina-cnt" style="color:#C0392B;border-color:#FDEEEC">&#128465; Elimina pratica</button>
   </div>
 </div>
 
@@ -484,6 +487,7 @@ function bindAll() {
   T('btn-cessione').addEventListener('click', function(){ apriAdm('cessione'); });
   T('btn-chat-cnt').addEventListener('click', function(){ if(curCnt) apriChatCnt(curCnt.id); });
   T('btn-modifica-cnt').addEventListener('click', modificaCnt);
+  T('btn-elimina-cnt').addEventListener('click', eliminaCnt);
   // Ncnt
   T('btn-ncnt-back').addEventListener('click', ncntBack);
   T('ncnt-btn').addEventListener('click', ncntAvanti);
@@ -522,11 +526,12 @@ function renderHome() {
   var el = T('hpratiche');
   if (!el) return;
   el.innerHTML = '';
-  if (!D.contratti.length) {
+  var cntAttivi = D.contratti.filter(function(c){ return c.eliminato!==true && c.eliminato!=='true'; });
+  if (!cntAttivi.length) {
     el.innerHTML = '<div class="info">Nessuna pratica ancora. Aggiungi un immobile per iniziare.</div>';
     return;
   }
-  var list = D.contratti.slice(0,5);
+  var list = cntAttivi.slice(0,5);
   for (var i=0; i<list.length; i++) {
     var ct = list[i];
     var col = ct.stato==='completato' ? '#2D7A4F' : ct.stato==='lavorazione' ? '#1A5FA8' : '#E8631A';
@@ -569,7 +574,7 @@ function renderImmobili() {
   }
   for (var i=0; i<lista.length; i++) {
     var a = lista[i];
-    var cnts = D.contratti.filter(function(c){ return c.appartamentoId===a.id; });
+    var cnts = D.contratti.filter(function(c){ return c.appartamentoId===a.id && c.eliminato!==true && c.eliminato!=='true'; });
     var att = cnts.filter(function(c){ return c.stato!=='completato'; }).length > 0;
     var col = att ? '#2D7A4F' : '#8A8A8A';
     var div = document.createElement('div'); div.className='row';
@@ -849,6 +854,22 @@ function apriNuovoCnt() {
   ST('ncnt-lbl', curApt?curApt.nome:'NUOVO CONTRATTO');
   renderNcnt();
   apriOv('ov-ncnt');
+}
+
+function eliminaCnt() {
+  if (!curCnt) return;
+  if (!confirm('Sei sicuro di voler eliminare questa pratica? L'operazione non e' reversibile.')) return;
+  curCnt.eliminato = true;
+  api('saveContratto', {data: curCnt}, function(err, r) {
+    if (!err && r && r.ok) {
+      chiudiOv('ov-cnt');
+      chiudiOv('ov-apt');
+      caricaDati();
+      alert('Pratica eliminata.');
+    } else {
+      alert('Errore: ' + ((r && r.error) || err || 'Riprova'));
+    }
+  });
 }
 
 function modificaCnt() {
