@@ -482,7 +482,7 @@ window.onload = function() {
   if (!S.user.userId && S.userId) S.user.userId = S.userId;
   // Se user ha nome direttamente (nuovo formato da index.html)
   // {token:..., user:{ok:true, token:..., userId:..., nome:..., email:...}}
-  var nome = S.user.nome || '';
+  var nome = S.user.displayName || S.user.nome || '';
   var email = S.user.email || '';
 
   document.getElementById('tnome').textContent = nome || email || 'Socio';
