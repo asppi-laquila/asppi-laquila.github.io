@@ -1372,7 +1372,7 @@ function renderSoci(query, campo) {
       +'<input type="text" id="pp-imp-'+u.id+'" placeholder="€ Importo" style="width:90px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px"/>'
       +'</div>'
       +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
-      +'<select id="pp-stato-'+u.id+'" onchange="togglePanelDettagli(''+u.id+'')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px">'
+      +'<select id="pp-stato-'+u.id+'" data-uid="'+u.id+'" class="pp-stato-sel" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px">'
       +'<option value="dovuto">Da pagare</option>'
       +'<option value="confermato">Gia pagato</option>'
       +'</select>'
@@ -1389,13 +1389,13 @@ function renderSoci(query, campo) {
       panel.innerHTML += '<div style="background:#EBF2FB;border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px;color:#1A5FA8">'
         +'&#9888; Bonifico dichiarato il '+(pagBon?pagBon.dataPagamento:'')
         +' — Rif: '+(pagBon&&pagBon.riferimentoBonifico?pagBon.riferimentoBonifico:'non indicato')
-        +'<button onclick="confermaBonificoDiretto(''+u.id+'',''+(pagBon?pagBon.id:'')+'',this)" style="margin-left:8px;background:#2D7A4F;color:#fff;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">Conferma bonifico</button>'
+        +'<button class="pp-btn-conf" data-uid="'+u.id+'" data-pagid="'+(pagBon?pagBon.id:'')+'\" style="margin-left:8px;background:#2D7A4F;color:#fff;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">Conferma bonifico</button>'
         +'</div>';
     }
     
     panel.innerHTML += '<div style="display:flex;gap:6px">'
-      +'<button onclick="registraPagamentoDiretto(''+u.id+'')" style="flex:1;padding:8px;background:#E8631A;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Registra</button>'
-      +'<button onclick="chiudiPanelPag(''+u.id+'')" style="padding:8px 14px;background:#fff;color:#1A1A1A;border:1.5px solid #e5e5e5;border-radius:8px;font-size:13px;cursor:pointer">Annulla</button>'
+      +'<button class="pp-btn-reg" data-uid="'+u.id+'" style="flex:1;padding:8px;background:#E8631A;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Registra</button>'
+      +'<button class="pp-btn-close" data-uid="'+u.id+'" style="padding:8px 14px;background:#fff;color:#1A1A1A;border:1.5px solid #e5e5e5;border-radius:8px;font-size:13px;cursor:pointer">Annulla</button>'
       +'</div>'
       +'<div id="pp-ok-'+u.id+'" style="display:none;color:#2D7A4F;font-size:12px;font-weight:700;margin-top:6px">&#9989; Registrato!</div>';
     
@@ -1441,6 +1441,24 @@ function chiudiPanelPag(uid) {
   var panel = document.getElementById('pag-panel-'+uid);
   if(panel) panel.style.display='none';
 }
+
+// Event delegation for pagamenti panel buttons
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.classList.contains('pp-stato-sel')) {
+    togglePanelDettagli(e.target.getAttribute('data-uid'));
+  }
+});
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest ? e.target.closest('button') : e.target;
+  if (!btn) return;
+  if (btn.classList.contains('pp-btn-reg')) {
+    registraPagamentoDiretto(btn.getAttribute('data-uid'));
+  } else if (btn.classList.contains('pp-btn-close')) {
+    chiudiPanelPag(btn.getAttribute('data-uid'));
+  } else if (btn.classList.contains('pp-btn-conf')) {
+    confermaBonificoDiretto(btn.getAttribute('data-uid'), btn.getAttribute('data-pagid'), btn);
+  }
+});
 
 function togglePanelDettagli(uid) {
   var stato = (document.getElementById('pp-stato-'+uid)||{}).value||'dovuto';
@@ -1810,7 +1828,7 @@ function renderPagamenti(query, campo) {
       +'<input type="text" id="pp-imp-'+u.id+'" placeholder="€ Importo" style="width:90px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px"/>'
       +'</div>'
       +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
-      +'<select id="pp-stato-'+u.id+'" onchange="togglePanelDettagli(''+u.id+'')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px">'
+      +'<select id="pp-stato-'+u.id+'" data-uid="'+u.id+'" class="pp-stato-sel" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px">'
       +'<option value="dovuto">Da pagare</option>'
       +'<option value="confermato">Gia pagato</option>'
       +'</select>'
@@ -1827,13 +1845,13 @@ function renderPagamenti(query, campo) {
       panel.innerHTML += '<div style="background:#EBF2FB;border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px;color:#1A5FA8">'
         +'&#9888; Bonifico dichiarato il '+(pagBon?pagBon.dataPagamento:'')
         +' — Rif: '+(pagBon&&pagBon.riferimentoBonifico?pagBon.riferimentoBonifico:'non indicato')
-        +'<button onclick="confermaBonificoDiretto(''+u.id+'',''+(pagBon?pagBon.id:'')+'',this)" style="margin-left:8px;background:#2D7A4F;color:#fff;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">Conferma bonifico</button>'
+        +'<button class="pp-btn-conf" data-uid="'+u.id+'" data-pagid="'+(pagBon?pagBon.id:'')+'\" style="margin-left:8px;background:#2D7A4F;color:#fff;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">Conferma bonifico</button>'
         +'</div>';
     }
     
     panel.innerHTML += '<div style="display:flex;gap:6px">'
-      +'<button onclick="registraPagamentoDiretto(''+u.id+'')" style="flex:1;padding:8px;background:#E8631A;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Registra</button>'
-      +'<button onclick="chiudiPanelPag(''+u.id+'')" style="padding:8px 14px;background:#fff;color:#1A1A1A;border:1.5px solid #e5e5e5;border-radius:8px;font-size:13px;cursor:pointer">Annulla</button>'
+      +'<button class="pp-btn-reg" data-uid="'+u.id+'" style="flex:1;padding:8px;background:#E8631A;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Registra</button>'
+      +'<button class="pp-btn-close" data-uid="'+u.id+'" style="padding:8px 14px;background:#fff;color:#1A1A1A;border:1.5px solid #e5e5e5;border-radius:8px;font-size:13px;cursor:pointer">Annulla</button>'
       +'</div>'
       +'<div id="pp-ok-'+u.id+'" style="display:none;color:#2D7A4F;font-size:12px;font-weight:700;margin-top:6px">&#9989; Registrato!</div>';
     
@@ -1879,6 +1897,24 @@ function chiudiPanelPag(uid) {
   var panel = document.getElementById('pag-panel-'+uid);
   if(panel) panel.style.display='none';
 }
+
+// Event delegation for pagamenti panel buttons
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.classList.contains('pp-stato-sel')) {
+    togglePanelDettagli(e.target.getAttribute('data-uid'));
+  }
+});
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest ? e.target.closest('button') : e.target;
+  if (!btn) return;
+  if (btn.classList.contains('pp-btn-reg')) {
+    registraPagamentoDiretto(btn.getAttribute('data-uid'));
+  } else if (btn.classList.contains('pp-btn-close')) {
+    chiudiPanelPag(btn.getAttribute('data-uid'));
+  } else if (btn.classList.contains('pp-btn-conf')) {
+    confermaBonificoDiretto(btn.getAttribute('data-uid'), btn.getAttribute('data-pagid'), btn);
+  }
+});
 
 function togglePanelDettagli(uid) {
   var stato = (document.getElementById('pp-stato-'+uid)||{}).value||'dovuto';
