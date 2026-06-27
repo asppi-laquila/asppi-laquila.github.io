@@ -1476,7 +1476,7 @@ function exportPagamentiCSV() {
       item.saldo||0
     ]);
   });
-  var csv = rows.map(function(r){ return r.map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(','); }).join(nl);
+  var csv = csvEsporta(rows);
   var blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
   var url  = URL.createObjectURL(blob);
   var a    = document.createElement('a');
@@ -1747,6 +1747,17 @@ function cercaPratiche(query) {
 }
 
 // ── EXPORT EXCEL SOCI ─────────────────────────────────────────
+function csvEsporta(rows) {
+  var nl = String.fromCharCode(10);
+  var sep = ',';
+  return rows.map(function(r){
+    return r.map(function(v){
+      var s = String(v).split('"').join('""');
+      return '"' + s + '"';
+    }).join(sep);
+  }).join(nl);
+}
+
 function exportSociExcel() {
   var utenti = window._utentiData || [];
   if (!utenti.length) { alert('Nessun socio da esportare'); return; }
@@ -1757,7 +1768,7 @@ function exportSociExcel() {
   });
 
   // Crea CSV
-  var csv = rows.map(function(r){ return r.map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(','); }).join(nl);
+  var csv = csvEsporta(rows);
 
   var blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
   var url  = URL.createObjectURL(blob);
