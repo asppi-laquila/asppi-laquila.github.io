@@ -555,23 +555,23 @@ function bindEvents() {
   // Nav
   document.getElementById('nb-home').addEventListener('click', function(){ navTo('home'); });
   document.getElementById('nb-prat').addEventListener('click', function(){ navTo('prat'); });
-  document.getElementById('btn-export-soci').addEventListener('click', exportSociExcel);
+  if (document.getElementById('btn-export-soci')) document.getElementById('btn-export-soci').addEventListener('click', exportSociExcel);
   document.getElementById('nb-soci').addEventListener('click', function(){ navTo('soci'); caricaSoci(); });
-  document.getElementById('nb-pren') && document.getElementById('nb-pren').addEventListener('click', function(){ navTo('pren'); caricaPrenotazioni(); });
+  if (document.getElementById('nb-pren')) document.getElementById('nb-pren').addEventListener('click', function(){ navTo('pren'); caricaPrenotazioni(); });
   document.getElementById('nb-pag').addEventListener('click',  function(){ navTo('pag');  caricaPagamenti(); });
   document.getElementById('nb-srv').addEventListener('click', function(){ navTo('srv'); caricaServizi(); caricaTariffe(); });
   document.getElementById('nb-imp').addEventListener('click', function(){ navTo('imp'); caricaImpostazioni(); });
-  document.getElementById('btn-salva-tariffe').addEventListener('click', salvaTariffe);
-  document.getElementById('btn-nuovo-servizio').addEventListener('click', function(){ apriServizio(null); });
-  document.getElementById('btn-chiudi-servizio').addEventListener('click', function(){ chiudi('ov-servizio'); });
-  document.getElementById('btn-salva-servizio').addEventListener('click', salvaServizio);
-  document.getElementById('btn-elimina-servizio').addEventListener('click', eliminaServizioCorrente);
-  document.getElementById('btn-salva-doc').addEventListener('click', salvaDocumento);
+  if (document.getElementById('btn-salva-tariffe')) document.getElementById('btn-salva-tariffe').addEventListener('click', salvaTariffe);
+  if (document.getElementById('btn-nuovo-servizio')) document.getElementById('btn-nuovo-servizio').addEventListener('click', function(){ apriServizio(null); });
+  if (document.getElementById('btn-chiudi-servizio')) document.getElementById('btn-chiudi-servizio').addEventListener('click', function(){ chiudi('ov-servizio'); });
+  if (document.getElementById('btn-salva-servizio')) document.getElementById('btn-salva-servizio').addEventListener('click', salvaServizio);
+  if (document.getElementById('btn-elimina-servizio')) document.getElementById('btn-elimina-servizio').addEventListener('click', eliminaServizioCorrente);
+  if (document.getElementById('btn-salva-doc')) document.getElementById('btn-salva-doc').addEventListener('click', salvaDocumento);
   document.getElementById('btn-cambia-pwd-admin').addEventListener('click', cambiaPwdAdmin);
-  document.getElementById('btn-chiudi-socio').addEventListener('click', function(){ chiudi('ov-socio'); });
-  document.getElementById('btn-salva-tessera').addEventListener('click', salvaTessera);
-  document.getElementById('btn-registra-pag').addEventListener('click', registraPagamento);
-  document.getElementById('btn-elimina-socio').addEventListener('click', eliminaSocio);
+  if (document.getElementById('btn-chiudi-socio')) document.getElementById('btn-chiudi-socio').addEventListener('click', function(){ chiudi('ov-socio'); });
+  if (document.getElementById('btn-salva-tessera')) document.getElementById('btn-salva-tessera').addEventListener('click', salvaTessera);
+  if (document.getElementById('btn-registra-pag')) document.getElementById('btn-registra-pag').addEventListener('click', registraPagamento);
+  if (document.getElementById('btn-elimina-socio')) document.getElementById('btn-elimina-socio').addEventListener('click', eliminaSocio);
   // Overlay close
   document.getElementById('btn-chiudi-op').addEventListener('click', function(){ chiudi('ov-pren'); });
   document.getElementById('btn-chiudi-opr').addEventListener('click', function(){ chiudi('ov-prat'); });
