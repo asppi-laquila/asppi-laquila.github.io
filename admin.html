@@ -133,6 +133,10 @@ select.inp{cursor:pointer;}
   <!-- Alert urgenti -->
   <div id="h-alerts"></div>
 
+  <!-- Prossimi appuntamenti (nascosti ma usati da renderHome) -->
+  <div id="h-prens" style="display:none"></div>
+  <div id="h-prats" style="display:none"></div>
+
 
 <!-- PRENOTAZIONI -->
 <div id="p-pren" class="pg">
@@ -832,7 +836,7 @@ function esci() { localStorage.removeItem('asppi_admin_ok'); localStorage.remove
 
 // ── CARICA ────────────────────────────────────────────────────
 function carica() {
-  setText('h-prens', ''); document.getElementById('h-prens').innerHTML='<div class="info">Caricamento...</div>';
+  var hprens = document.getElementById('h-prens'); if(hprens) hprens.innerHTML='<div class="info">Caricamento...</div>';
   // Chiamate separate per evitare timeout
   apiCall('getPrenotazioni', {}, function(err, r) {
     D.prenotazioni = (!err && r && r.ok) ? (r.data||[]) : [];
@@ -3251,7 +3255,7 @@ function esci() { localStorage.removeItem('asppi_admin_ok'); localStorage.remove
 
 // ── CARICA ────────────────────────────────────────────────────
 function carica() {
-  setText('h-prens', ''); document.getElementById('h-prens').innerHTML='<div class="info">Caricamento...</div>';
+  var hprens = document.getElementById('h-prens'); if(hprens) hprens.innerHTML='<div class="info">Caricamento...</div>';
   // Chiamate separate per evitare timeout
   apiCall('getPrenotazioni', {}, function(err, r) {
     D.prenotazioni = (!err && r && r.ok) ? (r.data||[]) : [];
