@@ -988,7 +988,7 @@ function apriPrat(id) {
   hide('opr-ok');
   // Carica note interne
   var noteEl = document.getElementById('opr-note-interne');
-  if(noteEl) noteEl.value = ct.noteInterne||'';
+  if(noteEl) noteEl.value = c.noteInterne||'';
   hide('opr-note-ok');
   var modDiv = document.getElementById('opr-modificato');
   if (c.modificato) {
@@ -2078,7 +2078,7 @@ function caricaSlotAdmin() {
       });
     }
 
-    caricaChiusure();
+    caricaChiusureAdmin();
   });
 }
 
@@ -2605,6 +2605,44 @@ function cambiaPwdAdmin() {
   document.getElementById('acp-new').value='';
   document.getElementById('acp-new2').value='';
 }
+
+function caricaChiusureAdmin() {
+  apiCall('getChiusure', {}, function(err, r) {
+    var el = document.getElementById('slot-chiusure'); if(!el) return;
+    var ch = (!err&&r&&r.ok) ? r.data||[] : [];
+    if(!ch.length){ el.innerHTML='<div class="info" style="font-size:12px">Nessuna chiusura configurata.</div>'; return; }
+    el.innerHTML='';
+    ch.forEach(function(x){
+      var div=document.createElement('div');
+      div.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px;background:#FDF0E8;border-radius:8px;margin-bottom:6px';
+      var txt=document.createElement('div');
+      txt.innerHTML='<div style="font-size:13px;font-weight:700">'+x.dal+' - '+x.al+'</div>'
+        +'<div style="font-size:11px;color:#8A8A8A">'+(x.label||x.mot||'Chiusura')+'</div>';
+      var btn=document.createElement('button');
+      btn.innerHTML='&#128465;';
+      btn.style.cssText='background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px';
+      btn.addEventListener('click',(function(xid){return function(){ eliminaChiusuraAdmin(xid); };})(x.id));
+      div.appendChild(txt); div.appendChild(btn); el.appendChild(div);
+    });
+  });
+}
+
+function eliminaChiusuraAdmin(id) {
+  apiCall('eliminaChiusura', {id:id}, function(err,r){
+    if(!err&&r&&r.ok) caricaChiusureAdmin();
+    else alert('Errore eliminazione chiusura');
+  });
+}
+
+function salvaTuttiSlot() {
+  var durataGrid = document.getElementById('slot-durata-grid');
+  var durata = 30;
+  if (durataGrid) durataGrid.querySelectorAll('button').forEach(function(b){ if(b.getAttribute('data-on')==='1') durata=parseInt(b.getAttribute('data-durata'))||30; });
+  apiCall('saveSlot', {slotMatrix: slotMatrix, durata: durata}, function(err,r){
+    if(err||!r||!r.ok) alert('Errore salvataggio');
+  });
+}
+
 </script>
 </body>
 </html>
