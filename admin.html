@@ -137,11 +137,6 @@ select.inp{cursor:pointer;}
   <div id="h-prens" style="display:none"></div>
   <div id="h-prats" style="display:none"></div>
 
-
-<!-- PRENOTAZIONI -->
-<div id="p-pren" class="pg">
-  <div class="frow" id="pren-filtri"></div>
-  <div id="l-pren"><div class="info">Caricamento...</div></div>
 </div>
 
 <!-- PRATICHE -->
@@ -484,47 +479,6 @@ select.inp{cursor:pointer;}
   <div id="l-pren"><div class="info">Caricamento...</div></div>
 </div>
 
-<!-- SLOT -->
-<div id="p-slot" class="pg">
-  <div class="card"><div class="cb">
-    <div class="sec">GIORNI DI RICEVIMENTO</div>
-    <div class="grow" id="slot-giorni"></div>
-  </div></div>
-  <div class="card"><div class="cb">
-    <div class="sec">ORARI (ogni 30 min)</div>
-    <div class="sg" id="slot-orari"></div>
-  </div></div>
-  <div class="card"><div class="cb">
-    <div class="sec">PERIODI DI CHIUSURA</div>
-    <div id="slot-chiusure"></div>
-    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-      <input type="text" class="inp" id="ch-lbl" placeholder="Descrizione" style="flex:3;margin-bottom:0"/>
-      <input type="text" class="inp" id="ch-dal" placeholder="dal gg/mm/aaaa" style="flex:2;margin-bottom:0"/>
-      <input type="text" class="inp" id="ch-al"  placeholder="al gg/mm/aaaa"  style="flex:2;margin-bottom:0"/>
-      <button id="btn-add-ch" style="padding:8px 14px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">+</button>
-    </div>
-  </div></div>
-  <div class="card"><div class="cb">
-    <div class="sec">GIORNI SINGOLI BLOCCATI</div>
-    <div id="slot-bloccati"></div>
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <input type="text" class="inp" id="blocco-d" placeholder="gg/mm/aaaa" style="flex:1;margin-bottom:0"/>
-      <button id="btn-add-blocco" style="padding:8px 14px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer">+</button>
-    </div>
-  </div></div>
-  <div class="info">Le prenotazioni gia confermate non vengono cancellate automaticamente.</div>
-  <button class="bp" id="btn-salva-slot">Salva tutte le impostazioni</button>
-  <div class="infog" id="slot-ok" style="display:none;margin-top:8px">&#9989; Impostazioni salvate!</div>
-  <div class="card" style="margin-top:16px"><div class="cb">
-    <div class="sec">CAMBIO PASSWORD ADMIN</div>
-    <label class="lbl">Password attuale</label><input type="password" class="inp" id="acp-old" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"/>
-    <label class="lbl">Nuova password (min. 8 caratteri)</label><input type="password" class="inp" id="acp-new" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"/>
-    <label class="lbl">Conferma nuova password</label><input type="password" class="inp" id="acp-new2" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"/>
-    <div class="infor" id="acp-err" style="display:none"></div>
-    <div class="infog" id="acp-ok" style="display:none">&#9989; Password aggiornata!</div>
-    <button class="bp" id="btn-cambia-pwd-admin" style="background:#0D1B2A">Aggiorna password</button>
-  </div></div>
-</div>
 
 <!-- OV PRENOTAZIONE -->
 <div id="ov-pren" class="ov">
