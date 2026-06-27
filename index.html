@@ -328,7 +328,18 @@ async function doLogin() {
     localStorage.setItem('asppi_session', JSON.stringify({token:res.token, user:res}));
     window.location.href = 'socio.html';
   } else {
-    showErr('acc-err', res.error || 'Credenziali non valide');
+    var errEl = document.getElementById('acc-err');
+    var msg = res.error || 'Credenziali non valide';
+    if (errEl) {
+      errEl.textContent = msg;
+      errEl.style.display = 'block';
+      errEl.style.background = '#FDEEEC';
+      errEl.style.color = '#C0392B';
+      errEl.style.padding = '10px 14px';
+      errEl.style.borderRadius = '10px';
+      errEl.style.marginBottom = '12px';
+      errEl.style.fontSize = '13px';
+    }
   }
 }
 

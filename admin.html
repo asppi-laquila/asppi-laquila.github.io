@@ -224,6 +224,7 @@ select.inp{cursor:pointer;}
       <input type="text" class="inp" id="os-pag-data" placeholder="gg/mm/aaaa"/>
       <div class="infog" id="os-pag-ok" style="display:none">&#9989; Pagamento registrato!</div>
       <button class="bp" id="btn-registra-pag">Registra pagamento</button>
+      <button class="bs" id="btn-promemoria-singolo" style="margin-top:8px">&#128232; Invia promemoria a questo socio</button>
     </div></div>
     <div class="card"><div class="cb">
       <div class="sec">STORICO PAGAMENTI</div>
@@ -620,6 +621,7 @@ function bindEvents() {
   if (document.getElementById('btn-chiudi-socio')) document.getElementById('btn-chiudi-socio').addEventListener('click', function(){ chiudi('ov-socio'); });
   if (document.getElementById('btn-salva-tessera')) document.getElementById('btn-salva-tessera').addEventListener('click', salvaTessera);
   if (document.getElementById('btn-registra-pag')) document.getElementById('btn-registra-pag').addEventListener('click', registraPagamento);
+  if (document.getElementById('btn-promemoria-singolo')) document.getElementById('btn-promemoria-singolo').addEventListener('click', inviaPromemoriasingolo);
   if (document.getElementById('btn-elimina-socio')) document.getElementById('btn-elimina-socio').addEventListener('click', eliminaSocio);
   // Overlay close
   document.getElementById('btn-chiudi-op').addEventListener('click', function(){ chiudi('ov-pren'); });
@@ -1512,6 +1514,17 @@ function inviaPromemoria() {
   });
 }
 
+function inviaPromemoriasingolo() {
+  if (!curSocioId) return;
+  var u = (window._utentiData||[]).filter(function(x){ return x.id===curSocioId; })[0];
+  var nome = u ? (u.displayName||u.nome||'questo socio') : 'questo socio';
+  if (!confirm('Inviare promemoria pagamento a '+nome+'?')) return;
+  apiCall('inviaPromemoriaSingolo', {userId: curSocioId}, function(err,r){
+    if(!err&&r&&r.ok){ alert('Promemoria inviato!'); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
 function exportPagamentiCSV() {
   var lista = window._pagListaFiltrata || window._econData || [];
   if (!lista.length) { alert('Nessun dato da esportare'); return; }
@@ -1892,6 +1905,29 @@ function cercaPratiche(query) {
 }
 
 // ── EXPORT EXCEL SOCI ─────────────────────────────────────────
+function scaricaExcel(rows, nomeFile) {
+  // Crea file HTML che Excel apre come foglio di calcolo con filtri
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>';
+  html += '<table border="1" style="border-collapse:collapse">';
+  rows.forEach(function(row, idx){
+    html += '<tr>';
+    row.forEach(function(cell){
+      var tag = idx===0 ? 'th' : 'td';
+      var style = idx===0 ? 'style="background:#E8631A;color:white;padding:6px 10px;font-weight:bold"' : 'style="padding:5px 10px"';
+      html += '<'+tag+' '+style+'>'+String(cell).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</'+tag+'>';
+    });
+    html += '</tr>';
+  });
+  html += '</table></body></html>';
+  var blob = new Blob([html], {type:'application/vnd.ms-excel;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = nomeFile+'_'+new Date().toISOString().substring(0,10)+'.xls';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function csvEsporta(rows) {
   var nl = String.fromCharCode(10);
   var sep = ',';
