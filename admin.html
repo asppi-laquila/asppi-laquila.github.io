@@ -1384,8 +1384,10 @@ function renderSoci(query, campo) {
       +'</div>';
     
     // Se ha bonifico dichiarato, mostra bottone conferma
-    if (bonDichiarato) {
-      var pagBon = item.pagamenti.find(function(p){ return p.stato==='bonifico_dichiarato'; });
+    var econItem = (window._econData||[]).find(function(e){ return e.socio && e.socio.id===u.id; });
+    var bonDichiarato2 = econItem && econItem.pagamenti && econItem.pagamenti.some(function(p){ return p.stato==='bonifico_dichiarato'; });
+    if (bonDichiarato2) {
+      var pagBon = econItem.pagamenti.find(function(p){ return p.stato==='bonifico_dichiarato'; });
       panel.innerHTML += '<div style="background:#EBF2FB;border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px;color:#1A5FA8">'
         +'&#9888; Bonifico dichiarato il '+(pagBon?pagBon.dataPagamento:'')
         +' — Rif: '+(pagBon&&pagBon.riferimentoBonifico?pagBon.riferimentoBonifico:'non indicato')
@@ -1790,7 +1792,8 @@ function renderPagamenti(query, campo) {
     var importoEl = document.createElement('span'); importoEl.style.cssText='font-size:15px;font-weight:800;color:'+col;
     importoEl.textContent = item.saldo>0 ? '€'+item.saldo+' dovuti' : '✅ In regola';
     var rs = document.createElement('div'); rs.className='rs';
-    rs.textContent = (u.email||'') + (bonDichiarato?' · ⚠️ Bonifico da verificare':'');
+    var bonCheck = (window._econData||[]).some(function(e){ return e.socio && e.socio.id===u.id && e.pagamenti && e.pagamenti.some(function(p){ return p.stato==='bonifico_dichiarato'; }); });
+    rs.textContent = (u.email||'') + (bonCheck?' · ⚠️ Bonifico da verificare':'');
     var right = document.createElement('div'); right.style.cssText='display:flex;flex-direction:column;align-items:flex-end;padding:10px;gap:6px;justify-content:center';
     right.appendChild(importoEl);
     if (item.saldo > 0) {
@@ -1840,8 +1843,10 @@ function renderPagamenti(query, campo) {
       +'</div>';
     
     // Se ha bonifico dichiarato, mostra bottone conferma
-    if (bonDichiarato) {
-      var pagBon = item.pagamenti.find(function(p){ return p.stato==='bonifico_dichiarato'; });
+    var econItem = (window._econData||[]).find(function(e){ return e.socio && e.socio.id===u.id; });
+    var bonDichiarato2 = econItem && econItem.pagamenti && econItem.pagamenti.some(function(p){ return p.stato==='bonifico_dichiarato'; });
+    if (bonDichiarato2) {
+      var pagBon = econItem.pagamenti.find(function(p){ return p.stato==='bonifico_dichiarato'; });
       panel.innerHTML += '<div style="background:#EBF2FB;border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px;color:#1A5FA8">'
         +'&#9888; Bonifico dichiarato il '+(pagBon?pagBon.dataPagamento:'')
         +' — Rif: '+(pagBon&&pagBon.riferimentoBonifico?pagBon.riferimentoBonifico:'non indicato')
