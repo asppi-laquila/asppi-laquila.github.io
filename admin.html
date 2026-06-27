@@ -2574,102 +2574,91 @@ function exportSociExcel() {
 function generaDatiContratto() {
   var box = document.getElementById('dati-contratto-box');
   if (!box) return;
+  var NL = String.fromCharCode(10);
   
-  // Trova il contratto corrente
   var ct = null;
   for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){ct=D.contratti[i];break;} }
   if (!ct) { box.textContent='Contratto non trovato'; return; }
   
-  // Trova immobile
   var imm = (D.appartamenti||[]).find(function(a){ return a.id===ct.appartamentoId; }) || {};
-  
-  // Parse JSON
-  var locatori=[], conduttori=[], garanti=[];
+  var locatori=[], conduttori=[], garanti=[], perts=[], pertSel=[];
   try { locatori=JSON.parse(ct.locatoriJSON||'[]'); } catch(e){}
   try { conduttori=JSON.parse(ct.conduttoriJSON||'[]'); } catch(e){}
   try { garanti=JSON.parse(ct.garantiJSON||'[]'); } catch(e){}
-  var perts=[];
   try { perts=JSON.parse(imm.pertinenze||'[]'); } catch(e){}
-  var pertSel=[];
   try { pertSel=JSON.parse(ct.pertinenzeSel||'[]'); } catch(e){}
 
-  var NL = String.fromCharCode(10);
   function fmtPers(p, tipo) {
     if (!p || !p.nome) return tipo+': (non compilato)'+NL;
     var s = tipo+':'+NL;
     s += '  Nome: '+(p.nome||'')+' '+(p.cognome||'')+NL;
-    if(p.cf)          s += '  CF: '+p.cf+NL;
-    if(p.dataNascita) s += '  Nato il: '+p.dataNascita+NL;
-    if(p.luogoNascita)s += '  Nato a: '+p.luogoNascita+NL;
-    if(p.residenza)   s += '  Residente: '+p.residenza+NL;
-    if(p.tipoDoc)     s += '  Documento: '+p.tipoDoc+' n.'+p.numDoc+NL;
-    if(p.rilasciatoDa)s += '  Rilasciato da: '+p.rilasciatoDa+' il '+p.dataDoc+NL;
-    if(p.scadenzaDoc) s += '  Scadenza doc: '+p.scadenzaDoc+NL;
+    if(p.cf)           s += '  CF: '+p.cf+NL;
+    if(p.dataNascita)  s += '  Nato il: '+p.dataNascita+NL;
+    if(p.luogoNascita) s += '  Nato a: '+p.luogoNascita+NL;
+    if(p.residenza)    s += '  Residente: '+p.residenza+NL;
+    if(p.tipoDoc)      s += '  Documento: '+p.tipoDoc+' n.'+(p.numDoc||'')+NL;
+    if(p.rilasciatoDa) s += '  Rilasciato da: '+p.rilasciatoDa+' il '+(p.dataDoc||'')+NL;
+    if(p.scadenzaDoc)  s += '  Scadenza doc: '+p.scadenzaDoc+NL;
     return s;
   }
 
-  var txt = '=== DATI PER CONTRATTO ASPPI ==='+NL;
-  
-  txt += '--- TIPO CONTRATTO ---'+NL;
-  txt += 'Tipo: '+(ct.tipo||'non specificato')+''+NL;
-  txt += 'Unita: '+(ct.unitaTipo||'intera unita immobiliare')+''+NL;
-
-  txt += '--- IMMOBILE PRINCIPALE ---'+NL;
-  txt += 'Indirizzo: '+(imm.via||'')+(imm.citta?', '+imm.citta:'')+''+NL;
-  txt += 'Tipo: '+(imm.tipo||'')+''+NL;
-  if(imm.catComune)    txt += 'Comune catastale: '+imm.catComune+''+NL;
-  if(imm.catSezione)   txt += 'Sezione: '+imm.catSezione+''+NL;
-  if(imm.catFoglio)    txt += 'Foglio: '+imm.catFoglio+''+NL;
-  if(imm.catParticella)txt += 'Particella: '+imm.catParticella+''+NL;
-  if(imm.catSub)       txt += 'Subalterno: '+imm.catSub+''+NL;
-  if(imm.catCategoria) txt += 'Categoria: '+imm.catCategoria+''+NL;
-  if(imm.catRendita)   txt += 'Rendita: '+imm.catRendita+''+NL;
+  var lines = [
+    '=== DATI PER CONTRATTO ASPPI ===',
+    '',
+    '--- TIPO CONTRATTO ---',
+    'Tipo: '+(ct.tipo||'non specificato'),
+    'Unita: '+(ct.unitaTipo||'intera unita immobiliare'),
+    '',
+    '--- IMMOBILE PRINCIPALE ---',
+    'Indirizzo: '+(imm.via||'')+(imm.citta?', '+imm.citta:''),
+    'Tipo: '+(imm.tipo||'')
+  ];
+  if(imm.catComune)     lines.push('Comune catastale: '+imm.catComune);
+  if(imm.catSezione)    lines.push('Sezione: '+imm.catSezione);
+  if(imm.catFoglio)     lines.push('Foglio: '+imm.catFoglio);
+  if(imm.catParticella) lines.push('Particella: '+imm.catParticella);
+  if(imm.catSub)        lines.push('Subalterno: '+imm.catSub);
+  if(imm.catCategoria)  lines.push('Categoria: '+imm.catCategoria);
+  if(imm.catRendita)    lines.push('Rendita: '+imm.catRendita);
 
   if(pertSel.length) {
-    txt += '
---- PERTINENZE INCLUSE ---'+NL;
+    lines.push(''); lines.push('--- PERTINENZE INCLUSE ---');
     pertSel.forEach(function(p,i){
-      txt += (i+1)+'. '+(p.tipo||'Pertinenza')+' — '+(p.via||'')+''+NL;
-      if(p.foglio) txt += '   Fg.'+p.foglio+' Part.'+p.particella+(p.sub?' Sub.'+p.sub:'')+' Cat.'+p.cat+''+NL;
+      lines.push((i+1)+'. '+(p.tipo||'Pertinenza')+(p.via?' - '+p.via:''));
+      if(p.foglio) lines.push('   Fg.'+p.foglio+' Part.'+p.particella+(p.sub?' Sub.'+p.sub:'')+(p.cat?' Cat.'+p.cat:''));
     });
   }
 
-  txt += '
---- DURATA E CANONE ---'+NL;
-  txt += 'Dal: '+(ct.duraDal||'')+''+NL;
-  txt += 'Al: '+(ct.duraAl||'')+''+NL;
-  txt += 'Mesi: '+(ct.duraMesi||'')+''+NL;
-  txt += 'Canone mensile: '+(ct.canoneMensile||'')+' euro'+NL;
-  txt += 'Canone annuale: '+(ct.canoneAnnuale||'')+' euro'+NL;
-  if(ct.canoneIBAN)   txt += 'IBAN pagamento: '+ct.canoneIBAN+''+NL;
-  if(ct.depositoImporto) txt += 'Deposito: '+ct.depositoImporto+' euro ('+(ct.depositoMesi||'')+' mesi)'+NL;
-  if(ct.oneriMensili) txt += 'Oneri accessori: '+ct.oneriMensili+' euro/mese'+NL;
-  if(ct.oneriIBAN)    txt += 'IBAN oneri: '+ct.oneriIBAN+''+NL;
+  lines.push(''); lines.push('--- DURATA E CANONE ---');
+  lines.push('Dal: '+(ct.duraDal||''));
+  lines.push('Al: '+(ct.duraAl||''));
+  lines.push('Mesi: '+(ct.duraMesi||''));
+  lines.push('Canone mensile: '+(ct.canoneMensile||'')+' euro');
+  lines.push('Canone annuale: '+(ct.canoneAnnuale||'')+' euro');
+  if(ct.canoneIBAN)    lines.push('IBAN pagamento: '+ct.canoneIBAN);
+  if(ct.depositoImporto) lines.push('Deposito: '+ct.depositoImporto+' euro ('+(ct.depositoMesi||'')+' mesi)');
+  if(ct.oneriMensili)  lines.push('Oneri accessori: '+ct.oneriMensili+' euro/mese');
+  if(ct.oneriIBAN)     lines.push('IBAN oneri: '+ct.oneriIBAN);
 
-  txt += '
---- LOCATORI ---'+NL;
-  locatori.forEach(function(p,i){ txt += fmtPers(p, 'Locatore '+(i+1)); });
+  lines.push(''); lines.push('--- LOCATORI ---');
+  locatori.forEach(function(p,i){ lines.push(fmtPers(p, 'Locatore '+(i+1))); });
 
-  txt += '
---- CONDUTTORI ---'+NL;
-  conduttori.forEach(function(p,i){ txt += fmtPers(p, 'Conduttore '+(i+1)); });
+  lines.push(''); lines.push('--- CONDUTTORI ---');
+  conduttori.forEach(function(p,i){ lines.push(fmtPers(p, 'Conduttore '+(i+1))); });
 
   if(garanti.length) {
-    txt += '
---- GARANTI ---'+NL;
-    garanti.forEach(function(p,i){ txt += fmtPers(p, 'Garante '+(i+1)); });
+    lines.push(''); lines.push('--- GARANTI ---');
+    garanti.forEach(function(p,i){ lines.push(fmtPers(p, 'Garante '+(i+1))); });
   }
 
-  if(ct.note) txt += '
---- NOTE ---
-'+ct.note+''+NL;
-  
-  txt += '
-=== FINE DATI ===';
-  
+  if(ct.note) { lines.push(''); lines.push('--- NOTE ---'); lines.push(ct.note); }
+  lines.push(''); lines.push('=== FINE DATI ===');
+
+  var txt = lines.join(NL);
   box.textContent = txt;
   window._datiContratto = txt;
 }
+
 
 function copiaDatiContratto() {
   var txt = window._datiContratto || (document.getElementById('dati-contratto-box')||{}).textContent || '';
