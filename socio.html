@@ -1519,7 +1519,7 @@ function confermaPren() {
   if(!mot){var e=T('p-err');if(e){e.textContent='Seleziona il motivo';e.style.display='';}return;}
   api('savePrenotazione',{data:calDay,ora:calSlot,motivo:mot},function(err,r){
     if(!err&&r&&r.ok){
-      ST('p-cal-rie',calDay+' - ore '+calSlot+' - '+mot);
+      ST('p-cal-rie','Richiesta inviata per il '+calDay+' ore '+calSlot+' — In attesa di conferma');
       SH('p-cal-ok',true); SH('p-cal-form',false); caricaDati();
     } else {var e=T('p-err');if(e){e.textContent=(r&&r.error)||err||'Errore';e.style.display='';}}
   });

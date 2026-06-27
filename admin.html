@@ -1355,8 +1355,138 @@ function renderSoci(query, campo) {
     var arr = document.createElement('div'); arr.className='ra'; arr.textContent='›';
     top.appendChild(rt); top.appendChild(bdg); rb.appendChild(top); rb.appendChild(rs);
     div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
-    div.addEventListener('click', (function(uid){ return function(){ apriSocio(uid); }; })(u.id));
-    el.appendChild(div);
+    // Pannello pagamento inline espandibile
+    var panel = document.createElement('div');
+    panel.id = 'pag-panel-'+u.id;
+    panel.style.cssText = 'display:none;background:#F8F7F5;border-radius:0 0 14px 14px;padding:14px;margin-top:-10px;margin-bottom:10px;border:1px solid #e5e5e5;border-top:none';
+    panel.innerHTML = '<div style="font-size:11px;font-weight:700;color:#E8631A;text-transform:uppercase;margin-bottom:10px">Registra pagamento</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+      +'<select id="pp-tipo-'+u.id+'" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;min-width:150px">'
+      +'<option value="Primo tesseramento" data-imp="55">Primo tesseramento €55</option>'
+      +'<option value="Rinnovo tessera" data-imp="50">Rinnovo tessera €50</option>'
+      +'<option value="Contratto extra" data-imp="25">Contratto extra €25</option>'
+      +'<option value="Adempimento extra" data-imp="15">Adempimento extra €15</option>'
+      +'<option value="Acconto" data-imp="">Acconto/parziale</option>'
+      +'<option value="Altro" data-imp="">Altro</option>'
+      +'</select>'
+      +'<input type="text" id="pp-imp-'+u.id+'" placeholder="€ Importo" style="width:90px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px"/>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+      +'<select id="pp-stato-'+u.id+'" onchange="togglePanelDettagli(''+u.id+'')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px">'
+      +'<option value="dovuto">Da pagare</option>'
+      +'<option value="confermato">Gia pagato</option>'
+      +'</select>'
+      +'<select id="pp-met-'+u.id+'" style="width:110px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;display:none">'
+      +'<option value="contanti">Contanti</option>'
+      +'<option value="bonifico">Bonifico</option>'
+      +'</select>'
+      +'<input type="text" id="pp-data-'+u.id+'" placeholder="gg/mm/aaaa" style="width:110px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;display:none" oninput="autoDateAdmin(this)"/>'
+      +'</div>';
+    
+    // Se ha bonifico dichiarato, mostra bottone conferma
+    if (bonDichiarato) {
+      var pagBon = item.pagamenti.find(function(p){ return p.stato==='bonifico_dichiarato'; });
+      panel.innerHTML += '<div style="background:#EBF2FB;border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px;color:#1A5FA8">'
+        +'&#9888; Bonifico dichiarato il '+(pagBon?pagBon.dataPagamento:'')
+        +' — Rif: '+(pagBon&&pagBon.riferimentoBonifico?pagBon.riferimentoBonifico:'non indicato')
+        +'<button onclick="confermaBonificoDiretto(''+u.id+'',''+(pagBon?pagBon.id:'')+'',this)" style="margin-left:8px;background:#2D7A4F;color:#fff;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">Conferma bonifico</button>'
+        +'</div>';
+    }
+    
+    panel.innerHTML += '<div style="display:flex;gap:6px">'
+      +'<button onclick="registraPagamentoDiretto(''+u.id+'')" style="flex:1;padding:8px;background:#E8631A;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Registra</button>'
+      +'<button onclick="chiudiPanelPag(''+u.id+'')" style="padding:8px 14px;background:#fff;color:#1A1A1A;border:1.5px solid #e5e5e5;border-radius:8px;font-size:13px;cursor:pointer">Annulla</button>'
+      +'</div>'
+      +'<div id="pp-ok-'+u.id+'" style="display:none;color:#2D7A4F;font-size:12px;font-weight:700;margin-top:6px">&#9989; Registrato!</div>';
+    
+    // Pre-compila importo al cambio tipo
+    panel.querySelector('#pp-tipo-'+u.id).addEventListener('change', function(){
+      var opt = this.options[this.selectedIndex];
+      var imp = opt.getAttribute('data-imp');
+      var impEl = document.getElementById('pp-imp-'+u.id);
+      if(impEl && imp) impEl.value = imp;
+    });
+    // Pre-compila importo iniziale
+    var firstOpt = panel.querySelector('#pp-tipo-'+u.id+' option');
+    var firstImp = firstOpt ? firstOpt.getAttribute('data-imp') : '';
+    if(firstImp) panel.querySelector('#pp-imp-'+u.id).value = firstImp;
+    
+    // Wrapper per row + panel
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'margin-bottom:10px';
+    div.style.marginBottom = '0';
+    div.style.borderRadius = '14px 14px 0 0';
+    div.addEventListener('click', (function(uid, w){ 
+      return function(e){ 
+        if(e.target.tagName==='BUTTON'||e.target.closest('button')) return;
+        togglePanelPag(uid, w); 
+      }; 
+    })(u.id, wrapper));
+    wrapper.appendChild(div);
+    wrapper.appendChild(panel);
+    el.appendChild(wrapper);
+  });
+}
+
+function togglePanelPag(uid, wrapper) {
+  var panel = document.getElementById('pag-panel-'+uid);
+  if(!panel) return;
+  var isOpen = panel.style.display !== 'none';
+  // Chiudi tutti gli altri
+  document.querySelectorAll('[id^="pag-panel-"]').forEach(function(p){ p.style.display='none'; });
+  if(!isOpen) panel.style.display = '';
+}
+
+function chiudiPanelPag(uid) {
+  var panel = document.getElementById('pag-panel-'+uid);
+  if(panel) panel.style.display='none';
+}
+
+function togglePanelDettagli(uid) {
+  var stato = (document.getElementById('pp-stato-'+uid)||{}).value||'dovuto';
+  var met  = document.getElementById('pp-met-'+uid);
+  var data = document.getElementById('pp-data-'+uid);
+  if(met)  met.style.display  = stato==='confermato'?'':'none';
+  if(data) data.style.display = stato==='confermato'?'':'none';
+  if(stato==='confermato' && data && !data.value) {
+    var oggi = new Date();
+    data.value = ('0'+oggi.getDate()).slice(-2)+'/'+('0'+(oggi.getMonth()+1)).slice(-2)+'/'+oggi.getFullYear();
+  }
+}
+
+function registraPagamentoDiretto(uid) {
+  var tipoEl = document.getElementById('pp-tipo-'+uid);
+  var tipo   = tipoEl ? tipoEl.options[tipoEl.selectedIndex].value : '';
+  var importo= (document.getElementById('pp-imp-'+uid)||{}).value||'';
+  var stato  = (document.getElementById('pp-stato-'+uid)||{}).value||'dovuto';
+  var metodo = (document.getElementById('pp-met-'+uid)||{}).value||'contanti';
+  var data   = (document.getElementById('pp-data-'+uid)||{}).value||'';
+  if(!importo) { alert('Inserisci importo'); return; }
+  if(stato==='confermato'&&!data) { alert('Inserisci data pagamento'); return; }
+  var obj = {
+    userId:uid, tipo:tipo, importo:parseFloat(String(importo).replace(',','.')),
+    anno:new Date().getFullYear(), stato:stato,
+    metodoPagamento:stato==='confermato'?metodo:'',
+    dataPagamento:stato==='confermato'?data:''
+  };
+  apiCall('savePagamento', {data:obj}, function(err,r){
+    var okEl = document.getElementById('pp-ok-'+uid);
+    if(!err&&r&&r.ok){ 
+      if(okEl) okEl.style.display='';
+      setTimeout(function(){ chiudiPanelPag(uid); caricaPagamenti(); }, 1000);
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function confermaBonificoDiretto(uid, pagId, btn) {
+  if(!pagId) return;
+  var oggi = new Date();
+  var data = ('0'+oggi.getDate()).slice(-2)+'/'+('0'+(oggi.getMonth()+1)).slice(-2)+'/'+oggi.getFullYear();
+  apiCall('confermaPagamento', {id:pagId, metodoPagamento:'bonifico', dataPagamento:data}, function(err,r){
+    if(!err&&r&&r.ok){ 
+      if(btn){ btn.textContent='✓ Confermato'; btn.style.background='#8A8A8A'; btn.disabled=true; }
+      setTimeout(function(){ chiudiPanelPag(uid); caricaPagamenti(); }, 800);
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
   });
 }
 
@@ -1663,8 +1793,138 @@ function renderPagamenti(query, campo) {
     }
     top.appendChild(rt); rb.appendChild(top); rb.appendChild(rs);
     div.appendChild(bar); div.appendChild(rb); div.appendChild(right);
-    div.addEventListener('click', (function(uid){ return function(){ apriSocio(uid); }; })(u.id));
-    el.appendChild(div);
+    // Pannello pagamento inline espandibile
+    var panel = document.createElement('div');
+    panel.id = 'pag-panel-'+u.id;
+    panel.style.cssText = 'display:none;background:#F8F7F5;border-radius:0 0 14px 14px;padding:14px;margin-top:-10px;margin-bottom:10px;border:1px solid #e5e5e5;border-top:none';
+    panel.innerHTML = '<div style="font-size:11px;font-weight:700;color:#E8631A;text-transform:uppercase;margin-bottom:10px">Registra pagamento</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+      +'<select id="pp-tipo-'+u.id+'" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;min-width:150px">'
+      +'<option value="Primo tesseramento" data-imp="55">Primo tesseramento €55</option>'
+      +'<option value="Rinnovo tessera" data-imp="50">Rinnovo tessera €50</option>'
+      +'<option value="Contratto extra" data-imp="25">Contratto extra €25</option>'
+      +'<option value="Adempimento extra" data-imp="15">Adempimento extra €15</option>'
+      +'<option value="Acconto" data-imp="">Acconto/parziale</option>'
+      +'<option value="Altro" data-imp="">Altro</option>'
+      +'</select>'
+      +'<input type="text" id="pp-imp-'+u.id+'" placeholder="€ Importo" style="width:90px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px"/>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+      +'<select id="pp-stato-'+u.id+'" onchange="togglePanelDettagli(''+u.id+'')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px">'
+      +'<option value="dovuto">Da pagare</option>'
+      +'<option value="confermato">Gia pagato</option>'
+      +'</select>'
+      +'<select id="pp-met-'+u.id+'" style="width:110px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;display:none">'
+      +'<option value="contanti">Contanti</option>'
+      +'<option value="bonifico">Bonifico</option>'
+      +'</select>'
+      +'<input type="text" id="pp-data-'+u.id+'" placeholder="gg/mm/aaaa" style="width:110px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;display:none" oninput="autoDateAdmin(this)"/>'
+      +'</div>';
+    
+    // Se ha bonifico dichiarato, mostra bottone conferma
+    if (bonDichiarato) {
+      var pagBon = item.pagamenti.find(function(p){ return p.stato==='bonifico_dichiarato'; });
+      panel.innerHTML += '<div style="background:#EBF2FB;border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px;color:#1A5FA8">'
+        +'&#9888; Bonifico dichiarato il '+(pagBon?pagBon.dataPagamento:'')
+        +' — Rif: '+(pagBon&&pagBon.riferimentoBonifico?pagBon.riferimentoBonifico:'non indicato')
+        +'<button onclick="confermaBonificoDiretto(''+u.id+'',''+(pagBon?pagBon.id:'')+'',this)" style="margin-left:8px;background:#2D7A4F;color:#fff;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">Conferma bonifico</button>'
+        +'</div>';
+    }
+    
+    panel.innerHTML += '<div style="display:flex;gap:6px">'
+      +'<button onclick="registraPagamentoDiretto(''+u.id+'')" style="flex:1;padding:8px;background:#E8631A;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Registra</button>'
+      +'<button onclick="chiudiPanelPag(''+u.id+'')" style="padding:8px 14px;background:#fff;color:#1A1A1A;border:1.5px solid #e5e5e5;border-radius:8px;font-size:13px;cursor:pointer">Annulla</button>'
+      +'</div>'
+      +'<div id="pp-ok-'+u.id+'" style="display:none;color:#2D7A4F;font-size:12px;font-weight:700;margin-top:6px">&#9989; Registrato!</div>';
+    
+    // Pre-compila importo al cambio tipo
+    panel.querySelector('#pp-tipo-'+u.id).addEventListener('change', function(){
+      var opt = this.options[this.selectedIndex];
+      var imp = opt.getAttribute('data-imp');
+      var impEl = document.getElementById('pp-imp-'+u.id);
+      if(impEl && imp) impEl.value = imp;
+    });
+    // Pre-compila importo iniziale
+    var firstOpt = panel.querySelector('#pp-tipo-'+u.id+' option');
+    var firstImp = firstOpt ? firstOpt.getAttribute('data-imp') : '';
+    if(firstImp) panel.querySelector('#pp-imp-'+u.id).value = firstImp;
+    
+    // Wrapper per row + panel
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'margin-bottom:10px';
+    div.style.marginBottom = '0';
+    div.style.borderRadius = '14px 14px 0 0';
+    div.addEventListener('click', (function(uid, w){ 
+      return function(e){ 
+        if(e.target.tagName==='BUTTON'||e.target.closest('button')) return;
+        togglePanelPag(uid, w); 
+      }; 
+    })(u.id, wrapper));
+    wrapper.appendChild(div);
+    wrapper.appendChild(panel);
+    el.appendChild(wrapper);
+  });
+}
+
+function togglePanelPag(uid, wrapper) {
+  var panel = document.getElementById('pag-panel-'+uid);
+  if(!panel) return;
+  var isOpen = panel.style.display !== 'none';
+  // Chiudi tutti gli altri
+  document.querySelectorAll('[id^="pag-panel-"]').forEach(function(p){ p.style.display='none'; });
+  if(!isOpen) panel.style.display = '';
+}
+
+function chiudiPanelPag(uid) {
+  var panel = document.getElementById('pag-panel-'+uid);
+  if(panel) panel.style.display='none';
+}
+
+function togglePanelDettagli(uid) {
+  var stato = (document.getElementById('pp-stato-'+uid)||{}).value||'dovuto';
+  var met  = document.getElementById('pp-met-'+uid);
+  var data = document.getElementById('pp-data-'+uid);
+  if(met)  met.style.display  = stato==='confermato'?'':'none';
+  if(data) data.style.display = stato==='confermato'?'':'none';
+  if(stato==='confermato' && data && !data.value) {
+    var oggi = new Date();
+    data.value = ('0'+oggi.getDate()).slice(-2)+'/'+('0'+(oggi.getMonth()+1)).slice(-2)+'/'+oggi.getFullYear();
+  }
+}
+
+function registraPagamentoDiretto(uid) {
+  var tipoEl = document.getElementById('pp-tipo-'+uid);
+  var tipo   = tipoEl ? tipoEl.options[tipoEl.selectedIndex].value : '';
+  var importo= (document.getElementById('pp-imp-'+uid)||{}).value||'';
+  var stato  = (document.getElementById('pp-stato-'+uid)||{}).value||'dovuto';
+  var metodo = (document.getElementById('pp-met-'+uid)||{}).value||'contanti';
+  var data   = (document.getElementById('pp-data-'+uid)||{}).value||'';
+  if(!importo) { alert('Inserisci importo'); return; }
+  if(stato==='confermato'&&!data) { alert('Inserisci data pagamento'); return; }
+  var obj = {
+    userId:uid, tipo:tipo, importo:parseFloat(String(importo).replace(',','.')),
+    anno:new Date().getFullYear(), stato:stato,
+    metodoPagamento:stato==='confermato'?metodo:'',
+    dataPagamento:stato==='confermato'?data:''
+  };
+  apiCall('savePagamento', {data:obj}, function(err,r){
+    var okEl = document.getElementById('pp-ok-'+uid);
+    if(!err&&r&&r.ok){ 
+      if(okEl) okEl.style.display='';
+      setTimeout(function(){ chiudiPanelPag(uid); caricaPagamenti(); }, 1000);
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function confermaBonificoDiretto(uid, pagId, btn) {
+  if(!pagId) return;
+  var oggi = new Date();
+  var data = ('0'+oggi.getDate()).slice(-2)+'/'+('0'+(oggi.getMonth()+1)).slice(-2)+'/'+oggi.getFullYear();
+  apiCall('confermaPagamento', {id:pagId, metodoPagamento:'bonifico', dataPagamento:data}, function(err,r){
+    if(!err&&r&&r.ok){ 
+      if(btn){ btn.textContent='✓ Confermato'; btn.style.background='#8A8A8A'; btn.disabled=true; }
+      setTimeout(function(){ chiudiPanelPag(uid); caricaPagamenti(); }, 800);
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
   });
 }
 
@@ -2137,10 +2397,11 @@ function eseguiBackup() {
 
 // ── PRENOTAZIONI ADMIN ───────────────────────────────────────
 function caricaPrenotazioni() {
+  window._prenFiltro = 'tutte';
   makeFiltri('pren-filtri',
-    ['tutte','in_attesa','confermate','annullate'],
-    ['Tutte','In attesa','Confermate','Annullate'],
-    function(f){ renderPrenotazioni(f); }
+    ['tutte','in_attesa','confermata','negata','annullata'],
+    ['Tutte','In attesa','Confermate','Negate','Annullate'],
+    function(f){ window._prenFiltro=f; renderPrenotazioni(f); }
   );
   renderPrenotazioni('tutte');
 }
