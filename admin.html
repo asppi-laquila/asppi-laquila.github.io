@@ -87,25 +87,43 @@ select.inp{cursor:pointer;}
 
 <!-- HOME -->
 <div id="p-home" class="pg on">
-  <!-- Export Database -->
+
+  <!-- Bottone export -->
   <div style="margin-bottom:16px">
-    <button id="btn-esporta-db" style="width:100%;padding:14px;background:#1A3A8F;color:#fff;border:none;border-radius:14px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px">
-      <span style="font-size:20px">&#128196;</span>
-      <span>Scarica database completo Excel</span>
+    <button id="btn-esporta-db" style="width:100%;padding:12px;background:#1A3A8F;color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+      <span>&#128196;</span><span>Scarica database completo Excel</span>
     </button>
-    <div id="export-status" style="display:none;font-size:12px;color:#8A8A8A;text-align:center;margin-top:6px"></div>
+    <div id="export-status" style="display:none;font-size:12px;color:#8A8A8A;text-align:center;margin-top:4px"></div>
   </div>
 
-  <div class="stat">
-    <div class="sb2"><div class="sn" style="color:#E8631A" id="sh-app">—</div><div class="sl">Appuntamenti</div></div>
-    <div class="sb2"><div class="sn" style="color:#E8631A" id="sh-att">—</div><div class="sl">In attesa</div></div>
-    <div class="sb2"><div class="sn" style="color:#2D7A4F" id="sh-soc">—</div><div class="sl">Soci</div></div>
+  <!-- Statistiche rapide -->
+  <div id="h-pren-attesa"></div>
+  <div id="h-alert-box"></div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+    <div class="card" style="margin:0;cursor:pointer" onclick="document.getElementById('nb-soci').click()">
+      <div class="cb" style="text-align:center;padding:14px 8px">
+        <div style="font-size:28px;font-weight:800;color:#1A3A8F" id="sh-soci">—</div>
+        <div style="font-size:11px;color:#8A8A8A;font-weight:600">Soci</div>
+      </div>
+    </div>
+    <div class="card" style="margin:0;cursor:pointer" onclick="document.getElementById('nb-prat').click()">
+      <div class="cb" style="text-align:center;padding:14px 8px">
+        <div style="font-size:28px;font-weight:800;color:#E8631A" id="sh-att">—</div>
+        <div style="font-size:11px;color:#8A8A8A;font-weight:600">In attesa</div>
+      </div>
+    </div>
+    <div class="card" style="margin:0;cursor:pointer" onclick="document.getElementById('nb-pag').click()">
+      <div class="cb" style="text-align:center;padding:14px 8px">
+        <div style="font-size:28px;font-weight:800;color:#2D7A4F" id="sh-inc">—</div>
+        <div style="font-size:11px;color:#8A8A8A;font-weight:600">Incassato</div>
+      </div>
+    </div>
   </div>
-  <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin-bottom:10px">Prossimi appuntamenti</div>
-  <div id="h-prens"><div class="info">Caricamento...</div></div>
-  <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin:16px 0 10px">Pratiche recenti</div>
-  <div id="h-prats"><div class="info">Caricamento...</div></div>
-</div>
+
+  <!-- Alert urgenti -->
+  <div id="h-alerts"></div>
+
 
 <!-- PRENOTAZIONI -->
 <div id="p-pren" class="pg">
@@ -1015,15 +1033,2409 @@ function switchTab(t) {
 }
 
 function aggiornaPrat() {
-  var c = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){c=D.contratti[i];break;} }
-  if (!c) return;
+  var ct = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){ct=D.contratti[i];break;} }
+  if (!ct) return;
   var sel = document.getElementById('opr-stato-sel'); if(!sel) return;
-  c.stato = sel.value;
-  apiCall('saveContratto', {data: c}, function(err, r) {
+  var nuovoStato = sel.value;
+
+  // Se completato → popup addebito
+  if (nuovoStato === 'completato' && ct.stato !== 'completato') {
+    mostraPopupAddebito(ct, nuovoStato);
+    return;
+  }
+
+  salvaPratStato(ct, nuovoStato, null);
+}
+
+function mostraPopupAddebito(ct, nuovoStato) {
+  // Calcola tariffa suggerita
+  apiCall('getImpostazioni', {}, function(err, r) {
+    var tariffe = (!err&&r&&r.ok) ? r.data : {};
+    var importoSuggerito = parseFloat(tariffe.tariffa_contratto_extra)||25;
+
+    var popup = document.createElement('div');
+    popup.id = 'popup-addebito';
+    popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    popup.innerHTML = '<div style="background:#fff;border-radius:20px;padding:24px;max-width:380px;width:100%">'
+      +'<div style="font-size:16px;font-weight:800;color:#1A1A1A;margin-bottom:6px">&#9989; Archivia pratica</div>'
+      +'<div style="font-size:13px;color:#8A8A8A;margin-bottom:16px">Vuoi registrare un addebito per questa pratica?</div>'
+      +'<label style="font-size:11px;font-weight:700;color:#8A8A8A;text-transform:uppercase">Importo da addebitare €</label>'
+      +'<input type="text" id="popup-importo" value="'+importoSuggerito+'" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:16px;font-weight:700;margin:6px 0 4px;text-align:center"/>'
+      +'<div style="font-size:11px;color:#8A8A8A;margin-bottom:16px">Inserisci 0 per non addebitare nulla</div>'
+      +'<label style="font-size:11px;font-weight:700;color:#8A8A8A;text-transform:uppercase">Tipo</label>'
+      +'<select id="popup-tipo" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;margin:6px 0 16px">'
+      +'<option value="Contratto extra">Contratto extra</option>'
+      +'<option value="Primo tesseramento">Primo tesseramento</option>'
+      +'<option value="Rinnovo tessera">Rinnovo tessera</option>'
+      +'<option value="Adempimento extra">Adempimento extra</option>'
+      +'<option value="Altro">Altro</option>'
+      +'</select>'
+      +'<div style="display:flex;gap:8px">'
+      +'<button id="popup-salta" style="flex:1;padding:12px;border-radius:10px;border:1.5px solid #e5e5e5;background:#fff;font-size:13px;font-weight:700;cursor:pointer">Salta addebito</button>'
+      +'<button id="popup-conferma" style="flex:1;padding:12px;border-radius:10px;border:none;background:#E8631A;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Conferma e archivia</button>'
+      +'</div>'
+      +'</div>';
+
+    document.body.appendChild(popup);
+
+    document.getElementById('popup-salta').addEventListener('click', function(){
+      popup.remove();
+      salvaPratStato(ct, nuovoStato, null);
+    });
+
+    document.getElementById('popup-conferma').addEventListener('click', function(){
+      var importo = parseFloat((document.getElementById('popup-importo')||{}).value||'0');
+      var tipo = (document.getElementById('popup-tipo')||{}).value||'Contratto extra';
+      popup.remove();
+      salvaPratStato(ct, nuovoStato, importo>0 ? {importo:importo, tipo:tipo} : null);
+    });
+  });
+}
+
+function salvaPratStato(ct, nuovoStato, addebito) {
+  ct.stato = nuovoStato;
+  apiCall('saveContratto', {data: ct}, function(err, r) {
     if (!err && r && r.ok) {
       show('opr-ok');
-      setText('opr-stato', statoLbl(c.stato));
+      setText('opr-stato', statoLbl(ct.stato));
+      // Registra addebito se presente
+      if (addebito) {
+        var pagObj = {
+          userId: ct.userId, tipo: addebito.tipo,
+          importo: addebito.importo, anno: new Date().getFullYear(),
+          stato: 'dovuto', metodoPagamento: '', dataPagamento: '',
+          note: 'Pratica '+ct.id
+        };
+        apiCall('savePagamento', {data: pagObj}, function(){
+          carica();
+        });
+      } else {
+        carica();
+      }
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+// ── CHAT ─────────────────────────────────────────────────────
+function renderChat() {
+  var el = document.getElementById('l-chat'); if(!el) return;
+  el.innerHTML = '';
+  if (!D.contratti.length) { el.innerHTML='<div class="info">Nessuna conversazione ancora.</div>'; return; }
+  for (var i=0; i<D.contratti.length; i++) {
+    el.appendChild(makeChatCard(D.contratti[i]));
+  }
+}
+
+function makeChatCard(c) {
+  var msgs = D.chat.filter(function(m){ return m.contrattoId===c.id; });
+  var last = msgs.length ? msgs[msgs.length-1] : null;
+  var unread = msgs.filter(function(m){ return m.mittente==='socio' && !m.letto; }).length;
+  var nomeSocio = 'Socio';
+  var msgSocio = null; for(var i=0;i<msgs.length;i++){ if(msgs[i].mittente==='socio'){msgSocio=msgs[i];break;} }
+  if (msgSocio && msgSocio.nomeUtente) nomeSocio = msgSocio.nomeUtente.trim() || nomeSocio;
+  else {
+    var ut = null; for(var j=0;j<D.utenti.length;j++){ if(D.utenti[j].id===c.userId){ut=D.utenti[j];break;} }
+    if (ut) nomeSocio = ((ut.nome||'')+' '+(ut.cognome||'')).trim() || nomeSocio;
+  }
+  var iniziali = '';
+  var parts = nomeSocio.split(' ');
+  for (var k=0; k<Math.min(parts.length,2); k++) if(parts[k]) iniziali += parts[k][0].toUpperCase();
+  var titolo = nomeContratto(c);
+  var col = unread ? '#E8631A' : '#8A8A8A';
+  var div = document.createElement('div'); div.className='row';
+  var bar = document.createElement('div'); bar.className='bar'; bar.style.background=col;
+  var rb  = document.createElement('div'); rb.className='rb'; rb.style.cssText='display:flex;align-items:center;gap:12px';
+  var av  = document.createElement('div');
+  av.style.cssText='width:40px;height:40px;border-radius:20px;background:'+(unread?'#E8631A':'#F8F7F5')+';display:flex;align-items:center;justify-content:center;color:'+(unread?'#fff':'#8A8A8A')+';font-weight:800;font-size:13px;flex-shrink:0';
+  av.textContent = iniziali || 'S';
+  var info = document.createElement('div'); info.style.cssText='flex:1;min-width:0';
+  var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
+  var rt = document.createElement('div'); rt.className='rt'; rt.textContent=titolo;
+  var rs = document.createElement('div'); rs.className='rs'; rs.style.cssText='overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+  rs.textContent = nomeSocio + ' - ' + (last ? last.testo : 'Nessun messaggio');
+  top.appendChild(rt);
+  if (unread) {
+    var dot = document.createElement('div');
+    dot.style.cssText='width:8px;height:8px;border-radius:4px;background:#E8631A;flex-shrink:0';
+    top.appendChild(dot);
+  }
+  info.appendChild(top); info.appendChild(rs);
+  rb.appendChild(av); rb.appendChild(info);
+  div.appendChild(bar); div.appendChild(rb);
+  div.addEventListener('click', (function(id){ return function(){ apriChatAdmin(id); }; })(c.id));
+  return div;
+}
+
+function apriChatAdmin(id) {
+  curChatId = id; curPratId = id;
+  var c = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===id){c=D.contratti[i];break;} }
+  var msgs = D.chat.filter(function(m){ return m.contrattoId===id && m.mittente==='socio'; });
+  var nomeSocio = 'Socio';
+  if (msgs.length && msgs[0].nomeUtente) nomeSocio = msgs[0].nomeUtente.trim() || nomeSocio;
+  else {
+    var ut = null; for(var j=0;j<D.utenti.length;j++){ if(D.utenti[j].id===(c?c.userId:null)){ut=D.utenti[j];break;} }
+    if (ut) nomeSocio = ((ut.nome||'')+' '+(ut.cognome||'')).trim() || nomeSocio;
+  }
+  setText('opr-lbl', 'CHAT - '+nomeContratto(c||{}));
+  setText('opr-ttl', nomeSocio);
+  // Popola anche dati pratica per tab
+  if (c) {
+    setText('opr-nome-cnt', nomeContratto(c));
+    setText('opr-tipo', c.tipo||'—');
+    setText('opr-stato', statoLbl(c.stato));
+    var sel=document.getElementById('opr-stato-sel'); if(sel) sel.value=c.stato||'richiesta';
+    setText('opr-dal', fmtDate(c.duraDal));
+    setText('opr-al', fmtDate(c.duraAl));
+    setText('opr-canone', c.canoneMensile?'€ '+c.canoneMensile+'/mese':'—');
+    setText('opr-dep', c.depositoImporto?'€ '+c.depositoImporto:'—');
+    document.getElementById('opr-locs').innerHTML=parsePeople(c.locatoriJSON);
+    document.getElementById('opr-cons').innerHTML=parsePeople(c.conduttoriJSON);
+    hide('opr-ok');
+    var modDiv=document.getElementById('opr-modificato');
+    if(c.modificato){setText('opr-data-mod',fmtDate(c.modificato));if(modDiv)modDiv.style.display='';}
+    else{if(modDiv)modDiv.style.display='none';}
+  }
+  switchTab('chat');
+  apri('ov-prat');
+}
+
+function caricaMsgsAdmin() {
+  apiCall('getChat', {contrattoId: curChatId}, function(err, r) {
+    var msgs = (!err && r && r.ok) ? (r.data||[]) : [];
+    var el = document.getElementById('admin-msgs'); if(!el) return;
+    el.innerHTML = '';
+    if (!msgs.length) { el.innerHTML='<div class="info">Nessun messaggio ancora.</div>'; return; }
+    for (var i=0; i<msgs.length; i++) {
+      var m = msgs[i];
+      var mine = m.mittente==='admin';
+      var bbl = document.createElement('div'); bbl.className='bbl '+(mine?'bm':'bo'); bbl.textContent=m.testo; el.appendChild(bbl);
+      var bt = document.createElement('div'); bt.className='bt'; bt.style.alignSelf=mine?'flex-end':'flex-start';
+      bt.textContent=(mine?'Tu':(m.nomeUtente||'Socio'))+' - '+(m.timestamp?m.timestamp.substring(11,16):''); el.appendChild(bt);
+    }
+    el.scrollTop = el.scrollHeight;
+  });
+}
+
+function adminSendMsg() {
+  var inp = document.getElementById('admin-chat-inp'); if(!inp) return;
+  var t = inp.value.trim(); if(!t||!curChatId) return;
+  inp.value = '';
+  apiCall('sendMessage', {contrattoId: curChatId, testo: t}, function(err, r) {
+    if (!err && r && r.ok) { caricaMsgsAdmin(); carica(); }
+  });
+}
+
+// ── SLOT ─────────────────────────────────────────────────────
+function initSlot() {
+  var gEl = document.getElementById('slot-giorni'); if(!gEl) return;
+  gEl.innerHTML = '';
+  for (var i=0; i<TGIORNI.length; i++) {
+    var g = TGIORNI[i];
+    var inSet = sGiorni.indexOf(g) > -1;
+    var btn = document.createElement('button');
+    btn.className = 'gbtn ' + (inSet?'on':'off');
+    btn.id = 'sg-'+g;
+    btn.textContent = g;
+    btn.addEventListener('click', (function(gg){ return function(){ togGiorno(gg); }; })(g));
+    gEl.appendChild(btn);
+  }
+  var oEl = document.getElementById('slot-orari'); if(!oEl) return;
+  oEl.innerHTML = '';
+  for (var j=0; j<TORARI.length; j++) {
+    var o = TORARI[j];
+    var inSet2 = sOrari.indexOf(o) > -1;
+    var btn2 = document.createElement('button');
+    btn2.className = 'sbt ' + (inSet2?'on':'off');
+    btn2.id = 'so-'+o.replace(':','-');
+    btn2.textContent = o;
+    btn2.addEventListener('click', (function(oo){ return function(){ togOrario(oo); }; })(o));
+    oEl.appendChild(btn2);
+  }
+  renderChiusure();
+  renderBloccati();
+}
+
+function togGiorno(g) {
+  var idx = sGiorni.indexOf(g);
+  if (idx > -1) sGiorni.splice(idx,1); else sGiorni.push(g);
+  var btn = document.getElementById('sg-'+g); if(btn) btn.className='gbtn '+(sGiorni.indexOf(g)>-1?'on':'off');
+}
+function togOrario(o) {
+  var idx = sOrari.indexOf(o);
+  if (idx > -1) sOrari.splice(idx,1); else sOrari.push(o);
+  var btn = document.getElementById('so-'+o.replace(':','-')); if(btn) btn.className='sbt '+(sOrari.indexOf(o)>-1?'on':'off');
+}
+
+function renderChiusure() {
+  var el = document.getElementById('slot-chiusure'); if(!el) return;
+  el.innerHTML = '';
+  if (!D.chiusure.length) { el.innerHTML='<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessuna chiusura impostata</div>'; return; }
+  for (var i=0; i<D.chiusure.length; i++) {
+    var ch = D.chiusure[i];
+    var div = document.createElement('div'); div.className='li';
+    var ico = document.createElement('span'); ico.style.fontSize='18px'; ico.textContent='🏖';
+    var info = document.createElement('div'); info.style.flex='1';
+    var t1 = document.createElement('div'); t1.style.cssText='font-size:13px;font-weight:700;color:#1A1A1A'; t1.textContent=ch.label;
+    var t2 = document.createElement('div'); t2.style.cssText='font-size:11px;color:#8A8A8A'; t2.textContent='dal '+ch.dal+' al '+ch.al;
+    info.appendChild(t1); info.appendChild(t2);
+    var btn = document.createElement('button'); btn.style.cssText='background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px'; btn.textContent='✕';
+    btn.addEventListener('click', (function(id){ return function(){ delChiusura(id); }; })(ch.id));
+    div.appendChild(ico); div.appendChild(info); div.appendChild(btn);
+    el.appendChild(div);
+  }
+}
+
+function renderBloccati() {
+  var el = document.getElementById('slot-bloccati'); if(!el) return;
+  el.innerHTML = '';
+  if (!bloccati.length) { el.innerHTML='<div style="font-size:12px;color:#8A8A8A;font-style:italic;margin-bottom:8px">Nessun giorno bloccato</div>'; return; }
+  for (var i=0; i<bloccati.length; i++) {
+    var div = document.createElement('div'); div.className='li';
+    var ico = document.createElement('span'); ico.textContent='🚫';
+    var t = document.createElement('div'); t.style.cssText='flex:1;font-size:13px;font-weight:600;color:#1A1A1A'; t.textContent=bloccati[i];
+    var btn = document.createElement('button'); btn.style.cssText='background:none;border:none;cursor:pointer;color:#C0392B;font-size:18px'; btn.textContent='✕';
+    btn.addEventListener('click', (function(idx){ return function(){ bloccati.splice(idx,1); renderBloccati(); }; })(i));
+    div.appendChild(ico); div.appendChild(t); div.appendChild(btn);
+    el.appendChild(div);
+  }
+}
+
+function addChiusura() {
+  var label=(document.getElementById('ch-lbl')||{}).value||'';
+  var dal=(document.getElementById('ch-dal')||{}).value||'';
+  var al=(document.getElementById('ch-al')||{}).value||'';
+  if(!label||!dal||!al){alert('Compila tutti i campi chiusura');return;}
+  apiCall('saveChiusura',{label:label,dal:dal,al:al},function(err,r){
+    if(!err&&r&&r.ok){
+      D.chiusure.push({id:r.id,label:label,dal:dal,al:al});
+      renderChiusure();
+      document.getElementById('ch-lbl').value='';
+      document.getElementById('ch-dal').value='';
+      document.getElementById('ch-al').value='';
+    } else alert('Errore: '+((r&&r.error)||err||'Riprova'));
+  });
+}
+
+function delChiusura(id) {
+  apiCall('deleteChiusura',{id:id},function(err,r){
+    if(!err&&r&&r.ok){
+      var newList=[]; for(var i=0;i<D.chiusure.length;i++){if(D.chiusure[i].id!==id)newList.push(D.chiusure[i]);}
+      D.chiusure=newList; renderChiusure();
+    }
+  });
+}
+
+function addBlocco() {
+  var d=(document.getElementById('blocco-d')||{}).value||'';
+  if(!d)return;
+  bloccati.push(d); document.getElementById('blocco-d').value=''; renderBloccati();
+}
+
+function salvaSlot() {
+  apiCall('saveSlot',{giorni:sGiorni,orari:sOrari,durata:30},function(err,r){
+    var ok=document.getElementById('slot-ok');
+    if(ok){ok.style.display='';setTimeout(function(){ok.style.display='none';},3000);}
+  });
+}
+
+// ── CAMBIO PASSWORD ADMIN ─────────────────────────────────────
+// ── SOCI E TESSERE ───────────────────────────────────────────
+var curSocioId = null;
+
+function caricaSoci() {
+  makeFiltri('soci-filtri', ['tutti','con_tessera','senza_tessera'], ['Tutti','Con tessera','Senza tessera'], function(f){ filtraSoci(f); });
+  apiCall('getUtenti', {}, function(err, r) {
+    apiCall('getTessere', {}, function(err2, r2) {
+      var utenti  = (!err&&r&&r.ok) ? r.data||[] : [];
+      var tessere = (!err2&&r2&&r2.ok) ? r2.data||[] : [];
+      var anno = new Date().getFullYear();
+      var el = document.getElementById('l-soci'); if(!el) return;
+      el.innerHTML = '';
+      if (!utenti.length) { el.innerHTML='<div class="info">Nessun socio ancora.</div>'; return; }
+      utenti.forEach(function(u) {
+        var tes = tessere.filter(function(t){ return t.userId===u.id && String(t.anno)===String(anno); });
+        var haTessera = tes.length > 0;
+        var div = document.createElement('div'); div.className='row';
+        var bar = document.createElement('div'); bar.className='bar'; bar.style.background=haTessera?'#2D7A4F':'#E8631A';
+        var rb  = document.createElement('div'); rb.className='rb';
+        var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
+        var rt  = document.createElement('div'); rt.className='rt'; rt.textContent=u.displayName||((u.nome||'')+' '+(u.cognome||''));
+        var bdg = document.createElement('span'); bdg.className='bdg';
+        bdg.textContent = haTessera ? 'Tessera '+anno : 'Senza tessera';
+        bdg.style.color = haTessera?'#2D7A4F':'#E8631A';
+        bdg.style.background = haTessera?'#EBF5F0':'#FDF0E8';
+        var praticheSocio = (D.contratti||[]).filter(function(ct){ return ct.userId===u.id && ct.eliminato!==true && String(ct.eliminato).toLowerCase()!=='true'; });
+        var rs  = document.createElement('div'); rs.className='rs';
+        rs.textContent = (u.email||'') + (haTessera?' · '+tes[0].numeroTessera:'') + (praticheSocio.length?' · '+praticheSocio.length+' prat.':'');
+        var arr = document.createElement('div'); arr.className='ra'; arr.textContent='›';
+        top.appendChild(rt); top.appendChild(bdg); rb.appendChild(top); rb.appendChild(rs);
+        div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
+        div.addEventListener('click', (function(uid){ return function(){ apriSocio(uid); }; })(u.id));
+        el.appendChild(div);
+      });
+      window._utentiData  = utenti;
+      window._tessereData = tessere;
+      // Svuota search bar e mostra tutti
+      var searchEl = document.getElementById('soci-search');
+      if (searchEl) searchEl.value = '';
+      renderSoci();
+    });
+  });
+}
+
+function filtraSoci(f) {
+  renderSoci();
+}
+
+function filtraSociRicerca(query) {
+  var campo = (document.getElementById('soci-campo')||{}).value || 'tutti';
+  renderSoci(query, campo);
+}
+
+function renderSoci(query, campo) {
+  var utenti  = window._utentiData  || [];
+  var tessere = window._tessereData || [];
+  var anno    = new Date().getFullYear();
+  var el      = document.getElementById('l-soci'); if(!el) return;
+  var countEl = document.getElementById('soci-count');
+  campo = campo || 'tutti';
+
+  // Filtro ricerca
+  var lista = utenti;
+  if (query && query.trim()) {
+    var q = query.trim().toLowerCase();
+    lista = utenti.filter(function(u) {
+      if (campo === 'nome')    return ((u.nome||'')+' '+(u.cognome||'')).toLowerCase().indexOf(q) > -1;
+      if (campo === 'display') return (u.displayName||'').toLowerCase().indexOf(q) > -1;
+      if (campo === 'email')   return (u.email||'').toLowerCase().indexOf(q) > -1;
+      if (campo === 'cf')      return (u.cf||'').toLowerCase().indexOf(q) > -1;
+      // tutti i campi
+      return (u.nome||'').toLowerCase().indexOf(q) > -1
+          || (u.cognome||'').toLowerCase().indexOf(q) > -1
+          || (u.displayName||'').toLowerCase().indexOf(q) > -1
+          || (u.email||'').toLowerCase().indexOf(q) > -1
+          || (u.cf||'').toLowerCase().indexOf(q) > -1;
+    });
+  }
+
+  if (countEl) countEl.textContent = lista.length + ' socio/i trovati';
+
+  el.innerHTML = '';
+  if (!lista.length) {
+    el.innerHTML = '<div class="info">Nessun socio trovato.</div>';
+    return;
+  }
+
+  lista.forEach(function(u) {
+    var tes = tessere.filter(function(t){ return t.userId===u.id && String(t.anno)===String(anno); });
+    var haTessera = tes.length > 0;
+    var div = document.createElement('div'); div.className='row';
+    var bar = document.createElement('div'); bar.className='bar'; bar.style.background=haTessera?'#2D7A4F':'#E8631A';
+    var rb  = document.createElement('div'); rb.className='rb';
+    var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
+    var rt  = document.createElement('div'); rt.className='rt';
+    rt.textContent = u.displayName||((u.nome||'')+' '+(u.cognome||'')).trim();
+    var bdg = document.createElement('span'); bdg.className='bdg';
+    bdg.textContent = haTessera ? 'Tessera '+anno : 'Senza tessera';
+    bdg.style.color = haTessera?'#2D7A4F':'#E8631A';
+    bdg.style.background = haTessera?'#EBF5F0':'#FDF0E8';
+    var rs  = document.createElement('div'); rs.className='rs';
+    rs.textContent = (u.email||'') + (haTessera?' · '+tes[0].numeroTessera:'');
+    var arr = document.createElement('div'); arr.className='ra'; arr.textContent='›';
+    top.appendChild(rt); top.appendChild(bdg); rb.appendChild(top); rb.appendChild(rs);
+    div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
+    // Pannello pagamento inline espandibile
+    var panel = document.createElement('div');
+    panel.id = 'pag-panel-'+u.id;
+    panel.style.cssText = 'display:none;background:#F8F7F5;border-radius:0 0 14px 14px;padding:14px;margin-top:-10px;margin-bottom:10px;border:1px solid #e5e5e5;border-top:none';
+    panel.innerHTML = '<div style="font-size:11px;font-weight:700;color:#E8631A;text-transform:uppercase;margin-bottom:10px">Registra pagamento</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+      +'<select id="pp-tipo-'+u.id+'" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;min-width:150px">'
+      +'<option value="Primo tesseramento" data-imp="55">Primo tesseramento €55</option>'
+      +'<option value="Rinnovo tessera" data-imp="50">Rinnovo tessera €50</option>'
+      +'<option value="Contratto extra" data-imp="25">Contratto extra €25</option>'
+      +'<option value="Adempimento extra" data-imp="15">Adempimento extra €15</option>'
+      +'<option value="Acconto" data-imp="">Acconto/parziale</option>'
+      +'<option value="Altro" data-imp="">Altro</option>'
+      +'</select>'
+      +'<input type="text" id="pp-imp-'+u.id+'" placeholder="€ Importo" style="width:90px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px"/>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+      +'<select id="pp-stato-'+u.id+'" data-uid="'+u.id+'" class="pp-stato-sel" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px">'
+      +'<option value="dovuto">Da pagare</option>'
+      +'<option value="confermato">Gia pagato</option>'
+      +'</select>'
+      +'<select id="pp-met-'+u.id+'" style="width:110px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;display:none">'
+      +'<option value="contanti">Contanti</option>'
+      +'<option value="bonifico">Bonifico</option>'
+      +'</select>'
+      +'<input type="text" id="pp-data-'+u.id+'" placeholder="gg/mm/aaaa" style="width:110px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;display:none" oninput="autoDateAdmin(this)"/>'
+      +'</div>';
+    
+    // Se ha bonifico dichiarato, mostra bottone conferma
+    var econItem = (window._econData||[]).find(function(e){ return e.socio && e.socio.id===u.id; });
+    var bonDichiarato2 = econItem && econItem.pagamenti && econItem.pagamenti.some(function(p){ return p.stato==='bonifico_dichiarato'; });
+    if (bonDichiarato2) {
+      var pagBon = econItem.pagamenti.find(function(p){ return p.stato==='bonifico_dichiarato'; });
+      panel.innerHTML += '<div style="background:#EBF2FB;border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px;color:#1A5FA8">'
+        +'&#9888; Bonifico dichiarato il '+(pagBon?pagBon.dataPagamento:'')
+        +' — Rif: '+(pagBon&&pagBon.riferimentoBonifico?pagBon.riferimentoBonifico:'non indicato')
+        +'<button class="pp-btn-conf" data-uid="'+u.id+'" data-pagid="'+(pagBon?pagBon.id:'')+'\" style="margin-left:8px;background:#2D7A4F;color:#fff;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">Conferma bonifico</button>'
+        +'</div>';
+    }
+    
+    panel.innerHTML += '<div style="display:flex;gap:6px">'
+      +'<button class="pp-btn-reg" data-uid="'+u.id+'" style="flex:1;padding:8px;background:#E8631A;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Registra</button>'
+      +'<button class="pp-btn-close" data-uid="'+u.id+'" style="padding:8px 14px;background:#fff;color:#1A1A1A;border:1.5px solid #e5e5e5;border-radius:8px;font-size:13px;cursor:pointer">Annulla</button>'
+      +'</div>'
+      +'<div id="pp-ok-'+u.id+'" style="display:none;color:#2D7A4F;font-size:12px;font-weight:700;margin-top:6px">&#9989; Registrato!</div>';
+    
+    // Pre-compila importo al cambio tipo
+    panel.querySelector('#pp-tipo-'+u.id).addEventListener('change', function(){
+      var opt = this.options[this.selectedIndex];
+      var imp = opt.getAttribute('data-imp');
+      var impEl = document.getElementById('pp-imp-'+u.id);
+      if(impEl && imp) impEl.value = imp;
+    });
+    // Pre-compila importo iniziale
+    var firstOpt = panel.querySelector('#pp-tipo-'+u.id+' option');
+    var firstImp = firstOpt ? firstOpt.getAttribute('data-imp') : '';
+    if(firstImp) panel.querySelector('#pp-imp-'+u.id).value = firstImp;
+    
+    // Wrapper per row + panel
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'margin-bottom:10px';
+    div.style.marginBottom = '0';
+    div.style.borderRadius = '14px 14px 0 0';
+    div.addEventListener('click', (function(uid, w){ 
+      return function(e){ 
+        if(e.target.tagName==='BUTTON'||e.target.closest('button')) return;
+        togglePanelPag(uid, w); 
+      }; 
+    })(u.id, wrapper));
+    wrapper.appendChild(div);
+    wrapper.appendChild(panel);
+    el.appendChild(wrapper);
+  });
+}
+
+function togglePanelPag(uid, wrapper) {
+  var panel = document.getElementById('pag-panel-'+uid);
+  if(!panel) return;
+  var isOpen = panel.style.display !== 'none';
+  // Chiudi tutti gli altri
+  document.querySelectorAll('[id^="pag-panel-"]').forEach(function(p){ p.style.display='none'; });
+  if(!isOpen) panel.style.display = '';
+}
+
+function chiudiPanelPag(uid) {
+  var panel = document.getElementById('pag-panel-'+uid);
+  if(panel) panel.style.display='none';
+}
+
+// Event delegation for pagamenti panel buttons
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.classList.contains('pp-stato-sel')) {
+    togglePanelDettagli(e.target.getAttribute('data-uid'));
+  }
+});
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest ? e.target.closest('button') : e.target;
+  if (!btn) return;
+  if (btn.classList.contains('pp-btn-reg')) {
+    registraPagamentoDiretto(btn.getAttribute('data-uid'));
+  } else if (btn.classList.contains('pp-btn-close')) {
+    chiudiPanelPag(btn.getAttribute('data-uid'));
+  } else if (btn.classList.contains('pp-btn-conf')) {
+    confermaBonificoDiretto(btn.getAttribute('data-uid'), btn.getAttribute('data-pagid'), btn);
+  }
+});
+
+function togglePanelDettagli(uid) {
+  var stato = (document.getElementById('pp-stato-'+uid)||{}).value||'dovuto';
+  var met  = document.getElementById('pp-met-'+uid);
+  var data = document.getElementById('pp-data-'+uid);
+  if(met)  met.style.display  = stato==='confermato'?'':'none';
+  if(data) data.style.display = stato==='confermato'?'':'none';
+  if(stato==='confermato' && data && !data.value) {
+    var oggi = new Date();
+    data.value = ('0'+oggi.getDate()).slice(-2)+'/'+('0'+(oggi.getMonth()+1)).slice(-2)+'/'+oggi.getFullYear();
+  }
+}
+
+function registraPagamentoDiretto(uid) {
+  var tipoEl = document.getElementById('pp-tipo-'+uid);
+  var tipo   = tipoEl ? tipoEl.options[tipoEl.selectedIndex].value : '';
+  var importo= (document.getElementById('pp-imp-'+uid)||{}).value||'';
+  var stato  = (document.getElementById('pp-stato-'+uid)||{}).value||'dovuto';
+  var metodo = (document.getElementById('pp-met-'+uid)||{}).value||'contanti';
+  var data   = (document.getElementById('pp-data-'+uid)||{}).value||'';
+  if(!importo) { alert('Inserisci importo'); return; }
+  if(stato==='confermato'&&!data) { alert('Inserisci data pagamento'); return; }
+  var obj = {
+    userId:uid, tipo:tipo, importo:parseFloat(String(importo).replace(',','.')),
+    anno:new Date().getFullYear(), stato:stato,
+    metodoPagamento:stato==='confermato'?metodo:'',
+    dataPagamento:stato==='confermato'?data:''
+  };
+  apiCall('savePagamento', {data:obj}, function(err,r){
+    var okEl = document.getElementById('pp-ok-'+uid);
+    if(!err&&r&&r.ok){ 
+      if(okEl) okEl.style.display='';
+      setTimeout(function(){ chiudiPanelPag(uid); caricaPagamenti(); }, 1000);
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function confermaBonificoDiretto(uid, pagId, btn) {
+  if(!pagId) return;
+  var oggi = new Date();
+  var data = ('0'+oggi.getDate()).slice(-2)+'/'+('0'+(oggi.getMonth()+1)).slice(-2)+'/'+oggi.getFullYear();
+  apiCall('confermaPagamento', {id:pagId, metodoPagamento:'bonifico', dataPagamento:data}, function(err,r){
+    if(!err&&r&&r.ok){ 
+      if(btn){ btn.textContent='✓ Confermato'; btn.style.background='#8A8A8A'; btn.disabled=true; }
+      setTimeout(function(){ chiudiPanelPag(uid); caricaPagamenti(); }, 800);
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function apriSocio(uid) {
+  curSocioId = uid;
+  var u = (window._utentiData||[]).filter(function(x){ return x.id===uid; })[0];
+  if (!u) return;
+  var anno = new Date().getFullYear();
+  var tes  = (window._tessereData||[]).filter(function(t){ return t.userId===uid && String(t.anno)===String(anno); });
+
+  setText('os-ttl',   u.displayName||((u.nome||'')+' '+(u.cognome||'')));
+  setText('os-nome',  (u.nome||'')+' '+(u.cognome||''));
+  setText('os-cf',    u.cf||'—');
+  setText('os-dtn',   u.dataNascita||'—');
+  setText('os-lng',   u.luogoNascita||'—');
+  setText('os-res',   u.comuneResidenza||'—');
+  setText('os-via',   u.viaResidenza||'—');
+  setText('os-tel',   u.telefono||'—');
+  setText('os-email', u.email||'—');
+  setText('os-data',  u.dataRegistrazione?u.dataRegistrazione.substring(0,10):'—');
+
+  // Tessera
+  var tesInfo = document.getElementById('os-tessera-info');
+  var tesNum  = document.getElementById('os-tes-num');
+  var tesAnno = document.getElementById('os-tes-anno');
+  if (tes.length) {
+    if(tesInfo) tesInfo.innerHTML='<div class="infog">&#9989; Tessera '+anno+': <strong>'+tes[0].numeroTessera+'</strong></div>';
+    if(tesNum)  tesNum.value  = tes[0].numeroTessera||'';
+    if(tesAnno) tesAnno.value = tes[0].anno||anno;
+  } else {
+    if(tesInfo) tesInfo.innerHTML='<div class="info">Nessuna tessera per il '+anno+'</div>';
+    if(tesNum)  tesNum.value  = '';
+    if(tesAnno) tesAnno.value = anno;
+  }
+  hide('os-tes-ok');
+
+  // Situazione economica
+  var econ = document.getElementById('os-economia');
+  if(econ) econ.innerHTML='<div class="info">Caricamento...</div>';
+  apiCall('getStrategiaEconomica', {userId: uid}, function(err, r) {
+    if(!econ) return;
+    if(err||!r||!r.ok){ econ.innerHTML='<div class="info">Dati non disponibili.</div>'; return; }
+    var h='';
+    if(r.tesseramento && !r.tesseramento.hasTessera){
+      h+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee"><span class="lbl" style="margin:0">'+r.tesseramento.tipo+'</span><span style="font-weight:700;color:#E8631A">€'+r.tesseramento.dovuto+'</span></div>';
+    }
+    if(r.lavori&&r.lavori.dettaglio){
+      r.lavori.dettaglio.forEach(function(l){
+        h+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee"><span class="lbl" style="margin:0">'+l.tipo+'</span><span style="font-weight:700;color:'+(l.importo===0?'#2D7A4F':'#E8631A')+'">'+(l.importo===0?'Incluso':'€'+l.importo)+'</span></div>';
+      });
+    }
+    h+='<div style="display:flex;justify-content:space-between;padding:10px 0"><span style="font-weight:800">TOTALE DOVUTO</span><span style="font-size:18px;font-weight:800;color:#E8631A">€'+r.totaleDovuto+'</span></div>';
+    if(r.totalePagato>0){
+      h+='<div style="display:flex;justify-content:space-between"><span style="color:#2D7A4F">Pagato</span><span style="font-weight:700;color:#2D7A4F">€'+r.totalePagato+'</span></div>';
+      h+='<div style="display:flex;justify-content:space-between"><span style="font-weight:800">SALDO</span><span style="font-size:16px;font-weight:800;color:'+(r.saldo>0?'#C0392B':'#2D7A4F')+'">€'+r.saldo+'</span></div>';
+    }
+    econ.innerHTML = h||'<div class="infog">&#9989; Nessun importo dovuto</div>';
+    // Pre-compila importo pagamento
+    var impEl = document.getElementById('os-pag-importo');
+    if(impEl && r.saldo>0) impEl.value = r.saldo;
+  });
+
+  // Data oggi
+  var oggi = new Date();
+  var dataEl = document.getElementById('os-pag-data');
+  if(dataEl) dataEl.value = ('0'+oggi.getDate()).slice(-2)+'/'+('0'+(oggi.getMonth()+1)).slice(-2)+'/'+oggi.getFullYear();
+
+  hide('os-pag-ok');
+  caricaStoricoPagamenti(uid);
+  apri('ov-socio');
+}
+
+function salvaTessera() {
+  var num  = (document.getElementById('os-tes-num')||{}).value||'';
+  var anno = (document.getElementById('os-tes-anno')||{}).value||new Date().getFullYear();
+  if(!num) { alert('Inserisci il numero tessera'); return; }
+  var tessere = (window._tessereData||[]).filter(function(t){ return t.userId===curSocioId&&String(t.anno)===String(anno); });
+  var obj = tessere.length ? tessere[0] : {};
+  obj.userId       = curSocioId;
+  obj.numeroTessera= num;
+  obj.anno         = anno;
+  obj.stato        = 'valida';
+  apiCall('saveTessera', {data:obj}, function(err,r){
+    if(!err&&r&&r.ok){ show('os-tes-ok'); caricaSoci(); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function aggiornaImportoPag() {
+  var sel = document.getElementById('os-pag-tipo');
+  var imp = document.getElementById('os-pag-importo');
+  if(!sel||!imp) return;
+  var opt = sel.options[sel.selectedIndex];
+  var importo = opt.getAttribute('data-importo');
+  if(importo) imp.value = importo;
+}
+
+function toggleCampiPagamento() {
+  var stato = (document.getElementById('os-pag-stato')||{}).value||'dovuto';
+  var det = document.getElementById('os-pag-dettagli');
+  if(det) det.style.display = stato==='confermato' ? '' : 'none';
+  // Pre-compila data di oggi se confermato
+  if(stato==='confermato') {
+    var dataEl = document.getElementById('os-pag-data');
+    if(dataEl && !dataEl.value) {
+      var oggi = new Date();
+      dataEl.value = ('0'+oggi.getDate()).slice(-2)+'/'+('0'+(oggi.getMonth()+1)).slice(-2)+'/'+oggi.getFullYear();
+    }
+  }
+}
+
+function registraPagamento() {
+  var tipoEl  = document.getElementById('os-pag-tipo');
+  var tipo    = tipoEl ? tipoEl.options[tipoEl.selectedIndex].value : '';
+  var importo = (document.getElementById('os-pag-importo')||{}).value||'';
+  var stato   = (document.getElementById('os-pag-stato')||{}).value||'dovuto';
+  var metodo  = (document.getElementById('os-pag-metodo')||{}).value||'contanti';
+  var data    = (document.getElementById('os-pag-data')||{}).value||'';
+  var note    = (document.getElementById('os-pag-note')||{}).value||'';
+  if(!importo) { alert('Inserisci importo'); return; }
+  if(stato==='confermato' && !data) { alert('Inserisci la data del pagamento'); return; }
+  var obj = {
+    userId: curSocioId, tipo: tipo,
+    importo: parseFloat(String(importo).replace(',','.')),
+    anno: new Date().getFullYear(), stato: stato,
+    metodoPagamento: stato==='confermato'?metodo:'',
+    dataPagamento: stato==='confermato'?data:'',
+    note: note
+  };
+  apiCall('savePagamento', {data:obj}, function(err,r){
+    if(!err&&r&&r.ok){
+      show('os-pag-ok');
+      // Reset form
+      if(document.getElementById('os-pag-importo')) document.getElementById('os-pag-importo').value='';
+      if(document.getElementById('os-pag-note')) document.getElementById('os-pag-note').value='';
+      if(document.getElementById('os-pag-stato')) document.getElementById('os-pag-stato').value='dovuto';
+      toggleCampiPagamento();
+      caricaStoricoPagamenti(curSocioId);
+      caricaPagamenti();
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function caricaStoricoPagamenti(userId) {
+  apiCall('getPagamenti', {}, function(err, r) {
+    var el = document.getElementById('os-pag-lista'); if(!el) return;
+    var pags = (!err&&r&&r.ok) ? (r.data||[]).filter(function(p){ return p.userId===userId; }) : [];
+    if (!pags.length) { el.innerHTML='<div class="info">Nessun pagamento ancora.</div>'; return; }
+    var h = '';
+    pags.forEach(function(p) {
+      var pagato = p.stato==='confermato';
+      var col = pagato?'#2D7A4F':'#E8631A';
+      var div = document.createElement('div');
+      div.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e5e5e5';
+      var left = document.createElement('div');
+      var t1 = document.createElement('div'); t1.style.cssText='font-size:13px;font-weight:600'; t1.textContent=p.tipo||'Servizio';
+      var t2 = document.createElement('div'); t2.style.cssText='font-size:11px;color:#8A8A8A';
+      t2.textContent=(p.dataPagamento||'')+(p.metodoPagamento?' · '+p.metodoPagamento:'');
+      left.appendChild(t1); left.appendChild(t2);
+      var right = document.createElement('div'); right.style.cssText='display:flex;align-items:center;gap:8px';
+      var price = document.createElement('span'); price.style.cssText='font-size:15px;font-weight:800;color:'+col; price.textContent='€'+p.importo;
+      if (p.stato !== 'confermato') {
+        var btnConf = document.createElement('button');
+        btnConf.textContent = '✓ Pagato';
+        btnConf.style.cssText='background:#2D7A4F;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer';
+        btnConf.addEventListener('click', (function(pid){ return function(){ confermaPagamento(pid); }; })(p.id));
+        right.appendChild(btnConf);
+      }
+      var btnEl = document.createElement('button');
+      btnEl.style.cssText='background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px';
+      btnEl.innerHTML='&#128465;';
+      btnEl.addEventListener('click', (function(pid){ return function(){ eliminaPagamento(pid); }; })(p.id));
+      right.appendChild(price); right.appendChild(btnEl);
+      div.appendChild(left); div.appendChild(right);
+      el.appendChild(div);
+    });
+  });
+}
+
+function confermaPagamento(pagId) {
+  var metodo = prompt('Metodo di pagamento:', 'contanti');
+  if (metodo === null) return;
+  var data = prompt('Data pagamento (gg/mm/aaaa):', new Date().toLocaleDateString('it-IT'));
+  if (!data) return;
+  apiCall('confermaPagamento', {id: pagId, metodoPagamento: metodo, dataPagamento: data}, function(err,r){
+    if(!err&&r&&r.ok){ caricaStoricoPagamenti(curSocioId); caricaPagamenti(); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function eliminaPagamento(pagId) {
+  if (!confirm('Eliminare questo pagamento?')) return;
+  apiCall('eliminaPagamento', {id: pagId}, function(err, r) {
+    if (!err&&r&&r.ok) { caricaStoricoPagamenti(curSocioId); caricaPagamenti(); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function eliminaSocio() {
+  var u = (window._utentiData||[]).filter(function(x){ return x.id===curSocioId; })[0];
+  var nome = u ? (u.displayName||u.nome||'questo socio') : 'questo socio';
+  if (!confirm('Sei sicuro di voler eliminare '+nome+'? Tutti i suoi dati verranno cancellati definitivamente.')) return;
+  apiCall('eliminaSocio', {userId: curSocioId}, function(err, r) {
+    if (!err&&r&&r.ok) { chiudi('ov-socio'); caricaSoci(); alert('Socio eliminato.'); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+// ── PAGAMENTI ─────────────────────────────────────────────────
+var pagFiltro = 'tutti';
+
+function caricaPagamenti() {
+  makeFiltri('pag-filtri',
+    ['tutti','da_pagare','bonifico_dichiarato','pagati'],
+    ['Tutti','Da pagare','Bonifico da verificare','Pagati'],
+    function(f){ pagFiltro=f; renderPagamenti(); }
+  );
+  apiCall('getStrategiaEconomica', {}, function(err, r) {
+    if(err||!r||!r.ok){ document.getElementById('l-pag').innerHTML='<div class="info">Errore caricamento.</div>'; return; }
+    window._econData = r.data || [];
+    renderPagamenti();
+  });
+}
+
+function cercaPagamenti(query) {
+  var campo = (document.getElementById('pag-campo')||{}).value || 'tutti';
+  renderPagamenti(query, campo);
+}
+
+function renderPagamenti(query, campo) {
+  var el = document.getElementById('l-pag'); if(!el) return;
+  var countEl = document.getElementById('pag-count');
+  campo = campo || 'tutti';
+
+  var lista = window._econData || [];
+
+  // Filtro stato
+  if (pagFiltro === 'da_pagare') lista = lista.filter(function(x){ return x.saldo>0; });
+  else if (pagFiltro === 'bonifico_dichiarato') lista = lista.filter(function(x){
+    return x.pagamenti && x.pagamenti.some(function(p){ return p.stato==='bonifico_dichiarato'; });
+  });
+  else if (pagFiltro === 'pagati') lista = lista.filter(function(x){ return x.saldo===0 && x.totaleDovuto>0; });
+
+  // Filtro ricerca
+  if (query && query.trim()) {
+    var q = query.trim().toLowerCase();
+    lista = lista.filter(function(item) {
+      var u = item.socio || {};
+      if (campo === 'display') return (u.displayName||'').toLowerCase().indexOf(q)>-1 || ((u.nome||'')+' '+(u.cognome||'')).toLowerCase().indexOf(q)>-1;
+      if (campo === 'email')   return (u.email||'').toLowerCase().indexOf(q)>-1;
+      return (u.displayName||'').toLowerCase().indexOf(q)>-1
+          || ((u.nome||'')+' '+(u.cognome||'')).toLowerCase().indexOf(q)>-1
+          || (u.email||'').toLowerCase().indexOf(q)>-1;
+    });
+  }
+
+  window._pagListaFiltrata = lista;
+  if (countEl) countEl.textContent = lista.length + ' socio/i trovati';
+  
+  // Totali
+  var totEl = document.getElementById('pag-totali');
+  if (totEl) {
+    var totDovuto = 0, totPagato = 0, totSaldo = 0;
+    lista.forEach(function(item){ totDovuto+=item.totaleDovuto||0; totPagato+=item.totalePagato||0; totSaldo+=item.saldo||0; });
+    totEl.innerHTML = '<div style="flex:1;background:#FDF0E8;border-radius:10px;padding:10px;text-align:center"><div style="font-size:11px;color:#8A8A8A">Dovuto</div><div style="font-size:16px;font-weight:800;color:#E8631A">€'+totDovuto+'</div></div>'
+      +'<div style="flex:1;background:#EBF5F0;border-radius:10px;padding:10px;text-align:center"><div style="font-size:11px;color:#8A8A8A">Incassato</div><div style="font-size:16px;font-weight:800;color:#2D7A4F">€'+totPagato+'</div></div>'
+      +'<div style="flex:1;background:#FDEEEC;border-radius:10px;padding:10px;text-align:center"><div style="font-size:11px;color:#8A8A8A">Da incassare</div><div style="font-size:16px;font-weight:800;color:#C0392B">€'+totSaldo+'</div></div>';
+  }
+
+  el.innerHTML = '';
+  if (!lista.length) { el.innerHTML='<div class="info">Nessun risultato.</div>'; return; }
+
+  lista.forEach(function(item) {
+    var u = item.socio || {};
+    var col = item.saldo>0 ? '#C0392B' : '#2D7A4F';
+    var bonDichiarato = item.pagamenti && item.pagamenti.some(function(p){ return p.stato==='bonifico_dichiarato'; });
+    var div = document.createElement('div'); div.className='row';
+    var bar = document.createElement('div'); bar.className='bar'; bar.style.background=col;
+    var rb  = document.createElement('div'); rb.className='rb';
+    var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
+    var rt  = document.createElement('div'); rt.className='rt';
+    rt.textContent = u.displayName||((u.nome||'')+' '+(u.cognome||'')).trim();
+    var importoEl = document.createElement('span'); importoEl.style.cssText='font-size:15px;font-weight:800;color:'+col;
+    importoEl.textContent = item.saldo>0 ? '€'+item.saldo+' dovuti' : '✅ In regola';
+    var rs = document.createElement('div'); rs.className='rs';
+    var bonCheck = (window._econData||[]).some(function(e){ return e.socio && e.socio.id===u.id && e.pagamenti && e.pagamenti.some(function(p){ return p.stato==='bonifico_dichiarato'; }); });
+    rs.textContent = (u.email||'') + (bonCheck?' · ⚠️ Bonifico da verificare':'');
+    var right = document.createElement('div'); right.style.cssText='display:flex;flex-direction:column;align-items:flex-end;padding:10px;gap:6px;justify-content:center';
+    right.appendChild(importoEl);
+    if (item.saldo > 0) {
+      var btnProm = document.createElement('button');
+      btnProm.textContent = '📨 Promemoria';
+      btnProm.style.cssText = 'background:#E8631A;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap';
+      btnProm.addEventListener('click', (function(uid, nome){
+        return function(e){
+          e.stopPropagation();
+          if (!confirm('Inviare promemoria a '+nome+'?')) return;
+          apiCall('inviaPromemoriaSingolo', {userId:uid}, function(err,r){
+            if(!err&&r&&r.ok){ alert('Promemoria inviato!'); }
+            else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+          });
+        };
+      })(u.id, u.displayName||((u.nome||'')+' '+(u.cognome||'')).trim()));
+      right.appendChild(btnProm);
+    }
+    top.appendChild(rt); rb.appendChild(top); rb.appendChild(rs);
+    div.appendChild(bar); div.appendChild(rb); div.appendChild(right);
+    // Pannello pagamento inline espandibile
+    var panel = document.createElement('div');
+    panel.id = 'pag-panel-'+u.id;
+    panel.style.cssText = 'display:none;background:#F8F7F5;border-radius:0 0 14px 14px;padding:14px;margin-top:-10px;margin-bottom:10px;border:1px solid #e5e5e5;border-top:none';
+    panel.innerHTML = '<div style="font-size:11px;font-weight:700;color:#E8631A;text-transform:uppercase;margin-bottom:10px">Registra pagamento</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+      +'<select id="pp-tipo-'+u.id+'" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;min-width:150px">'
+      +'<option value="Primo tesseramento" data-imp="55">Primo tesseramento €55</option>'
+      +'<option value="Rinnovo tessera" data-imp="50">Rinnovo tessera €50</option>'
+      +'<option value="Contratto extra" data-imp="25">Contratto extra €25</option>'
+      +'<option value="Adempimento extra" data-imp="15">Adempimento extra €15</option>'
+      +'<option value="Acconto" data-imp="">Acconto/parziale</option>'
+      +'<option value="Altro" data-imp="">Altro</option>'
+      +'</select>'
+      +'<input type="text" id="pp-imp-'+u.id+'" placeholder="€ Importo" style="width:90px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px"/>'
+      +'</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">'
+      +'<select id="pp-stato-'+u.id+'" data-uid="'+u.id+'" class="pp-stato-sel" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px">'
+      +'<option value="dovuto">Da pagare</option>'
+      +'<option value="confermato">Gia pagato</option>'
+      +'</select>'
+      +'<select id="pp-met-'+u.id+'" style="width:110px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;display:none">'
+      +'<option value="contanti">Contanti</option>'
+      +'<option value="bonifico">Bonifico</option>'
+      +'</select>'
+      +'<input type="text" id="pp-data-'+u.id+'" placeholder="gg/mm/aaaa" style="width:110px;padding:8px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;display:none" oninput="autoDateAdmin(this)"/>'
+      +'</div>';
+    
+    // Se ha bonifico dichiarato, mostra bottone conferma
+    var econItem = (window._econData||[]).find(function(e){ return e.socio && e.socio.id===u.id; });
+    var bonDichiarato2 = econItem && econItem.pagamenti && econItem.pagamenti.some(function(p){ return p.stato==='bonifico_dichiarato'; });
+    if (bonDichiarato2) {
+      var pagBon = econItem.pagamenti.find(function(p){ return p.stato==='bonifico_dichiarato'; });
+      panel.innerHTML += '<div style="background:#EBF2FB;border-radius:8px;padding:10px;margin-bottom:8px;font-size:12px;color:#1A5FA8">'
+        +'&#9888; Bonifico dichiarato il '+(pagBon?pagBon.dataPagamento:'')
+        +' — Rif: '+(pagBon&&pagBon.riferimentoBonifico?pagBon.riferimentoBonifico:'non indicato')
+        +'<button class="pp-btn-conf" data-uid="'+u.id+'" data-pagid="'+(pagBon?pagBon.id:'')+'\" style="margin-left:8px;background:#2D7A4F;color:#fff;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">Conferma bonifico</button>'
+        +'</div>';
+    }
+    
+    panel.innerHTML += '<div style="display:flex;gap:6px">'
+      +'<button class="pp-btn-reg" data-uid="'+u.id+'" style="flex:1;padding:8px;background:#E8631A;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Registra</button>'
+      +'<button class="pp-btn-close" data-uid="'+u.id+'" style="padding:8px 14px;background:#fff;color:#1A1A1A;border:1.5px solid #e5e5e5;border-radius:8px;font-size:13px;cursor:pointer">Annulla</button>'
+      +'</div>'
+      +'<div id="pp-ok-'+u.id+'" style="display:none;color:#2D7A4F;font-size:12px;font-weight:700;margin-top:6px">&#9989; Registrato!</div>';
+    
+    // Pre-compila importo al cambio tipo
+    panel.querySelector('#pp-tipo-'+u.id).addEventListener('change', function(){
+      var opt = this.options[this.selectedIndex];
+      var imp = opt.getAttribute('data-imp');
+      var impEl = document.getElementById('pp-imp-'+u.id);
+      if(impEl && imp) impEl.value = imp;
+    });
+    // Pre-compila importo iniziale
+    var firstOpt = panel.querySelector('#pp-tipo-'+u.id+' option');
+    var firstImp = firstOpt ? firstOpt.getAttribute('data-imp') : '';
+    if(firstImp) panel.querySelector('#pp-imp-'+u.id).value = firstImp;
+    
+    // Wrapper per row + panel
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'margin-bottom:10px';
+    div.style.marginBottom = '0';
+    div.style.borderRadius = '14px 14px 0 0';
+    div.addEventListener('click', (function(uid, w){ 
+      return function(e){ 
+        if(e.target.tagName==='BUTTON'||e.target.closest('button')) return;
+        togglePanelPag(uid, w); 
+      }; 
+    })(u.id, wrapper));
+    wrapper.appendChild(div);
+    wrapper.appendChild(panel);
+    el.appendChild(wrapper);
+  });
+}
+
+function togglePanelPag(uid, wrapper) {
+  var panel = document.getElementById('pag-panel-'+uid);
+  if(!panel) return;
+  var isOpen = panel.style.display !== 'none';
+  // Chiudi tutti gli altri
+  document.querySelectorAll('[id^="pag-panel-"]').forEach(function(p){ p.style.display='none'; });
+  if(!isOpen) panel.style.display = '';
+}
+
+function chiudiPanelPag(uid) {
+  var panel = document.getElementById('pag-panel-'+uid);
+  if(panel) panel.style.display='none';
+}
+
+// Event delegation for pagamenti panel buttons
+document.addEventListener('change', function(e) {
+  if (e.target && e.target.classList.contains('pp-stato-sel')) {
+    togglePanelDettagli(e.target.getAttribute('data-uid'));
+  }
+});
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest ? e.target.closest('button') : e.target;
+  if (!btn) return;
+  if (btn.classList.contains('pp-btn-reg')) {
+    registraPagamentoDiretto(btn.getAttribute('data-uid'));
+  } else if (btn.classList.contains('pp-btn-close')) {
+    chiudiPanelPag(btn.getAttribute('data-uid'));
+  } else if (btn.classList.contains('pp-btn-conf')) {
+    confermaBonificoDiretto(btn.getAttribute('data-uid'), btn.getAttribute('data-pagid'), btn);
+  }
+});
+
+function togglePanelDettagli(uid) {
+  var stato = (document.getElementById('pp-stato-'+uid)||{}).value||'dovuto';
+  var met  = document.getElementById('pp-met-'+uid);
+  var data = document.getElementById('pp-data-'+uid);
+  if(met)  met.style.display  = stato==='confermato'?'':'none';
+  if(data) data.style.display = stato==='confermato'?'':'none';
+  if(stato==='confermato' && data && !data.value) {
+    var oggi = new Date();
+    data.value = ('0'+oggi.getDate()).slice(-2)+'/'+('0'+(oggi.getMonth()+1)).slice(-2)+'/'+oggi.getFullYear();
+  }
+}
+
+function registraPagamentoDiretto(uid) {
+  var tipoEl = document.getElementById('pp-tipo-'+uid);
+  var tipo   = tipoEl ? tipoEl.options[tipoEl.selectedIndex].value : '';
+  var importo= (document.getElementById('pp-imp-'+uid)||{}).value||'';
+  var stato  = (document.getElementById('pp-stato-'+uid)||{}).value||'dovuto';
+  var metodo = (document.getElementById('pp-met-'+uid)||{}).value||'contanti';
+  var data   = (document.getElementById('pp-data-'+uid)||{}).value||'';
+  if(!importo) { alert('Inserisci importo'); return; }
+  if(stato==='confermato'&&!data) { alert('Inserisci data pagamento'); return; }
+  var obj = {
+    userId:uid, tipo:tipo, importo:parseFloat(String(importo).replace(',','.')),
+    anno:new Date().getFullYear(), stato:stato,
+    metodoPagamento:stato==='confermato'?metodo:'',
+    dataPagamento:stato==='confermato'?data:''
+  };
+  apiCall('savePagamento', {data:obj}, function(err,r){
+    var okEl = document.getElementById('pp-ok-'+uid);
+    if(!err&&r&&r.ok){ 
+      if(okEl) okEl.style.display='';
+      setTimeout(function(){ chiudiPanelPag(uid); caricaPagamenti(); }, 1000);
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function confermaBonificoDiretto(uid, pagId, btn) {
+  if(!pagId) return;
+  var oggi = new Date();
+  var data = ('0'+oggi.getDate()).slice(-2)+'/'+('0'+(oggi.getMonth()+1)).slice(-2)+'/'+oggi.getFullYear();
+  apiCall('confermaPagamento', {id:pagId, metodoPagamento:'bonifico', dataPagamento:data}, function(err,r){
+    if(!err&&r&&r.ok){ 
+      if(btn){ btn.textContent='✓ Confermato'; btn.style.background='#8A8A8A'; btn.disabled=true; }
+      setTimeout(function(){ chiudiPanelPag(uid); caricaPagamenti(); }, 800);
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function inviaPromemoria() {
+  if (!confirm('Inviare email di promemoria a tutti i soci con pagamenti in sospeso?')) return;
+  apiCall('inviaPromemoriaPagamenti', {}, function(err,r){
+    if(!err&&r&&r.ok){ alert('Promemoria inviati a '+r.inviati+' soci!'); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function inviaPromemoriasingolo() {
+  if (!curSocioId) return;
+  var u = (window._utentiData||[]).filter(function(x){ return x.id===curSocioId; })[0];
+  var nome = u ? (u.displayName||u.nome||'questo socio') : 'questo socio';
+  if (!confirm('Inviare promemoria pagamento a '+nome+'?')) return;
+  apiCall('inviaPromemoriaSingolo', {userId: curSocioId}, function(err,r){
+    if(!err&&r&&r.ok){ alert('Promemoria inviato!'); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function exportPagamentiCSV() {
+  var lista = window._pagListaFiltrata || window._econData || [];
+  if (!lista.length) { alert('Nessun dato da esportare'); return; }
+  var rows = [['Nome','Ragione Sociale','Email','Anno','Totale Dovuto','Totale Pagato','Saldo']];
+  lista.forEach(function(item) {
+    var u = item.socio || {};
+    rows.push([
+      ((u.nome||'')+' '+(u.cognome||'')).trim(),
+      u.displayName||'',
+      u.email||'',
+      item.anno||'',
+      item.totaleDovuto||0,
+      item.totalePagato||0,
+      item.saldo||0
+    ]);
+  });
+  var csv = csvEsporta(rows);
+  var blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = 'pagamenti_asppi_'+new Date().toISOString().substring(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── IMPOSTAZIONI ─────────────────────────────────────────────
+var curSrvId = null;
+var srvAttivo = true;
+
+function caricaImpostazioni() {
+  caricaDocumenti();
+  caricaAvvisi();
+  caricaSlotAdmin();
+}
+
+var ORARI_DEFAULT = ['08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
+var GIORNI_SETTIMANA = ['Lun','Mar','Mer','Gio','Ven','Sab'];
+// slotMatrix[giorno][ora] = true/false
+var slotMatrix = {};
+
+function caricaSlotAdmin() {
+  apiCall('getSlot', {}, function(err, r) {
+    // slotMatrix e' ora un oggetto giorno->array orari
+    slotMatrix = {};
+    if (!err && r && r.ok && r.slotMatrix) {
+      slotMatrix = r.slotMatrix;
+    } else if (!err && r && r.ok && r.orari && r.orari.length) {
+      // Compatibilita vecchio formato: tutti gli orari per tutti i giorni
+      GIORNI_SETTIMANA.forEach(function(g){
+        slotMatrix[g] = {};
+        r.orari.forEach(function(o){ slotMatrix[g][o] = true; });
+      });
+    }
+
+    // Aggiungi orari custom
+    Object.keys(slotMatrix).forEach(function(g){
+      Object.keys(slotMatrix[g]).forEach(function(o){
+        if (ORARI_DEFAULT.indexOf(o)===-1) ORARI_DEFAULT.push(o);
+      });
+    });
+    ORARI_DEFAULT.sort();
+
+    renderSlotTable();
+
+    // Durata
+    var durataEl = document.getElementById('slot-durata-grid');
+    var durataAttiva = (r && r.durata) ? parseInt(r.durata) : 30;
+    if (durataEl) {
+      durataEl.innerHTML = '';
+      [15,30,45,60].forEach(function(d){
+        var btn = document.createElement('button');
+        var on = durataAttiva === d;
+        btn.textContent = d+' min';
+        btn.setAttribute('data-durata', d);
+        btn.setAttribute('data-on', on?'1':'0');
+        btn.style.cssText = 'padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid '+(on?'#2D7A4F':'#e5e5e5')+';background:'+(on?'#2D7A4F':'#fff')+';color:'+(on?'#fff':'#8A8A8A');
+        btn.addEventListener('click', function(){
+          durataEl.querySelectorAll('button').forEach(function(b){
+            b.setAttribute('data-on','0');
+            b.style.background='#fff'; b.style.borderColor='#e5e5e5'; b.style.color='#8A8A8A';
+          });
+          this.setAttribute('data-on','1');
+          this.style.background='#2D7A4F'; this.style.borderColor='#2D7A4F'; this.style.color='#fff';
+          salvaTuttiSlot();
+        });
+        durataEl.appendChild(btn);
+      });
+    }
+
+    caricaChiusureAdmin();
+  });
+}
+
+function renderSlotTable() {
+  var thead = document.getElementById('slot-thead');
+  var tbody = document.getElementById('slot-tbody');
+  if (!thead || !tbody) return;
+
+  // Header row
+  thead.innerHTML = '';
+  var tr = document.createElement('tr');
+  var th0 = document.createElement('th');
+  th0.textContent = 'Orario';
+  th0.style.cssText = 'padding:6px 4px;font-size:11px;color:#8A8A8A;font-weight:700;text-align:left;border-bottom:2px solid #e5e5e5';
+  tr.appendChild(th0);
+  GIORNI_SETTIMANA.forEach(function(g){
+    var th = document.createElement('th');
+    th.textContent = g;
+    th.style.cssText = 'padding:6px 4px;font-size:11px;color:#1A1A1A;font-weight:800;text-align:center;border-bottom:2px solid #e5e5e5;min-width:44px';
+    tr.appendChild(th);
+  });
+  thead.appendChild(tr);
+
+  // Body rows
+  tbody.innerHTML = '';
+  ORARI_DEFAULT.forEach(function(ora){
+    var row = document.createElement('tr');
+    var tdOra = document.createElement('td');
+    tdOra.textContent = ora;
+    tdOra.style.cssText = 'padding:4px 6px;font-size:12px;font-weight:700;color:#1A1A1A;border-bottom:1px solid #f0f0f0;white-space:nowrap';
+    row.appendChild(tdOra);
+
+    GIORNI_SETTIMANA.forEach(function(g){
+      var td = document.createElement('td');
+      td.style.cssText = 'padding:4px;text-align:center;border-bottom:1px solid #f0f0f0';
+      var on = slotMatrix[g] && slotMatrix[g][ora];
+      var btn = document.createElement('button');
+      btn.style.cssText = 'width:36px;height:28px;border-radius:6px;border:1.5px solid '+(on?'#E8631A':'#e5e5e5')+';background:'+(on?'#E8631A':'#fff')+';cursor:pointer;font-size:13px';
+      btn.textContent = on ? '✓' : '';
+      btn.addEventListener('click', (function(giorno, orario){
+        return function(){
+          if (!slotMatrix[giorno]) slotMatrix[giorno] = {};
+          slotMatrix[giorno][orario] = !slotMatrix[giorno][orario];
+          var nowOn = slotMatrix[giorno][orario];
+          this.style.background = nowOn ? '#E8631A' : '#fff';
+          this.style.borderColor = nowOn ? '#E8631A' : '#e5e5e5';
+          this.textContent = nowOn ? '✓' : '';
+          salvaTuttiSlot();
+        };
+      })(g, ora));
+      td.appendChild(btn);
+      row.appendChild(td);
+    });
+    tbody.appendChild(row);
+  });
+}
+
+function caricaServizi() {
+  apiCall('getServizi', {}, function(err, r) {
+    var el = document.getElementById('l-servizi'); if(!el) return;
+    var servizi = (!err&&r&&r.ok) ? r.data||[] : [];
+    if (!servizi.length) { el.innerHTML='<div class="info">Nessun servizio ancora. Aggiungine uno!</div>'; return; }
+    el.innerHTML = '';
+    servizi.forEach(function(s) {
+      var attivo = s.attivo===true || String(s.attivo).toLowerCase()==='true';
+      var div = document.createElement('div');
+      div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #e5e5e5;cursor:pointer';
+      var left = document.createElement('div');
+      var n = document.createElement('div'); n.style.cssText='font-size:14px;font-weight:700;color:#1A1A1A'; n.textContent=s.nome||'';
+      var sub = document.createElement('div'); sub.style.cssText='font-size:12px;color:#8A8A8A';
+      sub.textContent=(s.categoria||'')+' - '+(attivo?'Attivo':'Disattivo');
+      left.appendChild(n); left.appendChild(sub);
+      var right = document.createElement('div'); right.style.cssText='text-align:right';
+      if (s.prezzoSoci) { var ps=document.createElement('div'); ps.style.cssText='font-size:14px;font-weight:800;color:#E8631A'; ps.textContent='€ '+s.prezzoSoci; right.appendChild(ps); }
+      if (s.prezzoNormale) { var pn=document.createElement('div'); pn.style.cssText='font-size:11px;color:#8A8A8A;text-decoration:line-through'; pn.textContent='€ '+s.prezzoNormale; right.appendChild(pn); }
+      div.appendChild(left); div.appendChild(right);
+      div.addEventListener('click', (function(sid){ return function(){ apriServizio(sid); }; })(s.id));
+      el.appendChild(div);
+    });
+  });
+}
+
+function apriServizio(id) {
+  curSrvId = id;
+  var srvEl = document.getElementById('srv-ttl');
+  if(srvEl) srvEl.textContent = id ? 'Modifica servizio' : 'Nuovo servizio';
+  hide('srv-ok');
+
+  if (id) {
+    // Carica dati esistenti
+    apiCall('getServizi', {}, function(err, r) {
+      var servizi = (!err&&r&&r.ok) ? r.data||[] : [];
+      var s = null;
+      for(var i=0;i<servizi.length;i++){ if(servizi[i].id===id){s=servizi[i];break;} }
+      if (!s) return;
+      var set = function(elId, val){ var e=document.getElementById(elId); if(e) e.value=val||''; };
+      set('srv-nome', s.nome);
+      set('srv-desc', s.descrizione);
+      set('srv-cat',  s.categoria);
+      set('srv-pnorm',s.prezzoNormale);
+      set('srv-psoci',s.prezzoSoci);
+      set('srv-ordine',s.ordine);
+      srvAttivo = s.attivo===true || String(s.attivo).toLowerCase()==='true';
+      aggiornaBoxAttivo();
+      var btnEl = document.getElementById('btn-elimina-servizio');
+      if(btnEl) btnEl.style.display = '';
+      apri('ov-servizio');
+    });
+  } else {
+    var set2 = function(elId, val){ var e=document.getElementById(elId); if(e) e.value=val||''; };
+    set2('srv-nome',''); set2('srv-desc',''); set2('srv-pnorm',''); set2('srv-psoci',''); set2('srv-ordine','');
+    var catEl = document.getElementById('srv-cat'); if(catEl) catEl.value='Tecnico';
+    srvAttivo = true; aggiornaBoxAttivo();
+    var btnEl2 = document.getElementById('btn-elimina-servizio');
+    if(btnEl2) btnEl2.style.display = 'none';
+    apri('ov-servizio');
+  }
+}
+
+function toggleSrvAttivo() {
+  srvAttivo = !srvAttivo;
+  aggiornaBoxAttivo();
+}
+
+function aggiornaBoxAttivo() {
+  var box = document.getElementById('srv-attivo-box');
+  if (!box) return;
+  box.style.background = srvAttivo ? '#E8631A' : '#fff';
+  box.style.borderColor = srvAttivo ? '#E8631A' : '#e5e5e5';
+  box.style.color = srvAttivo ? '#fff' : '#8A8A8A';
+  box.innerHTML = srvAttivo ? '&#10003;' : '';
+}
+
+function salvaServizio() {
+  var nome = (document.getElementById('srv-nome')||{}).value||'';
+  if (!nome) { alert('Inserisci il nome del servizio'); return; }
+  var obj = {
+    id          : curSrvId||'',
+    nome        : nome,
+    descrizione : (document.getElementById('srv-desc')||{}).value||'',
+    categoria   : (document.getElementById('srv-cat')||{}).value||'Tecnico',
+    prezzoNormale:(document.getElementById('srv-pnorm')||{}).value||'',
+    prezzoSoci  : (document.getElementById('srv-psoci')||{}).value||'',
+    ordine      : (document.getElementById('srv-ordine')||{}).value||'99',
+    attivo      : srvAttivo
+  };
+  apiCall('saveServizio', {data:obj}, function(err,r){
+    if(!err&&r&&r.ok){ show('srv-ok'); caricaServizi(); curSrvId=r.id||curSrvId; }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function eliminaServizioCorrente() {
+  if (!curSrvId) return;
+  if (!confirm('Eliminare questo servizio?')) return;
+  apiCall('eliminaServizio', {id:curSrvId}, function(err,r){
+    if(!err&&r&&r.ok){ chiudi('ov-servizio'); caricaServizi(); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function caricaTariffe() {
+  apiCall('getImpostazioni', {}, function(err, r) {
+    if(!err&&r&&r.ok) {
+      var set = function(id, key, def){ var e=document.getElementById(id); if(e) e.value=r.data[key]||def; };
+      set('tar-new','tariffa_tesseramento_nuovo','55');
+      set('tar-ren','tariffa_tesseramento_rinnovo','50');
+      set('tar-cnt','tariffa_contratto_extra','25');
+      set('tar-adm','tariffa_adempimento_extra','15');
+    }
+  });
+}
+
+function salvaTariffe() {
+  var get = function(id){ return (document.getElementById(id)||{}).value||''; };
+  hide('tar-ok');
+  var tariffe = [
+    {chiave:'tariffa_tesseramento_nuovo',   valore:get('tar-new')},
+    {chiave:'tariffa_tesseramento_rinnovo', valore:get('tar-ren')},
+    {chiave:'tariffa_contratto_extra',      valore:get('tar-cnt')},
+    {chiave:'tariffa_adempimento_extra',    valore:get('tar-adm')}
+  ];
+  var count = 0;
+  tariffe.forEach(function(t) {
+    apiCall('saveImpostazione', {chiave:t.chiave, valore:t.valore}, function(err,r){
+      count++;
+      if(count===tariffe.length) show('tar-ok');
+    });
+  });
+}
+
+var curDocId = null, curAvvId = null, avvAttivo = true;
+
+function caricaDocumenti() {
+  apiCall('getDocumenti', {}, function(err, r) {
+    var el = document.getElementById('l-documenti'); if(!el) return;
+    var docs = (!err&&r&&r.ok) ? r.data||[] : [];
+    if (!docs.length) { el.innerHTML='<div class="info">Nessun documento ancora.</div>'; return; }
+    el.innerHTML='';
+    docs.forEach(function(d) {
+      var div = document.createElement('div');
+      div.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e5e5e5';
+      var left = document.createElement('div');
+      var t1 = document.createElement('div'); t1.style.cssText='font-size:14px;font-weight:700;color:#1A1A1A'; t1.textContent=d.nome||'Documento';
+      var t2 = document.createElement('div'); t2.style.cssText='font-size:11px;color:#8A8A8A'; t2.textContent=(d.descrizione||'')+(d.dataCaricamento?' · '+d.dataCaricamento:'');
+      left.appendChild(t1); left.appendChild(t2);
+      var right = document.createElement('div'); right.style.cssText='display:flex;gap:6px';
+      var btnA = document.createElement('a'); btnA.href=d.url||'#'; btnA.target='_blank';
+      btnA.style.cssText='background:#EBF2FB;color:#1A5FA8;border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;text-decoration:none';
+      btnA.textContent='Apri';
+      var btnE = document.createElement('button');
+      btnE.style.cssText='background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px';
+      btnE.innerHTML='&#128465;';
+      btnE.addEventListener('click', (function(did){ return function(){ eliminaDocumentoById(did); }; })(d.id));
+      right.appendChild(btnA); right.appendChild(btnE);
+      div.appendChild(left); div.appendChild(right);
+      el.appendChild(div);
+    });
+  });
+}
+
+function apriDocumento(id) {
+  curDocId = id;
+  var el = document.getElementById('doc-ttl'); if(el) el.textContent = id ? 'Modifica documento' : 'Nuovo documento';
+  var set = function(elId,v){ var e=document.getElementById(elId); if(e) e.value=v||''; };
+  set('doc-nome',''); set('doc-desc','');
+  hide('doc-upload-info'); hide('doc-upload-ok'); hide('doc-err');
+  apri('ov-documento');
+}
+
+function uploadDocumento() {
+  var nome = (document.getElementById('doc-nome')||{}).value||'';
+  var desc = (document.getElementById('doc-desc')||{}).value||'';
+  var fileInput = document.getElementById('doc-file');
+  var errEl = document.getElementById('doc-err');
+  if(errEl) errEl.style.display='none';
+  if(!nome) { if(errEl){errEl.textContent='Inserisci il nome del documento';errEl.style.display='';} return; }
+  if(!fileInput||!fileInput.files||!fileInput.files[0]) { if(errEl){errEl.textContent='Seleziona un file';errEl.style.display='';} return; }
+  var file = fileInput.files[0];
+  show('doc-upload-info');
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var base64 = e.target.result.split(',')[1];
+    apiCall('uploadDocumento', {
+      nome:nome, descrizione:desc,
+      fileData:base64, fileName:file.name, mimeType:file.type
+    }, function(err,r){
+      hide('doc-upload-info');
+      if(!err&&r&&r.ok){ show('doc-upload-ok'); caricaDocumenti(); fileInput.value=''; }
+      else { if(errEl){errEl.textContent=(r&&r.error)||err||'Errore upload';errEl.style.display='';} }
+    });
+  };
+  reader.readAsDataURL(file);
+}
+
+function eliminaDocumentoById(id) {
+  if (!confirm('Eliminare questo documento? Verra cancellato anche da Google Drive.')) return;
+  apiCall('eliminaDocumento', {id:id}, function(err,r){
+    if(!err&&r&&r.ok){ caricaDocumenti(); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function caricaAvvisi() {
+  apiCall('getAvvisi', {}, function(err, r) {
+    var el = document.getElementById('l-avvisi'); if(!el) return;
+    var avvisi = (!err&&r&&r.ok) ? r.data||[] : [];
+    if (!avvisi.length) { el.innerHTML='<div class="info">Nessun avviso ancora.</div>'; return; }
+    el.innerHTML='';
+    avvisi.forEach(function(a){
+      var attivo = a.attivo===true||String(a.attivo).toLowerCase()==='true';
+      var div = document.createElement('div');
+      div.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e5e5e5;cursor:pointer';
+      var left = document.createElement('div');
+      var t1 = document.createElement('div'); t1.style.cssText='font-size:14px;font-weight:700;color:#1A1A1A;display:flex;align-items:center;gap:6px';
+      t1.textContent=a.titolo||'Avviso';
+      var badge = document.createElement('span'); badge.style.cssText='font-size:10px;padding:2px 6px;border-radius:10px;font-weight:700;'+(attivo?'background:#EBF5F0;color:#2D7A4F':'background:#F8F7F5;color:#8A8A8A');
+      badge.textContent=attivo?'Attivo':'Disattivo'; t1.appendChild(badge);
+      var t2 = document.createElement('div'); t2.style.cssText='font-size:11px;color:#8A8A8A'; t2.textContent=(a.dataInizio||'')+(a.dataFine?' → '+a.dataFine:'');
+      left.appendChild(t1); left.appendChild(t2);
+      var btnE = document.createElement('button'); btnE.style.cssText='background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px'; btnE.innerHTML='&#128465;';
+      btnE.addEventListener('click', (function(aid){ return function(e){ e.stopPropagation(); eliminaAvvisoById(aid); }; })(a.id));
+      div.appendChild(left); div.appendChild(btnE);
+      div.addEventListener('click', (function(av){ return function(){ apriAvviso(av); }; })(a));
+      el.appendChild(div);
+    });
+  });
+}
+
+function apriAvviso(avviso) {
+  curAvvId = avviso ? avviso.id : null;
+  var ttl = document.getElementById('avv-ttl'); if(ttl) ttl.textContent = curAvvId ? 'Modifica avviso' : 'Nuovo avviso';
+  var set = function(id,v){ var e=document.getElementById(id); if(e) e.value=v||''; };
+  set('avv-titolo', avviso?avviso.titolo:'');
+  set('avv-testo',  avviso?avviso.testo:'');
+  set('avv-dal',    avviso?avviso.dataInizio:'');
+  set('avv-al',     avviso?avviso.dataFine:'');
+  avvAttivo = avviso ? (avviso.attivo===true||String(avviso.attivo).toLowerCase()==='true') : true;
+  var box = document.getElementById('avv-attivo-box');
+  if(box){ box.style.background=avvAttivo?'#E8631A':'#fff'; box.style.borderColor=avvAttivo?'#E8631A':'#e5e5e5'; box.innerHTML=avvAttivo?'&#10003;':''; }
+  var btnEl = document.getElementById('btn-elimina-avviso'); if(btnEl) btnEl.style.display=curAvvId?'':'none';
+  hide('avv-ok');
+  apri('ov-avviso');
+}
+
+function toggleAvvAttivo() {
+  avvAttivo=!avvAttivo;
+  var box=document.getElementById('avv-attivo-box');
+  if(box){ box.style.background=avvAttivo?'#E8631A':'#fff'; box.style.borderColor=avvAttivo?'#E8631A':'#e5e5e5'; box.innerHTML=avvAttivo?'&#10003;':''; }
+}
+
+function salvaAvviso() {
+  var titolo = (document.getElementById('avv-titolo')||{}).value||'';
+  if(!titolo){ alert('Inserisci il titolo'); return; }
+  var obj = {
+    id: curAvvId||'', titolo:titolo,
+    testo:(document.getElementById('avv-testo')||{}).value||'',
+    dataInizio:(document.getElementById('avv-dal')||{}).value||'',
+    dataFine:(document.getElementById('avv-al')||{}).value||'',
+    attivo:avvAttivo
+  };
+  apiCall('saveAvviso', {data:obj}, function(err,r){
+    if(!err&&r&&r.ok){ show('avv-ok'); caricaAvvisi(); curAvvId=r.id||curAvvId; }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function eliminaAvvisoCorrente() {
+  if(!curAvvId) return;
+  eliminaAvvisoById(curAvvId);
+  chiudi('ov-avviso');
+}
+
+function eliminaAvvisoById(id) {
+  if(!confirm('Eliminare questo avviso?')) return;
+  apiCall('eliminaAvviso', {id:id}, function(err,r){
+    if(!err&&r&&r.ok){ caricaAvvisi(); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function eseguiBackup() {
+  var btn = document.getElementById('btn-backup');
+  if(btn){ btn.textContent='Backup in corso...'; btn.disabled=true; }
+  apiCall('backupDatabase', {}, function(err,r){
+    if(btn){ btn.textContent='&#128190; Esegui backup ora'; btn.disabled=false; }
+    var okEl = document.getElementById('backup-ok');
+    if(!err&&r&&r.ok){
+      if(okEl){ okEl.innerHTML='&#9989; Backup completato: <a href="'+r.url+'" target="_blank" style="color:#2D7A4F">'+r.nome+'</a>'; okEl.style.display=''; }
+    } else {
+      alert('Errore backup: '+((r&&r.error)||err||'Riprova'));
+    }
+  });
+}
+
+
+
+// ── PRENOTAZIONI ADMIN ───────────────────────────────────────
+function caricaPrenotazioni() {
+  window._prenFiltro = 'tutte';
+  makeFiltri('pren-filtri',
+    ['tutte','in_attesa','confermata','negata','annullata'],
+    ['Tutte','In attesa','Confermate','Negate','Annullate'],
+    function(f){ window._prenFiltro=f; renderPrenotazioni(f); }
+  );
+  renderPrenotazioni('tutte');
+}
+
+function renderPrenotazioni(filtro) {
+  apiCall('getPrenotazioni', {all:true}, function(err, r) {
+    var el = document.getElementById('l-pren'); if(!el) return;
+    var pren = (!err&&r&&r.ok) ? r.data||[] : [];
+    if (filtro && filtro !== 'tutte') pren = pren.filter(function(p){ return p.stato===filtro; });
+    pren.sort(function(a,b){ return (a.data+a.ora)<(b.data+b.ora)?-1:1; });
+    if (!pren.length) { el.innerHTML='<div class="info">Nessuna prenotazione.</div>'; return; }
+    el.innerHTML='';
+    pren.forEach(function(p) {
+      var col = p.stato==='confermata'?'#2D7A4F':p.stato==='annullata'?'#C0392B':'#E8631A';
+      var div = document.createElement('div'); div.className='row';
+      var bar = document.createElement('div'); bar.className='bar'; bar.style.background=col;
+      var rb  = document.createElement('div'); rb.className='rb';
+      var rt  = document.createElement('div'); rt.className='rt';
+      rt.textContent=(p.displayName||p.nomeUtente||'Socio')+' — '+p.data+' ore '+p.ora;
+      var rs  = document.createElement('div'); rs.className='rs';
+      rs.textContent=(p.motivo||'')+(p.stato?' · '+p.stato:'');
+      var btns = document.createElement('div'); btns.style.cssText='display:flex;gap:6px;padding:8px 10px;align-items:center';
+      if (p.stato!=='confermata') {
+        var bc=document.createElement('button'); bc.textContent='✓';
+        bc.style.cssText='background:#2D7A4F;color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:14px';
+        bc.addEventListener('click', (function(pid){ return function(e){ e.stopPropagation(); aggiornaStatoPren(pid,'confermata'); }; })(p.id));
+        btns.appendChild(bc);
+      }
+      if (p.stato!=='annullata') {
+        var ba=document.createElement('button'); ba.textContent='✕';
+        ba.style.cssText='background:#C0392B;color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:14px';
+        ba.addEventListener('click', (function(pid){ return function(e){ e.stopPropagation(); aggiornaStatoPren(pid,'annullata'); }; })(p.id));
+        btns.appendChild(ba);
+      }
+      rb.appendChild(rt); rb.appendChild(rs); div.appendChild(bar); div.appendChild(rb); div.appendChild(btns);
+      el.appendChild(div);
+    });
+  });
+}
+
+function aggiornaStatoPren(id, stato) {
+  apiCall('aggiornaPrenotazione', {id:id, stato:stato}, function(err,r){
+    if(!err&&r&&r.ok) renderPrenotazioni('tutte');
+    else alert('Errore: '+((r&&r.error)||err||'Riprova'));
+  });
+}
+
+// ── RICERCA PRATICHE ──────────────────────────────────────────
+function cercaPratiche(query) {
+  var el = document.getElementById('l-prat'); if(!el) return;
+  if (!query || !query.trim()) { renderPrat(); return; }
+  var q = query.trim().toLowerCase();
+  var lista = D.contratti.filter(function(ct) {
+    if (ct.eliminato===true || String(ct.eliminato).toLowerCase()==='true') return false;
+    var locs='', cons='';
+    try { var l=JSON.parse(ct.locatoriJSON||'[]'); locs=(l[0]&&(l[0].cognome||l[0].nome))||''; } catch(e){}
+    try { var c2=JSON.parse(ct.conduttoriJSON||'[]'); cons=(c2[0]&&(c2[0].cognome||c2[0].nome))||''; } catch(e){}
+    return locs.toLowerCase().indexOf(q)>-1
+        || cons.toLowerCase().indexOf(q)>-1
+        || (ct.tipo||'').toLowerCase().indexOf(q)>-1
+        || (ct.id||'').toLowerCase().indexOf(q)>-1;
+  });
+  el.innerHTML='';
+  if (!lista.length) { el.innerHTML='<div class="info">Nessuna pratica trovata per "'+query+'"</div>'; return; }
+  lista.forEach(function(ct){ el.appendChild(makePratCard(ct)); });
+}
+
+// ── EXPORT EXCEL SOCI ─────────────────────────────────────────
+function scaricaExcel(rows, nomeFile) {
+  function doExport() {
+    var XLSX = window.XLSX;
+    if (!XLSX) { alert('Libreria non caricata, riprova tra qualche secondo'); return; }
+    var wb = XLSX.utils.book_new();
+    var ws = XLSX.utils.aoa_to_sheet(rows);
+    var colWidths = rows[0].map(function(h, i){
+      var maxLen = String(h).length;
+      rows.forEach(function(r){ var l = String(r[i]===null||r[i]===undefined?'':r[i]).length; if(l>maxLen) maxLen=l; });
+      return { wch: Math.min(maxLen+2, 40) };
+    });
+    ws['!cols'] = colWidths;
+    XLSX.utils.book_append_sheet(wb, ws, 'Dati');
+    XLSX.writeFile(wb, nomeFile+'_'+new Date().toISOString().substring(0,10)+'.xlsx');
+  }
+
+  if (window.XLSX) {
+    doExport();
+  } else {
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = doExport;
+    s.onerror = function(){ alert('Errore caricamento libreria Excel. Controlla la connessione.'); };
+    document.head.appendChild(s);
+  }
+}
+
+function csvEsporta(rows) {
+  var nl = String.fromCharCode(10);
+  var sep = ',';
+  return rows.map(function(r){
+    return r.map(function(v){
+      var s = String(v).split('"').join('""');
+      return '"' + s + '"';
+    }).join(sep);
+  }).join(nl);
+}
+
+function exportSociExcel() {
+  var utenti = window._utentiData || [];
+  if (!utenti.length) { alert('Nessun socio da esportare'); return; }
+
+  var rows = [['ID','Nome','Cognome','Ragione Sociale','Email','Telefono','CF','Data Nascita','Comune Residenza','Via','Data Registrazione']];
+  utenti.forEach(function(u) {
+    rows.push([u.id||'',u.nome||'',u.cognome||'',u.displayName||'',u.email||'',u.telefono||'',u.cf||'',u.dataNascita||'',u.comuneResidenza||'',u.viaResidenza||'',u.dataRegistrazione?u.dataRegistrazione.substring(0,10):'']);
+  });
+
+  // Crea CSV
+  var csv = csvEsporta(rows);
+
+  var blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = 'soci_asppi_'+new Date().toISOString().substring(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function generaDatiContratto() {
+  var box = document.getElementById('dati-contratto-box');
+  if (!box) return;
+  var NL = String.fromCharCode(10);
+  
+  var ct = null;
+  for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){ct=D.contratti[i];break;} }
+  if (!ct) { box.textContent='Contratto non trovato'; return; }
+  
+  var imm = (D.appartamenti||[]).find(function(a){ return a.id===ct.appartamentoId; }) || {};
+  var locatori=[], conduttori=[], garanti=[], perts=[], pertSel=[];
+  try { locatori=JSON.parse(ct.locatoriJSON||'[]'); } catch(e){}
+  try { conduttori=JSON.parse(ct.conduttoriJSON||'[]'); } catch(e){}
+  try { garanti=JSON.parse(ct.garantiJSON||'[]'); } catch(e){}
+  try { perts=JSON.parse(imm.pertinenze||'[]'); } catch(e){}
+  try { pertSel=JSON.parse(ct.pertinenzeSel||'[]'); } catch(e){}
+
+  function fmtPers(p, tipo) {
+    if (!p || !p.nome) return tipo+': (non compilato)'+NL;
+    var s = tipo+':'+NL;
+    s += '  Nome: '+(p.nome||'')+' '+(p.cognome||'')+NL;
+    if(p.cf)           s += '  CF: '+p.cf+NL;
+    if(p.dataNascita)  s += '  Nato il: '+p.dataNascita+NL;
+    if(p.luogoNascita) s += '  Nato a: '+p.luogoNascita+NL;
+    if(p.residenza)    s += '  Residente: '+p.residenza+NL;
+    if(p.tipoDoc)      s += '  Documento: '+p.tipoDoc+' n.'+(p.numDoc||'')+NL;
+    if(p.rilasciatoDa) s += '  Rilasciato da: '+p.rilasciatoDa+' il '+(p.dataDoc||'')+NL;
+    if(p.scadenzaDoc)  s += '  Scadenza doc: '+p.scadenzaDoc+NL;
+    return s;
+  }
+
+  var lines = [
+    '=== DATI PER CONTRATTO ASPPI ===',
+    '',
+    '--- TIPO CONTRATTO ---',
+    'Tipo: '+(ct.tipo||'non specificato'),
+    'Unita: '+(ct.unitaTipo||'intera unita immobiliare'),
+    '',
+    '--- IMMOBILE PRINCIPALE ---',
+    'Indirizzo: '+(imm.via||'')+(imm.citta?', '+imm.citta:''),
+    'Tipo: '+(imm.tipo||'')
+  ];
+  if(imm.catComune)     lines.push('Comune catastale: '+imm.catComune);
+  if(imm.catSezione)    lines.push('Sezione: '+imm.catSezione);
+  if(imm.catFoglio)     lines.push('Foglio: '+imm.catFoglio);
+  if(imm.catParticella) lines.push('Particella: '+imm.catParticella);
+  if(imm.catSub)        lines.push('Subalterno: '+imm.catSub);
+  if(imm.catCategoria)  lines.push('Categoria: '+imm.catCategoria);
+  if(imm.catRendita)    lines.push('Rendita: '+imm.catRendita);
+
+  if(pertSel.length) {
+    lines.push(''); lines.push('--- PERTINENZE INCLUSE ---');
+    pertSel.forEach(function(p,i){
+      lines.push((i+1)+'. '+(p.tipo||'Pertinenza')+(p.via?' - '+p.via:''));
+      if(p.foglio) lines.push('   Fg.'+p.foglio+' Part.'+p.particella+(p.sub?' Sub.'+p.sub:'')+(p.cat?' Cat.'+p.cat:''));
+    });
+  }
+
+  lines.push(''); lines.push('--- DURATA E CANONE ---');
+  lines.push('Dal: '+(ct.duraDal||''));
+  lines.push('Al: '+(ct.duraAl||''));
+  lines.push('Mesi: '+(ct.duraMesi||''));
+  lines.push('Canone mensile: '+(ct.canoneMensile||'')+' euro');
+  lines.push('Canone annuale: '+(ct.canoneAnnuale||'')+' euro');
+  if(ct.canoneIBAN)    lines.push('IBAN pagamento: '+ct.canoneIBAN);
+  if(ct.depositoImporto) lines.push('Deposito: '+ct.depositoImporto+' euro ('+(ct.depositoMesi||'')+' mesi)');
+  if(ct.oneriMensili)  lines.push('Oneri accessori: '+ct.oneriMensili+' euro/mese');
+  if(ct.oneriIBAN)     lines.push('IBAN oneri: '+ct.oneriIBAN);
+
+  lines.push(''); lines.push('--- LOCATORI ---');
+  locatori.forEach(function(p,i){ lines.push(fmtPers(p, 'Locatore '+(i+1))); });
+
+  lines.push(''); lines.push('--- CONDUTTORI ---');
+  conduttori.forEach(function(p,i){ lines.push(fmtPers(p, 'Conduttore '+(i+1))); });
+
+  if(garanti.length) {
+    lines.push(''); lines.push('--- GARANTI ---');
+    garanti.forEach(function(p,i){ lines.push(fmtPers(p, 'Garante '+(i+1))); });
+  }
+
+  if(ct.note) { lines.push(''); lines.push('--- NOTE ---'); lines.push(ct.note); }
+  lines.push(''); lines.push('=== FINE DATI ===');
+
+  var txt = lines.join(NL);
+  box.textContent = txt;
+  window._datiContratto = txt;
+}
+
+
+function copiaDatiContratto() {
+  var txt = window._datiContratto || (document.getElementById('dati-contratto-box')||{}).textContent || '';
+  if(!txt){ alert('Genera prima i dati'); return; }
+  navigator.clipboard.writeText(txt).then(function(){
+    alert('Dati copiati negli appunti! Incollali nella skill contratti-locazione');
+  }).catch(function(){
+    // Fallback
+    var ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('Dati copiati negli appunti!');
+  });
+}
+
+function scaricaDatiContratto() {
+  var ct = null;
+  for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){ct=D.contratti[i];break;} }
+  var imm = (D.appartamenti||[]).find(function(a){ return ct && a.id===ct.appartamentoId; }) || {};
+  var locatori=[], conduttori=[], garanti=[];
+  try { locatori=JSON.parse(ct&&ct.locatoriJSON||'[]'); } catch(e){}
+  try { conduttori=JSON.parse(ct&&ct.conduttoriJSON||'[]'); } catch(e){}
+  try { garanti=JSON.parse(ct&&ct.garantiJSON||'[]'); } catch(e){}
+  var perts=[];
+  try { perts=JSON.parse(imm.pertinenze||'[]'); } catch(e){}
+  var pertSel=[];
+  try { pertSel=JSON.parse(ct&&ct.pertinenzeSel||'[]'); } catch(e){}
+
+  var txt = window._datiContratto || (document.getElementById('dati-contratto-box')||{}).textContent;
+  if(!txt) { generaDatiContratto(); txt = window._datiContratto; }
+
+  // Crea file .txt scaricabile
+  var blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'dati_contratto_'+(ct&&ct.id||'pratica')+'.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function esportaDatabase() {
+  var btn = document.getElementById('btn-esporta-db');
+  var status = document.getElementById('export-status');
+  if(btn) { btn.disabled=true; btn.querySelector('span:last-child').textContent='Generazione in corso...'; }
+  if(status) { status.textContent='Sto preparando il file Excel con tutti i dati...'; status.style.display=''; }
+  
+  apiCall('esportaDatabase', {}, function(err, r) {
+    if(btn) { btn.disabled=false; btn.querySelector('span:last-child').textContent='Scarica database completo Excel'; }
+    if(!err && r && r.ok) {
+      if(status) { status.innerHTML='&#9989; File pronto! <a href="'+r.url+'" target="_blank" style="color:#1A3A8F;font-weight:700">Clicca qui per scaricare '+r.nome+'</a>'; }
+      // Apri automaticamente il download
+      window.open(r.url, '_blank');
+    } else {
+      if(status) { status.textContent='Errore: '+((r&&r.error)||err||'Riprova'); status.style.color='#C0392B'; }
+    }
+  });
+}
+
+function cambiaPwdAdmin() {
+  var o=(document.getElementById('acp-old')||{}).value||'';
+  var n=(document.getElementById('acp-new')||{}).value||'';
+  var n2=(document.getElementById('acp-new2')||{}).value||'';
+  var errEl=document.getElementById('acp-err'); if(errEl){errEl.style.display='none';}
+  hide('acp-ok');
+  var cur=localStorage.getItem('asppi_admin_custom_pwd')||'Asppi2025!';
+  if(o!==cur){if(errEl){errEl.textContent='Password attuale non corretta';errEl.style.display='';}return;}
+  if(n.length<8){if(errEl){errEl.textContent='Minimo 8 caratteri';errEl.style.display='';}return;}
+  if(n!==n2){if(errEl){errEl.textContent='Le due password non coincidono';errEl.style.display='';}return;}
+  localStorage.setItem('asppi_admin_custom_pwd',n);
+  if(localStorage.getItem('asppi_admin_pwd'))localStorage.setItem('asppi_admin_pwd',n);
+  show('acp-ok');
+  document.getElementById('acp-old').value='';
+  document.getElementById('acp-new').value='';
+  document.getElementById('acp-new2').value='';
+}
+
+function caricaChiusureAdmin() {
+  apiCall('getChiusure', {}, function(err, r) {
+    var el = document.getElementById('slot-chiusure'); if(!el) return;
+    var ch = (!err&&r&&r.ok) ? r.data||[] : [];
+    if(!ch.length){ el.innerHTML='<div class="info" style="font-size:12px">Nessuna chiusura configurata.</div>'; return; }
+    el.innerHTML='';
+    ch.forEach(function(x){
+      var div=document.createElement('div');
+      div.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px;background:#FDF0E8;border-radius:8px;margin-bottom:6px';
+      var txt=document.createElement('div');
+      txt.innerHTML='<div style="font-size:13px;font-weight:700">'+x.dal+' - '+x.al+'</div>'
+        +'<div style="font-size:11px;color:#8A8A8A">'+(x.label||x.mot||'Chiusura')+'</div>';
+      var btn=document.createElement('button');
+      btn.innerHTML='&#128465;';
+      btn.style.cssText='background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px';
+      btn.addEventListener('click',(function(xid){return function(){ eliminaChiusuraAdmin(xid); };})(x.id));
+      div.appendChild(txt); div.appendChild(btn); el.appendChild(div);
+    });
+  });
+}
+
+function eliminaChiusuraAdmin(id) {
+  apiCall('eliminaChiusura', {id:id}, function(err,r){
+    if(!err&&r&&r.ok) caricaChiusureAdmin();
+    else alert('Errore eliminazione chiusura');
+  });
+}
+
+function salvaTuttiSlot() {
+  var durataGrid = document.getElementById('slot-durata-grid');
+  var durata = 30;
+  if (durataGrid) durataGrid.querySelectorAll('button').forEach(function(b){ if(b.getAttribute('data-on')==='1') durata=parseInt(b.getAttribute('data-durata'))||30; });
+  apiCall('saveSlot', {slotMatrix: slotMatrix, durata: durata}, function(err,r){
+    if(err||!r||!r.ok) alert('Errore salvataggio');
+  });
+}
+
+</script>
+</body>
+</html>function caricaHome() {
+  var alerts = [];
+
+  // Statistiche soci
+  apiCall('getUtenti', {}, function(err, r) {
+    var n = (!err&&r&&r.ok) ? (r.data||[]).length : 0;
+    var el = document.getElementById('sh-soci'); if(el) el.textContent = n;
+  });
+
+  // Pratiche in attesa
+  apiCall('getContratti', {}, function(err, r) {
+    var all = (!err&&r&&r.ok) ? r.data||[] : [];
+    var att = all.filter(function(ct){ return ct.stato==='in_attesa'&&ct.eliminato!==true&&String(ct.eliminato).toLowerCase()!=='true'; });
+    var el = document.getElementById('sh-att'); if(el) el.textContent = att.length||'0';
+    if(att.length) {
+      alerts.push({col:'#E8631A', icon:'&#128203;', msg: att.length+' pratica'+(att.length===1?'':'he')+' in attesa', nav:'nb-prat'});
+      aggiornaAlerts(alerts);
+    }
+  });
+
+  // Pagamenti e incasso
+  apiCall('getStrategiaEconomicaAll', {}, function(err, r) {
+    var tot = (!err&&r&&r.ok) ? r.totalePagato||0 : 0;
+    var bon = (!err&&r&&r.ok) ? r.bonDichiarati||0 : 0;
+    var el = document.getElementById('sh-inc'); if(el) el.textContent = '€'+tot;
+    if(bon>0) {
+      alerts.push({col:'#1A5FA8', icon:'&#128179;', msg: bon+' bonifico'+(bon===1?'':'i')+' da verificare', nav:'nb-pag'});
+      aggiornaAlerts(alerts);
+    }
+  });
+
+  // Appuntamenti in attesa
+  apiCall('getPrenotazioni', {all:true}, function(err, r) {
+    var pren = (!err&&r&&r.ok) ? r.data||[] : [];
+    var att = pren.filter(function(p){ return p.stato==='in_attesa'; });
+    if(att.length) {
+      alerts.push({col:'#E8631A', icon:'&#128197;', msg: att.length+' appuntament'+(att.length===1?'o':'i')+' in attesa di conferma', nav:'nb-pren'});
+      aggiornaAlerts(alerts);
+    }
+    // Prossimi confermati per info
+    var conf = pren.filter(function(p){ return p.stato==='confermata'; });
+    conf.sort(function(a,b){ return (a.data+a.ora)<(b.data+b.ora)?-1:1; });
+    if(conf.length) {
+      var p = conf[0];
+      alerts.push({col:'#2D7A4F', icon:'&#9989;', msg: 'Prossimo appuntamento: '+(p.nomeUtente||'Socio')+' il '+p.data+' ore '+p.ora, nav:'nb-pren'});
+      aggiornaAlerts(alerts);
+    }
+  });
+}
+
+function aggiornaAlerts(alerts) {
+  var el = document.getElementById('h-alerts'); if(!el) return;
+  el.innerHTML = '';
+  alerts.forEach(function(a){
+    var div = document.createElement('div');
+    div.style.cssText = 'background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;border-left:4px solid '+a.col+';cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.06);display:flex;align-items:center;gap:10px';
+    div.innerHTML = '<span style="font-size:20px">'+a.icon+'</span>'
+      +'<div style="font-size:13px;font-weight:700;color:#1A1A1A;flex:1">'+a.msg+'</div>'
+      +'<span style="color:#8A8A8A;font-size:18px">&#8250;</span>';
+    div.addEventListener('click', function(){ 
+      var btn = document.getElementById(a.nav);
+      if(btn) btn.click();
+    });
+    el.appendChild(div);
+  });
+}
+
+
+function setText(id, val) { var e=document.getElementById(id); if(e) e.textContent=val||''; }
+function show(id) { var e=document.getElementById(id); if(e) e.style.display=''; }
+function hide(id) { var e=document.getElementById(id); if(e) e.style.display='none'; }
+function fmtDate(d) {
+  if (!d) return '—';
+  if (d.indexOf('T') > -1) { var p=d.substring(0,10).split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+  return d;
+}
+function statoLbl(s) {
+  return s==='completato'  ? 'Completato' :
+         s==='lavorazione' ? 'In lavorazione' :
+         s==='da_firmare'  ? 'Da firmare' : 'In attesa';
+}
+function statoCol(s) {
+  return s==='completato'  ? '#2D7A4F' :
+         s==='lavorazione' ? '#1A5FA8' :
+         s==='da_firmare'  ? '#8B5CF6' : '#E8631A';
+}
+function nomeContratto(c) {
+  var nome = '';
+  try { var l=JSON.parse(c.locatoriJSON||'[]'); var cn=JSON.parse(c.conduttoriJSON||'[]');
+    var cl=(l[0]&&(l[0].cognome||l[0].nome))||''; var cc=(cn[0]&&(cn[0].cognome||cn[0].nome))||'';
+    if(cl&&cc) nome='CNT_'+cl+'_'+cc; }
+  catch(e){}
+  return nome || c.nomeContratto || c.tipo || 'Contratto';
+}
+
+function nomeSocio(u) {
+  return u.displayName || ((u.nome||'')+' '+(u.cognome||'')).trim() || u.email || '—';
+}
+function parsePeople(json) {
+  var arr = []; try { arr = JSON.parse(json||'[]'); } catch(e) {}
+  if (!arr.length) return '<div class="val" style="color:#C0392B">Dati non inseriti</div>';
+  var h = '';
+  for (var i=0; i<arr.length; i++) {
+    var p = arr[i];
+    // Anagrafica
+    var cognome = p.cognome||'';
+    var nome    = p.nome||'';
+    var cf      = p.cf||'';
+    var luogo   = p.luogoNascita||'';
+    var dataN   = p.dataNascita||'';
+    var res     = p.comuneResidenza||'';
+    var via     = p.viaResidenza||p.via||'';
+    // Ruolo
+    var titolo  = p.titolo||'';
+    var quota   = p.quota||'';
+    var ced     = p.cedolare||'';
+    var mot     = p.mot||p.motivoTransitorieta||'';
+    var cr2     = p.cr2||'';
+    // Documento
+    var docTipo = p.docTipo||p.doctipo||'';
+    var docNum  = p.docNum||p.docnum||'';
+    var docRil  = p.docRilascio||p.docril||'';
+    var docSca  = p.docScadenza||p.docsca||'';
+    var docEnte = p.docEnte||p.docente||'';
+
+    h += '<div style="background:#F8F7F5;border-radius:10px;padding:14px;margin-bottom:10px">';
+    h += '<div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:10px">SOGGETTO N.'+(i+1)+'</div>';
+
+    // Sempre visibili anche se vuoti
+    h += '<div class="lbl">Cognome</div><div class="val">'+(cognome||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Nome</div><div class="val">'+(nome||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Codice Fiscale</div><div class="val" style="font-family:monospace">'+(cf||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Luogo di nascita</div><div class="val">'+(luogo||'<span style="color:#8A8A8A">—</span>')+'</div>';
+    h += '<div class="lbl">Data di nascita</div><div class="val">'+(dataN||'<span style="color:#8A8A8A">—</span>')+'</div>';
+    h += '<div class="lbl">Comune di residenza</div><div class="val">'+(res||'<span style="color:#8A8A8A">—</span>')+'</div>';
+    h += '<div class="lbl">Via e n. civico</div><div class="val">'+(via||'<span style="color:#8A8A8A">—</span>')+'</div>';
+
+    if (titolo||quota||ced) {
+      h += '<div style="font-size:10px;font-weight:700;color:#1A5FA8;margin:10px 0 6px;text-transform:uppercase">RUOLO</div>';
+      if (titolo) h += '<div class="lbl">Titolo proprieta</div><div class="val">'+titolo+'</div>';
+      if (quota)  h += '<div class="lbl">Quota</div><div class="val">'+quota+'%</div>';
+      if (ced)    h += '<div class="lbl">Cedolare secca</div><div class="val">'+ced+'</div>';
+    }
+    if (mot) h += '<div class="lbl">Motivo transitorieta</div><div class="val">'+mot+'</div>';
+    if (cr2) h += '<div class="lbl">Conduttore riferimento</div><div class="val">'+cr2+'</div>';
+
+    // Documento
+    h += '<div style="font-size:10px;font-weight:700;color:#1A5FA8;margin:10px 0 6px;text-transform:uppercase">DOCUMENTO DI RICONOSCIMENTO</div>';
+    h += '<div class="lbl">Tipo</div><div class="val">'+(docTipo||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Numero</div><div class="val" style="font-family:monospace">'+(docNum||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Data rilascio</div><div class="val">'+(docRil||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Data scadenza</div><div class="val">'+(docSca||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+    h += '<div class="lbl">Rilasciato da</div><div class="val">'+(docEnte||'<span style="color:#C0392B">Non inserito</span>')+'</div>';
+
+    h += '</div>';
+  }
+  return h;
+}
+
+// ── EVENTS ────────────────────────────────────────────────────
+function bindEvents() {
+  document.getElementById('btn-esci').addEventListener('click', esci);
+  if (document.getElementById('btn-esporta-db')) document.getElementById('btn-esporta-db').addEventListener('click', esportaDatabase);
+  // Nav
+  document.getElementById('nb-home').addEventListener('click', function(){ navTo('home'); });
+  document.getElementById('nb-prat').addEventListener('click', function(){ navTo('prat'); });
+  if (document.getElementById('btn-export-soci')) document.getElementById('btn-export-soci').addEventListener('click', exportSociExcel);
+  document.getElementById('nb-soci').addEventListener('click', function(){ navTo('soci'); caricaSoci(); });
+  if (document.getElementById('nb-pren')) document.getElementById('nb-pren').addEventListener('click', function(){ navTo('pren'); caricaPrenotazioni(); });
+  document.getElementById('nb-pag').addEventListener('click',  function(){ navTo('pag');  caricaPagamenti(); });
+  if (document.getElementById('btn-export-pag')) document.getElementById('btn-export-pag').addEventListener('click', exportPagamentiCSV);
+  if (document.getElementById('btn-promemoria-pag')) document.getElementById('btn-promemoria-pag').addEventListener('click', inviaPromemoria);
+  document.getElementById('nb-srv').addEventListener('click', function(){ navTo('srv'); caricaServizi(); caricaTariffe(); });
+  document.getElementById('nb-imp').addEventListener('click', function(){ navTo('imp'); caricaImpostazioni(); });
+  if (document.getElementById('btn-salva-tariffe')) document.getElementById('btn-salva-tariffe').addEventListener('click', salvaTariffe);
+  if (document.getElementById('btn-nuovo-servizio')) document.getElementById('btn-nuovo-servizio').addEventListener('click', function(){ apriServizio(null); });
+  if (document.getElementById('btn-chiudi-servizio')) document.getElementById('btn-chiudi-servizio').addEventListener('click', function(){ chiudi('ov-servizio'); });
+  if (document.getElementById('btn-salva-servizio')) document.getElementById('btn-salva-servizio').addEventListener('click', salvaServizio);
+  if (document.getElementById('btn-elimina-servizio')) document.getElementById('btn-elimina-servizio').addEventListener('click', eliminaServizioCorrente);
+  if (document.getElementById('btn-nuovo-doc')) document.getElementById('btn-nuovo-doc').addEventListener('click', function(){ apriDocumento(null); });
+  if (document.getElementById('btn-chiudi-doc')) document.getElementById('btn-chiudi-doc').addEventListener('click', function(){ chiudi('ov-documento'); });
+  if (document.getElementById('btn-upload-doc')) document.getElementById('btn-upload-doc').addEventListener('click', uploadDocumento);
+  if (document.getElementById('btn-nuovo-avviso')) document.getElementById('btn-nuovo-avviso').addEventListener('click', function(){ apriAvviso(null); });
+  if (document.getElementById('btn-chiudi-avviso')) document.getElementById('btn-chiudi-avviso').addEventListener('click', function(){ chiudi('ov-avviso'); });
+  if (document.getElementById('btn-salva-avviso')) document.getElementById('btn-salva-avviso').addEventListener('click', salvaAvviso);
+  if (document.getElementById('btn-elimina-avviso')) document.getElementById('btn-elimina-avviso').addEventListener('click', eliminaAvvisoCorrente);
+  if (document.getElementById('btn-backup')) document.getElementById('btn-backup').addEventListener('click', eseguiBackup);
+  if (document.getElementById('btn-chiudi-socio')) document.getElementById('btn-chiudi-socio').addEventListener('click', function(){ chiudi('ov-socio'); });
+  if (document.getElementById('btn-salva-tessera')) document.getElementById('btn-salva-tessera').addEventListener('click', salvaTessera);
+  if (document.getElementById('btn-registra-pag')) document.getElementById('btn-registra-pag').addEventListener('click', registraPagamento);
+  if (document.getElementById('btn-promemoria-singolo')) document.getElementById('btn-promemoria-singolo').addEventListener('click', inviaPromemoriasingolo);
+  if (document.getElementById('btn-elimina-socio')) document.getElementById('btn-elimina-socio').addEventListener('click', eliminaSocio);
+  // Overlay close
+  document.getElementById('btn-chiudi-op').addEventListener('click', function(){ chiudi('ov-pren'); });
+  document.getElementById('btn-chiudi-opr').addEventListener('click', function(){ chiudi('ov-prat'); });
+  // Pren
+  document.getElementById('btn-cancella-pren').addEventListener('click', cancellaPren);
+  // Prat
+  document.getElementById('btn-aggiorna-stato').addEventListener('click', aggiornaPrat);
+  document.getElementById('btn-elimina-prat').addEventListener('click', eliminaPrat);
+  document.getElementById('tab-dati').addEventListener('click', function(){ switchTab('dati'); });
+  document.getElementById('tab-chat').addEventListener('click', function(){ switchTab('chat'); });
+  // Chat
+  document.getElementById('btn-admin-send').addEventListener('click', adminSendMsg);
+  document.getElementById('admin-chat-inp').addEventListener('keydown', function(e){ if(e.key==='Enter') adminSendMsg(); });
+  // Slot
+  document.getElementById('btn-add-ch').addEventListener('click', addChiusura);
+  document.getElementById('btn-add-blocco').addEventListener('click', addBlocco);
+  document.getElementById('btn-salva-slot').addEventListener('click', salvaSlot);
+  // Pwd admin
+  document.getElementById('btn-cambia-pwd-admin').addEventListener('click', cambiaPwdAdmin);
+  // Filtri prenotazioni
+  makeFiltri('pren-filtri', ['tutte','confermata','cancellata'], ['Tutte','Confermate','Cancellate'], function(f){ prenFiltro=f; renderPren(); });
+  makeFiltri('prat-filtri', ['tutte','richiesta','lavorazione','da_firmare','completato'], ['Attive','In attesa','In lavorazione','Da firmare','Archivio'], function(f){ pratFiltro=f; renderPrat(); });
+}
+
+function makeFiltri(containerId, vals, labels, cb) {
+  var el = document.getElementById(containerId); if(!el) return;
+  el.innerHTML = '';
+  for (var i=0; i<vals.length; i++) {
+    var btn = document.createElement('button');
+    btn.className = 'fb ' + (i===0?'on':'off');
+    btn.textContent = labels[i];
+    btn.dataset.val = vals[i];
+    btn.addEventListener('click', (function(v, container){
+      return function() {
+        var all = document.getElementById(container).querySelectorAll('.fb');
+        for (var j=0; j<all.length; j++) all[j].className='fb off';
+        this.className='fb on';
+        cb(v);
+      };
+    })(vals[i], containerId));
+    el.appendChild(btn);
+  }
+}
+
+// ── API ───────────────────────────────────────────────────────
+function apiCall(action, data, cb) {
+  var payload = {action: action, token: ATOKEN};
+  if (data) { for (var k in data) { if (data.hasOwnProperty(k)) payload[k] = data[k]; } }
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', API, true);
+  xhr.setRequestHeader('Content-Type', 'text/plain');
+  xhr.timeout = 25000;
+  xhr.onload = function() {
+    try { cb(null, JSON.parse(xhr.responseText)); }
+    catch(e) { cb('Risposta non valida: ' + xhr.responseText.substring(0,100)); }
+  };
+  xhr.onerror = function() { cb('Errore connessione'); };
+  xhr.ontimeout = function() { cb('Timeout - riprova'); };
+  xhr.send(JSON.stringify(payload));
+}
+
+// ── NAV ───────────────────────────────────────────────────────
+function navTo(id) {
+  var pages = ['home','pren','prat','chat','slot','soci','pag','srv','imp'];
+  for (var i=0; i<pages.length; i++) {
+    var pg = document.getElementById('p-'+pages[i]);
+    var nb = document.getElementById('nb-'+pages[i]);
+    if (pg) pg.className = pages[i]===id ? 'pg on' : 'pg';
+    if (nb) nb.className = pages[i]===id ? 'nb on' : 'nb';
+  }
+  window.scrollTo(0,0);
+}
+function apri(id) { var e=document.getElementById(id); if(e){ e.className='ov on'; e.scrollTop=0; } }
+function chiudi(id) { var e=document.getElementById(id); if(e) e.className='ov'; }
+function esci() { localStorage.removeItem('asppi_admin_ok'); localStorage.removeItem('asppi_admin_pwd'); window.location.replace('index.html'); }
+
+// ── CARICA ────────────────────────────────────────────────────
+function carica() {
+  setText('h-prens', ''); document.getElementById('h-prens').innerHTML='<div class="info">Caricamento...</div>';
+  // Chiamate separate per evitare timeout
+  apiCall('getPrenotazioni', {}, function(err, r) {
+    D.prenotazioni = (!err && r && r.ok) ? (r.data||[]) : [];
+    renderHome();
+    renderPren();
+  });
+  apiCall('getContratti', {}, function(err, r) {
+    D.contratti = (!err && r && r.ok) ? (r.data||[]) : [];
+    renderHome();
+    renderPrat();
+    renderChat();
+  });
+  apiCall('getUtenti', {}, function(err, r) {
+    D.utenti = (!err && r && r.ok) ? (r.data||[]) : [];
+    setText('sh-soc', D.utenti.length);
+  });
+  apiCall('getAllChat', {}, function(err, r) {
+    D.chat = (!err && r && r.ok) ? (r.data||[]) : [];
+    renderChat();
+  });
+  apiCall('getChiusure', {}, function(err, r) {
+    D.chiusure = (!err && r && r.ok) ? (r.data||[]) : [];
+    renderChiusure();
+  });
+  apiCall('getSlot', {}, function(err, r) {
+    if (!err && r && r.ok) {
+      if (r.giorni && r.giorni.length) sGiorni = r.giorni;
+      if (r.orari  && r.orari.length)  sOrari  = r.orari;
+    }
+    initSlot();
+  });
+}
+
+// ── HOME ──────────────────────────────────────────────────────
+function renderHome() {
+  setText('sh-app', D.prenotazioni.filter(function(p){ return p.stato==='confermata'; }).length);
+  setText('sh-att', D.contratti.filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; }).length);
+  // Prenotazioni
+  var hp = document.getElementById('h-prens'); if(!hp) return;
+  var prens = D.prenotazioni.filter(function(p){ return p.stato==='confermata'; }).slice(0,3);
+  hp.innerHTML = '';
+  if (!prens.length) { hp.innerHTML='<div class="info">Nessun appuntamento confermato.</div>'; }
+  else { for(var i=0;i<prens.length;i++) hp.appendChild(makePrenCard(prens[i])); }
+  // Pratiche
+  var hpr = document.getElementById('h-prats'); if(!hpr) return;
+  hpr.innerHTML = '';
+  var pratAttive = D.contratti.filter(function(c){ return c.stato!=='completato' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; });
+  if (!pratAttive.length) { hpr.innerHTML='<div class="info">Nessuna pratica attiva.</div>'; }
+  else { var listP=pratAttive.slice(0,3); for(var j=0;j<listP.length;j++) hpr.appendChild(makePratCard(listP[j])); }
+}
+
+// ── PRENOTAZIONI ──────────────────────────────────────────────
+function makePrenCard(p) {
+  var col = p.stato==='cancellata' ? '#8A8A8A' : '#2D7A4F';
+  var div = document.createElement('div'); div.className='row';
+  var bar = document.createElement('div'); bar.className='bar'; bar.style.background=col;
+  var rb  = document.createElement('div'); rb.className='rb';
+  var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
+  var rt = document.createElement('div'); rt.className='rt'; rt.textContent=p.displayName||p.nomeUtente||'—';
+  var ora = document.createElement('div'); ora.style.cssText='font-size:15px;font-weight:800;color:#E8631A'; ora.textContent=p.ora||'—';
+  var rs = document.createElement('div'); rs.className='rs'; rs.textContent=(p.motivo||'')+' - '+(p.data||'');
+  var ra = document.createElement('div'); ra.className='ra'; ra.textContent='›';
+  top.appendChild(rt); top.appendChild(ora); rb.appendChild(top); rb.appendChild(rs);
+  div.appendChild(bar); div.appendChild(rb); div.appendChild(ra);
+  div.addEventListener('click', (function(id){ return function(){ apriPren(id); }; })(p.id));
+  return div;
+}
+
+function renderPren() {
+  var el = document.getElementById('l-pren'); if(!el) return;
+  var list = D.prenotazioni;
+  if (prenFiltro !== 'tutte') list = list.filter(function(p){ return p.stato===prenFiltro; });
+  el.innerHTML = '';
+  if (!list.length) { el.innerHTML='<div class="info">Nessuna prenotazione trovata.</div>'; return; }
+  for (var i=0; i<list.length; i++) el.appendChild(makePrenCard(list[i]));
+}
+
+function apriPren(id) {
+  var p = null; for(var i=0;i<D.prenotazioni.length;i++){ if(D.prenotazioni[i].id===id){p=D.prenotazioni[i];break;} }
+  if (!p) return;
+  curPrenId = id;
+  setText('op-ttl', p.nomeUtente||'—');
+  setText('op-data', fmtDate(p.data)+' ore '+(p.ora||'—'));
+  setText('op-stato', p.stato==='confermata'?'Confermata':'Cancellata');
+  setText('op-nome', p.nomeUtente||'—');
+  setText('op-email', p.emailUtente||'—');
+  setText('op-motivo', p.motivo||'—');
+  hide('op-ok');
+  var btn = document.getElementById('btn-cancella-pren');
+  if (btn) btn.style.display = p.stato==='cancellata' ? 'none' : '';
+  apri('ov-pren');
+}
+
+function cancellaPren() {
+  apiCall('cancelPrenotazione', {id: curPrenId}, function(err, r) {
+    if (!err && r && r.ok) { show('op-ok'); hide('btn-cancella-pren'); carica(); }
+    else alert('Errore: '+((r&&r.error)||err||'Riprova'));
+  });
+}
+
+function salvaNoteInterne() {
+  var note = (document.getElementById('opr-note-interne')||{}).value||'';
+  var ct2 = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){ct2=D.contratti[i];break;} }
+  if (!ct2) return;
+  ct2.noteInterne = note;
+  apiCall('saveContratto', {data:ct2}, function(err,r){
+    if(!err&&r&&r.ok){ show('opr-note-ok'); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function eliminaPrat() {
+  var c2 = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){c2=D.contratti[i];break;} }
+  if (!c2) return;
+  if (!confirm('Eliminare definitivamente questa pratica?')) return;
+  c2.eliminato = true;
+  apiCall('saveContratto', {data: c2}, function(err, r) {
+    if (!err && r && r.ok) {
+      chiudi('ov-prat');
       carica();
+      alert('Pratica eliminata.');
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+// ── PRATICHE ─────────────────────────────────────────────────
+function makePratCard(c) {
+  var col = statoCol(c.stato);
+  var nome = nomeContratto(c);
+  var div = document.createElement('div'); div.className='row';
+  var bar = document.createElement('div'); bar.className='bar'; bar.style.background=col;
+  var rb  = document.createElement('div'); rb.className='rb';
+  var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between';
+  var rt = document.createElement('div'); rt.className='rt'; rt.textContent=nome;
+  var bdg = document.createElement('span'); bdg.className='bdg'; bdg.textContent=statoLbl(c.stato);
+  bdg.style.color=col; bdg.style.background=col+'22';
+  var rs = document.createElement('div'); rs.className='rs'; rs.textContent=(c.dataRichiesta?c.dataRichiesta.substring(0,10):'');
+  var ra = document.createElement('div'); ra.className='ra'; ra.textContent='›';
+  top.appendChild(rt); top.appendChild(bdg); rb.appendChild(top); rb.appendChild(rs);
+  div.appendChild(bar); div.appendChild(rb); div.appendChild(ra);
+  div.addEventListener('click', (function(id){ return function(){ apriPrat(id); }; })(c.id));
+  return div;
+}
+
+function renderPrat() {
+  var el = document.getElementById('l-prat'); if(!el) return;
+  var list = D.contratti.filter(function(c){ return c.eliminato!==true && c.eliminato!=='true'; });
+  if (pratFiltro === 'tutte') {
+    // Mostra tutto tranne completati (che sono in archivio)
+    // Ma se clicco filtro completato lo mostro
+  } else if (pratFiltro === 'completato') {
+    list = list.filter(function(c){ return c.stato==='completato'; });
+  } else {
+    list = list.filter(function(c){ return c.stato===pratFiltro && c.stato!=='completato'; });
+  }
+  // Di default (tutte) nascondi i completati
+  if (pratFiltro === 'tutte') {
+    list = list.filter(function(c){ return c.stato !== 'completato'; });
+  }
+  el.innerHTML = '';
+  if (!list.length) { el.innerHTML='<div class="info">Nessuna pratica trovata.</div>'; return; }
+  for (var i=0; i<list.length; i++) el.appendChild(makePratCard(list[i]));
+}
+
+function apriPrat(id) {
+  var c = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===id){c=D.contratti[i];break;} }
+  if (!c) return;
+  curPratId = id; curChatId = id;
+  setText('opr-lbl', 'PRATICA '+id);
+  setText('opr-ttl', nomeContratto(c));
+  setText('opr-nome-cnt', nomeContratto(c));
+  setText('opr-tipo', c.tipo||'—');
+  setText('opr-stato', statoLbl(c.stato));
+  var sel = document.getElementById('opr-stato-sel'); if(sel) sel.value=c.stato||'richiesta';
+  setText('opr-dal', fmtDate(c.duraDal));
+  setText('opr-al', fmtDate(c.duraAl));
+  setText('opr-canone', c.canoneMensile?'€ '+c.canoneMensile+'/mese':'—');
+  setText('opr-dep', c.depositoImporto?'€ '+c.depositoImporto:'—');
+  document.getElementById('opr-locs').innerHTML = parsePeople(c.locatoriJSON);
+  document.getElementById('opr-cons').innerHTML = parsePeople(c.conduttoriJSON);
+  // Mostra dati aggiuntivi se presenti
+  var extra = document.getElementById('opr-extra');
+  if (extra) {
+    var eh = '';
+    if (c.apeClasse)       eh += '<div class="lbl">Classe APE</div><div class="val">'+c.apeClasse+'</div>';
+    if (c.apeNumero)       eh += '<div class="lbl">N. Certificato APE</div><div class="val">'+c.apeNumero+'</div>';
+    if (c.canoneIBAN)      eh += '<div class="lbl">IBAN Locatore</div><div class="val" style="font-family:monospace">'+c.canoneIBAN+'</div>';
+    if (c.depositoMesi)    eh += '<div class="lbl">Deposito (mesi)</div><div class="val">'+c.depositoMesi+'</div>';
+    if (c.oneriMensili)    eh += '<div class="lbl">Oneri mensili</div><div class="val">€ '+c.oneriMensili+'</div>';
+    if (c.note)            eh += '<div class="lbl">Note</div><div class="val">'+c.note+'</div>';
+    if (c.taj)             eh += '<div class="lbl">TAJ</div><div class="val" style="font-family:monospace">'+c.taj+'</div>';
+    if (c.nomeContratto)   eh += '<div class="lbl">Nome file contratto</div><div class="val" style="font-family:monospace">'+c.nomeContratto+'</div>';
+    extra.innerHTML = eh || '<div class="val">—</div>';
+  }
+  hide('opr-ok');
+  // Carica note interne
+  var noteEl = document.getElementById('opr-note-interne');
+  if(noteEl) noteEl.value = c.noteInterne||'';
+  hide('opr-note-ok');
+  var modDiv = document.getElementById('opr-modificato');
+  if (c.modificato) {
+    setText('opr-data-mod', fmtDate(c.modificato));
+    if (modDiv) modDiv.style.display='';
+  } else {
+    if (modDiv) modDiv.style.display='none';
+  }
+  switchTab('dati');
+  apri('ov-prat');
+}
+
+function switchTab(t) {
+  var datiBody = document.getElementById('tab-dati-body');
+  var chatBody = document.getElementById('tab-chat-body');
+  var tDati = document.getElementById('tab-dati');
+  var tChat = document.getElementById('tab-chat');
+  if (datiBody) datiBody.style.display = t==='dati' ? '' : 'none';
+  if (chatBody) chatBody.style.display = t==='chat' ? '' : 'none';
+  if (tDati) tDati.className = 'tabbtn ' + (t==='dati'?'on':'');
+  if (tChat) tChat.className = 'tabbtn ' + (t==='chat'?'on':'');
+  if (t==='chat') caricaMsgsAdmin();
+}
+
+function aggiornaPrat() {
+  var ct = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){ct=D.contratti[i];break;} }
+  if (!ct) return;
+  var sel = document.getElementById('opr-stato-sel'); if(!sel) return;
+  var nuovoStato = sel.value;
+
+  // Se completato → popup addebito
+  if (nuovoStato === 'completato' && ct.stato !== 'completato') {
+    mostraPopupAddebito(ct, nuovoStato);
+    return;
+  }
+
+  salvaPratStato(ct, nuovoStato, null);
+}
+
+function mostraPopupAddebito(ct, nuovoStato) {
+  // Calcola tariffa suggerita
+  apiCall('getImpostazioni', {}, function(err, r) {
+    var tariffe = (!err&&r&&r.ok) ? r.data : {};
+    var importoSuggerito = parseFloat(tariffe.tariffa_contratto_extra)||25;
+
+    var popup = document.createElement('div');
+    popup.id = 'popup-addebito';
+    popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    popup.innerHTML = '<div style="background:#fff;border-radius:20px;padding:24px;max-width:380px;width:100%">'
+      +'<div style="font-size:16px;font-weight:800;color:#1A1A1A;margin-bottom:6px">&#9989; Archivia pratica</div>'
+      +'<div style="font-size:13px;color:#8A8A8A;margin-bottom:16px">Vuoi registrare un addebito per questa pratica?</div>'
+      +'<label style="font-size:11px;font-weight:700;color:#8A8A8A;text-transform:uppercase">Importo da addebitare €</label>'
+      +'<input type="text" id="popup-importo" value="'+importoSuggerito+'" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:16px;font-weight:700;margin:6px 0 4px;text-align:center"/>'
+      +'<div style="font-size:11px;color:#8A8A8A;margin-bottom:16px">Inserisci 0 per non addebitare nulla</div>'
+      +'<label style="font-size:11px;font-weight:700;color:#8A8A8A;text-transform:uppercase">Tipo</label>'
+      +'<select id="popup-tipo" style="width:100%;padding:10px;border-radius:8px;border:1.5px solid #e5e5e5;font-size:13px;margin:6px 0 16px">'
+      +'<option value="Contratto extra">Contratto extra</option>'
+      +'<option value="Primo tesseramento">Primo tesseramento</option>'
+      +'<option value="Rinnovo tessera">Rinnovo tessera</option>'
+      +'<option value="Adempimento extra">Adempimento extra</option>'
+      +'<option value="Altro">Altro</option>'
+      +'</select>'
+      +'<div style="display:flex;gap:8px">'
+      +'<button id="popup-salta" style="flex:1;padding:12px;border-radius:10px;border:1.5px solid #e5e5e5;background:#fff;font-size:13px;font-weight:700;cursor:pointer">Salta addebito</button>'
+      +'<button id="popup-conferma" style="flex:1;padding:12px;border-radius:10px;border:none;background:#E8631A;color:#fff;font-size:13px;font-weight:700;cursor:pointer">Conferma e archivia</button>'
+      +'</div>'
+      +'</div>';
+
+    document.body.appendChild(popup);
+
+    document.getElementById('popup-salta').addEventListener('click', function(){
+      popup.remove();
+      salvaPratStato(ct, nuovoStato, null);
+    });
+
+    document.getElementById('popup-conferma').addEventListener('click', function(){
+      var importo = parseFloat((document.getElementById('popup-importo')||{}).value||'0');
+      var tipo = (document.getElementById('popup-tipo')||{}).value||'Contratto extra';
+      popup.remove();
+      salvaPratStato(ct, nuovoStato, importo>0 ? {importo:importo, tipo:tipo} : null);
+    });
+  });
+}
+
+function salvaPratStato(ct, nuovoStato, addebito) {
+  ct.stato = nuovoStato;
+  apiCall('saveContratto', {data: ct}, function(err, r) {
+    if (!err && r && r.ok) {
+      show('opr-ok');
+      setText('opr-stato', statoLbl(ct.stato));
+      // Registra addebito se presente
+      if (addebito) {
+        var pagObj = {
+          userId: ct.userId, tipo: addebito.tipo,
+          importo: addebito.importo, anno: new Date().getFullYear(),
+          stato: 'dovuto', metodoPagamento: '', dataPagamento: '',
+          note: 'Pratica '+ct.id
+        };
+        apiCall('savePagamento', {data: pagObj}, function(){
+          carica();
+        });
+      } else {
+        carica();
+      }
     } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
   });
 }
