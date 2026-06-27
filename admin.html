@@ -76,6 +76,7 @@ select.inp{cursor:pointer;}
 .cs{width:44px;height:44px;border-radius:22px;border:none;background:#E8631A;color:#fff;font-size:20px;cursor:pointer;flex-shrink:0;}
 .exbtn{background:none;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer;}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
@@ -215,13 +216,8 @@ select.inp{cursor:pointer;}
       </select>
       <label class="lbl">Importo €</label>
       <input type="text" class="inp" id="os-pag-importo" placeholder="55"/>
-      <label class="lbl">Metodo</label>
-      <select class="inp" id="os-pag-metodo">
-        <option value="contanti">Contanti</option>
-        <option value="bonifico">Bonifico confermato</option>
-      </select>
-      <label class="lbl">Data pagamento</label>
-      <input type="text" class="inp" id="os-pag-data" placeholder="gg/mm/aaaa"/>
+      <label class="lbl">Note (opzionale)</label>
+      <input type="text" class="inp" id="os-pag-note" placeholder="es. Tesseramento 2026"/>
       <div class="infog" id="os-pag-ok" style="display:none">&#9989; Pagamento registrato!</div>
       <button class="bp" id="btn-registra-pag">Registra pagamento</button>
       <button class="bs" id="btn-promemoria-singolo" style="margin-top:8px">&#128232; Invia promemoria a questo socio</button>
@@ -1428,13 +1424,12 @@ function salvaTessera() {
 function registraPagamento() {
   var tipo    = (document.getElementById('os-pag-tipo')||{}).value||'';
   var importo = (document.getElementById('os-pag-importo')||{}).value||'';
-  var metodo  = (document.getElementById('os-pag-metodo')||{}).value||'contanti';
-  var data    = (document.getElementById('os-pag-data')||{}).value||'';
-  if(!importo||!data) { alert('Inserisci importo e data'); return; }
+  var note    = (document.getElementById('os-pag-note')||{}).value||'';
+  if(!importo) { alert('Inserisci importo'); return; }
   var obj = {
     userId: curSocioId, tipo: tipo, importo: parseFloat(importo.replace(',','.')),
-    anno: new Date().getFullYear(), stato: 'confermato',
-    metodoPagamento: metodo, dataPagamento: data, _statoChanged: true
+    anno: new Date().getFullYear(), stato: 'dovuto',
+    metodoPagamento: '', dataPagamento: '', note: note, _statoChanged: false
   };
   apiCall('savePagamento', {data:obj}, function(err,r){
     if(!err&&r&&r.ok){ show('os-pag-ok'); caricaStoricoPagamenti(curSocioId); caricaPagamenti(); }
@@ -1460,6 +1455,13 @@ function caricaStoricoPagamenti(userId) {
       left.appendChild(t1); left.appendChild(t2);
       var right = document.createElement('div'); right.style.cssText='display:flex;align-items:center;gap:8px';
       var price = document.createElement('span'); price.style.cssText='font-size:15px;font-weight:800;color:'+col; price.textContent='€'+p.importo;
+      if (p.stato !== 'confermato') {
+        var btnConf = document.createElement('button');
+        btnConf.textContent = '✓ Pagato';
+        btnConf.style.cssText='background:#2D7A4F;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer';
+        btnConf.addEventListener('click', (function(pid){ return function(){ confermaPagamento(pid); }; })(p.id));
+        right.appendChild(btnConf);
+      }
       var btnEl = document.createElement('button');
       btnEl.style.cssText='background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px';
       btnEl.innerHTML='&#128465;';
@@ -1468,6 +1470,17 @@ function caricaStoricoPagamenti(userId) {
       div.appendChild(left); div.appendChild(right);
       el.appendChild(div);
     });
+  });
+}
+
+function confermaPagamento(pagId) {
+  var metodo = prompt('Metodo di pagamento:', 'contanti');
+  if (metodo === null) return;
+  var data = prompt('Data pagamento (gg/mm/aaaa):', new Date().toLocaleDateString('it-IT'));
+  if (!data) return;
+  apiCall('confermaPagamento', {id: pagId, metodoPagamento: metodo, dataPagamento: data}, function(err,r){
+    if(!err&&r&&r.ok){ caricaStoricoPagamenti(curSocioId); caricaPagamenti(); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
   });
 }
 
@@ -2134,28 +2147,34 @@ function cercaPratiche(query) {
 
 // ── EXPORT EXCEL SOCI ─────────────────────────────────────────
 function scaricaExcel(rows, nomeFile) {
-  // CSV con separatore punto e virgola - Excel italiano lo riconosce correttamente
-  var nl = String.fromCharCode(10);
-  var sep = ';';
-  var lines = rows.map(function(row){
-    return row.map(function(cell){
-      var s = String(cell===null||cell===undefined?'':cell);
-      // Escape virgolette e wrap in virgolette se contiene separatore
-      s = s.replace(/"/g, '""');
-      if (s.indexOf(sep)>-1 || s.indexOf(nl)>-1 || s.indexOf('"')>-1) {
-        s = '"' + s + '"';
-      }
-      return s;
-    }).join(sep);
+  // Usa SheetJS per generare vero file .xlsx
+  var XLSX = window.XLSX;
+  if (!XLSX) {
+    // Carica SheetJS dinamicamente se non disponibile
+    var script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    script.onload = function(){ scaricaExcelConSheetJS(rows, nomeFile); };
+    document.head.appendChild(script);
+    return;
+  }
+  scaricaExcelConSheetJS(rows, nomeFile);
+}
+
+function scaricaExcelConSheetJS(rows, nomeFile) {
+  var XLSX = window.XLSX;
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.aoa_to_sheet(rows);
+
+  // Stile intestazione (larghezza colonne automatica)
+  var colWidths = rows[0].map(function(h, i){
+    var maxLen = String(h).length;
+    rows.forEach(function(r){ var l = String(r[i]||'').length; if(l>maxLen) maxLen=l; });
+    return { wch: Math.min(maxLen+2, 40) };
   });
-  var csv = '﻿' + lines.join(nl); // BOM per Excel italiano
-  var blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url;
-  a.download = nomeFile+'_'+new Date().toISOString().substring(0,10)+'.csv';
-  a.click();
-  URL.revokeObjectURL(url);
+  ws['!cols'] = colWidths;
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Dati');
+  XLSX.writeFile(wb, nomeFile+'_'+new Date().toISOString().substring(0,10)+'.xlsx');
 }
 
 function csvEsporta(rows) {
