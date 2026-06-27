@@ -1498,9 +1498,26 @@ function renderPagamenti(query, campo) {
     importoEl.textContent = item.saldo>0 ? '€'+item.saldo+' dovuti' : '✅ In regola';
     var rs = document.createElement('div'); rs.className='rs';
     rs.textContent = (u.email||'') + (bonDichiarato?' · ⚠️ Bonifico da verificare':'');
-    var arr = document.createElement('div'); arr.className='ra'; arr.textContent='›';
-    top.appendChild(rt); top.appendChild(importoEl); rb.appendChild(top); rb.appendChild(rs);
-    div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
+    var right = document.createElement('div'); right.style.cssText='display:flex;flex-direction:column;align-items:flex-end;padding:10px;gap:6px;justify-content:center';
+    right.appendChild(importoEl);
+    if (item.saldo > 0) {
+      var btnProm = document.createElement('button');
+      btnProm.textContent = '📨 Promemoria';
+      btnProm.style.cssText = 'background:#E8631A;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap';
+      btnProm.addEventListener('click', (function(uid, nome){
+        return function(e){
+          e.stopPropagation();
+          if (!confirm('Inviare promemoria a '+nome+'?')) return;
+          apiCall('inviaPromemoriaSingolo', {userId:uid}, function(err,r){
+            if(!err&&r&&r.ok){ alert('Promemoria inviato!'); }
+            else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+          });
+        };
+      })(u.id, u.displayName||((u.nome||'')+' '+(u.cognome||'')).trim()));
+      right.appendChild(btnProm);
+    }
+    top.appendChild(rt); rb.appendChild(top); rb.appendChild(rs);
+    div.appendChild(bar); div.appendChild(rb); div.appendChild(right);
     div.addEventListener('click', (function(uid){ return function(){ apriSocio(uid); }; })(u.id));
     el.appendChild(div);
   });
