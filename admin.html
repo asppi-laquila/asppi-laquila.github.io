@@ -564,6 +564,7 @@ select.inp{cursor:pointer;}
   <button class="nb" id="nb-prat"><span class="ic">&#128203;</span><span class="lb">Pratiche</span></button>
   <button class="nb" id="nb-soci"><span class="ic">&#128100;</span><span class="lb">Soci</span></button>
   <button class="nb" id="nb-pag"><span class="ic">&#128176;</span><span class="lb">Pag.</span></button>
+  <button class="nb" id="nb-pren"><span class="ic">&#128197;</span><span class="lb">Appunt.</span></button>
   <button class="nb" id="nb-srv"><span class="ic">&#11088;</span><span class="lb">Servizi</span></button>
   <button class="nb" id="nb-imp"><span class="ic">&#9881;</span><span class="lb">Imp.</span></button>
 </div>
@@ -2566,6 +2567,188 @@ function exportSociExcel() {
   var a    = document.createElement('a');
   a.href   = url;
   a.download = 'soci_asppi_'+new Date().toISOString().substring(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function generaDatiContratto() {
+  var box = document.getElementById('dati-contratto-box');
+  if (!box) return;
+  
+  // Trova il contratto corrente
+  var ct = null;
+  for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){ct=D.contratti[i];break;} }
+  if (!ct) { box.textContent='Contratto non trovato'; return; }
+  
+  // Trova immobile
+  var imm = (D.appartamenti||[]).find(function(a){ return a.id===ct.appartamentoId; }) || {};
+  
+  // Parse JSON
+  var locatori=[], conduttori=[], garanti=[];
+  try { locatori=JSON.parse(ct.locatoriJSON||'[]'); } catch(e){}
+  try { conduttori=JSON.parse(ct.conduttoriJSON||'[]'); } catch(e){}
+  try { garanti=JSON.parse(ct.garantiJSON||'[]'); } catch(e){}
+  var perts=[];
+  try { perts=JSON.parse(imm.pertinenze||'[]'); } catch(e){}
+  var pertSel=[];
+  try { pertSel=JSON.parse(ct.pertinenzeSel||'[]'); } catch(e){}
+
+  function fmtPers(p, tipo) {
+    if (!p || !p.nome) return tipo+': (non compilato)
+';
+    var s = tipo+':
+';
+    s += '  Nome: '+(p.nome||'')+' '+(p.cognome||'')+'
+';
+    if(p.cf)          s += '  CF: '+p.cf+'
+';
+    if(p.dataNascita) s += '  Nato il: '+p.dataNascita+'
+';
+    if(p.luogoNascita)s += '  Nato a: '+p.luogoNascita+'
+';
+    if(p.residenza)   s += '  Residente: '+p.residenza+'
+';
+    if(p.tipoDoc)     s += '  Documento: '+p.tipoDoc+' n.'+p.numDoc+'
+';
+    if(p.rilasciatoDa)s += '  Rilasciato da: '+p.rilasciatoDa+' il '+p.dataDoc+'
+';
+    if(p.scadenzaDoc) s += '  Scadenza doc: '+p.scadenzaDoc+'
+';
+    return s;
+  }
+
+  var txt = '=== DATI PER CONTRATTO ASPPI ===
+
+';
+  
+  txt += '--- TIPO CONTRATTO ---
+';
+  txt += 'Tipo: '+(ct.tipo||'non specificato')+'
+';
+  txt += 'Unita: '+(ct.unitaTipo||'intera unita immobiliare')+'
+
+';
+
+  txt += '--- IMMOBILE PRINCIPALE ---
+';
+  txt += 'Indirizzo: '+(imm.via||'')+(imm.citta?', '+imm.citta:'')+'
+';
+  txt += 'Tipo: '+(imm.tipo||'')+'
+';
+  if(imm.catComune)    txt += 'Comune catastale: '+imm.catComune+'
+';
+  if(imm.catSezione)   txt += 'Sezione: '+imm.catSezione+'
+';
+  if(imm.catFoglio)    txt += 'Foglio: '+imm.catFoglio+'
+';
+  if(imm.catParticella)txt += 'Particella: '+imm.catParticella+'
+';
+  if(imm.catSub)       txt += 'Subalterno: '+imm.catSub+'
+';
+  if(imm.catCategoria) txt += 'Categoria: '+imm.catCategoria+'
+';
+  if(imm.catRendita)   txt += 'Rendita: '+imm.catRendita+'
+';
+
+  if(pertSel.length) {
+    txt += '
+--- PERTINENZE INCLUSE ---
+';
+    pertSel.forEach(function(p,i){
+      txt += (i+1)+'. '+(p.tipo||'Pertinenza')+' — '+(p.via||'')+'
+';
+      if(p.foglio) txt += '   Fg.'+p.foglio+' Part.'+p.particella+(p.sub?' Sub.'+p.sub:'')+' Cat.'+p.cat+'
+';
+    });
+  }
+
+  txt += '
+--- DURATA E CANONE ---
+';
+  txt += 'Dal: '+(ct.duraDal||'')+'
+';
+  txt += 'Al: '+(ct.duraAl||'')+'
+';
+  txt += 'Mesi: '+(ct.duraMesi||'')+'
+';
+  txt += 'Canone mensile: '+(ct.canoneMensile||'')+' euro
+';
+  txt += 'Canone annuale: '+(ct.canoneAnnuale||'')+' euro
+';
+  if(ct.canoneIBAN)   txt += 'IBAN pagamento: '+ct.canoneIBAN+'
+';
+  if(ct.depositoImporto) txt += 'Deposito: '+ct.depositoImporto+' euro ('+(ct.depositoMesi||'')+' mesi)
+';
+  if(ct.oneriMensili) txt += 'Oneri accessori: '+ct.oneriMensili+' euro/mese
+';
+  if(ct.oneriIBAN)    txt += 'IBAN oneri: '+ct.oneriIBAN+'
+';
+
+  txt += '
+--- LOCATORI ---
+';
+  locatori.forEach(function(p,i){ txt += fmtPers(p, 'Locatore '+(i+1)); });
+
+  txt += '
+--- CONDUTTORI ---
+';
+  conduttori.forEach(function(p,i){ txt += fmtPers(p, 'Conduttore '+(i+1)); });
+
+  if(garanti.length) {
+    txt += '
+--- GARANTI ---
+';
+    garanti.forEach(function(p,i){ txt += fmtPers(p, 'Garante '+(i+1)); });
+  }
+
+  if(ct.note) txt += '
+--- NOTE ---
+'+ct.note+'
+';
+  
+  txt += '
+=== FINE DATI ===';
+  
+  box.textContent = txt;
+  window._datiContratto = txt;
+}
+
+function copiaDatiContratto() {
+  var txt = window._datiContratto || (document.getElementById('dati-contratto-box')||{}).textContent || '';
+  if(!txt){ alert('Genera prima i dati'); return; }
+  navigator.clipboard.writeText(txt).then(function(){
+    alert('Dati copiati negli appunti! Incollali nella skill contratti-locazione');
+  }).catch(function(){
+    // Fallback
+    var ta = document.createElement('textarea');
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('Dati copiati negli appunti!');
+  });
+}
+
+function scaricaDatiContratto() {
+  var ct = null;
+  for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){ct=D.contratti[i];break;} }
+  var imm = (D.appartamenti||[]).find(function(a){ return ct && a.id===ct.appartamentoId; }) || {};
+  var locatori=[], conduttori=[], garanti=[];
+  try { locatori=JSON.parse(ct&&ct.locatoriJSON||'[]'); } catch(e){}
+  try { conduttori=JSON.parse(ct&&ct.conduttoriJSON||'[]'); } catch(e){}
+  try { garanti=JSON.parse(ct&&ct.garantiJSON||'[]'); } catch(e){}
+  var perts=[];
+  try { perts=JSON.parse(imm.pertinenze||'[]'); } catch(e){}
+  var pertSel=[];
+  try { pertSel=JSON.parse(ct&&ct.pertinenzeSel||'[]'); } catch(e){}
+
+  var txt = window._datiContratto || (document.getElementById('dati-contratto-box')||{}).textContent;
+  if(!txt) { generaDatiContratto(); txt = window._datiContratto; }
+
+  // Crea file .txt scaricabile
+  var blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'dati_contratto_'+(ct&&ct.id||'pratica')+'.txt';
   a.click();
   URL.revokeObjectURL(url);
 }
