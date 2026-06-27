@@ -1515,16 +1515,18 @@ function caricaSlotAdmin() {
       var btn = document.createElement('button');
       var on = !!attivi[o];
       btn.textContent = o;
+      btn.setAttribute('data-ora', o);
+      btn.setAttribute('data-on', on ? '1' : '0');
       btn.style.cssText = 'padding:10px 0;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid '+(on?'#E8631A':'#e5e5e5')+';background:'+(on?'#E8631A':'#fff')+';color:'+(on?'#fff':'#8A8A8A');
-      btn.addEventListener('click', (function(ora, wasOn){
-        return function(){
-          if (wasOn) {
-            eliminaSlotOra(ora);
-          } else {
-            apiCall('saveSlot', {orario:ora}, function(err,r){ if(!err&&r&&r.ok) caricaSlotAdmin(); });
-          }
-        };
-      })(o, on));
+      btn.addEventListener('click', function(){
+        var isOn = this.getAttribute('data-on') === '1';
+        var newOn = !isOn;
+        this.setAttribute('data-on', newOn ? '1' : '0');
+        this.style.background = newOn ? '#E8631A' : '#fff';
+        this.style.borderColor = newOn ? '#E8631A' : '#e5e5e5';
+        this.style.color = newOn ? '#fff' : '#8A8A8A';
+        salvaTuttiSlot();
+      });
       el.appendChild(btn);
     });
 
