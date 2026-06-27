@@ -817,7 +817,8 @@ function carica() {
   });
   apiCall('getUtenti', {}, function(err, r) {
     D.utenti = (!err && r && r.ok) ? (r.data||[]) : [];
-    setText('sh-soc', D.utenti.length);
+    window._utentiData = D.utenti;
+    setText('sh-soci', D.utenti.length);
   });
   apiCall('getAllChat', {}, function(err, r) {
     D.chat = (!err && r && r.ok) ? (r.data||[]) : [];
@@ -3255,7 +3256,8 @@ function carica() {
   });
   apiCall('getUtenti', {}, function(err, r) {
     D.utenti = (!err && r && r.ok) ? (r.data||[]) : [];
-    setText('sh-soc', D.utenti.length);
+    window._utentiData = D.utenti;
+    setText('sh-soci', D.utenti.length);
   });
   apiCall('getAllChat', {}, function(err, r) {
     D.chat = (!err && r && r.ok) ? (r.data||[]) : [];
