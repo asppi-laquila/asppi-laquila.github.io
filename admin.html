@@ -1295,8 +1295,7 @@ function eliminaPagamento(pagId) {
 function eliminaSocio() {
   var u = (window._utentiData||[]).filter(function(x){ return x.id===curSocioId; })[0];
   var nome = u ? (u.displayName||u.nome||'questo socio') : 'questo socio';
-  if (!confirm('Sei sicuro di voler eliminare '+nome+'?
-Tutti i suoi dati verranno cancellati definitivamente.')) return;
+  if (!confirm('Sei sicuro di voler eliminare '+nome+'? Tutti i suoi dati verranno cancellati definitivamente.')) return;
   apiCall('eliminaSocio', {userId: curSocioId}, function(err, r) {
     if (!err&&r&&r.ok) { chiudi('ov-socio'); caricaSoci(); alert('Socio eliminato.'); }
     else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }

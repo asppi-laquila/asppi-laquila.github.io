@@ -185,7 +185,10 @@ input:focus{border-color:#E8631A;}
   <div class="body">
     <div class="info-blue">🔒 Pannello riservato a Simeoni Maurizio</div>
     <label>Password amministratore</label>
-    <input type="password" id="adm-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+    <div style="position:relative">
+      <input type="password" id="adm-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()" style="padding-right:44px"/>
+      <button type="button" onclick="togglePwd('adm-pwd','eye-adm')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:#8A8A8A" id="eye-adm">&#128065;</button>
+    </div>
     <div class="err" id="adm-err"></div>
     <div class="cr" onclick="toggleRem('rem-adm')">
       <div class="cb" id="rem-adm-box"></div>
@@ -379,7 +382,7 @@ function doAdminLogin() {
     localStorage.setItem('asppi_admin_ok', 'yes');
     window.location.href = 'admin.html';
   } else {
-    showErr('adm-err', 'Password non corretta');
+    showErr('adm-err', 'Password non corretta. Riprova.');
   }
 }
 
