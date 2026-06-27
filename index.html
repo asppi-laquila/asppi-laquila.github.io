@@ -371,8 +371,9 @@ async function doRegister() {
 // ── ADMIN LOGIN ───────────────────────────────────────────────
 function doAdminLogin() {
   var pwd = document.getElementById('adm-pwd').value;
-  var cur = localStorage.getItem('asppi_admin_custom_pwd') || ADM_PWD_DEFAULT;
   showErr('adm-err', '');
+  if (!pwd) { showErr('adm-err', 'Inserisci la password'); return; }
+  var cur = localStorage.getItem('asppi_admin_custom_pwd') || ADM_PWD_DEFAULT;
   if(pwd === cur) {
     if(checks['rem-adm']) {
       localStorage.setItem('asppi_admin_pwd', pwd);
@@ -382,7 +383,7 @@ function doAdminLogin() {
     localStorage.setItem('asppi_admin_ok', 'yes');
     window.location.href = 'admin.html';
   } else {
-    showErr('adm-err', 'Password non corretta. Riprova.');
+    showErr('adm-err', 'Password non corretta. La password di default e: Asppi2025!');
   }
 }
 

@@ -1366,20 +1366,23 @@ function caricaServizi() {
     var el = document.getElementById('l-servizi'); if(!el) return;
     var servizi = (!err&&r&&r.ok) ? r.data||[] : [];
     if (!servizi.length) { el.innerHTML='<div class="info">Nessun servizio ancora. Aggiungine uno!</div>'; return; }
-    var h = '';
+    el.innerHTML = '';
     servizi.forEach(function(s) {
       var attivo = s.attivo===true || String(s.attivo).toLowerCase()==='true';
-      h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #e5e5e5;cursor:pointer" onclick="apriServizio(''+s.id+'')">'
-        +'<div>'
-        +'<div style="font-size:14px;font-weight:700;color:#1A1A1A">'+s.nome+'</div>'
-        +'<div style="font-size:12px;color:#8A8A8A">'+s.categoria+' · '+(attivo?'Attivo':'Disattivo')+'</div>'
-        +'</div>'
-        +'<div style="text-align:right">'
-        +(s.prezzoSoci?'<div style="font-size:14px;font-weight:800;color:#E8631A">€ '+s.prezzoSoci+'</div>':'')
-        +(s.prezzoNormale?'<div style="font-size:11px;color:#8A8A8A;text-decoration:line-through">€ '+s.prezzoNormale+'</div>':'')
-        +'</div></div>';
+      var div = document.createElement('div');
+      div.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #e5e5e5;cursor:pointer';
+      var left = document.createElement('div');
+      var n = document.createElement('div'); n.style.cssText='font-size:14px;font-weight:700;color:#1A1A1A'; n.textContent=s.nome||'';
+      var sub = document.createElement('div'); sub.style.cssText='font-size:12px;color:#8A8A8A';
+      sub.textContent=(s.categoria||'')+' - '+(attivo?'Attivo':'Disattivo');
+      left.appendChild(n); left.appendChild(sub);
+      var right = document.createElement('div'); right.style.cssText='text-align:right';
+      if (s.prezzoSoci) { var ps=document.createElement('div'); ps.style.cssText='font-size:14px;font-weight:800;color:#E8631A'; ps.textContent='€ '+s.prezzoSoci; right.appendChild(ps); }
+      if (s.prezzoNormale) { var pn=document.createElement('div'); pn.style.cssText='font-size:11px;color:#8A8A8A;text-decoration:line-through'; pn.textContent='€ '+s.prezzoNormale; right.appendChild(pn); }
+      div.appendChild(left); div.appendChild(right);
+      div.addEventListener('click', (function(sid){ return function(){ apriServizio(sid); }; })(s.id));
+      el.appendChild(div);
     });
-    el.innerHTML = h;
   });
 }
 
