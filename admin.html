@@ -1476,8 +1476,7 @@ function exportPagamentiCSV() {
       item.saldo||0
     ]);
   });
-  var csv = rows.map(function(r){ return r.map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(','); }).join('
-');
+  var csv = rows.map(function(r){ return r.map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(','); }).join(\n');
   var blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
   var url  = URL.createObjectURL(blob);
   var a    = document.createElement('a');
