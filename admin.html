@@ -512,6 +512,7 @@ select.inp{cursor:pointer;}
   <div class="tabrow">
     <button class="tabbtn on" id="tab-dati">&#128203; Dati</button>
     <button class="tabbtn" id="tab-chat">&#128172; Chat</button>
+    <button class="tabbtn" id="tab-contratto">&#128196; Contratto</button>
   </div>
   <div id="tab-dati-body" style="padding:16px">
     <div id="opr-modificato" class="infor" style="display:none">&#9888; Questo contratto e stato modificato dal socio il <span id="opr-data-mod"></span></div>
@@ -549,6 +550,14 @@ select.inp{cursor:pointer;}
     <div class="card"><div class="cb"><div class="sec">CONDUTTORI</div><div id="opr-cons"></div></div></div>
     <div class="card"><div class="cb"><div class="sec">ALTRI DATI CONTRATTO</div><div id="opr-extra"></div></div></div>
   </div>
+  <div id="tc-contratto" style="display:none;padding:16px">
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="bp" id="btn-copia-dati" style="flex:1">&#128203; Copia dati per skill</button>
+      <button class="bd" id="btn-scarica-dati" style="flex:1">&#128196; Scarica .txt</button>
+    </div>
+    <div id="dati-contratto-box" style="background:#F8F7F5;border-radius:10px;padding:14px;font-size:12px;font-family:monospace;white-space:pre-wrap;line-height:1.6;max-height:400px;overflow-y:auto;border:1px solid #e5e5e5">Clicca per generare i dati...</div>
+  </div>
+
   <div id="tab-chat-body" style="display:none">
     <div class="cms" id="admin-msgs"></div>
     <div class="ci">
@@ -722,6 +731,9 @@ function bindEvents() {
   document.getElementById('btn-elimina-prat').addEventListener('click', eliminaPrat);
   document.getElementById('tab-dati').addEventListener('click', function(){ switchTab('dati'); });
   document.getElementById('tab-chat').addEventListener('click', function(){ switchTab('chat'); });
+  if(document.getElementById('tab-contratto')) document.getElementById('tab-contratto').addEventListener('click', function(){ switchTab('contratto'); });
+  if(document.getElementById('btn-copia-dati')) document.getElementById('btn-copia-dati').addEventListener('click', copiaDatiContratto);
+  if(document.getElementById('btn-scarica-dati')) document.getElementById('btn-scarica-dati').addEventListener('click', scaricaDatiContratto);
   // Chat
   document.getElementById('btn-admin-send').addEventListener('click', adminSendMsg);
   document.getElementById('admin-chat-inp').addEventListener('keydown', function(e){ if(e.key==='Enter') adminSendMsg(); });
@@ -1004,13 +1016,18 @@ function apriPrat(id) {
 function switchTab(t) {
   var datiBody = document.getElementById('tab-dati-body');
   var chatBody = document.getElementById('tab-chat-body');
+  var cntBody  = document.getElementById('tc-contratto');
   var tDati = document.getElementById('tab-dati');
   var tChat = document.getElementById('tab-chat');
+  var tCnt  = document.getElementById('tab-contratto');
   if (datiBody) datiBody.style.display = t==='dati' ? '' : 'none';
   if (chatBody) chatBody.style.display = t==='chat' ? '' : 'none';
+  if (cntBody)  cntBody.style.display  = t==='contratto' ? '' : 'none';
   if (tDati) tDati.className = 'tabbtn ' + (t==='dati'?'on':'');
   if (tChat) tChat.className = 'tabbtn ' + (t==='chat'?'on':'');
+  if (tCnt)  tCnt.className  = 'tabbtn ' + (t==='contratto'?'on':'');
   if (t==='chat') caricaMsgsAdmin();
+  if (t==='contratto') generaDatiContratto();
 }
 
 function aggiornaPrat() {
@@ -2876,22 +2893,38 @@ function salvaTuttiSlot() {
 function caricaHome() {
   var alerts = [];
 
-  // Statistiche soci
-  apiCall('getUtenti', {}, function(err, r) {
-    var n = (!err&&r&&r.ok) ? (r.data||[]).length : 0;
-    var el = document.getElementById('sh-soci'); if(el) el.textContent = n;
-  });
+  // Statistiche soci - usa dati già caricati o scarica
+  var aggiornaSoci = function() {
+    var n = (window._utentiData||[]).length;
+    var el = document.getElementById('sh-soci'); if(el) el.textContent = n||'—';
+  };
+  if (window._utentiData && window._utentiData.length) {
+    aggiornaSoci();
+  } else {
+    apiCall('getUtenti', {}, function(err, r) {
+      if(!err&&r&&r.ok) window._utentiData = r.data||[];
+      aggiornaSoci();
+    });
+  }
 
   // Pratiche in attesa
-  apiCall('getContratti', {}, function(err, r) {
-    var all = (!err&&r&&r.ok) ? r.data||[] : [];
+  var aggiornaContratti = function() {
+    var all = D.contratti||[];
     var att = all.filter(function(ct){ return ct.stato==='in_attesa'&&ct.eliminato!==true&&String(ct.eliminato).toLowerCase()!=='true'; });
     var el = document.getElementById('sh-att'); if(el) el.textContent = att.length||'0';
     if(att.length) {
       alerts.push({col:'#E8631A', icon:'&#128203;', msg: att.length+' pratica'+(att.length===1?'':'he')+' in attesa', nav:'nb-prat'});
       aggiornaAlerts(alerts);
     }
-  });
+  };
+  if (D.contratti && D.contratti.length) {
+    aggiornaContratti();
+  } else {
+    apiCall('getContratti', {}, function(err, r) {
+      if(!err&&r&&r.ok) D.contratti = r.data||[];
+      aggiornaContratti();
+    });
+  }
 
   // Pagamenti e incasso
   apiCall('getStrategiaEconomicaAll', {}, function(err, r) {
@@ -3141,6 +3174,9 @@ function bindEvents() {
   document.getElementById('btn-elimina-prat').addEventListener('click', eliminaPrat);
   document.getElementById('tab-dati').addEventListener('click', function(){ switchTab('dati'); });
   document.getElementById('tab-chat').addEventListener('click', function(){ switchTab('chat'); });
+  if(document.getElementById('tab-contratto')) document.getElementById('tab-contratto').addEventListener('click', function(){ switchTab('contratto'); });
+  if(document.getElementById('btn-copia-dati')) document.getElementById('btn-copia-dati').addEventListener('click', copiaDatiContratto);
+  if(document.getElementById('btn-scarica-dati')) document.getElementById('btn-scarica-dati').addEventListener('click', scaricaDatiContratto);
   // Chat
   document.getElementById('btn-admin-send').addEventListener('click', adminSendMsg);
   document.getElementById('admin-chat-inp').addEventListener('keydown', function(e){ if(e.key==='Enter') adminSendMsg(); });
@@ -3423,13 +3459,18 @@ function apriPrat(id) {
 function switchTab(t) {
   var datiBody = document.getElementById('tab-dati-body');
   var chatBody = document.getElementById('tab-chat-body');
+  var cntBody  = document.getElementById('tc-contratto');
   var tDati = document.getElementById('tab-dati');
   var tChat = document.getElementById('tab-chat');
+  var tCnt  = document.getElementById('tab-contratto');
   if (datiBody) datiBody.style.display = t==='dati' ? '' : 'none';
   if (chatBody) chatBody.style.display = t==='chat' ? '' : 'none';
+  if (cntBody)  cntBody.style.display  = t==='contratto' ? '' : 'none';
   if (tDati) tDati.className = 'tabbtn ' + (t==='dati'?'on':'');
   if (tChat) tChat.className = 'tabbtn ' + (t==='chat'?'on':'');
+  if (tCnt)  tCnt.className  = 'tabbtn ' + (t==='contratto'?'on':'');
   if (t==='chat') caricaMsgsAdmin();
+  if (t==='contratto') generaDatiContratto();
 }
 
 function aggiornaPrat() {
