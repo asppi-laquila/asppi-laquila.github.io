@@ -143,8 +143,26 @@ select.inp{cursor:pointer;}
 
 <!-- PAGAMENTI -->
 <div id="p-pag" class="pg">
-  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Gestione Pagamenti</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div style="font-size:18px;font-weight:800;color:#1A1A1A">Gestione Pagamenti</div>
+    <button id="btn-export-pag" style="background:#1A1A1A;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">&#128190; Export CSV</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <div style="position:relative;flex:1">
+      <input type="text" id="pag-search" placeholder="Cerca socio..."
+        style="width:100%;padding:11px 14px 11px 38px;border-radius:10px;border:1.5px solid #e5e5e5;font-size:14px;outline:none;font-family:inherit"
+        oninput="cercaPagamenti(this.value)"/>
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px;color:#8A8A8A">&#128269;</span>
+    </div>
+    <select id="pag-campo" onchange="cercaPagamenti(document.getElementById('pag-search').value)"
+      style="padding:0 10px;border-radius:10px;border:1.5px solid #e5e5e5;font-size:13px;color:#1A1A1A;background:#fff;cursor:pointer;outline:none">
+      <option value="tutti">Tutti i campi</option>
+      <option value="display">Nome / Ragione sociale</option>
+      <option value="email">Email</option>
+    </select>
+  </div>
   <div class="frow" id="pag-filtri"></div>
+  <div id="pag-count" style="font-size:12px;color:#8A8A8A;margin-bottom:8px"></div>
   <div id="l-pag"><div class="info">Caricamento...</div></div>
 </div>
 
@@ -245,8 +263,21 @@ select.inp{cursor:pointer;}
   <!-- Slot appuntamenti -->
   <div class="card"><div class="cb">
     <div class="sec">ORARI RICEVIMENTO</div>
-    <div id="slot-body"><div class="info">Caricamento...</div></div>
-    <button class="bd" id="btn-aggiungi-slot">+ Aggiungi orario</button>
+    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Giorni e orari in cui i soci possono prenotare</div>
+    <div id="slot-giorni" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
+    <div id="slot-orari-list" style="margin-bottom:12px"></div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input type="text" id="slot-new-ora" class="inp" placeholder="es. 09:00" style="margin:0;flex:1"/>
+      <button class="bp" id="btn-aggiungi-slot" style="width:auto;padding:0 16px">+ Aggiungi</button>
+    </div>
+    <div style="font-size:13px;font-weight:700;color:#1A1A1A;margin:12px 0 8px">Periodi di chiusura</div>
+    <div id="slot-chiusure"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+      <input type="text" id="ch-dal" class="inp" placeholder="Dal gg/mm/aaaa" style="margin:0;flex:1" oninput="autoDateAdmin(this)"/>
+      <input type="text" id="ch-al"  class="inp" placeholder="Al gg/mm/aaaa"  style="margin:0;flex:1" oninput="autoDateAdmin(this)"/>
+      <input type="text" id="ch-mot" class="inp" placeholder="Motivo" style="margin:0;flex:1"/>
+    </div>
+    <button class="bs" id="btn-add-ch" style="margin-top:8px">+ Aggiungi chiusura</button>
   </div></div>
 
   <!-- Allegati / Documenti -->
@@ -559,6 +590,7 @@ function bindEvents() {
   document.getElementById('nb-soci').addEventListener('click', function(){ navTo('soci'); caricaSoci(); });
   if (document.getElementById('nb-pren')) document.getElementById('nb-pren').addEventListener('click', function(){ navTo('pren'); caricaPrenotazioni(); });
   document.getElementById('nb-pag').addEventListener('click',  function(){ navTo('pag');  caricaPagamenti(); });
+  if (document.getElementById('btn-export-pag')) document.getElementById('btn-export-pag').addEventListener('click', exportPagamentiCSV);
   document.getElementById('nb-srv').addEventListener('click', function(){ navTo('srv'); caricaServizi(); caricaTariffe(); });
   document.getElementById('nb-imp').addEventListener('click', function(){ navTo('imp'); caricaImpostazioni(); });
   if (document.getElementById('btn-salva-tariffe')) document.getElementById('btn-salva-tariffe').addEventListener('click', salvaTariffe);
@@ -567,7 +599,6 @@ function bindEvents() {
   if (document.getElementById('btn-salva-servizio')) document.getElementById('btn-salva-servizio').addEventListener('click', salvaServizio);
   if (document.getElementById('btn-elimina-servizio')) document.getElementById('btn-elimina-servizio').addEventListener('click', eliminaServizioCorrente);
   if (document.getElementById('btn-salva-doc')) document.getElementById('btn-salva-doc').addEventListener('click', salvaDocumento);
-  document.getElementById('btn-cambia-pwd-admin').addEventListener('click', cambiaPwdAdmin);
   if (document.getElementById('btn-chiudi-socio')) document.getElementById('btn-chiudi-socio').addEventListener('click', function(){ chiudi('ov-socio'); });
   if (document.getElementById('btn-salva-tessera')) document.getElementById('btn-salva-tessera').addEventListener('click', salvaTessera);
   if (document.getElementById('btn-registra-pag')) document.getElementById('btn-registra-pag').addEventListener('click', registraPagamento);
@@ -1369,14 +1400,40 @@ function caricaPagamenti() {
   });
 }
 
-function renderPagamenti() {
+function cercaPagamenti(query) {
+  var campo = (document.getElementById('pag-campo')||{}).value || 'tutti';
+  renderPagamenti(query, campo);
+}
+
+function renderPagamenti(query, campo) {
   var el = document.getElementById('l-pag'); if(!el) return;
+  var countEl = document.getElementById('pag-count');
+  campo = campo || 'tutti';
+
   var lista = window._econData || [];
-  if (pagFiltro === 'da_pagare')          lista = lista.filter(function(x){ return x.saldo>0; });
+
+  // Filtro stato
+  if (pagFiltro === 'da_pagare') lista = lista.filter(function(x){ return x.saldo>0; });
   else if (pagFiltro === 'bonifico_dichiarato') lista = lista.filter(function(x){
     return x.pagamenti && x.pagamenti.some(function(p){ return p.stato==='bonifico_dichiarato'; });
   });
-  else if (pagFiltro === 'pagati')        lista = lista.filter(function(x){ return x.saldo===0 && x.totaleDovuto>0; });
+  else if (pagFiltro === 'pagati') lista = lista.filter(function(x){ return x.saldo===0 && x.totaleDovuto>0; });
+
+  // Filtro ricerca
+  if (query && query.trim()) {
+    var q = query.trim().toLowerCase();
+    lista = lista.filter(function(item) {
+      var u = item.socio || {};
+      if (campo === 'display') return (u.displayName||'').toLowerCase().indexOf(q)>-1 || ((u.nome||'')+' '+(u.cognome||'')).toLowerCase().indexOf(q)>-1;
+      if (campo === 'email')   return (u.email||'').toLowerCase().indexOf(q)>-1;
+      return (u.displayName||'').toLowerCase().indexOf(q)>-1
+          || ((u.nome||'')+' '+(u.cognome||'')).toLowerCase().indexOf(q)>-1
+          || (u.email||'').toLowerCase().indexOf(q)>-1;
+    });
+  }
+
+  window._pagListaFiltrata = lista;
+  if (countEl) countEl.textContent = lista.length + ' socio/i trovati';
 
   el.innerHTML = '';
   if (!lista.length) { el.innerHTML='<div class="info">Nessun risultato.</div>'; return; }
@@ -1389,7 +1446,8 @@ function renderPagamenti() {
     var bar = document.createElement('div'); bar.className='bar'; bar.style.background=col;
     var rb  = document.createElement('div'); rb.className='rb';
     var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
-    var rt  = document.createElement('div'); rt.className='rt'; rt.textContent=(u.nome||'')+' '+(u.cognome||'');
+    var rt  = document.createElement('div'); rt.className='rt';
+    rt.textContent = u.displayName||((u.nome||'')+' '+(u.cognome||'')).trim();
     var importoEl = document.createElement('span'); importoEl.style.cssText='font-size:15px;font-weight:800;color:'+col;
     importoEl.textContent = item.saldo>0 ? '€'+item.saldo+' dovuti' : '✅ In regola';
     var rs = document.createElement('div'); rs.className='rs';
@@ -1400,6 +1458,33 @@ function renderPagamenti() {
     div.addEventListener('click', (function(uid){ return function(){ apriSocio(uid); }; })(u.id));
     el.appendChild(div);
   });
+}
+
+function exportPagamentiCSV() {
+  var lista = window._pagListaFiltrata || window._econData || [];
+  if (!lista.length) { alert('Nessun dato da esportare'); return; }
+  var rows = [['Nome','Ragione Sociale','Email','Anno','Totale Dovuto','Totale Pagato','Saldo']];
+  lista.forEach(function(item) {
+    var u = item.socio || {};
+    rows.push([
+      ((u.nome||'')+' '+(u.cognome||'')).trim(),
+      u.displayName||'',
+      u.email||'',
+      item.anno||'',
+      item.totaleDovuto||0,
+      item.totalePagato||0,
+      item.saldo||0
+    ]);
+  });
+  var csv = rows.map(function(r){ return r.map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(','); }).join('
+');
+  var blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = 'pagamenti_asppi_'+new Date().toISOString().substring(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // ── IMPOSTAZIONI ─────────────────────────────────────────────
