@@ -198,42 +198,61 @@ select.inp{cursor:pointer;}
   </div>
 </div>
 
+<!-- SERVIZI -->
+<div id="p-srv" class="pg">
+  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Servizi e Tariffe</div>
+
+  <!-- Tariffe base -->
+  <div class="card"><div class="cb">
+    <div class="sec">TARIFFE BASE</div>
+    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Modificabili in qualsiasi momento</div>
+    <div class="g2">
+      <div><label class="lbl">Primo tesseramento €</label><input type="text" class="inp" id="tar-new" placeholder="55"/></div>
+      <div><label class="lbl">Rinnovo tessera €</label><input type="text" class="inp" id="tar-ren" placeholder="50"/></div>
+      <div><label class="lbl">Contratto extra €</label><input type="text" class="inp" id="tar-cnt" placeholder="25"/></div>
+      <div><label class="lbl">Adempimento extra €</label><input type="text" class="inp" id="tar-adm" placeholder="15"/></div>
+    </div>
+    <div class="infog" id="tar-ok" style="display:none">&#9989; Tariffe aggiornate!</div>
+    <button class="bp" id="btn-salva-tariffe">Salva tariffe</button>
+  </div></div>
+
+  <!-- Servizi aggiuntivi -->
+  <div class="card"><div class="cb">
+    <div class="sec">SERVIZI AGGIUNTIVI</div>
+    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Servizi e scontistiche visibili ai soci</div>
+    <div id="l-servizi"><div class="info">Caricamento...</div></div>
+    <button class="bd" id="btn-nuovo-servizio" style="margin-top:8px">+ Aggiungi servizio</button>
+  </div></div>
+</div>
+
 <!-- IMPOSTAZIONI -->
 <div id="p-imp" class="pg">
   <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Impostazioni</div>
 
-  <!-- Servizi e Convenzioni -->
+  <!-- Slot appuntamenti -->
   <div class="card"><div class="cb">
-    <div class="sec">SERVIZI E CONVENZIONI</div>
-    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Gestisci i servizi visibili ai soci tesserati</div>
-    <div id="l-servizi"><div class="info">Caricamento...</div></div>
-    <button class="bd" id="btn-nuovo-servizio" style="margin-top:8px">+ Aggiungi servizio</button>
+    <div class="sec">ORARI RICEVIMENTO</div>
+    <div id="slot-body"><div class="info">Caricamento...</div></div>
+    <button class="bd" id="btn-aggiungi-slot">+ Aggiungi orario</button>
   </div></div>
 
   <!-- Allegati / Documenti -->
   <div class="card"><div class="cb">
     <div class="sec">DOCUMENTI E ALLEGATI</div>
     <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Il socio potra scaricare questi documenti dall'app</div>
-    <label style="display:block;font-size:11px;font-weight:600;color:#8A8A8A;margin-bottom:4px;text-transform:uppercase">Nome documento</label>
+    <label class="lbl">Nome documento</label>
     <input type="text" class="inp" id="doc-nome" placeholder="es. Attestazione 2026"/>
-    <label style="display:block;font-size:11px;font-weight:600;color:#8A8A8A;margin-bottom:4px;text-transform:uppercase">Link Google Drive (URL)</label>
+    <label class="lbl">Link Google Drive (URL)</label>
     <input type="text" class="inp" id="doc-url" placeholder="https://drive.google.com/file/d/..."/>
     <div style="font-size:11px;color:#8A8A8A;margin-top:-8px;margin-bottom:12px">Su Drive: tasto destro sul file → Copia link → incolla qui</div>
     <div class="infog" id="doc-ok" style="display:none">&#9989; Documento aggiornato!</div>
     <button class="bp" id="btn-salva-doc">Salva documento</button>
   </div></div>
 
-  <!-- Slot appuntamenti -->
-  <div class="card"><div class="cb">
-    <div class="sec">SLOT APPUNTAMENTI</div>
-    <div id="slot-body"><div class="info">Caricamento...</div></div>
-    <button class="bd" id="btn-aggiungi-slot">+ Aggiungi orario</button>
-  </div></div>
-
   <!-- Cambio password -->
   <div class="card"><div class="cb">
     <div class="sec">SICUREZZA</div>
-    <label style="display:block;font-size:11px;font-weight:600;color:#8A8A8A;margin-bottom:4px;text-transform:uppercase">Nuova password admin</label>
+    <label class="lbl">Nuova password admin</label>
     <input type="password" class="inp" id="new-adm-pwd" placeholder="Nuova password"/>
     <div class="infog" id="adm-pwd-ok" style="display:none">&#9989; Password aggiornata!</div>
     <button class="bp" id="btn-cambia-pwd-admin">Cambia password</button>
@@ -394,7 +413,7 @@ select.inp{cursor:pointer;}
   <button class="nb on" id="nb-home"><span class="ic">&#128202;</span><span class="lb">Home</span></button>
   <button class="nb" id="nb-prat"><span class="ic">&#128203;</span><span class="lb">Pratiche</span></button>
   <button class="nb" id="nb-soci"><span class="ic">&#128100;</span><span class="lb">Soci</span></button>
-  <button class="nb" id="nb-pag"><span class="ic">&#128176;</span><span class="lb">Pagamenti</span></button>
+  <button class="nb" id="nb-srv"><span class="ic">&#11088;</span><span class="lb">Servizi</span></button>
   <button class="nb" id="nb-imp"><span class="ic">&#9881;</span><span class="lb">Impost.</span></button>
 </div>
 
@@ -517,7 +536,9 @@ function bindEvents() {
   document.getElementById('nb-prat').addEventListener('click', function(){ navTo('prat'); });
   document.getElementById('nb-soci').addEventListener('click', function(){ navTo('soci'); caricaSoci(); });
   document.getElementById('nb-pag').addEventListener('click',  function(){ navTo('pag');  caricaPagamenti(); });
+  document.getElementById('nb-srv').addEventListener('click', function(){ navTo('srv'); caricaServizi(); caricaTariffe(); });
   document.getElementById('nb-imp').addEventListener('click', function(){ navTo('imp'); caricaImpostazioni(); });
+  document.getElementById('btn-salva-tariffe').addEventListener('click', salvaTariffe);
   document.getElementById('btn-nuovo-servizio').addEventListener('click', function(){ apriServizio(null); });
   document.getElementById('btn-chiudi-servizio').addEventListener('click', function(){ chiudi('ov-servizio'); });
   document.getElementById('btn-salva-servizio').addEventListener('click', salvaServizio);
@@ -591,7 +612,7 @@ function apiCall(action, data, cb) {
 
 // ── NAV ───────────────────────────────────────────────────────
 function navTo(id) {
-  var pages = ['home','pren','prat','chat','slot','soci','pag','imp'];
+  var pages = ['home','pren','prat','chat','slot','soci','pag','srv','imp'];
   for (var i=0; i<pages.length; i++) {
     var pg = document.getElementById('p-'+pages[i]);
     var nb = document.getElementById('nb-'+pages[i]);
@@ -1356,9 +1377,24 @@ var curSrvId = null;
 var srvAttivo = true;
 
 function caricaImpostazioni() {
-  caricaServizi();
   caricaDocumento();
-  caricaSlotInImp();
+  caricaSlotAdmin();
+}
+
+function caricaSlotAdmin() {
+  apiCall('getSlot', {}, function(err, r) {
+    var el = document.getElementById('slot-body'); if(!el) return;
+    var orari = (!err&&r&&r.ok) ? r.orari||[] : [];
+    if (!orari.length) { el.innerHTML='<div class="info">Nessuno slot configurato.</div>'; return; }
+    var h='';
+    orari.forEach(function(o){
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #e5e5e5">'
+        +'<span style="font-size:14px;font-weight:600">'+o+'</span>'
+        +'<button onclick="eliminaSlotOra(''+o+'')" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px">&#128465;</button>'
+        +'</div>';
+    });
+    el.innerHTML=h;
+  });
 }
 
 function caricaServizi() {
@@ -1465,6 +1501,36 @@ function eliminaServizioCorrente() {
   });
 }
 
+function caricaTariffe() {
+  apiCall('getImpostazioni', {}, function(err, r) {
+    if(!err&&r&&r.ok) {
+      var set = function(id, key, def){ var e=document.getElementById(id); if(e) e.value=r.data[key]||def; };
+      set('tar-new','tariffa_tesseramento_nuovo','55');
+      set('tar-ren','tariffa_tesseramento_rinnovo','50');
+      set('tar-cnt','tariffa_contratto_extra','25');
+      set('tar-adm','tariffa_adempimento_extra','15');
+    }
+  });
+}
+
+function salvaTariffe() {
+  var get = function(id){ return (document.getElementById(id)||{}).value||''; };
+  hide('tar-ok');
+  var tariffe = [
+    {chiave:'tariffa_tesseramento_nuovo',   valore:get('tar-new')},
+    {chiave:'tariffa_tesseramento_rinnovo', valore:get('tar-ren')},
+    {chiave:'tariffa_contratto_extra',      valore:get('tar-cnt')},
+    {chiave:'tariffa_adempimento_extra',    valore:get('tar-adm')}
+  ];
+  var count = 0;
+  tariffe.forEach(function(t) {
+    apiCall('saveImpostazione', {chiave:t.chiave, valore:t.valore}, function(err,r){
+      count++;
+      if(count===tariffe.length) show('tar-ok');
+    });
+  });
+}
+
 function caricaDocumento() {
   apiCall('getImpostazioni', {}, function(err, r) {
     if(!err&&r&&r.ok) {
@@ -1488,11 +1554,7 @@ function salvaDocumento() {
   });
 }
 
-function caricaSlotInImp() {
-  // Slot già gestito separatamente - qui mostriamo link
-  var el = document.getElementById('slot-body');
-  if(el) el.innerHTML='<div class="infob">&#128197; Gli slot appuntamenti si gestiscono nella sezione dedicata.</div>';
-}
+
 
 function cambiaPwdAdmin() {
   var o=(document.getElementById('acp-old')||{}).value||'';
