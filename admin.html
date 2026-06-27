@@ -267,17 +267,19 @@ select.inp{cursor:pointer;}
   <!-- Slot appuntamenti -->
   <div class="card"><div class="cb">
     <div class="sec">ORARI RICEVIMENTO</div>
-    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Tocca un orario per attivarlo o disattivarlo</div>
-    <div style="font-size:11px;font-weight:700;color:#8A8A8A;text-transform:uppercase;margin-bottom:6px">Giorni di ricevimento</div>
-    <div id="slot-giorni-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px"></div>
-    <div style="font-size:11px;font-weight:700;color:#8A8A8A;text-transform:uppercase;margin-bottom:6px">Orari disponibili</div>
-    <div id="slot-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px"></div>
-    <div style="font-size:11px;font-weight:700;color:#8A8A8A;text-transform:uppercase;margin-bottom:6px">Durata appuntamento</div>
-    <div id="slot-durata-grid" style="display:flex;gap:6px;margin-bottom:16px"></div>
-    <div style="display:flex;gap:8px;margin-bottom:16px">
-      <input type="text" id="slot-new-ora" class="inp" placeholder="es. 09:00" style="margin:0;flex:1"/>
+    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Clicca ogni cella per attivare/disattivare orario per quel giorno</div>
+    <div style="overflow-x:auto;margin-bottom:16px">
+      <table id="slot-table" style="border-collapse:collapse;width:100%;min-width:320px">
+        <thead id="slot-thead"></thead>
+        <tbody id="slot-tbody"></tbody>
+      </table>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center">
+      <input type="text" id="slot-new-ora" class="inp" placeholder="Aggiungi orario es. 09:00" style="margin:0;flex:1"/>
       <button class="bp" id="btn-aggiungi-slot" style="width:auto;padding:0 16px;margin:0">+</button>
     </div>
+    <div style="font-size:11px;font-weight:700;color:#8A8A8A;text-transform:uppercase;margin-bottom:6px">Durata appuntamento</div>
+    <div id="slot-durata-grid" style="display:flex;gap:6px;margin-bottom:16px"></div>
     <div style="font-size:13px;font-weight:700;color:#1A1A1A;margin-bottom:8px">Periodi di chiusura / Ferie</div>
     <div id="slot-chiusure" style="margin-bottom:8px"></div>
     <div class="g2" style="margin-bottom:8px">
@@ -1545,70 +1547,36 @@ function caricaImpostazioni() {
   caricaSlotAdmin();
 }
 
-// Orari predefiniti sempre visibili
 var ORARI_DEFAULT = ['08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
+var GIORNI_SETTIMANA = ['Lun','Mar','Mer','Gio','Ven','Sab'];
+// slotMatrix[giorno][ora] = true/false
+var slotMatrix = {};
 
 function caricaSlotAdmin() {
   apiCall('getSlot', {}, function(err, r) {
-    var attiviRaw = (!err&&r&&r.ok) ? r.orari||[] : [];
-    var attivi = {};
-    attiviRaw.forEach(function(o){ attivi[o]=true; });
-    
-    var el = document.getElementById('slot-grid'); if(!el) return;
-    el.innerHTML='';
-    
-    // Aggiungi orari custom non presenti nei default
-    attiviRaw.forEach(function(o){
-      if (ORARI_DEFAULT.indexOf(o)===-1) ORARI_DEFAULT.push(o);
-    });
-    
-    ORARI_DEFAULT.forEach(function(o){
-      var btn = document.createElement('button');
-      var on = !!attivi[o];
-      btn.textContent = o;
-      btn.setAttribute('data-ora', o);
-      btn.setAttribute('data-on', on ? '1' : '0');
-      btn.style.cssText = 'padding:10px 0;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid '+(on?'#E8631A':'#e5e5e5')+';background:'+(on?'#E8631A':'#fff')+';color:'+(on?'#fff':'#8A8A8A');
-      btn.addEventListener('click', function(){
-        var isOn = this.getAttribute('data-on') === '1';
-        var newOn = !isOn;
-        this.setAttribute('data-on', newOn ? '1' : '0');
-        this.style.background = newOn ? '#E8631A' : '#fff';
-        this.style.borderColor = newOn ? '#E8631A' : '#e5e5e5';
-        this.style.color = newOn ? '#fff' : '#8A8A8A';
-        salvaTuttiSlot();
-      });
-      el.appendChild(btn);
-    });
-
-    // Giorni settimana
-    var giorniEl = document.getElementById('slot-giorni-grid');
-    if (giorniEl) {
-      giorniEl.innerHTML = '';
-      var giorniAttivi = {};
-      (r && r.giorni ? r.giorni : []).forEach(function(g){ giorniAttivi[g]=true; });
-      var GIORNI = ['Lun','Mar','Mer','Gio','Ven'];
-      GIORNI.forEach(function(g){
-        var btn = document.createElement('button');
-        var on = !!giorniAttivi[g];
-        btn.textContent = g;
-        btn.setAttribute('data-giorno', g);
-        btn.setAttribute('data-on', on ? '1' : '0');
-        btn.style.cssText = 'padding:10px 0;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid '+(on?'#1A5FA8':'#e5e5e5')+';background:'+(on?'#1A5FA8':'#fff')+';color:'+(on?'#fff':'#8A8A8A');
-        btn.addEventListener('click', function(){
-          var isOn = this.getAttribute('data-on')==='1';
-          var newOn = !isOn;
-          this.setAttribute('data-on', newOn?'1':'0');
-          this.style.background = newOn?'#1A5FA8':'#fff';
-          this.style.borderColor = newOn?'#1A5FA8':'#e5e5e5';
-          this.style.color = newOn?'#fff':'#8A8A8A';
-          salvaTuttiSlot();
-        });
-        giorniEl.appendChild(btn);
+    // slotMatrix e' ora un oggetto giorno->array orari
+    slotMatrix = {};
+    if (!err && r && r.ok && r.slotMatrix) {
+      slotMatrix = r.slotMatrix;
+    } else if (!err && r && r.ok && r.orari && r.orari.length) {
+      // Compatibilita vecchio formato: tutti gli orari per tutti i giorni
+      GIORNI_SETTIMANA.forEach(function(g){
+        slotMatrix[g] = {};
+        r.orari.forEach(function(o){ slotMatrix[g][o] = true; });
       });
     }
 
-    // Durata appuntamento
+    // Aggiungi orari custom
+    Object.keys(slotMatrix).forEach(function(g){
+      Object.keys(slotMatrix[g]).forEach(function(o){
+        if (ORARI_DEFAULT.indexOf(o)===-1) ORARI_DEFAULT.push(o);
+      });
+    });
+    ORARI_DEFAULT.sort();
+
+    renderSlotTable();
+
+    // Durata
     var durataEl = document.getElementById('slot-durata-grid');
     var durataAttiva = (r && r.durata) ? parseInt(r.durata) : 30;
     if (durataEl) {
@@ -1633,8 +1601,61 @@ function caricaSlotAdmin() {
       });
     }
 
-    // Chiusure
     caricaChiusure();
+  });
+}
+
+function renderSlotTable() {
+  var thead = document.getElementById('slot-thead');
+  var tbody = document.getElementById('slot-tbody');
+  if (!thead || !tbody) return;
+
+  // Header row
+  thead.innerHTML = '';
+  var tr = document.createElement('tr');
+  var th0 = document.createElement('th');
+  th0.textContent = 'Orario';
+  th0.style.cssText = 'padding:6px 4px;font-size:11px;color:#8A8A8A;font-weight:700;text-align:left;border-bottom:2px solid #e5e5e5';
+  tr.appendChild(th0);
+  GIORNI_SETTIMANA.forEach(function(g){
+    var th = document.createElement('th');
+    th.textContent = g;
+    th.style.cssText = 'padding:6px 4px;font-size:11px;color:#1A1A1A;font-weight:800;text-align:center;border-bottom:2px solid #e5e5e5;min-width:44px';
+    tr.appendChild(th);
+  });
+  thead.appendChild(tr);
+
+  // Body rows
+  tbody.innerHTML = '';
+  ORARI_DEFAULT.forEach(function(ora){
+    var row = document.createElement('tr');
+    var tdOra = document.createElement('td');
+    tdOra.textContent = ora;
+    tdOra.style.cssText = 'padding:4px 6px;font-size:12px;font-weight:700;color:#1A1A1A;border-bottom:1px solid #f0f0f0;white-space:nowrap';
+    row.appendChild(tdOra);
+
+    GIORNI_SETTIMANA.forEach(function(g){
+      var td = document.createElement('td');
+      td.style.cssText = 'padding:4px;text-align:center;border-bottom:1px solid #f0f0f0';
+      var on = slotMatrix[g] && slotMatrix[g][ora];
+      var btn = document.createElement('button');
+      btn.style.cssText = 'width:36px;height:28px;border-radius:6px;border:1.5px solid '+(on?'#E8631A':'#e5e5e5')+';background:'+(on?'#E8631A':'#fff')+';cursor:pointer;font-size:13px';
+      btn.textContent = on ? '✓' : '';
+      btn.addEventListener('click', (function(giorno, orario){
+        return function(){
+          if (!slotMatrix[giorno]) slotMatrix[giorno] = {};
+          slotMatrix[giorno][orario] = !slotMatrix[giorno][orario];
+          var nowOn = slotMatrix[giorno][orario];
+          this.style.background = nowOn ? '#E8631A' : '#fff';
+          this.style.borderColor = nowOn ? '#E8631A' : '#e5e5e5';
+          this.textContent = nowOn ? '✓' : '';
+          salvaTuttiSlot();
+        };
+      })(g, ora));
+      td.appendChild(btn);
+      row.appendChild(td);
+    });
+    tbody.appendChild(row);
   });
 }
 

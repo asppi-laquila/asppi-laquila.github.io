@@ -551,7 +551,8 @@ function caricaDati() {
       api('getSlot', {}, function(err4, r4) {
         if (!err4 && r4 && r4.ok) {
           D.slot = r4.orari || [];
-          D.slotData = r4;
+          D.slotMatrix = r4.slotMatrix || {};
+          D.slotDurata = r4.durata || 30;
         }
       });
     });
@@ -1349,11 +1350,21 @@ function selDay(ds) {
   SH('p-slot-sec',true); SH('p-rie',false);
   var occ=[];
   D.prenotazioni.forEach(function(p){if(p.data===ds&&p.stato==='confermata')occ.push(p.ora);});
-  renderSlots(occ);
+  // Determina giorno della settimana
+  var parts = ds.split('/');
+  var dateObj = new Date(parseInt(parts[2]), parseInt(parts[1])-1, parseInt(parts[0]));
+  var giorniMap = {1:'Lun',2:'Mar',3:'Mer',4:'Gio',5:'Ven',6:'Sab',0:'Dom'};
+  var nomeGiorno = giorniMap[dateObj.getDay()];
+  renderSlots(occ, nomeGiorno);
 }
 
-function renderSlots(occ) {
-  var slots=D.slot.length?D.slot:['09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00'];
+function renderSlots(occ, giorno) {
+  // Usa slotMatrix se disponibile
+  var slots = [];
+  if (D.slotMatrix && giorno && D.slotMatrix[giorno]) {
+    slots = Object.keys(D.slotMatrix[giorno]).filter(function(o){ return D.slotMatrix[giorno][o]; }).sort();
+  }
+  if (!slots.length) slots = D.slot.length ? D.slot : ['09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00'];
   var el=T('p-slot-grid'); if(!el) return; el.innerHTML='';
   slots.forEach(function(s){
     var bsy=occ.indexOf(s)>-1, sel=calSlot===s;
