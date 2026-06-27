@@ -145,7 +145,10 @@ select.inp{cursor:pointer;}
 <div id="p-pag" class="pg">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
     <div style="font-size:18px;font-weight:800;color:#1A1A1A">Gestione Pagamenti</div>
-    <button id="btn-export-pag" style="background:#1A1A1A;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">&#128190; Export CSV</button>
+    <div style="display:flex;gap:6px">
+      <button id="btn-promemoria-pag" style="background:#E8631A;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">&#128232; Promemoria</button>
+      <button id="btn-export-pag" style="background:#1A1A1A;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">&#128190; CSV</button>
+    </div>
   </div>
   <div style="display:flex;gap:8px;margin-bottom:12px">
     <div style="position:relative;flex:1">
@@ -163,6 +166,7 @@ select.inp{cursor:pointer;}
   </div>
   <div class="frow" id="pag-filtri"></div>
   <div id="pag-count" style="font-size:12px;color:#8A8A8A;margin-bottom:8px"></div>
+  <div id="pag-totali" style="display:flex;gap:10px;margin-bottom:12px"></div>
   <div id="l-pag"><div class="info">Caricamento...</div></div>
 </div>
 
@@ -264,7 +268,12 @@ select.inp{cursor:pointer;}
   <div class="card"><div class="cb">
     <div class="sec">ORARI RICEVIMENTO</div>
     <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Tocca un orario per attivarlo o disattivarlo</div>
+    <div style="font-size:11px;font-weight:700;color:#8A8A8A;text-transform:uppercase;margin-bottom:6px">Giorni di ricevimento</div>
+    <div id="slot-giorni-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px"></div>
+    <div style="font-size:11px;font-weight:700;color:#8A8A8A;text-transform:uppercase;margin-bottom:6px">Orari disponibili</div>
     <div id="slot-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px"></div>
+    <div style="font-size:11px;font-weight:700;color:#8A8A8A;text-transform:uppercase;margin-bottom:6px">Durata appuntamento</div>
+    <div id="slot-durata-grid" style="display:flex;gap:6px;margin-bottom:16px"></div>
     <div style="display:flex;gap:8px;margin-bottom:16px">
       <input type="text" id="slot-new-ora" class="inp" placeholder="es. 09:00" style="margin:0;flex:1"/>
       <button class="bp" id="btn-aggiungi-slot" style="width:auto;padding:0 16px;margin:0">+</button>
@@ -438,6 +447,13 @@ select.inp{cursor:pointer;}
       <button class="bp" id="btn-aggiorna-stato">Aggiorna stato</button>
       <div class="infog" id="opr-ok" style="display:none;margin-top:8px">&#9989; Stato aggiornato!</div>
       <button class="bs" id="btn-elimina-prat" style="color:#C0392B;border-color:#FDEEEC;margin-top:8px">&#128465; Elimina pratica</button>
+    </div>
+    <div class="cb">
+      <div class="sec">NOTE INTERNE</div>
+      <div style="font-size:11px;color:#8A8A8A;margin-bottom:8px">Visibili solo all'admin</div>
+      <textarea class="inp" id="opr-note-interne" placeholder="Note riservate sulla pratica..." style="min-height:80px"></textarea>
+      <button class="bp" id="btn-salva-note">Salva note</button>
+      <div class="infog" id="opr-note-ok" style="display:none">&#9989; Note salvate!</div>
     </div></div>
     <div class="card"><div class="cb">
       <div class="sec">DURATA E CANONE</div>
@@ -590,6 +606,7 @@ function bindEvents() {
   if (document.getElementById('nb-pren')) document.getElementById('nb-pren').addEventListener('click', function(){ navTo('pren'); caricaPrenotazioni(); });
   document.getElementById('nb-pag').addEventListener('click',  function(){ navTo('pag');  caricaPagamenti(); });
   if (document.getElementById('btn-export-pag')) document.getElementById('btn-export-pag').addEventListener('click', exportPagamentiCSV);
+  if (document.getElementById('btn-promemoria-pag')) document.getElementById('btn-promemoria-pag').addEventListener('click', inviaPromemoria);
   document.getElementById('nb-srv').addEventListener('click', function(){ navTo('srv'); caricaServizi(); caricaTariffe(); });
   document.getElementById('nb-imp').addEventListener('click', function(){ navTo('imp'); caricaImpostazioni(); });
   if (document.getElementById('btn-salva-tariffe')) document.getElementById('btn-salva-tariffe').addEventListener('click', salvaTariffe);
@@ -781,6 +798,17 @@ function cancellaPren() {
   });
 }
 
+function salvaNoteInterne() {
+  var note = (document.getElementById('opr-note-interne')||{}).value||'';
+  var c2 = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){c2=D.contratti[i];break;} }
+  if (!c2) return;
+  c2.noteInterne = note;
+  apiCall('saveContratto', {data:c2}, function(err,r){
+    if(!err&&r&&r.ok){ show('opr-note-ok'); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
 function eliminaPrat() {
   var c2 = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){c2=D.contratti[i];break;} }
   if (!c2) return;
@@ -865,6 +893,10 @@ function apriPrat(id) {
     extra.innerHTML = eh || '<div class="val">—</div>';
   }
   hide('opr-ok');
+  // Carica note interne
+  var noteEl = document.getElementById('opr-note-interne');
+  if(noteEl) noteEl.value = c2.noteInterne||'';
+  hide('opr-note-ok');
   var modDiv = document.getElementById('opr-modificato');
   if (c.modificato) {
     setText('opr-data-mod', fmtDate(c.modificato));
@@ -1150,8 +1182,9 @@ function caricaSoci() {
         bdg.textContent = haTessera ? 'Tessera '+anno : 'Senza tessera';
         bdg.style.color = haTessera?'#2D7A4F':'#E8631A';
         bdg.style.background = haTessera?'#EBF5F0':'#FDF0E8';
+        var praticheSocio = (D.contratti||[]).filter(function(ct){ return ct.userId===u.id && ct.eliminato!==true && String(ct.eliminato).toLowerCase()!=='true'; });
         var rs  = document.createElement('div'); rs.className='rs';
-        rs.textContent = (u.email||'') + (haTessera?' · '+tes[0].numeroTessera:'');
+        rs.textContent = (u.email||'') + (haTessera?' · '+tes[0].numeroTessera:'') + (praticheSocio.length?' · '+praticheSocio.length+' prat.':'');
         var arr = document.createElement('div'); arr.className='ra'; arr.textContent='›';
         top.appendChild(rt); top.appendChild(bdg); rb.appendChild(top); rb.appendChild(rs);
         div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
@@ -1433,6 +1466,16 @@ function renderPagamenti(query, campo) {
 
   window._pagListaFiltrata = lista;
   if (countEl) countEl.textContent = lista.length + ' socio/i trovati';
+  
+  // Totali
+  var totEl = document.getElementById('pag-totali');
+  if (totEl) {
+    var totDovuto = 0, totPagato = 0, totSaldo = 0;
+    lista.forEach(function(item){ totDovuto+=item.totaleDovuto||0; totPagato+=item.totalePagato||0; totSaldo+=item.saldo||0; });
+    totEl.innerHTML = '<div style="flex:1;background:#FDF0E8;border-radius:10px;padding:10px;text-align:center"><div style="font-size:11px;color:#8A8A8A">Dovuto</div><div style="font-size:16px;font-weight:800;color:#E8631A">€'+totDovuto+'</div></div>'
+      +'<div style="flex:1;background:#EBF5F0;border-radius:10px;padding:10px;text-align:center"><div style="font-size:11px;color:#8A8A8A">Incassato</div><div style="font-size:16px;font-weight:800;color:#2D7A4F">€'+totPagato+'</div></div>'
+      +'<div style="flex:1;background:#FDEEEC;border-radius:10px;padding:10px;text-align:center"><div style="font-size:11px;color:#8A8A8A">Da incassare</div><div style="font-size:16px;font-weight:800;color:#C0392B">€'+totSaldo+'</div></div>';
+  }
 
   el.innerHTML = '';
   if (!lista.length) { el.innerHTML='<div class="info">Nessun risultato.</div>'; return; }
@@ -1456,6 +1499,14 @@ function renderPagamenti(query, campo) {
     div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
     div.addEventListener('click', (function(uid){ return function(){ apriSocio(uid); }; })(u.id));
     el.appendChild(div);
+  });
+}
+
+function inviaPromemoria() {
+  if (!confirm('Inviare email di promemoria a tutti i soci con pagamenti in sospeso?')) return;
+  apiCall('inviaPromemoriaPagamenti', {}, function(err,r){
+    if(!err&&r&&r.ok){ alert('Promemoria inviati a '+r.inviati+' soci!'); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
   });
 }
 
@@ -1529,6 +1580,58 @@ function caricaSlotAdmin() {
       });
       el.appendChild(btn);
     });
+
+    // Giorni settimana
+    var giorniEl = document.getElementById('slot-giorni-grid');
+    if (giorniEl) {
+      giorniEl.innerHTML = '';
+      var giorniAttivi = {};
+      (r && r.giorni ? r.giorni : []).forEach(function(g){ giorniAttivi[g]=true; });
+      var GIORNI = ['Lun','Mar','Mer','Gio','Ven'];
+      GIORNI.forEach(function(g){
+        var btn = document.createElement('button');
+        var on = !!giorniAttivi[g];
+        btn.textContent = g;
+        btn.setAttribute('data-giorno', g);
+        btn.setAttribute('data-on', on ? '1' : '0');
+        btn.style.cssText = 'padding:10px 0;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid '+(on?'#1A5FA8':'#e5e5e5')+';background:'+(on?'#1A5FA8':'#fff')+';color:'+(on?'#fff':'#8A8A8A');
+        btn.addEventListener('click', function(){
+          var isOn = this.getAttribute('data-on')==='1';
+          var newOn = !isOn;
+          this.setAttribute('data-on', newOn?'1':'0');
+          this.style.background = newOn?'#1A5FA8':'#fff';
+          this.style.borderColor = newOn?'#1A5FA8':'#e5e5e5';
+          this.style.color = newOn?'#fff':'#8A8A8A';
+          salvaTuttiSlot();
+        });
+        giorniEl.appendChild(btn);
+      });
+    }
+
+    // Durata appuntamento
+    var durataEl = document.getElementById('slot-durata-grid');
+    var durataAttiva = (r && r.durata) ? parseInt(r.durata) : 30;
+    if (durataEl) {
+      durataEl.innerHTML = '';
+      [15,30,45,60].forEach(function(d){
+        var btn = document.createElement('button');
+        var on = durataAttiva === d;
+        btn.textContent = d+' min';
+        btn.setAttribute('data-durata', d);
+        btn.setAttribute('data-on', on?'1':'0');
+        btn.style.cssText = 'padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid '+(on?'#2D7A4F':'#e5e5e5')+';background:'+(on?'#2D7A4F':'#fff')+';color:'+(on?'#fff':'#8A8A8A');
+        btn.addEventListener('click', function(){
+          durataEl.querySelectorAll('button').forEach(function(b){
+            b.setAttribute('data-on','0');
+            b.style.background='#fff'; b.style.borderColor='#e5e5e5'; b.style.color='#8A8A8A';
+          });
+          this.setAttribute('data-on','1');
+          this.style.background='#2D7A4F'; this.style.borderColor='#2D7A4F'; this.style.color='#fff';
+          salvaTuttiSlot();
+        });
+        durataEl.appendChild(btn);
+      });
+    }
 
     // Chiusure
     caricaChiusure();

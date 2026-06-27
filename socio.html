@@ -549,7 +549,10 @@ function caricaDati() {
       });
 
       api('getSlot', {}, function(err4, r4) {
-        if (!err4 && r4 && r4.ok) D.slot = r4.orari || [];
+        if (!err4 && r4 && r4.ok) {
+          D.slot = r4.orari || [];
+          D.slotData = r4;
+        }
       });
     });
   });
@@ -1309,7 +1312,12 @@ function renderCal() {
     var dw=new Date(y,m,d).getDay();
     var past=new Date(y,m,d)<new Date(todayY,todayM,today);
     var wknd=dw===0||dw===6;
-    var av=!past&&!wknd;
+    // Controlla giorni attivi dallo slot admin
+    var giorniMap={'1':'Lun','2':'Mar','3':'Mer','4':'Gio','5':'Ven','6':'Sab','0':'Dom'};
+    var giorniAttivi = D.slot && D.slot.giorni && D.slot.giorni.length ? D.slot.giorni : ['Lun','Mar','Mer','Gio','Ven'];
+    var nomeGiorno = giorniMap[String(dw)];
+    var giornoOk = giorniAttivi.indexOf(nomeGiorno) > -1;
+    var av=!past&&!wknd&&giornoOk;
     var div=document.createElement('div');
     var sel=calDay===ds, tod=(d===today&&y===todayY&&m===todayM);
     div.className='cd'+(sel?' sel':tod&&av?' tod':av?' av':' un');
