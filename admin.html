@@ -148,7 +148,7 @@ select.inp{cursor:pointer;}
     <div style="font-size:18px;font-weight:800;color:#1A1A1A">Gestione Pagamenti</div>
     <div style="display:flex;gap:6px">
       <button id="btn-promemoria-pag" style="background:#E8631A;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">&#128232; Promemoria</button>
-      <button id="btn-export-pag" style="background:#1A1A1A;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">&#128190; CSV</button>
+      <button id="btn-export-pag" style="background:#1A1A1A;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">&#128190; Export</button>
     </div>
   </div>
   <div style="display:flex;gap:8px;margin-bottom:12px">
@@ -207,15 +207,29 @@ select.inp{cursor:pointer;}
     <div class="card"><div class="cb">
       <div class="sec">REGISTRA PAGAMENTO</div>
       <label class="lbl">Tipo</label>
-      <select class="inp" id="os-pag-tipo">
-        <option value="tesseramento_nuovo">Primo tesseramento (€55)</option>
-        <option value="tesseramento_rinnovo">Rinnovo tessera (€50)</option>
-        <option value="contratto_extra">Contratto extra (€25)</option>
-        <option value="adempimento_extra">Adempimento extra (€15)</option>
-        <option value="altro">Altro importo</option>
+      <select class="inp" id="os-pag-tipo" onchange="aggiornaImportoPag()">
+        <option value="Primo tesseramento" data-importo="55">Primo tesseramento (€55)</option>
+        <option value="Rinnovo tessera" data-importo="50">Rinnovo tessera (€50)</option>
+        <option value="Contratto extra" data-importo="25">Contratto extra (€25)</option>
+        <option value="Adempimento extra" data-importo="15">Adempimento extra (€15)</option>
+        <option value="Altro" data-importo="">Altro importo</option>
       </select>
       <label class="lbl">Importo €</label>
       <input type="text" class="inp" id="os-pag-importo" placeholder="55"/>
+      <label class="lbl">Stato</label>
+      <select class="inp" id="os-pag-stato" onchange="toggleCampiPagamento()">
+        <option value="dovuto">Da pagare</option>
+        <option value="confermato">Già pagato</option>
+      </select>
+      <div id="os-pag-dettagli" style="display:none">
+        <label class="lbl">Metodo pagamento</label>
+        <select class="inp" id="os-pag-metodo">
+          <option value="contanti">Contanti</option>
+          <option value="bonifico">Bonifico</option>
+        </select>
+        <label class="lbl">Data pagamento</label>
+        <input type="text" class="inp" id="os-pag-data" placeholder="gg/mm/aaaa" oninput="autoDateAdmin(this)"/>
+      </div>
       <label class="lbl">Note (opzionale)</label>
       <input type="text" class="inp" id="os-pag-note" placeholder="es. Tesseramento 2026"/>
       <div class="infog" id="os-pag-ok" style="display:none">&#9989; Pagamento registrato!</div>
@@ -1421,19 +1435,58 @@ function salvaTessera() {
   });
 }
 
+function aggiornaImportoPag() {
+  var sel = document.getElementById('os-pag-tipo');
+  var imp = document.getElementById('os-pag-importo');
+  if(!sel||!imp) return;
+  var opt = sel.options[sel.selectedIndex];
+  var importo = opt.getAttribute('data-importo');
+  if(importo) imp.value = importo;
+}
+
+function toggleCampiPagamento() {
+  var stato = (document.getElementById('os-pag-stato')||{}).value||'dovuto';
+  var det = document.getElementById('os-pag-dettagli');
+  if(det) det.style.display = stato==='confermato' ? '' : 'none';
+  // Pre-compila data di oggi se confermato
+  if(stato==='confermato') {
+    var dataEl = document.getElementById('os-pag-data');
+    if(dataEl && !dataEl.value) {
+      var oggi = new Date();
+      dataEl.value = ('0'+oggi.getDate()).slice(-2)+'/'+('0'+(oggi.getMonth()+1)).slice(-2)+'/'+oggi.getFullYear();
+    }
+  }
+}
+
 function registraPagamento() {
-  var tipo    = (document.getElementById('os-pag-tipo')||{}).value||'';
+  var tipoEl  = document.getElementById('os-pag-tipo');
+  var tipo    = tipoEl ? tipoEl.options[tipoEl.selectedIndex].value : '';
   var importo = (document.getElementById('os-pag-importo')||{}).value||'';
+  var stato   = (document.getElementById('os-pag-stato')||{}).value||'dovuto';
+  var metodo  = (document.getElementById('os-pag-metodo')||{}).value||'contanti';
+  var data    = (document.getElementById('os-pag-data')||{}).value||'';
   var note    = (document.getElementById('os-pag-note')||{}).value||'';
   if(!importo) { alert('Inserisci importo'); return; }
+  if(stato==='confermato' && !data) { alert('Inserisci la data del pagamento'); return; }
   var obj = {
-    userId: curSocioId, tipo: tipo, importo: parseFloat(importo.replace(',','.')),
-    anno: new Date().getFullYear(), stato: 'dovuto',
-    metodoPagamento: '', dataPagamento: '', note: note, _statoChanged: false
+    userId: curSocioId, tipo: tipo,
+    importo: parseFloat(String(importo).replace(',','.')),
+    anno: new Date().getFullYear(), stato: stato,
+    metodoPagamento: stato==='confermato'?metodo:'',
+    dataPagamento: stato==='confermato'?data:'',
+    note: note
   };
   apiCall('savePagamento', {data:obj}, function(err,r){
-    if(!err&&r&&r.ok){ show('os-pag-ok'); caricaStoricoPagamenti(curSocioId); caricaPagamenti(); }
-    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+    if(!err&&r&&r.ok){
+      show('os-pag-ok');
+      // Reset form
+      if(document.getElementById('os-pag-importo')) document.getElementById('os-pag-importo').value='';
+      if(document.getElementById('os-pag-note')) document.getElementById('os-pag-note').value='';
+      if(document.getElementById('os-pag-stato')) document.getElementById('os-pag-stato').value='dovuto';
+      toggleCampiPagamento();
+      caricaStoricoPagamenti(curSocioId);
+      caricaPagamenti();
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
   });
 }
 
