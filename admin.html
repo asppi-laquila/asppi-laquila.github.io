@@ -1299,18 +1299,27 @@ function renderBloccati() {
   }
 }
 
+function autoDateAdmin(el) {
+  var v = el.value.replace(/\D/g,"");
+  if (v.length >= 3) v = v.substring(0,2)+"/"+v.substring(2);
+  if (v.length >= 6) v = v.substring(0,5)+"/"+v.substring(5,9);
+  el.value = v;
+}
+
 function addChiusura() {
-  var label=(document.getElementById('ch-lbl')||{}).value||'';
+  var label=(document.getElementById('ch-mot')||{}).value||'';
   var dal=(document.getElementById('ch-dal')||{}).value||'';
   var al=(document.getElementById('ch-al')||{}).value||'';
-  if(!label||!dal||!al){alert('Compila tutti i campi chiusura');return;}
+  if(!dal||!al){alert('Inserisci le date Dal e Al'); return;}
+  if(!label) label='Chiusura';
   apiCall('saveChiusura',{label:label,dal:dal,al:al},function(err,r){
     if(!err&&r&&r.ok){
       D.chiusure.push({id:r.id,label:label,dal:dal,al:al});
       renderChiusure();
-      document.getElementById('ch-lbl').value='';
-      document.getElementById('ch-dal').value='';
-      document.getElementById('ch-al').value='';
+      caricaChiusureAdmin();
+      var mot=document.getElementById('ch-mot'); if(mot) mot.value='';
+      var dal2=document.getElementById('ch-dal'); if(dal2) dal2.value='';
+      var al2=document.getElementById('ch-al'); if(al2) al2.value='';
     } else alert('Errore: '+((r&&r.error)||err||'Riprova'));
   });
 }
@@ -3739,17 +3748,19 @@ function renderBloccati() {
 }
 
 function addChiusura() {
-  var label=(document.getElementById('ch-lbl')||{}).value||'';
+  var label=(document.getElementById('ch-mot')||{}).value||'';
   var dal=(document.getElementById('ch-dal')||{}).value||'';
   var al=(document.getElementById('ch-al')||{}).value||'';
-  if(!label||!dal||!al){alert('Compila tutti i campi chiusura');return;}
+  if(!dal||!al){alert('Inserisci le date Dal e Al'); return;}
+  if(!label) label='Chiusura';
   apiCall('saveChiusura',{label:label,dal:dal,al:al},function(err,r){
     if(!err&&r&&r.ok){
       D.chiusure.push({id:r.id,label:label,dal:dal,al:al});
       renderChiusure();
-      document.getElementById('ch-lbl').value='';
-      document.getElementById('ch-dal').value='';
-      document.getElementById('ch-al').value='';
+      caricaChiusureAdmin();
+      var mot=document.getElementById('ch-mot'); if(mot) mot.value='';
+      var dal2=document.getElementById('ch-dal'); if(dal2) dal2.value='';
+      var al2=document.getElementById('ch-al'); if(al2) al2.value='';
     } else alert('Errore: '+((r&&r.error)||err||'Riprova'));
   });
 }
