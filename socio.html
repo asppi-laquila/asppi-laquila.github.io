@@ -1570,6 +1570,19 @@ function resetPren() {
 }
 
 // ── PASSWORD ──────────────────────────────────────────────────
+function copiaIban() {
+  var iban = (document.getElementById('prof-iban-valore')||{}).textContent||'';
+  if(!iban) return;
+  navigator.clipboard.writeText(iban).then(function(){
+    alert('IBAN copiato negli appunti!');
+  }).catch(function(){
+    var ta=document.createElement('textarea'); ta.value=iban;
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('IBAN copiato!');
+  });
+}
+
 function caricaProfilo() {
   // Tessera
   api('getTessere', {}, function(err, r) {

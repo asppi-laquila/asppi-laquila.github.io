@@ -121,6 +121,15 @@ select.inp{cursor:pointer;}
     </div>
   </div>
 
+  <!-- Ricerca globale -->
+  <div style="position:relative;margin-bottom:12px">
+    <input type="text" id="global-search" placeholder="&#128269; Cerca soci, pratiche, pagamenti..."
+      style="width:100%;padding:12px 14px 12px 42px;border-radius:12px;border:1.5px solid #e5e5e5;font-size:14px;outline:none;font-family:inherit;background:#fff"
+      oninput="globalSearch(this.value)"/>
+    <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:#8A8A8A">&#128269;</span>
+  </div>
+  <div id="global-results" style="display:none;background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.1);margin-bottom:12px;overflow:hidden;max-height:300px;overflow-y:auto"></div>
+
   <!-- Alert urgenti -->
   <div id="h-alerts"></div>
 
@@ -350,6 +359,20 @@ select.inp{cursor:pointer;}
     <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Copia di sicurezza su Google Drive</div>
     <div class="infog" id="backup-ok" style="display:none"></div>
     <button class="bp" id="btn-backup">&#128190; Esegui backup ora</button>
+  </div></div>
+
+  <!-- IBAN per bonifici -->
+  <div class="card"><div class="cb">
+    <div class="sec">IBAN PER BONIFICI</div>
+    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Visibile ai soci nella sezione pagamenti</div>
+    <label class="lbl">Intestato a</label>
+    <input type="text" class="inp" id="iban-intestato" placeholder="es. ASPPI L'Aquila"/>
+    <label class="lbl">IBAN</label>
+    <input type="text" class="inp" id="iban-valore" placeholder="IT60 X054 2811 1010 0000 0123 456"/>
+    <label class="lbl">Causale suggerita</label>
+    <input type="text" class="inp" id="iban-causale" placeholder="es. Tesseramento ASPPI 2026 - [Nome Cognome]"/>
+    <div class="infog" id="iban-ok" style="display:none">&#9989; IBAN salvato!</div>
+    <button class="bp" id="btn-salva-iban">Salva IBAN</button>
   </div></div>
 
   <!-- Cambio password -->
@@ -2111,6 +2134,35 @@ function caricaImpostazioni() {
   caricaDocumenti();
   caricaAvvisi();
   caricaSlotAdmin();
+  caricaIban();
+}
+
+function caricaIban() {
+  apiCall('getImpostazioni', {}, function(err, r) {
+    if(!err&&r&&r.ok) {
+      var set = function(id, key){ var e=document.getElementById(id); if(e) e.value=r.data[key]||''; };
+      set('iban-intestato', 'iban_intestato');
+      set('iban-valore',    'iban_valore');
+      set('iban-causale',   'iban_causale');
+    }
+  });
+}
+
+function salvaIban() {
+  hide('iban-ok');
+  var campi = [
+    {chiave:'iban_intestato', id:'iban-intestato'},
+    {chiave:'iban_valore',    id:'iban-valore'},
+    {chiave:'iban_causale',   id:'iban-causale'}
+  ];
+  var count = 0;
+  campi.forEach(function(campo) {
+    var val = (document.getElementById(campo.id)||{}).value||'';
+    apiCall('saveImpostazione', {chiave:campo.chiave, valore:val}, function(){
+      count++;
+      if(count===campi.length) show('iban-ok');
+    });
+  });
 }
 
 var ORARI_DEFAULT = ['08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
@@ -2912,6 +2964,72 @@ function salvaTuttiSlot() {
     }
   });
 }
+
+function globalSearch(q) {
+  var el = document.getElementById('global-results');
+  if (!el) return;
+  if (!q || q.trim().length < 2) { el.style.display='none'; return; }
+  var query = q.trim().toLowerCase();
+  var results = [];
+
+  // Cerca soci
+  (window._utentiData||[]).forEach(function(u){
+    var nome = ((u.nome||'')+' '+(u.cognome||'')).trim();
+    var disp = u.displayName||'';
+    if(nome.toLowerCase().indexOf(query)>-1 || disp.toLowerCase().indexOf(query)>-1 || (u.email||'').toLowerCase().indexOf(query)>-1 || (u.cf||'').toLowerCase().indexOf(query)>-1) {
+      results.push({tipo:'socio', icon:'&#128100;', titolo:disp||nome, sub:u.email||'', uid:u.id, col:'#1A3A8F'});
+    }
+  });
+
+  // Cerca pratiche
+  (D.contratti||[]).forEach(function(ct){
+    if(ct.eliminato===true||String(ct.eliminato).toLowerCase()==='true') return;
+    var nome = ct.nomeContratto||ct.tipo||ct.id;
+    var locs='', cons='';
+    try{var l=JSON.parse(ct.locatoriJSON||'[]');locs=(l[0]&&(l[0].cognome||l[0].nome))||'';}catch(e){}
+    try{var cc=JSON.parse(ct.conduttoriJSON||'[]');cons=(cc[0]&&(cc[0].cognome||cc[0].nome))||'';}catch(e){}
+    if(nome.toLowerCase().indexOf(query)>-1||locs.toLowerCase().indexOf(query)>-1||cons.toLowerCase().indexOf(query)>-1||ct.id.toLowerCase().indexOf(query)>-1) {
+      results.push({tipo:'pratica', icon:'&#128203;', titolo:nome, sub:locs+(cons?' / '+cons:''), cid:ct.id, col:'#E8631A'});
+    }
+  });
+
+  // Cerca pagamenti
+  (window._econData||[]).forEach(function(item){
+    var u = item.socio||{};
+    var nome = ((u.nome||'')+' '+(u.cognome||'')).trim();
+    if(nome.toLowerCase().indexOf(query)>-1||(u.email||'').toLowerCase().indexOf(query)>-1) {
+      if(item.saldo>0) results.push({tipo:'pagamento', icon:'&#128176;', titolo:nome, sub:'Saldo: €'+item.saldo, uid:u.id, col:'#C0392B'});
+    }
+  });
+
+  if(!results.length){ el.innerHTML='<div class="info" style="padding:14px">Nessun risultato per "'+q+'"</div>'; el.style.display=''; return; }
+
+  el.innerHTML='';
+  el.style.display='';
+  results.slice(0,8).forEach(function(r){
+    var div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid #f0f0f0;cursor:pointer';
+    div.innerHTML='<span style="font-size:20px">'+r.icon+'</span>'
+      +'<div><div style="font-size:13px;font-weight:700;color:#1A1A1A">'+r.titolo+'</div>'
+      +'<div style="font-size:11px;color:#8A8A8A">'+r.sub+'</div></div>';
+    div.addEventListener('click', function(){
+      el.style.display='none';
+      document.getElementById('global-search').value='';
+      if(r.tipo==='socio'||r.tipo==='pagamento') { navTo('soci'); setTimeout(function(){ apriSocio(r.uid); },300); }
+      else if(r.tipo==='pratica') { navTo('prat'); setTimeout(function(){ apriPrat(r.cid); },300); }
+    });
+    div.addEventListener('mouseenter',function(){ this.style.background='#F8F7F5'; });
+    div.addEventListener('mouseleave',function(){ this.style.background=''; });
+    el.appendChild(div);
+  });
+}
+
+// Chiudi risultati cliccando fuori
+document.addEventListener('click', function(e){
+  var sr = document.getElementById('global-search');
+  var el = document.getElementById('global-results');
+  if(el && sr && !sr.contains(e.target) && !el.contains(e.target)) el.style.display='none';
+});
 
 function aggiornaAlerts(alerts) {
   var el = document.getElementById('h-alerts'); if(!el) return;
@@ -4435,6 +4553,35 @@ function caricaImpostazioni() {
   caricaDocumenti();
   caricaAvvisi();
   caricaSlotAdmin();
+  caricaIban();
+}
+
+function caricaIban() {
+  apiCall('getImpostazioni', {}, function(err, r) {
+    if(!err&&r&&r.ok) {
+      var set = function(id, key){ var e=document.getElementById(id); if(e) e.value=r.data[key]||''; };
+      set('iban-intestato', 'iban_intestato');
+      set('iban-valore',    'iban_valore');
+      set('iban-causale',   'iban_causale');
+    }
+  });
+}
+
+function salvaIban() {
+  hide('iban-ok');
+  var campi = [
+    {chiave:'iban_intestato', id:'iban-intestato'},
+    {chiave:'iban_valore',    id:'iban-valore'},
+    {chiave:'iban_causale',   id:'iban-causale'}
+  ];
+  var count = 0;
+  campi.forEach(function(campo) {
+    var val = (document.getElementById(campo.id)||{}).value||'';
+    apiCall('saveImpostazione', {chiave:campo.chiave, valore:val}, function(){
+      count++;
+      if(count===campi.length) show('iban-ok');
+    });
+  });
 }
 
 var ORARI_DEFAULT = ['08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
