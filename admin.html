@@ -893,10 +893,10 @@ function cancellaPren() {
 
 function salvaNoteInterne() {
   var note = (document.getElementById('opr-note-interne')||{}).value||'';
-  var c2 = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){c2=D.contratti[i];break;} }
-  if (!c2) return;
-  c2.noteInterne = note;
-  apiCall('saveContratto', {data:c2}, function(err,r){
+  var ct2 = null; for(var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){ct2=D.contratti[i];break;} }
+  if (!ct2) return;
+  ct2.noteInterne = note;
+  apiCall('saveContratto', {data:ct2}, function(err,r){
     if(!err&&r&&r.ok){ show('opr-note-ok'); }
     else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
   });
@@ -988,7 +988,7 @@ function apriPrat(id) {
   hide('opr-ok');
   // Carica note interne
   var noteEl = document.getElementById('opr-note-interne');
-  if(noteEl) noteEl.value = c2.noteInterne||'';
+  if(noteEl) noteEl.value = ct.noteInterne||'';
   hide('opr-note-ok');
   var modDiv = document.getElementById('opr-modificato');
   if (c.modificato) {
