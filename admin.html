@@ -263,21 +263,20 @@ select.inp{cursor:pointer;}
   <!-- Slot appuntamenti -->
   <div class="card"><div class="cb">
     <div class="sec">ORARI RICEVIMENTO</div>
-    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Giorni e orari in cui i soci possono prenotare</div>
-    <div id="slot-giorni" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px"></div>
-    <div id="slot-orari-list" style="margin-bottom:12px"></div>
-    <div style="display:flex;gap:8px;margin-bottom:8px">
+    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Tocca un orario per attivarlo o disattivarlo</div>
+    <div id="slot-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px"></div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
       <input type="text" id="slot-new-ora" class="inp" placeholder="es. 09:00" style="margin:0;flex:1"/>
-      <button class="bp" id="btn-aggiungi-slot" style="width:auto;padding:0 16px">+ Aggiungi</button>
+      <button class="bp" id="btn-aggiungi-slot" style="width:auto;padding:0 16px;margin:0">+</button>
     </div>
-    <div style="font-size:13px;font-weight:700;color:#1A1A1A;margin:12px 0 8px">Periodi di chiusura</div>
-    <div id="slot-chiusure"></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-      <input type="text" id="ch-dal" class="inp" placeholder="Dal gg/mm/aaaa" style="margin:0;flex:1" oninput="autoDateAdmin(this)"/>
-      <input type="text" id="ch-al"  class="inp" placeholder="Al gg/mm/aaaa"  style="margin:0;flex:1" oninput="autoDateAdmin(this)"/>
-      <input type="text" id="ch-mot" class="inp" placeholder="Motivo" style="margin:0;flex:1"/>
+    <div style="font-size:13px;font-weight:700;color:#1A1A1A;margin-bottom:8px">Periodi di chiusura / Ferie</div>
+    <div id="slot-chiusure" style="margin-bottom:8px"></div>
+    <div class="g2" style="margin-bottom:8px">
+      <div><label class="lbl">Dal</label><input type="text" id="ch-dal" class="inp" placeholder="gg/mm/aaaa" style="margin:0" oninput="autoDateAdmin(this)"/></div>
+      <div><label class="lbl">Al</label><input type="text" id="ch-al" class="inp" placeholder="gg/mm/aaaa" style="margin:0" oninput="autoDateAdmin(this)"/></div>
     </div>
-    <button class="bs" id="btn-add-ch" style="margin-top:8px">+ Aggiungi chiusura</button>
+    <input type="text" id="ch-mot" class="inp" placeholder="Motivo (es. Ferie agosto)" style="margin-bottom:8px"/>
+    <button class="bs" id="btn-add-ch">+ Aggiungi periodo chiusura</button>
   </div></div>
 
   <!-- Allegati / Documenti -->
@@ -1495,22 +1494,42 @@ function caricaImpostazioni() {
   caricaSlotAdmin();
 }
 
+// Orari predefiniti sempre visibili
+var ORARI_DEFAULT = ['08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','15:00','15:30','16:00','16:30','17:00','17:30','18:00'];
+
 function caricaSlotAdmin() {
   apiCall('getSlot', {}, function(err, r) {
-    var el = document.getElementById('slot-body'); if(!el) return;
-    var orari = (!err&&r&&r.ok) ? r.orari||[] : [];
-    if (!orari.length) { el.innerHTML='<div class="info">Nessuno slot configurato.</div>'; return; }
+    var attiviRaw = (!err&&r&&r.ok) ? r.orari||[] : [];
+    var attivi = {};
+    attiviRaw.forEach(function(o){ attivi[o]=true; });
+    
+    var el = document.getElementById('slot-grid'); if(!el) return;
     el.innerHTML='';
-    orari.forEach(function(o){
-      var div=document.createElement('div');
-      div.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #e5e5e5';
-      var sp=document.createElement('span'); sp.style.cssText='font-size:14px;font-weight:600'; sp.textContent=o;
-      var btn=document.createElement('button');
-      btn.style.cssText='background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px';
-      btn.innerHTML='&#128465;';
-      btn.addEventListener('click',(function(ora){return function(){eliminaSlotOra(ora);};})(o));
-      div.appendChild(sp); div.appendChild(btn); el.appendChild(div);
+    
+    // Aggiungi orari custom non presenti nei default
+    attiviRaw.forEach(function(o){
+      if (ORARI_DEFAULT.indexOf(o)===-1) ORARI_DEFAULT.push(o);
     });
+    
+    ORARI_DEFAULT.forEach(function(o){
+      var btn = document.createElement('button');
+      var on = !!attivi[o];
+      btn.textContent = o;
+      btn.style.cssText = 'padding:10px 0;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;border:2px solid '+(on?'#E8631A':'#e5e5e5')+';background:'+(on?'#E8631A':'#fff')+';color:'+(on?'#fff':'#8A8A8A');
+      btn.addEventListener('click', (function(ora, wasOn){
+        return function(){
+          if (wasOn) {
+            eliminaSlotOra(ora);
+          } else {
+            apiCall('saveSlot', {orario:ora}, function(err,r){ if(!err&&r&&r.ok) caricaSlotAdmin(); });
+          }
+        };
+      })(o, on));
+      el.appendChild(btn);
+    });
+
+    // Chiusure
+    caricaChiusure();
   });
 }
 
