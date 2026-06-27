@@ -90,7 +90,7 @@ textarea.inp{min-height:100px;resize:vertical;}
     <div style="font-size:12px;color:#8A8A8A">Benvenuto,</div>
     <div style="font-size:22px;font-weight:800;color:#1A1A1A" id="hnome">Socio</div>
   </div>
-  <div style="display:flex;gap:10px;margin-bottom:20px">
+  <div style="display:flex;gap:10px;margin-bottom:12px">
     <button id="btn-prenota-home" style="flex:1;border:none;border-radius:16px;padding:20px 14px;cursor:pointer;background:linear-gradient(135deg,#E8631A,#C94F0F);color:#fff;text-align:left">
       <div style="font-size:26px;margin-bottom:8px">&#128197;</div>
       <div style="font-size:14px;font-weight:800">Prenota</div>
@@ -102,6 +102,11 @@ textarea.inp{min-height:100px;resize:vertical;}
       <div style="font-size:11px;opacity:.6">e contratti</div>
     </button>
   </div>
+  <button id="btn-vantaggi-home" style="width:100%;border:none;border-radius:16px;padding:14px 18px;cursor:pointer;background:linear-gradient(135deg,#2D7A4F,#1A5C3A);color:#fff;text-align:left;display:flex;align-items:center;gap:12px;margin-bottom:20px">
+    <span style="font-size:28px">&#11088;</span>
+    <div><div style="font-size:14px;font-weight:800">I tuoi vantaggi ASPPI</div><div style="font-size:11px;opacity:.8">Servizi e scontistiche riservati</div></div>
+    <span style="margin-left:auto;font-size:20px;opacity:.7">&#8250;</span>
+  </button>
   <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin-bottom:10px">Le tue pratiche</div>
   <div id="hpratiche"><div class="info">Caricamento in corso...</div></div>
 </div>
@@ -159,6 +164,23 @@ textarea.inp{min-height:100px;resize:vertical;}
     </div>
   </div>
   </div>
+</div>
+
+<!-- VANTAGGI -->
+<div id="p-vantaggi" class="pg">
+  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:4px">I tuoi vantaggi</div>
+  <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px">Servizi e scontistiche riservati ai soci ASPPI</div>
+
+  <!-- Documento allegato -->
+  <div id="v-doc-card" style="display:none">
+    <div class="card"><div class="cb">
+      <div class="sec">DOCUMENTI</div>
+      <div id="v-doc-content"></div>
+    </div></div>
+  </div>
+
+  <!-- Lista servizi -->
+  <div id="v-servizi"><div class="info">Caricamento...</div></div>
 </div>
 
 <!-- CHAT -->
@@ -404,8 +426,8 @@ textarea.inp{min-height:100px;resize:vertical;}
 <div class="nav">
   <button class="nb on" id="nb-home"><span class="ic">&#127968;</span><span class="lb">Home</span></button>
   <button class="nb" id="nb-immobili"><span class="ic">&#127962;</span><span class="lb">Immobili</span></button>
+  <button class="nb" id="nb-vantaggi"><span class="ic">&#11088;</span><span class="lb">Vantaggi</span></button>
   <button class="nb" id="nb-prenota"><span class="ic">&#128197;</span><span class="lb">Prenota</span></button>
-  <button class="nb" id="nb-chat"><span class="ic">&#128172;</span><span class="lb">Chat</span></button>
   <button class="nb" id="nb-profilo"><span class="ic">&#128100;</span><span class="lb">Profilo</span></button>
 </div>
 
@@ -440,7 +462,8 @@ window.onload = function() {
 
   document.getElementById('tnome').textContent = nome || email || 'Socio';
   document.getElementById('hnome').textContent = nome || email || 'Socio';
-  document.getElementById('pr-nome').textContent = (nome + ' ' + (S.user.cognome||'')).trim() || '—';
+  var cognome = S.user.cognome || '';
+  document.getElementById('pr-nome').textContent = (nome + (cognome?' '+cognome:'')).trim() || '—';
   document.getElementById('pr-email').textContent = email || '—';
   document.getElementById('pr-cf').textContent  = S.user.cf  || '—';
   document.getElementById('pr-dtn').textContent = S.user.dataNascita || '—';
@@ -541,11 +564,13 @@ function bindAll() {
   T('nb-home').addEventListener('click', function(){ navTo('home'); });
   T('nb-immobili').addEventListener('click', function(){ navTo('immobili'); });
   T('nb-prenota').addEventListener('click', function(){ navTo('prenota'); });
-  T('nb-chat').addEventListener('click', function(){ navTo('chat'); caricaChatLibera(); });
+  T('nb-vantaggi').addEventListener('click', function(){ navTo('vantaggi'); caricaVantaggi(); });
+  T('nb-chat') && T('nb-chat').addEventListener('click', function(){ navTo('chat'); caricaChatLibera(); });
   T('nb-profilo').addEventListener('click', function(){ navTo('profilo'); caricaProfilo(); });
   // Home
   T('btn-prenota-home').addEventListener('click', function(){ navTo('prenota'); });
   T('btn-imm-home').addEventListener('click', function(){ navTo('immobili'); });
+  T('btn-vantaggi-home').addEventListener('click', function(){ navTo('vantaggi'); caricaVantaggi(); });
   // Immobili
   T('btn-nuovo-apt').addEventListener('click', apriNuovoApt);
   // Apt overlay
@@ -597,7 +622,7 @@ function bindAll() {
 
 // ── NAV ───────────────────────────────────────────────────────
 function navTo(id) {
-  var pages = ['home','immobili','prenota','chat','profilo'];
+  var pages = ['home','immobili','vantaggi','prenota','profilo'];
   for (var i=0; i<pages.length; i++) {
     var pg = T('p-'+pages[i]);
     var nb = T('nb-'+pages[i]);
@@ -609,9 +634,9 @@ function navTo(id) {
 
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome() {
-  // Controlla pagamenti sospesi per banner home
+  // Banner solo se ci sono pagamenti reali in sospeso
   api('getStrategiaEconomica', {}, function(err, r) {
-    if (!err && r && r.ok && r.saldo > 0) {
+    if (!err && r && r.ok && r.saldo > 0 && r.totaleDovuto > 0) {
       var banner = document.createElement('div');
       banner.style.cssText = 'background:#FDEEEC;border-radius:12px;padding:14px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer';
       banner.innerHTML = '<div><div style="font-size:13px;font-weight:800;color:#C0392B">&#9888; Pagamento in sospeso</div>'
@@ -1335,48 +1360,37 @@ function caricaProfilo() {
     }
   });
 
-  // Situazione economica
+  // Mostra solo pagamenti registrati dall'admin
   api('getStrategiaEconomica', {}, function(err, r) {
     var el = T('pr-pagamenti'); if(!el) return;
     var btnBon = T('btn-dichiara-bonifico');
     if (err||!r||!r.ok) { el.innerHTML='<div class="info">Dati non disponibili.</div>'; return; }
+
+    if (!r.dettaglio || !r.dettaglio.length) {
+      el.innerHTML = '<div class="infog">&#9989; Nessun pagamento registrato per il '+r.anno+'</div>';
+      if (btnBon) btnBon.style.display = 'none';
+      return;
+    }
+
     var h = '';
-    var anno = r.anno;
+    r.dettaglio.forEach(function(l) {
+      var pagato = l.stato === 'confermato';
+      var bonDich = l.stato === 'bonifico_dichiarato';
+      var colore = pagato ? '#2D7A4F' : '#E8631A';
+      var statoTxt = pagato ? 'Pagato' : bonDich ? 'Bonifico in verifica' : 'Da pagare';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e5e5e5">'
+        +'<div><div style="font-size:13px;font-weight:600;color:#1A1A1A">'+l.tipo+'</div>'
+        +'<div style="font-size:11px;color:#8A8A8A">'+statoTxt+(l.data?' · '+l.data:'')+'</div></div>'
+        +'<span style="font-size:15px;font-weight:800;color:'+colore+'">€ '+l.importo+'</span></div>';
+    });
 
-    // Tesseramento
-    if (r.tesseramento && !r.tesseramento.hasTessera) {
-      h += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e5e5e5">'
-        +'<span class="lbl" style="margin:0">'+r.tesseramento.tipo+'</span>'
-        +'<span style="font-size:14px;font-weight:700;color:#E8631A">€ '+r.tesseramento.dovuto+'</span></div>';
-    }
-
-    // Lavori
-    if (r.lavori && r.lavori.dettaglio) {
-      r.lavori.dettaglio.forEach(function(l) {
-        var gratuito = l.importo === 0;
-        h += '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e5e5e5">'
-          +'<span class="lbl" style="margin:0">'+l.tipo+'</span>'
-          +'<span style="font-size:14px;font-weight:700;color:'+(gratuito?'#2D7A4F':'#E8631A')+'">'+(gratuito?'Incluso':'€ '+l.importo)+'</span></div>';
-      });
-    }
-
-    // Totale
-    h += '<div style="display:flex;justify-content:space-between;padding:12px 0;margin-top:4px">'
-      +'<span style="font-size:14px;font-weight:800;color:#1A1A1A">TOTALE DOVUTO</span>'
-      +'<span style="font-size:18px;font-weight:800;color:#E8631A">€ '+r.totaleDovuto+'</span></div>';
-
-    if (r.totalePagato > 0) {
-      h += '<div style="display:flex;justify-content:space-between;padding:4px 0">'
-        +'<span style="font-size:13px;color:#2D7A4F">Pagato</span>'
-        +'<span style="font-size:14px;font-weight:700;color:#2D7A4F">€ '+r.totalePagato+'</span></div>';
-      h += '<div style="display:flex;justify-content:space-between;padding:4px 0">'
-        +'<span style="font-size:13px;font-weight:800">SALDO</span>'
+    if (r.totaleDovuto > 0) {
+      h += '<div style="display:flex;justify-content:space-between;padding:12px 0 4px">'
+        +'<span style="font-weight:800">SALDO</span>'
         +'<span style="font-size:16px;font-weight:800;color:'+(r.saldo>0?'#C0392B':'#2D7A4F')+'">€ '+r.saldo+'</span></div>';
     }
 
-    el.innerHTML = h || '<div class="infog">&#9989; Nessun importo dovuto per il '+anno+'</div>';
-
-    // Mostra bottone bonifico se c'è saldo da pagare
+    el.innerHTML = h;
     if (btnBon) btnBon.style.display = r.saldo > 0 ? '' : 'none';
   });
 }
@@ -1442,6 +1456,66 @@ function inviaDichiarazioneBonifico() {
       SH('bon-ok', true);
       var btn=T('btn-invia-bonifico'); if(btn) btn.style.display='none';
     } else { if(errEl){errEl.textContent=(r&&r.error)||err||'Errore';errEl.style.display='';} }
+  });
+}
+
+function caricaVantaggi() {
+  // Carica documento allegato
+  api('getImpostazioni', {}, function(err, r) {
+    var card = T('v-doc-card');
+    var cont = T('v-doc-content');
+    if (!err && r && r.ok && r.data.attestazione_url) {
+      if(card) card.style.display='';
+      if(cont) cont.innerHTML = '<a href="'+r.data.attestazione_url+'" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px;background:#EBF2FB;border-radius:10px;text-decoration:none">'
+        +'<span style="font-size:28px">&#128196;</span>'
+        +'<div><div style="font-size:14px;font-weight:700;color:#1A5FA8">'+(r.data.attestazione_nome||'Documento')+'</div>'
+        +'<div style="font-size:12px;color:#8A8A8A">Tocca per aprire o scaricare</div></div>'
+        +'<span style="margin-left:auto;font-size:20px;color:#1A5FA8">&#8250;</span></a>';
+    } else {
+      if(card) card.style.display='none';
+    }
+  });
+
+  // Carica servizi
+  api('getServizi', {}, function(err, r) {
+    var el = T('v-servizi'); if(!el) return;
+    var servizi = (!err&&r&&r.ok) ? r.data||[] : [];
+    if (!servizi.length) {
+      el.innerHTML = '<div class="info">Nessun servizio disponibile al momento.</div>';
+      return;
+    }
+
+    // Raggruppa per categoria
+    var cats = {};
+    servizi.forEach(function(s) {
+      var cat = s.categoria||'Altro';
+      if(!cats[cat]) cats[cat]=[];
+      cats[cat].push(s);
+    });
+
+    var h = '';
+    var catIcons = {Tecnico:'&#128295;', Legale:'&#9878;', Fiscale:'&#128179;', Altro:'&#127775;'};
+    Object.keys(cats).forEach(function(cat) {
+      h += '<div style="font-size:13px;font-weight:800;color:#1A1A1A;margin-bottom:10px;margin-top:4px">'
+        +(catIcons[cat]||'&#127775;')+' '+cat+'</div>';
+      cats[cat].forEach(function(s) {
+        var haSconto = s.prezzoNormale && s.prezzoSoci && parseFloat(s.prezzoSoci)<parseFloat(s.prezzoNormale);
+        h += '<div class="card" style="margin-bottom:10px"><div class="cb" style="padding:14px">'
+          +'<div style="display:flex;justify-content:space-between;align-items:flex-start">'
+          +'<div style="flex:1;padding-right:12px">'
+          +'<div style="font-size:14px;font-weight:700;color:#1A1A1A;margin-bottom:4px">'+s.nome+'</div>'
+          +(s.descrizione?'<div style="font-size:12px;color:#8A8A8A;line-height:1.5">'+s.descrizione+'</div>':'')
+          +'</div>'
+          +'<div style="text-align:right;flex-shrink:0">'
+          +(s.prezzoSoci?'<div style="font-size:16px;font-weight:800;color:#E8631A">€ '+s.prezzoSoci+'</div>'
+            +(haSconto?'<div style="font-size:11px;color:#8A8A8A;text-decoration:line-through">€ '+s.prezzoNormale+'</div>':'')
+            +(haSconto?'<div style="font-size:10px;color:#2D7A4F;font-weight:700">Prezzo soci</div>':'')
+          :'<div style="font-size:12px;color:#8A8A8A">Contattaci</div>')
+          +'</div></div></div></div>';
+      });
+    });
+
+    el.innerHTML = h;
   });
 }
 

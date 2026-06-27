@@ -117,7 +117,14 @@ select.inp{cursor:pointer;}
 <!-- SOCI E TESSERE -->
 <div id="p-soci" class="pg">
   <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Soci e Tessere</div>
+  <div style="position:relative;margin-bottom:12px">
+    <input type="text" id="soci-search" placeholder="&#128269; Cerca per nome, cognome, ragione sociale, email..." 
+      style="width:100%;padding:11px 14px 11px 40px;border-radius:10px;border:1.5px solid #e5e5e5;font-size:14px;outline:none;font-family:inherit"
+      oninput="filtraSociRicerca(this.value)"/>
+    <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:#8A8A8A">&#128269;</span>
+  </div>
   <div class="frow" id="soci-filtri"></div>
+  <div id="soci-count" style="font-size:12px;color:#8A8A8A;margin-bottom:8px"></div>
   <div id="l-soci"><div class="info">Caricamento...</div></div>
 </div>
 
@@ -182,6 +189,90 @@ select.inp{cursor:pointer;}
       <input type="text" class="inp" id="os-pag-data" placeholder="gg/mm/aaaa"/>
       <div class="infog" id="os-pag-ok" style="display:none">&#9989; Pagamento registrato!</div>
       <button class="bp" id="btn-registra-pag">Registra pagamento</button>
+    </div></div>
+    <div class="card"><div class="cb">
+      <div class="sec">STORICO PAGAMENTI</div>
+      <div id="os-pag-lista"><div class="info">Caricamento...</div></div>
+    </div></div>
+    <button class="bs" id="btn-elimina-socio" style="color:#C0392B;border-color:#FDEEEC;margin-top:8px">&#128465; Elimina socio</button>
+  </div>
+</div>
+
+<!-- IMPOSTAZIONI -->
+<div id="p-imp" class="pg">
+  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Impostazioni</div>
+
+  <!-- Servizi e Convenzioni -->
+  <div class="card"><div class="cb">
+    <div class="sec">SERVIZI E CONVENZIONI</div>
+    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Gestisci i servizi visibili ai soci tesserati</div>
+    <div id="l-servizi"><div class="info">Caricamento...</div></div>
+    <button class="bd" id="btn-nuovo-servizio" style="margin-top:8px">+ Aggiungi servizio</button>
+  </div></div>
+
+  <!-- Allegati / Documenti -->
+  <div class="card"><div class="cb">
+    <div class="sec">DOCUMENTI E ALLEGATI</div>
+    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Il socio potra scaricare questi documenti dall'app</div>
+    <label style="display:block;font-size:11px;font-weight:600;color:#8A8A8A;margin-bottom:4px;text-transform:uppercase">Nome documento</label>
+    <input type="text" class="inp" id="doc-nome" placeholder="es. Attestazione 2026"/>
+    <label style="display:block;font-size:11px;font-weight:600;color:#8A8A8A;margin-bottom:4px;text-transform:uppercase">Link Google Drive (URL)</label>
+    <input type="text" class="inp" id="doc-url" placeholder="https://drive.google.com/file/d/..."/>
+    <div style="font-size:11px;color:#8A8A8A;margin-top:-8px;margin-bottom:12px">Su Drive: tasto destro sul file → Copia link → incolla qui</div>
+    <div class="infog" id="doc-ok" style="display:none">&#9989; Documento aggiornato!</div>
+    <button class="bp" id="btn-salva-doc">Salva documento</button>
+  </div></div>
+
+  <!-- Slot appuntamenti -->
+  <div class="card"><div class="cb">
+    <div class="sec">SLOT APPUNTAMENTI</div>
+    <div id="slot-body"><div class="info">Caricamento...</div></div>
+    <button class="bd" id="btn-aggiungi-slot">+ Aggiungi orario</button>
+  </div></div>
+
+  <!-- Cambio password -->
+  <div class="card"><div class="cb">
+    <div class="sec">SICUREZZA</div>
+    <label style="display:block;font-size:11px;font-weight:600;color:#8A8A8A;margin-bottom:4px;text-transform:uppercase">Nuova password admin</label>
+    <input type="password" class="inp" id="new-adm-pwd" placeholder="Nuova password"/>
+    <div class="infog" id="adm-pwd-ok" style="display:none">&#9989; Password aggiornata!</div>
+    <button class="bp" id="btn-cambia-pwd-admin">Cambia password</button>
+  </div></div>
+</div>
+
+<!-- OV NUOVO/MODIFICA SERVIZIO -->
+<div id="ov-servizio" class="ov">
+  <div class="oh">
+    <div><div class="ohlbl">SERVIZIO</div><div class="ohttl" id="srv-ttl">Nuovo servizio</div></div>
+    <button class="exbtn" id="btn-chiudi-servizio">&#8592; Indietro</button>
+  </div>
+  <div style="padding:16px">
+    <div class="card"><div class="cb">
+      <div class="sec">DATI SERVIZIO</div>
+      <label class="lbl">Nome servizio *</label>
+      <input type="text" class="inp" id="srv-nome" placeholder="es. Contratto di locazione"/>
+      <label class="lbl">Descrizione</label>
+      <textarea class="inp" id="srv-desc" placeholder="Descrizione del servizio..." style="min-height:80px"></textarea>
+      <label class="lbl">Categoria</label>
+      <select class="inp" id="srv-cat">
+        <option value="Tecnico">Tecnico</option>
+        <option value="Legale">Legale</option>
+        <option value="Fiscale">Fiscale</option>
+        <option value="Altro">Altro</option>
+      </select>
+      <div class="g2">
+        <div><label class="lbl">Prezzo normale €</label><input type="text" class="inp" id="srv-pnorm" placeholder="es. 200"/></div>
+        <div><label class="lbl">Prezzo soci €</label><input type="text" class="inp" id="srv-psoci" placeholder="es. 150"/></div>
+      </div>
+      <label class="lbl">Ordine visualizzazione</label>
+      <input type="text" class="inp" id="srv-ordine" placeholder="es. 1"/>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;cursor:pointer" onclick="toggleSrvAttivo()">
+        <div id="srv-attivo-box" style="width:20px;height:20px;border-radius:6px;border:2px solid #E8631A;background:#E8631A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">&#10003;</div>
+        <span style="font-size:13px;font-weight:600">Servizio attivo (visibile ai soci)</span>
+      </div>
+      <div class="infog" id="srv-ok" style="display:none">&#9989; Servizio salvato!</div>
+      <button class="bp" id="btn-salva-servizio">Salva servizio</button>
+      <button class="bs" id="btn-elimina-servizio" style="color:#C0392B;border-color:#FDEEEC;display:none">&#128465; Elimina servizio</button>
     </div></div>
   </div>
 </div>
@@ -304,7 +395,7 @@ select.inp{cursor:pointer;}
   <button class="nb" id="nb-prat"><span class="ic">&#128203;</span><span class="lb">Pratiche</span></button>
   <button class="nb" id="nb-soci"><span class="ic">&#128100;</span><span class="lb">Soci</span></button>
   <button class="nb" id="nb-pag"><span class="ic">&#128176;</span><span class="lb">Pagamenti</span></button>
-  <button class="nb" id="nb-slot"><span class="ic">&#9881;</span><span class="lb">Impost.</span></button>
+  <button class="nb" id="nb-imp"><span class="ic">&#9881;</span><span class="lb">Impost.</span></button>
 </div>
 
 <script>
@@ -426,10 +517,17 @@ function bindEvents() {
   document.getElementById('nb-prat').addEventListener('click', function(){ navTo('prat'); });
   document.getElementById('nb-soci').addEventListener('click', function(){ navTo('soci'); caricaSoci(); });
   document.getElementById('nb-pag').addEventListener('click',  function(){ navTo('pag');  caricaPagamenti(); });
-  document.getElementById('nb-slot').addEventListener('click', function(){ navTo('slot'); });
+  document.getElementById('nb-imp').addEventListener('click', function(){ navTo('imp'); caricaImpostazioni(); });
+  document.getElementById('btn-nuovo-servizio').addEventListener('click', function(){ apriServizio(null); });
+  document.getElementById('btn-chiudi-servizio').addEventListener('click', function(){ chiudi('ov-servizio'); });
+  document.getElementById('btn-salva-servizio').addEventListener('click', salvaServizio);
+  document.getElementById('btn-elimina-servizio').addEventListener('click', eliminaServizioCorrente);
+  document.getElementById('btn-salva-doc').addEventListener('click', salvaDocumento);
+  document.getElementById('btn-cambia-pwd-admin').addEventListener('click', cambiaPwdAdmin);
   document.getElementById('btn-chiudi-socio').addEventListener('click', function(){ chiudi('ov-socio'); });
   document.getElementById('btn-salva-tessera').addEventListener('click', salvaTessera);
   document.getElementById('btn-registra-pag').addEventListener('click', registraPagamento);
+  document.getElementById('btn-elimina-socio').addEventListener('click', eliminaSocio);
   // Overlay close
   document.getElementById('btn-chiudi-op').addEventListener('click', function(){ chiudi('ov-pren'); });
   document.getElementById('btn-chiudi-opr').addEventListener('click', function(){ chiudi('ov-prat'); });
@@ -493,7 +591,7 @@ function apiCall(action, data, cb) {
 
 // ── NAV ───────────────────────────────────────────────────────
 function navTo(id) {
-  var pages = ['home','pren','prat','chat','slot','soci','pag'];
+  var pages = ['home','pren','prat','chat','slot','soci','pag','imp'];
   for (var i=0; i<pages.length; i++) {
     var pg = document.getElementById('p-'+pages[i]);
     var nb = document.getElementById('nb-'+pages[i]);
@@ -988,12 +1086,71 @@ function caricaSoci() {
       });
       window._utentiData  = utenti;
       window._tessereData = tessere;
+      // Svuota search bar e mostra tutti
+      var searchEl = document.getElementById('soci-search');
+      if (searchEl) searchEl.value = '';
+      renderSoci();
     });
   });
 }
 
 function filtraSoci(f) {
-  // implementa filtro
+  renderSoci();
+}
+
+function filtraSociRicerca(query) {
+  renderSoci(query);
+}
+
+function renderSoci(query) {
+  var utenti  = window._utentiData  || [];
+  var tessere = window._tessereData || [];
+  var anno    = new Date().getFullYear();
+  var el      = document.getElementById('l-soci'); if(!el) return;
+  var countEl = document.getElementById('soci-count');
+
+  // Filtro ricerca
+  var lista = utenti;
+  if (query && query.trim()) {
+    var q = query.trim().toLowerCase();
+    lista = utenti.filter(function(u) {
+      return (u.nome||'').toLowerCase().indexOf(q) > -1
+          || (u.cognome||'').toLowerCase().indexOf(q) > -1
+          || (u.displayName||'').toLowerCase().indexOf(q) > -1
+          || (u.email||'').toLowerCase().indexOf(q) > -1
+          || (u.cf||'').toLowerCase().indexOf(q) > -1;
+    });
+  }
+
+  if (countEl) countEl.textContent = lista.length + ' socio/i trovati';
+
+  el.innerHTML = '';
+  if (!lista.length) {
+    el.innerHTML = '<div class="info">Nessun socio trovato.</div>';
+    return;
+  }
+
+  lista.forEach(function(u) {
+    var tes = tessere.filter(function(t){ return t.userId===u.id && String(t.anno)===String(anno); });
+    var haTessera = tes.length > 0;
+    var div = document.createElement('div'); div.className='row';
+    var bar = document.createElement('div'); bar.className='bar'; bar.style.background=haTessera?'#2D7A4F':'#E8631A';
+    var rb  = document.createElement('div'); rb.className='rb';
+    var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
+    var rt  = document.createElement('div'); rt.className='rt';
+    rt.textContent = u.displayName||((u.nome||'')+' '+(u.cognome||'')).trim();
+    var bdg = document.createElement('span'); bdg.className='bdg';
+    bdg.textContent = haTessera ? 'Tessera '+anno : 'Senza tessera';
+    bdg.style.color = haTessera?'#2D7A4F':'#E8631A';
+    bdg.style.background = haTessera?'#EBF5F0':'#FDF0E8';
+    var rs  = document.createElement('div'); rs.className='rs';
+    rs.textContent = (u.email||'') + (haTessera?' · '+tes[0].numeroTessera:'');
+    var arr = document.createElement('div'); arr.className='ra'; arr.textContent='›';
+    top.appendChild(rt); top.appendChild(bdg); rb.appendChild(top); rb.appendChild(rs);
+    div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
+    div.addEventListener('click', (function(uid){ return function(){ apriSocio(uid); }; })(u.id));
+    el.appendChild(div);
+  });
 }
 
 function apriSocio(uid) {
@@ -1061,6 +1218,7 @@ function apriSocio(uid) {
   if(dataEl) dataEl.value = ('0'+oggi.getDate()).slice(-2)+'/'+('0'+(oggi.getMonth()+1)).slice(-2)+'/'+oggi.getFullYear();
 
   hide('os-pag-ok');
+  caricaStoricoPagamenti(uid);
   apri('ov-socio');
 }
 
@@ -1092,7 +1250,49 @@ function registraPagamento() {
     metodoPagamento: metodo, dataPagamento: data, _statoChanged: true
   };
   apiCall('savePagamento', {data:obj}, function(err,r){
-    if(!err&&r&&r.ok){ show('os-pag-ok'); apriSocio(curSocioId); }
+    if(!err&&r&&r.ok){ show('os-pag-ok'); caricaStoricoPagamenti(curSocioId); caricaPagamenti(); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function caricaStoricoPagamenti(userId) {
+  apiCall('getPagamenti', {}, function(err, r) {
+    var el = document.getElementById('os-pag-lista'); if(!el) return;
+    var pags = (!err&&r&&r.ok) ? (r.data||[]).filter(function(p){ return p.userId===userId; }) : [];
+    if (!pags.length) { el.innerHTML='<div class="info">Nessun pagamento ancora.</div>'; return; }
+    var h = '';
+    pags.forEach(function(p) {
+      var pagato = p.stato==='confermato';
+      var col = pagato?'#2D7A4F':'#E8631A';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e5e5e5">'
+        +'<div>'
+        +'<div style="font-size:13px;font-weight:600">'+( p.tipo||'Servizio')+'</div>'
+        +'<div style="font-size:11px;color:#8A8A8A">'+(p.dataPagamento||'')+(p.metodoPagamento?' · '+p.metodoPagamento:'')+'</div>'
+        +'</div>'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+        +'<span style="font-size:15px;font-weight:800;color:'+col+'">€'+p.importo+'</span>'
+        +'<button onclick="eliminaPagamento(''+p.id+'')" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px">&#128465;</button>'
+        +'</div></div>';
+    });
+    el.innerHTML = h;
+  });
+}
+
+function eliminaPagamento(pagId) {
+  if (!confirm('Eliminare questo pagamento?')) return;
+  apiCall('eliminaPagamento', {id: pagId}, function(err, r) {
+    if (!err&&r&&r.ok) { caricaStoricoPagamenti(curSocioId); caricaPagamenti(); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function eliminaSocio() {
+  var u = (window._utentiData||[]).filter(function(x){ return x.id===curSocioId; })[0];
+  var nome = u ? (u.displayName||u.nome||'questo socio') : 'questo socio';
+  if (!confirm('Sei sicuro di voler eliminare '+nome+'?
+Tutti i suoi dati verranno cancellati definitivamente.')) return;
+  apiCall('eliminaSocio', {userId: curSocioId}, function(err, r) {
+    if (!err&&r&&r.ok) { chiudi('ov-socio'); caricaSoci(); alert('Socio eliminato.'); }
     else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
   });
 }
@@ -1144,6 +1344,146 @@ function renderPagamenti() {
     div.addEventListener('click', (function(uid){ return function(){ apriSocio(uid); }; })(u.id));
     el.appendChild(div);
   });
+}
+
+// ── IMPOSTAZIONI ─────────────────────────────────────────────
+var curSrvId = null;
+var srvAttivo = true;
+
+function caricaImpostazioni() {
+  caricaServizi();
+  caricaDocumento();
+  caricaSlotInImp();
+}
+
+function caricaServizi() {
+  apiCall('getServizi', {}, function(err, r) {
+    var el = document.getElementById('l-servizi'); if(!el) return;
+    var servizi = (!err&&r&&r.ok) ? r.data||[] : [];
+    if (!servizi.length) { el.innerHTML='<div class="info">Nessun servizio ancora. Aggiungine uno!</div>'; return; }
+    var h = '';
+    servizi.forEach(function(s) {
+      var attivo = s.attivo===true || String(s.attivo).toLowerCase()==='true';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #e5e5e5;cursor:pointer" onclick="apriServizio(''+s.id+'')">'
+        +'<div>'
+        +'<div style="font-size:14px;font-weight:700;color:#1A1A1A">'+s.nome+'</div>'
+        +'<div style="font-size:12px;color:#8A8A8A">'+s.categoria+' · '+(attivo?'Attivo':'Disattivo')+'</div>'
+        +'</div>'
+        +'<div style="text-align:right">'
+        +(s.prezzoSoci?'<div style="font-size:14px;font-weight:800;color:#E8631A">€ '+s.prezzoSoci+'</div>':'')
+        +(s.prezzoNormale?'<div style="font-size:11px;color:#8A8A8A;text-decoration:line-through">€ '+s.prezzoNormale+'</div>':'')
+        +'</div></div>';
+    });
+    el.innerHTML = h;
+  });
+}
+
+function apriServizio(id) {
+  curSrvId = id;
+  var srvEl = document.getElementById('srv-ttl');
+  if(srvEl) srvEl.textContent = id ? 'Modifica servizio' : 'Nuovo servizio';
+  hide('srv-ok');
+
+  if (id) {
+    // Carica dati esistenti
+    apiCall('getServizi', {}, function(err, r) {
+      var servizi = (!err&&r&&r.ok) ? r.data||[] : [];
+      var s = null;
+      for(var i=0;i<servizi.length;i++){ if(servizi[i].id===id){s=servizi[i];break;} }
+      if (!s) return;
+      var set = function(elId, val){ var e=document.getElementById(elId); if(e) e.value=val||''; };
+      set('srv-nome', s.nome);
+      set('srv-desc', s.descrizione);
+      set('srv-cat',  s.categoria);
+      set('srv-pnorm',s.prezzoNormale);
+      set('srv-psoci',s.prezzoSoci);
+      set('srv-ordine',s.ordine);
+      srvAttivo = s.attivo===true || String(s.attivo).toLowerCase()==='true';
+      aggiornaBoxAttivo();
+      var btnEl = document.getElementById('btn-elimina-servizio');
+      if(btnEl) btnEl.style.display = '';
+      apri('ov-servizio');
+    });
+  } else {
+    var set2 = function(elId, val){ var e=document.getElementById(elId); if(e) e.value=val||''; };
+    set2('srv-nome',''); set2('srv-desc',''); set2('srv-pnorm',''); set2('srv-psoci',''); set2('srv-ordine','');
+    var catEl = document.getElementById('srv-cat'); if(catEl) catEl.value='Tecnico';
+    srvAttivo = true; aggiornaBoxAttivo();
+    var btnEl2 = document.getElementById('btn-elimina-servizio');
+    if(btnEl2) btnEl2.style.display = 'none';
+    apri('ov-servizio');
+  }
+}
+
+function toggleSrvAttivo() {
+  srvAttivo = !srvAttivo;
+  aggiornaBoxAttivo();
+}
+
+function aggiornaBoxAttivo() {
+  var box = document.getElementById('srv-attivo-box');
+  if (!box) return;
+  box.style.background = srvAttivo ? '#E8631A' : '#fff';
+  box.style.borderColor = srvAttivo ? '#E8631A' : '#e5e5e5';
+  box.style.color = srvAttivo ? '#fff' : '#8A8A8A';
+  box.innerHTML = srvAttivo ? '&#10003;' : '';
+}
+
+function salvaServizio() {
+  var nome = (document.getElementById('srv-nome')||{}).value||'';
+  if (!nome) { alert('Inserisci il nome del servizio'); return; }
+  var obj = {
+    id          : curSrvId||'',
+    nome        : nome,
+    descrizione : (document.getElementById('srv-desc')||{}).value||'',
+    categoria   : (document.getElementById('srv-cat')||{}).value||'Tecnico',
+    prezzoNormale:(document.getElementById('srv-pnorm')||{}).value||'',
+    prezzoSoci  : (document.getElementById('srv-psoci')||{}).value||'',
+    ordine      : (document.getElementById('srv-ordine')||{}).value||'99',
+    attivo      : srvAttivo
+  };
+  apiCall('saveServizio', {data:obj}, function(err,r){
+    if(!err&&r&&r.ok){ show('srv-ok'); caricaServizi(); curSrvId=r.id||curSrvId; }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function eliminaServizioCorrente() {
+  if (!curSrvId) return;
+  if (!confirm('Eliminare questo servizio?')) return;
+  apiCall('eliminaServizio', {id:curSrvId}, function(err,r){
+    if(!err&&r&&r.ok){ chiudi('ov-servizio'); caricaServizi(); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function caricaDocumento() {
+  apiCall('getImpostazioni', {}, function(err, r) {
+    if(!err&&r&&r.ok) {
+      var nomeEl = document.getElementById('doc-nome');
+      var urlEl  = document.getElementById('doc-url');
+      if(nomeEl) nomeEl.value = r.data.attestazione_nome||'';
+      if(urlEl)  urlEl.value  = r.data.attestazione_url||'';
+    }
+  });
+}
+
+function salvaDocumento() {
+  var nome = (document.getElementById('doc-nome')||{}).value||'';
+  var url  = (document.getElementById('doc-url')||{}).value||'';
+  hide('doc-ok');
+  apiCall('saveImpostazione', {chiave:'attestazione_nome', valore:nome}, function(){
+    apiCall('saveImpostazione', {chiave:'attestazione_url', valore:url}, function(err,r){
+      if(!err&&r&&r.ok){ show('doc-ok'); }
+      else { alert('Errore salvataggio'); }
+    });
+  });
+}
+
+function caricaSlotInImp() {
+  // Slot già gestito separatamente - qui mostriamo link
+  var el = document.getElementById('slot-body');
+  if(el) el.innerHTML='<div class="infob">&#128197; Gli slot appuntamenti si gestiscono nella sezione dedicata.</div>';
 }
 
 function cambiaPwdAdmin() {
