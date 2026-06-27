@@ -116,7 +116,10 @@ select.inp{cursor:pointer;}
 
 <!-- SOCI E TESSERE -->
 <div id="p-soci" class="pg">
-  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Soci e Tessere</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div style="font-size:18px;font-weight:800;color:#1A1A1A">Soci e Tessere</div>
+    <button id="btn-export-soci" style="background:#1A1A1A;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">&#128190; Export Excel</button>
+  </div>
   <div style="display:flex;gap:8px;margin-bottom:12px">
     <div style="position:relative;flex:1">
       <input type="text" id="soci-search" placeholder="Cerca socio..." 
@@ -304,6 +307,13 @@ select.inp{cursor:pointer;}
       <button class="bs" id="btn-elimina-servizio" style="color:#C0392B;border-color:#FDEEEC;display:none">&#128465; Elimina servizio</button>
     </div></div>
   </div>
+</div>
+
+<!-- PRENOTAZIONI ADMIN -->
+<div id="p-pren" class="pg">
+  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Prenotazioni</div>
+  <div class="frow" id="pren-filtri"></div>
+  <div id="l-pren"><div class="info">Caricamento...</div></div>
 </div>
 
 <!-- SLOT -->
@@ -544,7 +554,9 @@ function bindEvents() {
   // Nav
   document.getElementById('nb-home').addEventListener('click', function(){ navTo('home'); });
   document.getElementById('nb-prat').addEventListener('click', function(){ navTo('prat'); });
+  document.getElementById('btn-export-soci').addEventListener('click', exportSociExcel);
   document.getElementById('nb-soci').addEventListener('click', function(){ navTo('soci'); caricaSoci(); });
+  document.getElementById('nb-pren') && document.getElementById('nb-pren').addEventListener('click', function(){ navTo('pren'); caricaPrenotazioni(); });
   document.getElementById('nb-pag').addEventListener('click',  function(){ navTo('pag');  caricaPagamenti(); });
   document.getElementById('nb-srv').addEventListener('click', function(){ navTo('srv'); caricaServizi(); caricaTariffe(); });
   document.getElementById('nb-imp').addEventListener('click', function(){ navTo('imp'); caricaImpostazioni(); });
@@ -1403,14 +1415,17 @@ function caricaSlotAdmin() {
     var el = document.getElementById('slot-body'); if(!el) return;
     var orari = (!err&&r&&r.ok) ? r.orari||[] : [];
     if (!orari.length) { el.innerHTML='<div class="info">Nessuno slot configurato.</div>'; return; }
-    var h='';
+    el.innerHTML='';
     orari.forEach(function(o){
-      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #e5e5e5">'
-        +'<span style="font-size:14px;font-weight:600">'+o+'</span>'
-        +'<button onclick="eliminaSlotOra(''+o+'')" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px">&#128465;</button>'
-        +'</div>';
+      var div=document.createElement('div');
+      div.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #e5e5e5';
+      var sp=document.createElement('span'); sp.style.cssText='font-size:14px;font-weight:600'; sp.textContent=o;
+      var btn=document.createElement('button');
+      btn.style.cssText='background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px';
+      btn.innerHTML='&#128465;';
+      btn.addEventListener('click',(function(ora){return function(){eliminaSlotOra(ora);};})(o));
+      div.appendChild(sp); div.appendChild(btn); el.appendChild(div);
     });
-    el.innerHTML=h;
   });
 }
 
@@ -1572,6 +1587,101 @@ function salvaDocumento() {
 }
 
 
+
+// ── PRENOTAZIONI ADMIN ───────────────────────────────────────
+function caricaPrenotazioni() {
+  makeFiltri('pren-filtri',
+    ['tutte','in_attesa','confermate','annullate'],
+    ['Tutte','In attesa','Confermate','Annullate'],
+    function(f){ renderPrenotazioni(f); }
+  );
+  renderPrenotazioni('tutte');
+}
+
+function renderPrenotazioni(filtro) {
+  apiCall('getPrenotazioni', {all:true}, function(err, r) {
+    var el = document.getElementById('l-pren'); if(!el) return;
+    var pren = (!err&&r&&r.ok) ? r.data||[] : [];
+    if (filtro && filtro !== 'tutte') pren = pren.filter(function(p){ return p.stato===filtro; });
+    pren.sort(function(a,b){ return (a.data+a.ora)<(b.data+b.ora)?-1:1; });
+    if (!pren.length) { el.innerHTML='<div class="info">Nessuna prenotazione.</div>'; return; }
+    el.innerHTML='';
+    pren.forEach(function(p) {
+      var col = p.stato==='confermata'?'#2D7A4F':p.stato==='annullata'?'#C0392B':'#E8631A';
+      var div = document.createElement('div'); div.className='row';
+      var bar = document.createElement('div'); bar.className='bar'; bar.style.background=col;
+      var rb  = document.createElement('div'); rb.className='rb';
+      var rt  = document.createElement('div'); rt.className='rt';
+      rt.textContent=(p.displayName||p.nomeUtente||'Socio')+' — '+p.data+' ore '+p.ora;
+      var rs  = document.createElement('div'); rs.className='rs';
+      rs.textContent=(p.motivo||'')+(p.stato?' · '+p.stato:'');
+      var btns = document.createElement('div'); btns.style.cssText='display:flex;gap:6px;padding:8px 10px;align-items:center';
+      if (p.stato!=='confermata') {
+        var bc=document.createElement('button'); bc.textContent='✓';
+        bc.style.cssText='background:#2D7A4F;color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:14px';
+        bc.addEventListener('click', (function(pid){ return function(e){ e.stopPropagation(); aggiornaStatoPren(pid,'confermata'); }; })(p.id));
+        btns.appendChild(bc);
+      }
+      if (p.stato!=='annullata') {
+        var ba=document.createElement('button'); ba.textContent='✕';
+        ba.style.cssText='background:#C0392B;color:#fff;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:14px';
+        ba.addEventListener('click', (function(pid){ return function(e){ e.stopPropagation(); aggiornaStatoPren(pid,'annullata'); }; })(p.id));
+        btns.appendChild(ba);
+      }
+      rb.appendChild(rt); rb.appendChild(rs); div.appendChild(bar); div.appendChild(rb); div.appendChild(btns);
+      el.appendChild(div);
+    });
+  });
+}
+
+function aggiornaStatoPren(id, stato) {
+  apiCall('aggiornaPrenotazione', {id:id, stato:stato}, function(err,r){
+    if(!err&&r&&r.ok) renderPrenotazioni('tutte');
+    else alert('Errore: '+((r&&r.error)||err||'Riprova'));
+  });
+}
+
+// ── RICERCA PRATICHE ──────────────────────────────────────────
+function cercaPratiche(query) {
+  var el = document.getElementById('l-prat'); if(!el) return;
+  if (!query || !query.trim()) { renderPrat(); return; }
+  var q = query.trim().toLowerCase();
+  var lista = D.contratti.filter(function(ct) {
+    if (ct.eliminato===true || String(ct.eliminato).toLowerCase()==='true') return false;
+    var locs='', cons='';
+    try { var l=JSON.parse(ct.locatoriJSON||'[]'); locs=(l[0]&&(l[0].cognome||l[0].nome))||''; } catch(e){}
+    try { var c2=JSON.parse(ct.conduttoriJSON||'[]'); cons=(c2[0]&&(c2[0].cognome||c2[0].nome))||''; } catch(e){}
+    return locs.toLowerCase().indexOf(q)>-1
+        || cons.toLowerCase().indexOf(q)>-1
+        || (ct.tipo||'').toLowerCase().indexOf(q)>-1
+        || (ct.id||'').toLowerCase().indexOf(q)>-1;
+  });
+  el.innerHTML='';
+  if (!lista.length) { el.innerHTML='<div class="info">Nessuna pratica trovata per "'+query+'"</div>'; return; }
+  lista.forEach(function(ct){ el.appendChild(makePratCard(ct)); });
+}
+
+// ── EXPORT EXCEL SOCI ─────────────────────────────────────────
+function exportSociExcel() {
+  var utenti = window._utentiData || [];
+  if (!utenti.length) { alert('Nessun socio da esportare'); return; }
+
+  var rows = [['ID','Nome','Cognome','Ragione Sociale','Email','Telefono','CF','Data Nascita','Comune Residenza','Via','Data Registrazione']];
+  utenti.forEach(function(u) {
+    rows.push([u.id||'',u.nome||'',u.cognome||'',u.displayName||'',u.email||'',u.telefono||'',u.cf||'',u.dataNascita||'',u.comuneResidenza||'',u.viaResidenza||'',u.dataRegistrazione?u.dataRegistrazione.substring(0,10):'']);
+  });
+
+  // Crea CSV
+  var csv = rows.map(function(r){ return r.map(function(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }).join(','); }).join('
+');
+  var blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8'});
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = 'soci_asppi_'+new Date().toISOString().substring(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 function cambiaPwdAdmin() {
   var o=(document.getElementById('acp-old')||{}).value||'';

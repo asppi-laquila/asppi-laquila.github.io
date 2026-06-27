@@ -107,8 +107,15 @@ textarea.inp{min-height:100px;resize:vertical;}
     <div><div style="font-size:14px;font-weight:800">I tuoi vantaggi ASPPI</div><div style="font-size:11px;opacity:.8">Servizi e scontistiche riservati</div></div>
     <span style="margin-left:auto;font-size:20px;opacity:.7">&#8250;</span>
   </button>
-  <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin-bottom:10px">Le tue pratiche</div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div style="font-size:14px;font-weight:800;color:#1A1A1A">Le tue pratiche</div>
+    <button id="btn-storico" style="background:none;border:none;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer">Storico &#8250;</button>
+  </div>
   <div id="hpratiche"><div class="info">Caricamento in corso...</div></div>
+  <div id="hstorico" style="display:none">
+    <div style="font-size:13px;font-weight:700;color:#8A8A8A;margin:12px 0 8px">Pratiche completate</div>
+    <div id="hpratiche-completate"></div>
+  </div>
 </div>
 
 <!-- IMMOBILI -->
@@ -475,7 +482,38 @@ window.onload = function() {
   bindAll();
   initCal();
   caricaDati();
+
+  // Mostra onboarding solo al primo accesso
+  if (!localStorage.getItem('asppi_onboarding_done')) {
+    setTimeout(mostraOnboarding, 1000);
+  }
 };
+
+function mostraOnboarding() {
+  var popup = document.getElementById('onboarding-popup');
+  if (popup) return; // già mostrato
+  var p = document.createElement('div');
+  p.id = 'onboarding-popup';
+  p.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:999;display:flex;align-items:flex-end;justify-content:center;padding:20px';
+  p.innerHTML = '<div style="background:#fff;border-radius:20px 20px 16px 16px;padding:28px 24px;max-width:420px;width:100%">'
+    +'<div style="font-size:32px;text-align:center;margin-bottom:12px">&#127881;</div>'
+    +'<div style="font-size:20px;font-weight:800;color:#1A1A1A;text-align:center;margin-bottom:8px">Benvenuto in ASPPI!</div>'
+    +'<div style="font-size:14px;color:#8A8A8A;text-align:center;line-height:1.6;margin-bottom:20px">Sei registrato con successo. Ecco cosa puoi fare:</div>'
+    +'<div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">'
+    +'<div style="display:flex;align-items:center;gap:12px"><span style="font-size:24px">&#127962;</span><div><div style="font-weight:700;font-size:14px">Aggiungi i tuoi immobili</div><div style="font-size:12px;color:#8A8A8A">e richiedi contratti di locazione</div></div></div>'
+    +'<div style="display:flex;align-items:center;gap:12px"><span style="font-size:24px">&#128197;</span><div><div style="font-weight:700;font-size:14px">Prenota un appuntamento</div><div style="font-size:12px;color:#8A8A8A">per parlare con lo studio</div></div></div>'
+    +'<div style="display:flex;align-items:center;gap:12px"><span style="font-size:24px">&#11088;</span><div><div style="font-weight:700;font-size:14px">Scopri i tuoi vantaggi</div><div style="font-size:12px;color:#8A8A8A">servizi e scontistiche riservati</div></div></div>'
+    +'</div>'
+    +'<button onclick="chiudiOnboarding()" style="width:100%;padding:14px;background:#E8631A;color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer">Inizia subito!</button>'
+    +'</div>';
+  document.body.appendChild(p);
+  localStorage.setItem('asppi_onboarding_done', '1');
+}
+
+function chiudiOnboarding() {
+  var p = document.getElementById('onboarding-popup');
+  if (p) p.remove();
+}
 
 function caricaDati() {
   var hprat = document.getElementById('hpratiche');
@@ -569,6 +607,7 @@ function bindAll() {
   T('nb-profilo').addEventListener('click', function(){ navTo('profilo'); caricaProfilo(); });
   // Home
   T('btn-prenota-home').addEventListener('click', function(){ navTo('prenota'); });
+  T('btn-storico').addEventListener('click', toggleStorico);
   T('btn-imm-home').addEventListener('click', function(){ navTo('immobili'); });
   T('btn-vantaggi-home').addEventListener('click', function(){ navTo('vantaggi'); caricaVantaggi(); });
   // Immobili
@@ -1457,6 +1496,36 @@ function inviaDichiarazioneBonifico() {
       var btn=T('btn-invia-bonifico'); if(btn) btn.style.display='none';
     } else { if(errEl){errEl.textContent=(r&&r.error)||err||'Errore';errEl.style.display='';} }
   });
+}
+
+function toggleStorico() {
+  var el = T('hstorico');
+  var btn = T('btn-storico');
+  if (!el) return;
+  if (el.style.display === 'none') {
+    el.style.display = '';
+    if(btn) btn.textContent = 'Nascondi ‹';
+    // Render pratiche completate
+    var completate = D.contratti.filter(function(c){ return c.stato==='completato'; });
+    var elC = T('hpratiche-completate');
+    if (!elC) return;
+    if (!completate.length) { elC.innerHTML='<div class="info">Nessuna pratica completata ancora.</div>'; return; }
+    elC.innerHTML = '';
+    completate.forEach(function(ct){
+      var div = document.createElement('div'); div.className='row';
+      var bar = document.createElement('div'); bar.className='bar'; bar.style.background='#8A8A8A';
+      var rb  = document.createElement('div'); rb.className='rb';
+      var rt  = document.createElement('div'); rt.className='rt'; rt.textContent=ct.nomeContratto||ct.tipo||'Contratto';
+      var rs  = document.createElement('div'); rs.className='rs';
+      rs.textContent = 'Completato · '+fmtDate(ct.dataCompletamento||ct.dataRichiesta);
+      rb.appendChild(rt); rb.appendChild(rs); div.appendChild(bar); div.appendChild(rb);
+      div.addEventListener('click', (function(cid){ return function(){ apriCnt(cid); }; })(ct.id));
+      elC.appendChild(div);
+    });
+  } else {
+    el.style.display = 'none';
+    if(btn) btn.textContent = 'Storico ›';
+  }
 }
 
 function caricaVantaggi() {
