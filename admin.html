@@ -2893,19 +2893,14 @@ function salvaTuttiSlot() {
 function caricaHome() {
   var alerts = [];
 
-  // Statistiche soci - usa dati già caricati o scarica
-  var aggiornaSoci = function() {
-    var n = (window._utentiData||[]).length;
-    var el = document.getElementById('sh-soci'); if(el) el.textContent = n||'—';
-  };
-  if (window._utentiData && window._utentiData.length) {
-    aggiornaSoci();
-  } else {
-    apiCall('getUtenti', {}, function(err, r) {
-      if(!err&&r&&r.ok) window._utentiData = r.data||[];
-      aggiornaSoci();
-    });
-  }
+  // Statistiche soci - sempre aggiorna dalla API
+  apiCall('getUtenti', {}, function(err, r) {
+    if(!err&&r&&r.ok) {
+      window._utentiData = r.data||[];
+      var el = document.getElementById('sh-soci');
+      if(el) el.textContent = window._utentiData.length;
+    }
+  });
 
   // Pratiche in attesa
   var aggiornaContratti = function() {
