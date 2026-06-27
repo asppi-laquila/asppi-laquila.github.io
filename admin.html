@@ -2593,118 +2593,78 @@ function generaDatiContratto() {
   var pertSel=[];
   try { pertSel=JSON.parse(ct.pertinenzeSel||'[]'); } catch(e){}
 
+  var NL = String.fromCharCode(10);
   function fmtPers(p, tipo) {
-    if (!p || !p.nome) return tipo+': (non compilato)
-';
-    var s = tipo+':
-';
-    s += '  Nome: '+(p.nome||'')+' '+(p.cognome||'')+'
-';
-    if(p.cf)          s += '  CF: '+p.cf+'
-';
-    if(p.dataNascita) s += '  Nato il: '+p.dataNascita+'
-';
-    if(p.luogoNascita)s += '  Nato a: '+p.luogoNascita+'
-';
-    if(p.residenza)   s += '  Residente: '+p.residenza+'
-';
-    if(p.tipoDoc)     s += '  Documento: '+p.tipoDoc+' n.'+p.numDoc+'
-';
-    if(p.rilasciatoDa)s += '  Rilasciato da: '+p.rilasciatoDa+' il '+p.dataDoc+'
-';
-    if(p.scadenzaDoc) s += '  Scadenza doc: '+p.scadenzaDoc+'
-';
+    if (!p || !p.nome) return tipo+': (non compilato)'+NL;
+    var s = tipo+':'+NL;
+    s += '  Nome: '+(p.nome||'')+' '+(p.cognome||'')+NL;
+    if(p.cf)          s += '  CF: '+p.cf+NL;
+    if(p.dataNascita) s += '  Nato il: '+p.dataNascita+NL;
+    if(p.luogoNascita)s += '  Nato a: '+p.luogoNascita+NL;
+    if(p.residenza)   s += '  Residente: '+p.residenza+NL;
+    if(p.tipoDoc)     s += '  Documento: '+p.tipoDoc+' n.'+p.numDoc+NL;
+    if(p.rilasciatoDa)s += '  Rilasciato da: '+p.rilasciatoDa+' il '+p.dataDoc+NL;
+    if(p.scadenzaDoc) s += '  Scadenza doc: '+p.scadenzaDoc+NL;
     return s;
   }
 
   var txt = '=== DATI PER CONTRATTO ASPPI ===
-
-';
+'+NL;
   
-  txt += '--- TIPO CONTRATTO ---
-';
-  txt += 'Tipo: '+(ct.tipo||'non specificato')+'
-';
+  txt += '--- TIPO CONTRATTO ---'+NL;
+  txt += 'Tipo: '+(ct.tipo||'non specificato')+''+NL;
   txt += 'Unita: '+(ct.unitaTipo||'intera unita immobiliare')+'
+'+NL;
 
-';
-
-  txt += '--- IMMOBILE PRINCIPALE ---
-';
-  txt += 'Indirizzo: '+(imm.via||'')+(imm.citta?', '+imm.citta:'')+'
-';
-  txt += 'Tipo: '+(imm.tipo||'')+'
-';
-  if(imm.catComune)    txt += 'Comune catastale: '+imm.catComune+'
-';
-  if(imm.catSezione)   txt += 'Sezione: '+imm.catSezione+'
-';
-  if(imm.catFoglio)    txt += 'Foglio: '+imm.catFoglio+'
-';
-  if(imm.catParticella)txt += 'Particella: '+imm.catParticella+'
-';
-  if(imm.catSub)       txt += 'Subalterno: '+imm.catSub+'
-';
-  if(imm.catCategoria) txt += 'Categoria: '+imm.catCategoria+'
-';
-  if(imm.catRendita)   txt += 'Rendita: '+imm.catRendita+'
-';
+  txt += '--- IMMOBILE PRINCIPALE ---'+NL;
+  txt += 'Indirizzo: '+(imm.via||'')+(imm.citta?', '+imm.citta:'')+''+NL;
+  txt += 'Tipo: '+(imm.tipo||'')+''+NL;
+  if(imm.catComune)    txt += 'Comune catastale: '+imm.catComune+''+NL;
+  if(imm.catSezione)   txt += 'Sezione: '+imm.catSezione+''+NL;
+  if(imm.catFoglio)    txt += 'Foglio: '+imm.catFoglio+''+NL;
+  if(imm.catParticella)txt += 'Particella: '+imm.catParticella+''+NL;
+  if(imm.catSub)       txt += 'Subalterno: '+imm.catSub+''+NL;
+  if(imm.catCategoria) txt += 'Categoria: '+imm.catCategoria+''+NL;
+  if(imm.catRendita)   txt += 'Rendita: '+imm.catRendita+''+NL;
 
   if(pertSel.length) {
     txt += '
---- PERTINENZE INCLUSE ---
-';
+--- PERTINENZE INCLUSE ---'+NL;
     pertSel.forEach(function(p,i){
-      txt += (i+1)+'. '+(p.tipo||'Pertinenza')+' — '+(p.via||'')+'
-';
-      if(p.foglio) txt += '   Fg.'+p.foglio+' Part.'+p.particella+(p.sub?' Sub.'+p.sub:'')+' Cat.'+p.cat+'
-';
+      txt += (i+1)+'. '+(p.tipo||'Pertinenza')+' — '+(p.via||'')+''+NL;
+      if(p.foglio) txt += '   Fg.'+p.foglio+' Part.'+p.particella+(p.sub?' Sub.'+p.sub:'')+' Cat.'+p.cat+''+NL;
     });
   }
 
   txt += '
---- DURATA E CANONE ---
-';
-  txt += 'Dal: '+(ct.duraDal||'')+'
-';
-  txt += 'Al: '+(ct.duraAl||'')+'
-';
-  txt += 'Mesi: '+(ct.duraMesi||'')+'
-';
-  txt += 'Canone mensile: '+(ct.canoneMensile||'')+' euro
-';
-  txt += 'Canone annuale: '+(ct.canoneAnnuale||'')+' euro
-';
-  if(ct.canoneIBAN)   txt += 'IBAN pagamento: '+ct.canoneIBAN+'
-';
-  if(ct.depositoImporto) txt += 'Deposito: '+ct.depositoImporto+' euro ('+(ct.depositoMesi||'')+' mesi)
-';
-  if(ct.oneriMensili) txt += 'Oneri accessori: '+ct.oneriMensili+' euro/mese
-';
-  if(ct.oneriIBAN)    txt += 'IBAN oneri: '+ct.oneriIBAN+'
-';
+--- DURATA E CANONE ---'+NL;
+  txt += 'Dal: '+(ct.duraDal||'')+''+NL;
+  txt += 'Al: '+(ct.duraAl||'')+''+NL;
+  txt += 'Mesi: '+(ct.duraMesi||'')+''+NL;
+  txt += 'Canone mensile: '+(ct.canoneMensile||'')+' euro'+NL;
+  txt += 'Canone annuale: '+(ct.canoneAnnuale||'')+' euro'+NL;
+  if(ct.canoneIBAN)   txt += 'IBAN pagamento: '+ct.canoneIBAN+''+NL;
+  if(ct.depositoImporto) txt += 'Deposito: '+ct.depositoImporto+' euro ('+(ct.depositoMesi||'')+' mesi)'+NL;
+  if(ct.oneriMensili) txt += 'Oneri accessori: '+ct.oneriMensili+' euro/mese'+NL;
+  if(ct.oneriIBAN)    txt += 'IBAN oneri: '+ct.oneriIBAN+''+NL;
 
   txt += '
---- LOCATORI ---
-';
+--- LOCATORI ---'+NL;
   locatori.forEach(function(p,i){ txt += fmtPers(p, 'Locatore '+(i+1)); });
 
   txt += '
---- CONDUTTORI ---
-';
+--- CONDUTTORI ---'+NL;
   conduttori.forEach(function(p,i){ txt += fmtPers(p, 'Conduttore '+(i+1)); });
 
   if(garanti.length) {
     txt += '
---- GARANTI ---
-';
+--- GARANTI ---'+NL;
     garanti.forEach(function(p,i){ txt += fmtPers(p, 'Garante '+(i+1)); });
   }
 
   if(ct.note) txt += '
 --- NOTE ---
-'+ct.note+'
-';
+'+ct.note+''+NL;
   
   txt += '
 === FINE DATI ===';
