@@ -117,11 +117,21 @@ select.inp{cursor:pointer;}
 <!-- SOCI E TESSERE -->
 <div id="p-soci" class="pg">
   <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Soci e Tessere</div>
-  <div style="position:relative;margin-bottom:12px">
-    <input type="text" id="soci-search" placeholder="&#128269; Cerca per nome, cognome, ragione sociale, email..." 
-      style="width:100%;padding:11px 14px 11px 40px;border-radius:10px;border:1.5px solid #e5e5e5;font-size:14px;outline:none;font-family:inherit"
-      oninput="filtraSociRicerca(this.value)"/>
-    <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:#8A8A8A">&#128269;</span>
+  <div style="display:flex;gap:8px;margin-bottom:12px">
+    <div style="position:relative;flex:1">
+      <input type="text" id="soci-search" placeholder="Cerca socio..." 
+        style="width:100%;padding:11px 14px 11px 38px;border-radius:10px;border:1.5px solid #e5e5e5;font-size:14px;outline:none;font-family:inherit"
+        oninput="filtraSociRicerca(this.value)"/>
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px;color:#8A8A8A">&#128269;</span>
+    </div>
+    <select id="soci-campo" onchange="filtraSociRicerca(document.getElementById('soci-search').value)"
+      style="padding:0 10px;border-radius:10px;border:1.5px solid #e5e5e5;font-size:13px;color:#1A1A1A;background:#fff;cursor:pointer;outline:none">
+      <option value="tutti">Tutti i campi</option>
+      <option value="nome">Nome / Cognome</option>
+      <option value="display">Ragione sociale</option>
+      <option value="email">Email</option>
+      <option value="cf">Codice fiscale</option>
+    </select>
   </div>
   <div class="frow" id="soci-filtri"></div>
   <div id="soci-count" style="font-size:12px;color:#8A8A8A;margin-bottom:8px"></div>
@@ -1120,21 +1130,28 @@ function filtraSoci(f) {
 }
 
 function filtraSociRicerca(query) {
-  renderSoci(query);
+  var campo = (document.getElementById('soci-campo')||{}).value || 'tutti';
+  renderSoci(query, campo);
 }
 
-function renderSoci(query) {
+function renderSoci(query, campo) {
   var utenti  = window._utentiData  || [];
   var tessere = window._tessereData || [];
   var anno    = new Date().getFullYear();
   var el      = document.getElementById('l-soci'); if(!el) return;
   var countEl = document.getElementById('soci-count');
+  campo = campo || 'tutti';
 
   // Filtro ricerca
   var lista = utenti;
   if (query && query.trim()) {
     var q = query.trim().toLowerCase();
     lista = utenti.filter(function(u) {
+      if (campo === 'nome')    return ((u.nome||'')+' '+(u.cognome||'')).toLowerCase().indexOf(q) > -1;
+      if (campo === 'display') return (u.displayName||'').toLowerCase().indexOf(q) > -1;
+      if (campo === 'email')   return (u.email||'').toLowerCase().indexOf(q) > -1;
+      if (campo === 'cf')      return (u.cf||'').toLowerCase().indexOf(q) > -1;
+      // tutti i campi
       return (u.nome||'').toLowerCase().indexOf(q) > -1
           || (u.cognome||'').toLowerCase().indexOf(q) > -1
           || (u.displayName||'').toLowerCase().indexOf(q) > -1
