@@ -727,8 +727,8 @@ function bindEvents() {
   document.getElementById('admin-chat-inp').addEventListener('keydown', function(e){ if(e.key==='Enter') adminSendMsg(); });
   // Slot
   document.getElementById('btn-add-ch').addEventListener('click', addChiusura);
-  document.getElementById('btn-add-blocco').addEventListener('click', addBlocco);
-  document.getElementById('btn-salva-slot').addEventListener('click', salvaSlot);
+  if(document.getElementById('btn-add-blocco')) document.getElementById('btn-add-blocco').addEventListener('click', addBlocco);
+  if(document.getElementById('btn-salva-slot')) document.getElementById('btn-salva-slot').addEventListener('click', salvaSlot);
   // Pwd admin
   document.getElementById('btn-cambia-pwd-admin').addEventListener('click', cambiaPwdAdmin);
   // Filtri prenotazioni
@@ -2871,9 +2871,9 @@ function salvaTuttiSlot() {
   });
 }
 
-</script>
-</body>
-</html>function caricaHome() {
+
+
+function caricaHome() {
   var alerts = [];
 
   // Statistiche soci
@@ -3146,8 +3146,8 @@ function bindEvents() {
   document.getElementById('admin-chat-inp').addEventListener('keydown', function(e){ if(e.key==='Enter') adminSendMsg(); });
   // Slot
   document.getElementById('btn-add-ch').addEventListener('click', addChiusura);
-  document.getElementById('btn-add-blocco').addEventListener('click', addBlocco);
-  document.getElementById('btn-salva-slot').addEventListener('click', salvaSlot);
+  if(document.getElementById('btn-add-blocco')) document.getElementById('btn-add-blocco').addEventListener('click', addBlocco);
+  if(document.getElementById('btn-salva-slot')) document.getElementById('btn-salva-slot').addEventListener('click', salvaSlot);
   // Pwd admin
   document.getElementById('btn-cambia-pwd-admin').addEventListener('click', cambiaPwdAdmin);
   // Filtri prenotazioni
