@@ -2608,13 +2608,11 @@ function generaDatiContratto() {
     return s;
   }
 
-  var txt = '=== DATI PER CONTRATTO ASPPI ===
-'+NL;
+  var txt = '=== DATI PER CONTRATTO ASPPI ==='+NL;
   
   txt += '--- TIPO CONTRATTO ---'+NL;
   txt += 'Tipo: '+(ct.tipo||'non specificato')+''+NL;
-  txt += 'Unita: '+(ct.unitaTipo||'intera unita immobiliare')+'
-'+NL;
+  txt += 'Unita: '+(ct.unitaTipo||'intera unita immobiliare')+''+NL;
 
   txt += '--- IMMOBILE PRINCIPALE ---'+NL;
   txt += 'Indirizzo: '+(imm.via||'')+(imm.citta?', '+imm.citta:'')+''+NL;
