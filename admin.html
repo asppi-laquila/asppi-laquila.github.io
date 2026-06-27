@@ -123,7 +123,7 @@ select.inp{cursor:pointer;}
 
   <!-- Ricerca globale -->
   <div style="position:relative;margin-bottom:12px">
-    <input type="text" id="global-search" placeholder="&#128269; Cerca soci, pratiche, pagamenti..."
+    <input type="text" id="global-search" placeholder="Cerca soci, pratiche, pagamenti..."
       style="width:100%;padding:12px 14px 12px 42px;border-radius:12px;border:1.5px solid #e5e5e5;font-size:14px;outline:none;font-family:inherit;background:#fff"
       oninput="globalSearch(this.value)"/>
     <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:#8A8A8A">&#128269;</span>
@@ -2871,7 +2871,16 @@ function caricaChiusureAdmin() {
       var div=document.createElement('div');
       div.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px;background:#FDF0E8;border-radius:8px;margin-bottom:6px';
       var txt=document.createElement('div');
-      txt.innerHTML='<div style="font-size:13px;font-weight:700">'+x.dal+' - '+x.al+'</div>'
+      function fmtD(d) {
+        if (!d) return '';
+        var s = String(d);
+        if (s.indexOf('T') > -1) {
+          var dt = new Date(s);
+          return ('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2)+'/'+dt.getFullYear();
+        }
+        return s;
+      }
+      txt.innerHTML='<div style="font-size:13px;font-weight:700">'+fmtD(x.dal)+' - '+fmtD(x.al)+'</div>'
         +'<div style="font-size:11px;color:#8A8A8A">'+(x.label||x.mot||'Chiusura')+'</div>';
       var btn=document.createElement('button');
       btn.innerHTML='&#128465;';
@@ -5312,7 +5321,16 @@ function caricaChiusureAdmin() {
       var div=document.createElement('div');
       div.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:8px;background:#FDF0E8;border-radius:8px;margin-bottom:6px';
       var txt=document.createElement('div');
-      txt.innerHTML='<div style="font-size:13px;font-weight:700">'+x.dal+' - '+x.al+'</div>'
+      function fmtD(d) {
+        if (!d) return '';
+        var s = String(d);
+        if (s.indexOf('T') > -1) {
+          var dt = new Date(s);
+          return ('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2)+'/'+dt.getFullYear();
+        }
+        return s;
+      }
+      txt.innerHTML='<div style="font-size:13px;font-weight:700">'+fmtD(x.dal)+' - '+fmtD(x.al)+'</div>'
         +'<div style="font-size:11px;color:#8A8A8A">'+(x.label||x.mot||'Chiusura')+'</div>';
       var btn=document.createElement('button');
       btn.innerHTML='&#128465;';
