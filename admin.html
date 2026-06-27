@@ -1264,17 +1264,23 @@ function caricaStoricoPagamenti(userId) {
     pags.forEach(function(p) {
       var pagato = p.stato==='confermato';
       var col = pagato?'#2D7A4F':'#E8631A';
-      h += '<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e5e5e5">'
-        +'<div>'
-        +'<div style="font-size:13px;font-weight:600">'+( p.tipo||'Servizio')+'</div>'
-        +'<div style="font-size:11px;color:#8A8A8A">'+(p.dataPagamento||'')+(p.metodoPagamento?' · '+p.metodoPagamento:'')+'</div>'
-        +'</div>'
-        +'<div style="display:flex;align-items:center;gap:8px">'
-        +'<span style="font-size:15px;font-weight:800;color:'+col+'">€'+p.importo+'</span>'
-        +'<button onclick="eliminaPagamento(''+p.id+'')" style="background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px">&#128465;</button>'
-        +'</div></div>';
+      var div = document.createElement('div');
+      div.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e5e5e5';
+      var left = document.createElement('div');
+      var t1 = document.createElement('div'); t1.style.cssText='font-size:13px;font-weight:600'; t1.textContent=p.tipo||'Servizio';
+      var t2 = document.createElement('div'); t2.style.cssText='font-size:11px;color:#8A8A8A';
+      t2.textContent=(p.dataPagamento||'')+(p.metodoPagamento?' · '+p.metodoPagamento:'');
+      left.appendChild(t1); left.appendChild(t2);
+      var right = document.createElement('div'); right.style.cssText='display:flex;align-items:center;gap:8px';
+      var price = document.createElement('span'); price.style.cssText='font-size:15px;font-weight:800;color:'+col; price.textContent='€'+p.importo;
+      var btnEl = document.createElement('button');
+      btnEl.style.cssText='background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px';
+      btnEl.innerHTML='&#128465;';
+      btnEl.addEventListener('click', (function(pid){ return function(){ eliminaPagamento(pid); }; })(p.id));
+      right.appendChild(price); right.appendChild(btnEl);
+      div.appendChild(left); div.appendChild(right);
+      el.appendChild(div);
     });
-    el.innerHTML = h;
   });
 }
 
