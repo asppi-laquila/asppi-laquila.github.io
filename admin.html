@@ -291,17 +291,28 @@ select.inp{cursor:pointer;}
     <button class="bs" id="btn-add-ch">+ Aggiungi periodo chiusura</button>
   </div></div>
 
-  <!-- Allegati / Documenti -->
+  <!-- Allegati / Documenti multipli -->
   <div class="card"><div class="cb">
     <div class="sec">DOCUMENTI E ALLEGATI</div>
-    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Il socio potra scaricare questi documenti dall'app</div>
-    <label class="lbl">Nome documento</label>
-    <input type="text" class="inp" id="doc-nome" placeholder="es. Attestazione 2026"/>
-    <label class="lbl">Link Google Drive (URL)</label>
-    <input type="text" class="inp" id="doc-url" placeholder="https://drive.google.com/file/d/..."/>
-    <div style="font-size:11px;color:#8A8A8A;margin-top:-8px;margin-bottom:12px">Su Drive: tasto destro sul file → Copia link → incolla qui</div>
-    <div class="infog" id="doc-ok" style="display:none">&#9989; Documento aggiornato!</div>
-    <button class="bp" id="btn-salva-doc">Salva documento</button>
+    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">I soci possono scaricare questi documenti dall'app</div>
+    <div id="l-documenti"><div class="info">Caricamento...</div></div>
+    <button class="bd" id="btn-nuovo-doc" style="margin-top:8px">+ Carica nuovo documento</button>
+  </div></div>
+
+  <!-- Bacheca avvisi -->
+  <div class="card"><div class="cb">
+    <div class="sec">BACHECA AVVISI</div>
+    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Gli avvisi appaiono in home per tutti i soci</div>
+    <div id="l-avvisi"><div class="info">Caricamento...</div></div>
+    <button class="bd" id="btn-nuovo-avviso" style="margin-top:8px">+ Nuovo avviso</button>
+  </div></div>
+
+  <!-- Backup -->
+  <div class="card"><div class="cb">
+    <div class="sec">BACKUP DATABASE</div>
+    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Copia di sicurezza su Google Drive</div>
+    <div class="infog" id="backup-ok" style="display:none"></div>
+    <button class="bp" id="btn-backup">&#128190; Esegui backup ora</button>
   </div></div>
 
   <!-- Cambio password -->
@@ -312,6 +323,57 @@ select.inp{cursor:pointer;}
     <div class="infog" id="adm-pwd-ok" style="display:none">&#9989; Password aggiornata!</div>
     <button class="bp" id="btn-cambia-pwd-admin">Cambia password</button>
   </div></div>
+</div>
+
+<!-- OV DOCUMENTO -->
+<div id="ov-documento" class="ov">
+  <div class="oh">
+    <div><div class="ohlbl">DOCUMENTO</div><div class="ohttl" id="doc-ttl">Nuovo documento</div></div>
+    <button class="exbtn" id="btn-chiudi-doc">&#8592; Indietro</button>
+  </div>
+  <div style="padding:16px">
+    <div class="card"><div class="cb">
+      <div class="sec">DETTAGLI</div>
+      <label class="lbl">Nome documento *</label>
+      <input type="text" class="inp" id="doc-nome" placeholder="es. Attestazione 2026"/>
+      <label class="lbl">Descrizione (opzionale)</label>
+      <input type="text" class="inp" id="doc-desc" placeholder="es. Attestazione valida per L'Aquila"/>
+      <label class="lbl">Carica file (PDF, Word, Excel)</label>
+      <input type="file" id="doc-file" accept=".pdf,.doc,.docx,.xls,.xlsx" style="width:100%;margin-bottom:12px;font-size:13px"/>
+      <div class="infob" id="doc-upload-info" style="display:none">Caricamento in corso...</div>
+      <div class="infog" id="doc-upload-ok" style="display:none">&#9989; Documento caricato!</div>
+      <div class="errbox" id="doc-err"></div>
+      <button class="bp" id="btn-upload-doc">Carica documento</button>
+    </div></div>
+  </div>
+</div>
+
+<!-- OV AVVISO -->
+<div id="ov-avviso" class="ov">
+  <div class="oh">
+    <div><div class="ohlbl">AVVISO</div><div class="ohttl" id="avv-ttl">Nuovo avviso</div></div>
+    <button class="exbtn" id="btn-chiudi-avviso">&#8592; Indietro</button>
+  </div>
+  <div style="padding:16px">
+    <div class="card"><div class="cb">
+      <div class="sec">AVVISO PER I SOCI</div>
+      <label class="lbl">Titolo *</label>
+      <input type="text" class="inp" id="avv-titolo" placeholder="es. Ufficio chiuso il 15 agosto"/>
+      <label class="lbl">Testo</label>
+      <textarea class="inp" id="avv-testo" placeholder="Dettagli avviso..." style="min-height:100px"></textarea>
+      <div class="g2">
+        <div><label class="lbl">Valido dal</label><input type="text" class="inp" id="avv-dal" placeholder="gg/mm/aaaa" oninput="autoDateAdmin(this)"/></div>
+        <div><label class="lbl">Valido al</label><input type="text" class="inp" id="avv-al" placeholder="gg/mm/aaaa" oninput="autoDateAdmin(this)"/></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;cursor:pointer" onclick="toggleAvvAttivo()">
+        <div id="avv-attivo-box" style="width:20px;height:20px;border-radius:6px;border:2px solid #E8631A;background:#E8631A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">&#10003;</div>
+        <span style="font-size:13px;font-weight:600">Avviso attivo (visibile ai soci)</span>
+      </div>
+      <div class="infog" id="avv-ok" style="display:none">&#9989; Avviso salvato!</div>
+      <button class="bp" id="btn-salva-avviso">Salva avviso</button>
+      <button class="bs" id="btn-elimina-avviso" style="color:#C0392B;border-color:#FDEEEC;display:none">&#128465; Elimina avviso</button>
+    </div></div>
+  </div>
 </div>
 
 <!-- OV NUOVO/MODIFICA SERVIZIO -->
@@ -617,7 +679,14 @@ function bindEvents() {
   if (document.getElementById('btn-chiudi-servizio')) document.getElementById('btn-chiudi-servizio').addEventListener('click', function(){ chiudi('ov-servizio'); });
   if (document.getElementById('btn-salva-servizio')) document.getElementById('btn-salva-servizio').addEventListener('click', salvaServizio);
   if (document.getElementById('btn-elimina-servizio')) document.getElementById('btn-elimina-servizio').addEventListener('click', eliminaServizioCorrente);
-  if (document.getElementById('btn-salva-doc')) document.getElementById('btn-salva-doc').addEventListener('click', salvaDocumento);
+  if (document.getElementById('btn-nuovo-doc')) document.getElementById('btn-nuovo-doc').addEventListener('click', function(){ apriDocumento(null); });
+  if (document.getElementById('btn-chiudi-doc')) document.getElementById('btn-chiudi-doc').addEventListener('click', function(){ chiudi('ov-documento'); });
+  if (document.getElementById('btn-upload-doc')) document.getElementById('btn-upload-doc').addEventListener('click', uploadDocumento);
+  if (document.getElementById('btn-nuovo-avviso')) document.getElementById('btn-nuovo-avviso').addEventListener('click', function(){ apriAvviso(null); });
+  if (document.getElementById('btn-chiudi-avviso')) document.getElementById('btn-chiudi-avviso').addEventListener('click', function(){ chiudi('ov-avviso'); });
+  if (document.getElementById('btn-salva-avviso')) document.getElementById('btn-salva-avviso').addEventListener('click', salvaAvviso);
+  if (document.getElementById('btn-elimina-avviso')) document.getElementById('btn-elimina-avviso').addEventListener('click', eliminaAvvisoCorrente);
+  if (document.getElementById('btn-backup')) document.getElementById('btn-backup').addEventListener('click', eseguiBackup);
   if (document.getElementById('btn-chiudi-socio')) document.getElementById('btn-chiudi-socio').addEventListener('click', function(){ chiudi('ov-socio'); });
   if (document.getElementById('btn-salva-tessera')) document.getElementById('btn-salva-tessera').addEventListener('click', salvaTessera);
   if (document.getElementById('btn-registra-pag')) document.getElementById('btn-registra-pag').addEventListener('click', registraPagamento);
@@ -1573,7 +1642,8 @@ var curSrvId = null;
 var srvAttivo = true;
 
 function caricaImpostazioni() {
-  caricaDocumento();
+  caricaDocumenti();
+  caricaAvvisi();
   caricaSlotAdmin();
 }
 
@@ -1823,26 +1893,167 @@ function salvaTariffe() {
   });
 }
 
-function caricaDocumento() {
-  apiCall('getImpostazioni', {}, function(err, r) {
-    if(!err&&r&&r.ok) {
-      var nomeEl = document.getElementById('doc-nome');
-      var urlEl  = document.getElementById('doc-url');
-      if(nomeEl) nomeEl.value = r.data.attestazione_nome||'';
-      if(urlEl)  urlEl.value  = r.data.attestazione_url||'';
-    }
+var curDocId = null, curAvvId = null, avvAttivo = true;
+
+function caricaDocumenti() {
+  apiCall('getDocumenti', {}, function(err, r) {
+    var el = document.getElementById('l-documenti'); if(!el) return;
+    var docs = (!err&&r&&r.ok) ? r.data||[] : [];
+    if (!docs.length) { el.innerHTML='<div class="info">Nessun documento ancora.</div>'; return; }
+    el.innerHTML='';
+    docs.forEach(function(d) {
+      var div = document.createElement('div');
+      div.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e5e5e5';
+      var left = document.createElement('div');
+      var t1 = document.createElement('div'); t1.style.cssText='font-size:14px;font-weight:700;color:#1A1A1A'; t1.textContent=d.nome||'Documento';
+      var t2 = document.createElement('div'); t2.style.cssText='font-size:11px;color:#8A8A8A'; t2.textContent=(d.descrizione||'')+(d.dataCaricamento?' · '+d.dataCaricamento:'');
+      left.appendChild(t1); left.appendChild(t2);
+      var right = document.createElement('div'); right.style.cssText='display:flex;gap:6px';
+      var btnA = document.createElement('a'); btnA.href=d.url||'#'; btnA.target='_blank';
+      btnA.style.cssText='background:#EBF2FB;color:#1A5FA8;border:none;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:700;cursor:pointer;text-decoration:none';
+      btnA.textContent='Apri';
+      var btnE = document.createElement('button');
+      btnE.style.cssText='background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px';
+      btnE.innerHTML='&#128465;';
+      btnE.addEventListener('click', (function(did){ return function(){ eliminaDocumentoById(did); }; })(d.id));
+      right.appendChild(btnA); right.appendChild(btnE);
+      div.appendChild(left); div.appendChild(right);
+      el.appendChild(div);
+    });
   });
 }
 
-function salvaDocumento() {
+function apriDocumento(id) {
+  curDocId = id;
+  var el = document.getElementById('doc-ttl'); if(el) el.textContent = id ? 'Modifica documento' : 'Nuovo documento';
+  var set = function(elId,v){ var e=document.getElementById(elId); if(e) e.value=v||''; };
+  set('doc-nome',''); set('doc-desc','');
+  hide('doc-upload-info'); hide('doc-upload-ok'); hide('doc-err');
+  apri('ov-documento');
+}
+
+function uploadDocumento() {
   var nome = (document.getElementById('doc-nome')||{}).value||'';
-  var url  = (document.getElementById('doc-url')||{}).value||'';
-  hide('doc-ok');
-  apiCall('saveImpostazione', {chiave:'attestazione_nome', valore:nome}, function(){
-    apiCall('saveImpostazione', {chiave:'attestazione_url', valore:url}, function(err,r){
-      if(!err&&r&&r.ok){ show('doc-ok'); }
-      else { alert('Errore salvataggio'); }
+  var desc = (document.getElementById('doc-desc')||{}).value||'';
+  var fileInput = document.getElementById('doc-file');
+  var errEl = document.getElementById('doc-err');
+  if(errEl) errEl.style.display='none';
+  if(!nome) { if(errEl){errEl.textContent='Inserisci il nome del documento';errEl.style.display='';} return; }
+  if(!fileInput||!fileInput.files||!fileInput.files[0]) { if(errEl){errEl.textContent='Seleziona un file';errEl.style.display='';} return; }
+  var file = fileInput.files[0];
+  show('doc-upload-info');
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var base64 = e.target.result.split(',')[1];
+    apiCall('uploadDocumento', {
+      nome:nome, descrizione:desc,
+      fileData:base64, fileName:file.name, mimeType:file.type
+    }, function(err,r){
+      hide('doc-upload-info');
+      if(!err&&r&&r.ok){ show('doc-upload-ok'); caricaDocumenti(); fileInput.value=''; }
+      else { if(errEl){errEl.textContent=(r&&r.error)||err||'Errore upload';errEl.style.display='';} }
     });
+  };
+  reader.readAsDataURL(file);
+}
+
+function eliminaDocumentoById(id) {
+  if (!confirm('Eliminare questo documento? Verra cancellato anche da Google Drive.')) return;
+  apiCall('eliminaDocumento', {id:id}, function(err,r){
+    if(!err&&r&&r.ok){ caricaDocumenti(); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function caricaAvvisi() {
+  apiCall('getAvvisi', {}, function(err, r) {
+    var el = document.getElementById('l-avvisi'); if(!el) return;
+    var avvisi = (!err&&r&&r.ok) ? r.data||[] : [];
+    if (!avvisi.length) { el.innerHTML='<div class="info">Nessun avviso ancora.</div>'; return; }
+    el.innerHTML='';
+    avvisi.forEach(function(a){
+      var attivo = a.attivo===true||String(a.attivo).toLowerCase()==='true';
+      var div = document.createElement('div');
+      div.style.cssText='display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #e5e5e5;cursor:pointer';
+      var left = document.createElement('div');
+      var t1 = document.createElement('div'); t1.style.cssText='font-size:14px;font-weight:700;color:#1A1A1A;display:flex;align-items:center;gap:6px';
+      t1.textContent=a.titolo||'Avviso';
+      var badge = document.createElement('span'); badge.style.cssText='font-size:10px;padding:2px 6px;border-radius:10px;font-weight:700;'+(attivo?'background:#EBF5F0;color:#2D7A4F':'background:#F8F7F5;color:#8A8A8A');
+      badge.textContent=attivo?'Attivo':'Disattivo'; t1.appendChild(badge);
+      var t2 = document.createElement('div'); t2.style.cssText='font-size:11px;color:#8A8A8A'; t2.textContent=(a.dataInizio||'')+(a.dataFine?' → '+a.dataFine:'');
+      left.appendChild(t1); left.appendChild(t2);
+      var btnE = document.createElement('button'); btnE.style.cssText='background:none;border:none;color:#C0392B;cursor:pointer;font-size:16px'; btnE.innerHTML='&#128465;';
+      btnE.addEventListener('click', (function(aid){ return function(e){ e.stopPropagation(); eliminaAvvisoById(aid); }; })(a.id));
+      div.appendChild(left); div.appendChild(btnE);
+      div.addEventListener('click', (function(av){ return function(){ apriAvviso(av); }; })(a));
+      el.appendChild(div);
+    });
+  });
+}
+
+function apriAvviso(avviso) {
+  curAvvId = avviso ? avviso.id : null;
+  var ttl = document.getElementById('avv-ttl'); if(ttl) ttl.textContent = curAvvId ? 'Modifica avviso' : 'Nuovo avviso';
+  var set = function(id,v){ var e=document.getElementById(id); if(e) e.value=v||''; };
+  set('avv-titolo', avviso?avviso.titolo:'');
+  set('avv-testo',  avviso?avviso.testo:'');
+  set('avv-dal',    avviso?avviso.dataInizio:'');
+  set('avv-al',     avviso?avviso.dataFine:'');
+  avvAttivo = avviso ? (avviso.attivo===true||String(avviso.attivo).toLowerCase()==='true') : true;
+  var box = document.getElementById('avv-attivo-box');
+  if(box){ box.style.background=avvAttivo?'#E8631A':'#fff'; box.style.borderColor=avvAttivo?'#E8631A':'#e5e5e5'; box.innerHTML=avvAttivo?'&#10003;':''; }
+  var btnEl = document.getElementById('btn-elimina-avviso'); if(btnEl) btnEl.style.display=curAvvId?'':'none';
+  hide('avv-ok');
+  apri('ov-avviso');
+}
+
+function toggleAvvAttivo() {
+  avvAttivo=!avvAttivo;
+  var box=document.getElementById('avv-attivo-box');
+  if(box){ box.style.background=avvAttivo?'#E8631A':'#fff'; box.style.borderColor=avvAttivo?'#E8631A':'#e5e5e5'; box.innerHTML=avvAttivo?'&#10003;':''; }
+}
+
+function salvaAvviso() {
+  var titolo = (document.getElementById('avv-titolo')||{}).value||'';
+  if(!titolo){ alert('Inserisci il titolo'); return; }
+  var obj = {
+    id: curAvvId||'', titolo:titolo,
+    testo:(document.getElementById('avv-testo')||{}).value||'',
+    dataInizio:(document.getElementById('avv-dal')||{}).value||'',
+    dataFine:(document.getElementById('avv-al')||{}).value||'',
+    attivo:avvAttivo
+  };
+  apiCall('saveAvviso', {data:obj}, function(err,r){
+    if(!err&&r&&r.ok){ show('avv-ok'); caricaAvvisi(); curAvvId=r.id||curAvvId; }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function eliminaAvvisoCorrente() {
+  if(!curAvvId) return;
+  eliminaAvvisoById(curAvvId);
+  chiudi('ov-avviso');
+}
+
+function eliminaAvvisoById(id) {
+  if(!confirm('Eliminare questo avviso?')) return;
+  apiCall('eliminaAvviso', {id:id}, function(err,r){
+    if(!err&&r&&r.ok){ caricaAvvisi(); }
+    else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
+function eseguiBackup() {
+  var btn = document.getElementById('btn-backup');
+  if(btn){ btn.textContent='Backup in corso...'; btn.disabled=true; }
+  apiCall('backupDatabase', {}, function(err,r){
+    if(btn){ btn.textContent='&#128190; Esegui backup ora'; btn.disabled=false; }
+    var okEl = document.getElementById('backup-ok');
+    if(!err&&r&&r.ok){
+      if(okEl){ okEl.innerHTML='&#9989; Backup completato: <a href="'+r.url+'" target="_blank" style="color:#2D7A4F">'+r.nome+'</a>'; okEl.style.display=''; }
+    } else {
+      alert('Errore backup: '+((r&&r.error)||err||'Riprova'));
+    }
   });
 }
 
@@ -1923,24 +2134,26 @@ function cercaPratiche(query) {
 
 // ── EXPORT EXCEL SOCI ─────────────────────────────────────────
 function scaricaExcel(rows, nomeFile) {
-  // Crea file HTML che Excel apre come foglio di calcolo con filtri
-  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>';
-  html += '<table border="1" style="border-collapse:collapse">';
-  rows.forEach(function(row, idx){
-    html += '<tr>';
-    row.forEach(function(cell){
-      var tag = idx===0 ? 'th' : 'td';
-      var style = idx===0 ? 'style="background:#E8631A;color:white;padding:6px 10px;font-weight:bold"' : 'style="padding:5px 10px"';
-      html += '<'+tag+' '+style+'>'+String(cell).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</'+tag+'>';
-    });
-    html += '</tr>';
+  // CSV con separatore punto e virgola - Excel italiano lo riconosce correttamente
+  var nl = String.fromCharCode(10);
+  var sep = ';';
+  var lines = rows.map(function(row){
+    return row.map(function(cell){
+      var s = String(cell===null||cell===undefined?'':cell);
+      // Escape virgolette e wrap in virgolette se contiene separatore
+      s = s.replace(/"/g, '""');
+      if (s.indexOf(sep)>-1 || s.indexOf(nl)>-1 || s.indexOf('"')>-1) {
+        s = '"' + s + '"';
+      }
+      return s;
+    }).join(sep);
   });
-  html += '</table></body></html>';
-  var blob = new Blob([html], {type:'application/vnd.ms-excel;charset=utf-8'});
+  var csv = '﻿' + lines.join(nl); // BOM per Excel italiano
+  var blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.href = url;
-  a.download = nomeFile+'_'+new Date().toISOString().substring(0,10)+'.xls';
+  a.download = nomeFile+'_'+new Date().toISOString().substring(0,10)+'.csv';
   a.click();
   URL.revokeObjectURL(url);
 }

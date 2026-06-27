@@ -79,12 +79,15 @@ textarea.inp{min-height:100px;resize:vertical;}
 </head>
 <body>
 
-<div class="top">
+<div style="background:#fff;padding:10px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:0 1px 4px rgba(0,0,0,.1)">
   <div style="display:flex;align-items:center;gap:10px">
-    <img src="LOGO-NAZIONALE.png" alt="ASPPI" style="height:28px;filter:brightness(0) invert(1)"/>
-    <div><div class="tl">L'Aquila</div><div class="tt" id="tnome">Portale Soci</div></div>
+    <img src="LOGO-NAZIONALE.png" alt="ASPPI" style="height:36px"/>
+    <div style="border-left:2px solid #e5e5e5;padding-left:10px">
+      <div style="font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.1em;text-transform:uppercase">L'Aquila</div>
+      <div style="font-size:13px;font-weight:800;color:#1A1A1A" id="tnome">Portale Soci</div>
+    </div>
   </div>
-  <button class="exbtn" id="btn-esci">Esci</button>
+  <button style="background:none;border:1px solid #e5e5e5;color:#1A1A1A;border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer;font-weight:600" id="btn-esci">Esci</button>
 </div>
 
 <!-- HOME -->
@@ -120,6 +123,7 @@ textarea.inp{min-height:100px;resize:vertical;}
     <div><div style="font-size:14px;font-weight:800">I tuoi vantaggi ASPPI</div><div style="font-size:11px;opacity:.8">Servizi e scontistiche riservati</div></div>
     <span style="margin-left:auto;font-size:20px;opacity:.7">&#8250;</span>
   </button>
+  <div id="h-avvisi" style="margin-bottom:12px"></div>
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
     <div style="font-size:14px;font-weight:800;color:#1A1A1A">Le tue pratiche</div>
     <button id="btn-storico" style="background:none;border:none;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer">Storico &#8250;</button>
@@ -191,11 +195,11 @@ textarea.inp{min-height:100px;resize:vertical;}
   <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:4px">I tuoi vantaggi</div>
   <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px">Servizi e scontistiche riservati ai soci ASPPI</div>
 
-  <!-- Documento allegato -->
-  <div id="v-doc-card" style="display:none">
+  <!-- Documenti -->
+  <div id="v-docs-card" style="display:none">
     <div class="card"><div class="cb">
-      <div class="sec">DOCUMENTI</div>
-      <div id="v-doc-content"></div>
+      <div class="sec">DOCUMENTI DISPONIBILI</div>
+      <div id="v-docs-list"></div>
     </div></div>
   </div>
 
@@ -360,6 +364,7 @@ textarea.inp{min-height:100px;resize:vertical;}
     <button class="bs" id="btn-chat-cnt">&#128172; Chat con lo studio</button>
     <button class="bs" id="btn-modifica-cnt" style="color:#1A5FA8;border-color:#EBF2FB">&#9998; Modifica contratto</button>
     <button class="bs" id="btn-elimina-cnt" style="color:#C0392B;border-color:#FDEEEC">&#128465; Elimina pratica</button>
+    <button class="bs" id="btn-rinnova-cnt" style="color:#2D7A4F;border-color:#EBF5F0;display:none">&#128260; Rinnova contratto</button>
   </div>
 </div>
 
@@ -561,6 +566,23 @@ function caricaDati() {
         if (!err3 && r3 && r3.ok) D.prenotazioni = r3.data || [];
       });
 
+      // Avvisi in home
+      api('getAvvisi', {}, function(errA, rA) {
+        var el = T('h-avvisi'); if(!el) return;
+        var avvisi = (!errA&&rA&&rA.ok) ? rA.data||[] : [];
+        var attivi = avvisi.filter(function(a){ return a.attivo===true||String(a.attivo).toLowerCase()==='true'; });
+        if (!attivi.length) { el.innerHTML=''; return; }
+        el.innerHTML='';
+        attivi.forEach(function(a){
+          var div=document.createElement('div');
+          div.style.cssText='background:#FDF0E8;border-radius:12px;padding:12px 14px;margin-bottom:8px;border-left:4px solid #E8631A';
+          div.innerHTML='<div style="font-size:13px;font-weight:800;color:#E8631A;margin-bottom:4px">&#128226; '+a.titolo+'</div>'
+            +(a.testo?'<div style="font-size:12px;color:#4A4A4A;line-height:1.5">'+a.testo+'</div>':'')
+            +(a.dataFine?'<div style="font-size:11px;color:#8A8A8A;margin-top:4px">Valido fino al '+a.dataFine+'</div>':'');
+          el.appendChild(div);
+        });
+      });
+
       api('getSlot', {}, function(err4, r4) {
         if (!err4 && r4 && r4.ok) {
           D.slot = r4.orari || [];
@@ -681,6 +703,7 @@ function bindAll() {
   T('btn-chat-cnt').addEventListener('click', function(){ if(curCnt) apriChatCnt(curCnt.id); });
   T('btn-modifica-cnt').addEventListener('click', modificaCnt);
   T('btn-elimina-cnt').addEventListener('click', eliminaCnt);
+  T('btn-rinnova-cnt').addEventListener('click', rinnovaCnt);
   // Ncnt
   T('btn-ncnt-back').addEventListener('click', ncntBack);
   T('ncnt-btn').addEventListener('click', ncntAvanti);
@@ -722,6 +745,37 @@ function navTo(id) {
 
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome() {
+  // Scadenzario contratti
+  var oggi = new Date();
+  var scadenze = [];
+  D.contratti.forEach(function(ct){
+    if (ct.eliminato===true||String(ct.eliminato).toLowerCase()==='true') return;
+    if (ct.stato==='completato') return;
+    if (!ct.duraAl) return;
+    var parts = ct.duraAl.split('/');
+    if (parts.length!==3) return;
+    var scad = new Date(parseInt(parts[2]), parseInt(parts[1])-1, parseInt(parts[0]));
+    var giorni = Math.round((scad-oggi)/(1000*60*60*24));
+    if (giorni >= 0 && giorni <= 90) {
+      scadenze.push({nome:ct.nomeContratto||ct.tipo||'Contratto', giorni:giorni, data:ct.duraAl});
+    }
+  });
+  if (scadenze.length) {
+    var hprat = T('hpratiche');
+    if (hprat) {
+      var scadDiv = document.createElement('div');
+      scadenze.forEach(function(s){
+        var col = s.giorni<=30?'#C0392B':s.giorni<=60?'#E8631A':'#1A5FA8';
+        var sd = document.createElement('div');
+        sd.style.cssText='background:'+col+'11;border-radius:10px;padding:10px 12px;margin-bottom:8px;border-left:3px solid '+col;
+        sd.innerHTML='<div style="font-size:12px;font-weight:700;color:'+col+'">&#9888; Scadenza tra '+s.giorni+' giorni</div>'
+          +'<div style="font-size:13px;color:#1A1A1A">'+s.nome+' — '+s.data+'</div>';
+        scadDiv.appendChild(sd);
+      });
+      hprat.parentNode.insertBefore(scadDiv, hprat);
+    }
+  }
+
   // Banner solo se ci sono pagamenti reali in sospeso
   api('getStrategiaEconomica', {}, function(err, r) {
     if (!err && r && r.ok && r.saldo > 0 && r.totaleDovuto > 0) {
@@ -892,6 +946,9 @@ function apriCnt(id) {
   ST('oc-taj', ct.taj||'Non inserito');
   var inp = T('oc-taj-inp'); if(inp) inp.value = ct.taj||'';
   SH('oc-taj-ok', false);
+  // Mostra bottone rinnova solo se pratica completata
+  var btnRinnova = T('btn-rinnova-cnt');
+  if (btnRinnova) btnRinnova.style.display = (ct.stato==='completato') ? '' : 'none';
   apriOv('ov-cnt');
 }
 
@@ -1070,6 +1127,32 @@ function apriNuovoCnt() {
   ncntStep=0;
   ncntD={appartamentoId:curApt?curApt.id:'', locatori:[{}], conduttori:[{}], garanti:[]};
   ST('ncnt-lbl', curApt?curApt.nome:'NUOVO CONTRATTO');
+  renderNcnt();
+  apriOv('ov-ncnt');
+}
+
+function rinnovaCnt() {
+  if (!curCnt) return;
+  // Copia tutti i dati del contratto ma svuota le date
+  ncntStep = 0;
+  ncntD = JSON.parse(JSON.stringify(curCnt));
+  ncntD._rinnovo = true;
+  ncntD.id = ''; // Nuovo contratto
+  ncntD.stato = '';
+  ncntD.duraDal = ''; // Obbligatorio reinserire
+  ncntD.duraAl  = ''; // Obbligatorio reinserire
+  ncntD.duraMesi = '';
+  ncntD.dataRichiesta = '';
+  ncntD.dataCompletamento = '';
+  ncntD.taj = '';
+  ncntD.modificato = '';
+  ncntD.eliminato = false;
+  try{ncntD.locatori=JSON.parse(curCnt.locatoriJSON||'[]');}catch(e){ncntD.locatori=[{}];}
+  try{ncntD.conduttori=JSON.parse(curCnt.conduttoriJSON||'[]');}catch(e){ncntD.conduttori=[{}];}
+  try{ncntD.garanti=JSON.parse(curCnt.garantiJSON||'[]');}catch(e){ncntD.garanti=[];}
+  if(!ncntD.locatori.length) ncntD.locatori=[{}];
+  if(!ncntD.conduttori.length) ncntD.conduttori=[{}];
+  ST('ncnt-lbl','RINNOVO CONTRATTO');
   renderNcnt();
   apriOv('ov-ncnt');
 }
@@ -1593,19 +1676,26 @@ function toggleStorico() {
 }
 
 function caricaVantaggi() {
-  // Carica documento allegato
-  api('getImpostazioni', {}, function(err, r) {
-    var card = T('v-doc-card');
-    var cont = T('v-doc-content');
-    if (!err && r && r.ok && r.data.attestazione_url) {
-      if(card) card.style.display='';
-      if(cont) cont.innerHTML = '<a href="'+r.data.attestazione_url+'" target="_blank" style="display:flex;align-items:center;gap:10px;padding:12px;background:#EBF2FB;border-radius:10px;text-decoration:none">'
-        +'<span style="font-size:28px">&#128196;</span>'
-        +'<div><div style="font-size:14px;font-weight:700;color:#1A5FA8">'+(r.data.attestazione_nome||'Documento')+'</div>'
-        +'<div style="font-size:12px;color:#8A8A8A">Tocca per aprire o scaricare</div></div>'
-        +'<span style="margin-left:auto;font-size:20px;color:#1A5FA8">&#8250;</span></a>';
-    } else {
-      if(card) card.style.display='none';
+  // Carica documenti
+  api('getDocumenti', {}, function(err, r) {
+    var card = T('v-docs-card');
+    var list = T('v-docs-list');
+    var docs = (!err&&r&&r.ok) ? r.data||[] : [];
+    if (docs.length && card && list) {
+      card.style.display='';
+      list.innerHTML='';
+      docs.forEach(function(d){
+        var a = document.createElement('a');
+        a.href=d.url||'#'; a.target='_blank';
+        a.style.cssText='display:flex;align-items:center;gap:10px;padding:12px;background:#EBF2FB;border-radius:10px;text-decoration:none;margin-bottom:8px';
+        a.innerHTML='<span style="font-size:24px">&#128196;</span>'
+          +'<div><div style="font-size:14px;font-weight:700;color:#1A5FA8">'+d.nome+'</div>'
+          +(d.descrizione?'<div style="font-size:12px;color:#8A8A8A">'+d.descrizione+'</div>':'')
+          +'</div><span style="margin-left:auto;font-size:20px;color:#1A5FA8">&#8250;</span>';
+        list.appendChild(a);
+      });
+    } else if(card) {
+      card.style.display='none';
     }
   });
 
