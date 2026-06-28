@@ -5591,16 +5591,7 @@ function vaiAssistenza() {
   window.location.href = 'assistenza.html';
 }
 
-// Aggiorna etichetta pulsante se c'è un socio in sessione
-(function() {
-  try {
-    var stored = JSON.parse(localStorage.getItem('asppi_assistenza_socio') || 'null');
-    if (stored && stored.nome) {
-      var btn = document.getElementById('btn-ass-label');
-      if (btn) btn.textContent = stored.nome;
-    }
-  } catch(e) {}
-})();
+// Pulsante assistenza: porta sempre a assistenza.html
 
 </script>
 </body>
