@@ -94,8 +94,6 @@ body{
   position:absolute;top:0;
   margin-top:0;
 }
-.nav{position:relative;}
-.nav{position:fixed;}
 
 /* ── PAGES ── */
 .pg{display:none;padding:16px 16px 8px;}
@@ -866,6 +864,7 @@ window.onload = function() {
   document.getElementById('pr-tel').textContent = S.user.telefono || '—';
 
   bindAll();
+  navTo('home'); // forza stato iniziale corretto
 
 // ── BIND EXTRA ICONE HOME ─────────────────────────────────────
 (function(){
@@ -1053,72 +1052,73 @@ function chiudiOv(id) { var e = T(id); if(e) e.className='ov'; }
 
 // ── BIND EVENTI ───────────────────────────────────────────────
 function bindAll() {
+  function B(id, ev, fn) { var e=T(id); if(e) e.addEventListener(ev, fn); }
   // Esci
-  T('btn-esci').addEventListener('click', esci);
-  T('btn-esci-profilo').addEventListener('click', esci);
+  B('btn-esci','click',esci);
+  B('btn-esci-profilo','click',esci);
   // Nav
-  T('nb-home').addEventListener('click', function(){ navTo('home'); });
-  T('nb-immobili').addEventListener('click', function(){ navTo('immobili'); });
-  T('nb-prenota').addEventListener('click', function(){ navTo('prenota'); });
-  T('nb-vantaggi').addEventListener('click', function(){ navTo('vantaggi'); caricaVantaggi(); });
-  T('nb-chat') && T('nb-chat').addEventListener('click', function(){ navTo('chat'); caricaChatLibera(); });
-  T('nb-profilo').addEventListener('click', function(){ navTo('profilo'); caricaProfilo(); });
-  // Home
-  T('btn-prenota-home').addEventListener('click', function(){ navTo('prenota'); });
-  T('btn-storico').addEventListener('click', toggleStorico);
-  T('btn-imm-home').addEventListener('click', function(){ navTo('immobili'); });
-  T('btn-vantaggi-home').addEventListener('click', function(){ navTo('vantaggi'); caricaVantaggi(); });
+  B('nb-home','click',function(){ navTo('home'); });
+  B('nb-immobili','click',function(){ navTo('immobili'); });
+  B('nb-prenota','click',function(){ navTo('prenota'); });
+  B('nb-vantaggi','click',function(){ navTo('vantaggi'); caricaVantaggi(); });
+  B('nb-chat','click',function(){ navTo('chat'); caricaChatLibera(); });
+  B('nb-profilo','click',function(){ navTo('profilo'); caricaProfilo(); });
+  // Home icone
+  B('btn-prenota-home','click',function(){ navTo('prenota'); });
+  B('btn-storico','click',toggleStorico);
+  B('btn-imm-home','click',function(){ navTo('immobili'); });
+  B('btn-vantaggi-home','click',function(){ navTo('vantaggi'); caricaVantaggi(); });
   // Immobili
-  T('btn-nuovo-apt').addEventListener('click', apriNuovoApt);
+  B('btn-nuovo-apt','click',apriNuovoApt);
   // Apt overlay
-  T('btn-chiudi-apt').addEventListener('click', function(){ chiudiOv('ov-apt'); });
-  T('btn-nuovo-cnt').addEventListener('click', apriNuovoCnt);
-  T('btn-mod-apt').addEventListener('click', apriModApt);
-  T('btn-del-apt').addEventListener('click', eliminaApt);
+  B('btn-chiudi-apt','click',function(){ chiudiOv('ov-apt'); });
+  B('btn-nuovo-cnt','click',apriNuovoCnt);
+  B('btn-mod-apt','click',apriModApt);
+  B('btn-del-apt','click',eliminaApt);
   // Mod apt
-  T('btn-chiudi-mod-apt').addEventListener('click', function(){ chiudiOv('ov-mod-apt'); });
-  T('btn-salva-mod-apt').addEventListener('click', salvaModApt);
-  // Napt
-  T('btn-annulla-napt').addEventListener('click', function(){ chiudiOv('ov-napt'); naptStep=0; naptD={}; });
-  T('napt-btn').addEventListener('click', naptAvanti);
-  // Cnt overlay
-  T('btn-chiudi-cnt').addEventListener('click', function(){ chiudiOv('ov-cnt'); });
-  T('btn-salva-taj').addEventListener('click', salvaTaj);
-  T('btn-proroga').addEventListener('click', function(){ apriAdm('proroga'); });
-  T('btn-subentro').addEventListener('click', function(){ apriAdm('subentro'); });
-  T('btn-cessione').addEventListener('click', function(){ apriAdm('cessione'); });
-  T('btn-chat-cnt').addEventListener('click', function(){ if(curCnt) apriChatCnt(curCnt.id); });
-  T('btn-modifica-cnt').addEventListener('click', modificaCnt);
-  T('btn-elimina-cnt').addEventListener('click', eliminaCnt);
-  T('btn-rinnova-cnt').addEventListener('click', rinnovaCnt);
-  // Ncnt
-  T('btn-ncnt-back').addEventListener('click', ncntBack);
-  T('ncnt-btn').addEventListener('click', ncntAvanti);
-  // Adm
-  T('btn-chiudi-adm').addEventListener('click', function(){ chiudiOv('ov-adm'); });
-  // Chat cnt
-  T('btn-chiudi-chat').addEventListener('click', function(){ chiudiOv('ov-chat'); });
-  T('btn-send-cnt').addEventListener('click', inviaMsgCnt);
-  T('chat-cnt-inp').addEventListener('keydown', function(e){ if(e.key==='Enter') inviaMsgCnt(); });
+  B('btn-chiudi-mod-apt','click',function(){ chiudiOv('ov-mod-apt'); });
+  B('btn-salva-mod-apt','click',salvaModApt);
+  // Nuovo apt wizard
+  B('btn-annulla-napt','click',function(){ chiudiOv('ov-napt'); naptStep=0; naptD={}; });
+  B('napt-btn','click',naptAvanti);
+  // Contratto overlay
+  B('btn-chiudi-cnt','click',function(){ chiudiOv('ov-cnt'); });
+  B('btn-salva-taj','click',salvaTaj);
+  B('btn-proroga','click',function(){ apriAdm('proroga'); });
+  B('btn-subentro','click',function(){ apriAdm('subentro'); });
+  B('btn-cessione','click',function(){ apriAdm('cessione'); });
+  B('btn-chat-cnt','click',function(){ if(curCnt) apriChatCnt(curCnt.id); });
+  B('btn-modifica-cnt','click',modificaCnt);
+  B('btn-elimina-cnt','click',eliminaCnt);
+  B('btn-rinnova-cnt','click',rinnovaCnt);
+  // Nuovo contratto wizard
+  B('btn-ncnt-back','click',ncntBack);
+  B('ncnt-btn','click',ncntAvanti);
+  // Adempimento overlay
+  B('btn-chiudi-adm','click',function(){ chiudiOv('ov-adm'); });
+  // Chat contratto overlay
+  B('btn-chiudi-chat','click',function(){ chiudiOv('ov-chat'); });
+  B('btn-send-cnt','click',inviaMsgCnt);
+  B('chat-cnt-inp','keydown',function(e){ if(e.key==='Enter') inviaMsgCnt(); });
   // Chat libera
-  T('btn-send-free').addEventListener('click', inviaMsgLibero);
-  T('chat-free-inp').addEventListener('keydown', function(e){ if(e.key==='Enter') inviaMsgLibero(); });
-  // Prenota
-  T('btn-conf-pren').addEventListener('click', confermaPren);
-  T('btn-altra-pren').addEventListener('click', resetPren);
-  // Password
-  T('btn-apri-pwd').addEventListener('click', function(){ apriOv('ov-pwd'); });
-  T('btn-modifica-anagrafica').addEventListener('click', apriModificaAnagrafica);
-  T('btn-chiudi-anagrafica').addEventListener('click', function(){ chiudiOv('ov-anagrafica'); });
-  T('btn-salva-anagrafica').addEventListener('click', salvaAnagrafica);
-  T('btn-dichiara-bonifico').addEventListener('click', function(){ apriOv('ov-bonifico'); });
-  T('btn-chiudi-bonifico').addEventListener('click', function(){ chiudiOv('ov-bonifico'); });
-  T('btn-invia-bonifico').addEventListener('click', inviaDichiarazioneBonifico);
-  T('btn-chiudi-pwd').addEventListener('click', function(){ chiudiOv('ov-pwd'); });
-  T('btn-salva-pwd').addEventListener('click', cambiaPwd);
+  B('btn-send-free','click',inviaMsgLibero);
+  B('chat-free-inp','keydown',function(e){ if(e.key==='Enter') inviaMsgLibero(); });
+  // Prenotazione
+  B('btn-conf-pren','click',confermaPren);
+  B('btn-altra-pren','click',resetPren);
+  // Profilo
+  B('btn-apri-pwd','click',function(){ apriOv('ov-pwd'); });
+  B('btn-modifica-anagrafica','click',apriModificaAnagrafica);
+  B('btn-chiudi-anagrafica','click',function(){ chiudiOv('ov-anagrafica'); });
+  B('btn-salva-anagrafica','click',salvaAnagrafica);
+  B('btn-dichiara-bonifico','click',function(){ apriOv('ov-bonifico'); });
+  B('btn-chiudi-bonifico','click',function(){ chiudiOv('ov-bonifico'); });
+  B('btn-invia-bonifico','click',inviaDichiarazioneBonifico);
+  B('btn-chiudi-pwd','click',function(){ chiudiOv('ov-pwd'); });
+  B('btn-salva-pwd','click',cambiaPwd);
 }
 
-// ── NAV ───────────────────────────────────────────────────────
+
 function navTo(id) {
   var pages = ['home','immobili','vantaggi','prenota','profilo','chat'];
   for (var i=0; i<pages.length; i++) {

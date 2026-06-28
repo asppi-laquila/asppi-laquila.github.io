@@ -736,9 +736,20 @@ function cercaSocio(q) {
   if (!q || q.length < 2) { el.style.display = 'none'; return; }
   el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--text2)">🔍 Ricerca in corso...</div>';
   el.style.display = 'block';
-  apiCall('getUtenti', {}, function(err, r) {
-    if (err || !r || !r.ok) {
-      el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--red)">❌ Errore: ' + (err||((r&&r.error)||'Riprova')) + '</div>';
+  fetch(API, {
+    method: 'POST',
+    headers: {'Content-Type':'text/plain'},
+    body: JSON.stringify({ action: 'getUtenti', token: ATOKEN }),
+    redirect: 'follow'
+  })
+  .then(function(res){ return res.text(); })
+  .then(function(text){
+    var r;
+    try { r = JSON.parse(text); } catch(e) {
+      r = { ok: false, error: 'Risposta non valida dal server' };
+    }
+    if (!r || !r.ok) {
+      el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--red)">❌ ' + (r&&r.error||'Errore connessione') + '</div>';
       el.style.display = 'block'; return;
     }
     var utenti = r.data || [];
@@ -751,9 +762,8 @@ function cercaSocio(q) {
           || (u.cf||'').toLowerCase().includes(ql);
     });
     if (!found.length) {
-      el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--text2)">Nessun socio trovato per "' + q + '"</div>';
-      el.style.display = 'block';
-      return;
+      el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--text2)">Nessun risultato per "' + q + '" — ' + utenti.length + ' soci totali</div>';
+      el.style.display = 'block'; return;
     }
     el.innerHTML = '';
     found.slice(0, 8).forEach(function(u) {
@@ -763,9 +773,13 @@ function cercaSocio(q) {
         + '<div><div class="sri-nome">' + (u.displayName || ((u.nome||'') + ' ' + (u.cognome||'')).trim()) + '</div>'
         + '<div class="sri-meta">' + (u.email || 'Email non inserita') + (u.cf ? ' · ' + u.cf : '') + '</div></div>'
         + '<div class="sri-arr">›</div>';
-      div.addEventListener('click', function() { selezionaSocio(u); });
+      div.addEventListener('click', function(){ selezionaSocio(u); });
       el.appendChild(div);
     });
+    el.style.display = 'block';
+  })
+  .catch(function(err2){
+    el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--red)">❌ Connessione fallita: ' + err2.message + '</div>';
     el.style.display = 'block';
   });
 }
