@@ -181,6 +181,7 @@ textarea.inp{min-height:100px;resize:vertical;}
   display:none;position:fixed;inset:0;
   background:var(--bg);z-index:300;overflow-y:auto;
 }
+.ov-col.on{display:flex;flex-direction:column;}
 .ov.on{display:block;}
 .oh{
   background:rgba(255,255,255,0.94);backdrop-filter:blur(24px);
@@ -742,7 +743,7 @@ textarea.inp{min-height:100px;resize:vertical;}
 </div>
 
 <!-- OV CHAT CONTRATTO -->
-<div id="ov-chat" class="ov" style="display:flex;flex-direction:column">
+<div id="ov-chat" class="ov ov-col">
   <div class="oh">
     <div><div class="ohlbl" id="ochat-lbl">CHAT</div><div class="ohttl" id="ochat-ttl">Con lo studio</div></div>
     <button class="exbtn" id="btn-chiudi-chat">← Indietro</button>
@@ -1047,8 +1048,23 @@ function fmtDate(d) {
 }
 function pad(n) { return n < 10 ? '0'+n : ''+n; }
 function esci() { localStorage.removeItem('asppi_session'); localStorage.removeItem('asppi_remember'); window.location.replace('index.html'); }
-function apriOv(id) { var e = T(id); if(e){ e.className='ov on'; e.scrollTop=0; } }
-function chiudiOv(id) { var e = T(id); if(e) e.className='ov'; }
+function apriOv(id) {
+  var e = T(id);
+  if(e){
+    // Preserva classi extra (es. ov-col)
+    var extra = e.className.replace(/\bov\b/g,'').replace(/\bon\b/g,'').trim();
+    e.className = ('ov ' + extra + ' on').replace(/\s+/g,' ').trim();
+    e.scrollTop=0;
+  }
+}
+function chiudiOv(id) {
+  var e = T(id);
+  if(e){
+    // Preserva classi extra (es. ov-col)
+    var extra = e.className.replace(/\bov\b/g,'').replace(/\bon\b/g,'').trim();
+    e.className = ('ov ' + extra).replace(/\s+/g,' ').trim();
+  }
+}
 
 // ── BIND EVENTI ───────────────────────────────────────────────
 function bindAll() {
