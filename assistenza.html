@@ -720,6 +720,8 @@ function renderNapt() {
       + '</div></div><div class="card"><div class="cb"><div class="sec">DATI CATASTALI</div>'
       + '<div class="g2"><div><span class="lbl">Categoria</span><input type="text" class="inp" id="n5" value="'+(naptD.catCategoria||'')+'" placeholder="A/2"/></div>'
       + '<div><span class="lbl">Rendita €</span><input type="text" class="inp" id="n6" value="'+(naptD.catRendita||'')+'" placeholder="450,00"/></div>'
+      + '<span class="lbl">Sezione catastale <span style="font-size:10px;color:#8E8E93;font-weight:500">(solo se presente)</span></span>'
+      + '<input type="text" class="inp" id="nSez" placeholder="es. A oppure BO" value="'+(naptD.catSezione||'')+'"/>'
       + '<div><span class="lbl">Foglio</span><input type="text" class="inp" id="n7" value="'+(naptD.catFoglio||'')+'"/></div>'
       + '<div><span class="lbl">Particella</span><input type="text" class="inp" id="n8" value="'+(naptD.catParticella||'')+'"/></div></div>'
       + '<span class="lbl">Subalterno</span><input type="text" class="inp" id="n9" value="'+(naptD.catSubalterno||'')+'"/>'
@@ -742,7 +744,7 @@ function naptAvanti() {
     naptD.comune=(T('n1')||{}).value||''; naptD.via=(T('n2')||{}).value||'';
     naptD.piano=(T('n3')||{}).value||''; naptD.interno=(T('n4')||{}).value||'';
     naptD.catCategoria=(T('n5')||{}).value||''; naptD.catRendita=(T('n6')||{}).value||'';
-    naptD.catFoglio=(T('n7')||{}).value||''; naptD.catParticella=(T('n8')||{}).value||'';
+    naptD.catSezione=(T('nSez')||{}).value||''; naptD.catFoglio=(T('n7')||{}).value||''; naptD.catParticella=(T('n8')||{}).value||'';
     naptD.catSubalterno=(T('n9')||{}).value||'';
     naptD.indirizzo = (naptD.via||'') + (naptD.comune?', '+naptD.comune:'');
   } else {
@@ -816,12 +818,26 @@ function buildStep() {
       +'</div></div>';
   } else if (ncntStep===3) {
     h='<div class="card"><div class="cb"><div class="sec">DATI IMMOBILE</div>'
-      +'<span class="lbl">N. certificato APE</span><input type="text" class="inp" id="c3a" value="'+(ncntD.apeNumero||'')+'"/>'
-      +'<span class="lbl">Classe energetica *</span><input type="text" class="inp" id="c3b" placeholder="es. D" value="'+(ncntD.apeClasse||'')+'"/>'
+      +'<div class="g2"><div><span class="lbl">Classe energetica *</span><input type="text" class="inp" id="c3b" placeholder="es. D" value="'+(ncntD.apeClasse||'')+'"/></div>'
+      +'<div><span class="lbl">N. cert. APE</span><input type="text" class="inp" id="c3a" placeholder="N. certificato" value="'+(ncntD.apeNumero||'')+'"/></div></div>'
       +'<div class="g2">'
       +'<div><span class="lbl">Camere</span><input type="text" class="inp" id="c3c" value="'+(ncntD.compCamere||'')+'"/></div>'
       +'<div><span class="lbl">Bagni</span><input type="text" class="inp" id="c3d" value="'+(ncntD.compBagni||'')+'"/></div>'
-      +'</div></div></div>';
+      +'</div></div></div>'
+      +'<div class="card"><div class="cb"><div class="sec">INTERO O PORZIONE</div>'
+      +'<span class="lbl">Si affitta</span>'
+      +'<select class="inp" id="c3g" onchange="togglePorzione()"><option value="intero" '+(ncntD.tipoLocazione==="porzione"?'':'selected')+'>Intero immobile</option>'
+      +'<option value="porzione" '+(ncntD.tipoLocazione==="porzione"?'selected':'')+'>Porzione di immobile</option></select>'
+      +'<div id="c3g-det" style="'+(ncntD.tipoLocazione==="porzione"?'display:block':'display:none')+'">'
+      +'<span class="lbl">Descrizione porzione</span>'
+      +'<input type="text" class="inp" id="c3h" placeholder="es. piano primo, vani 3 e 4" value="'+(ncntD.descrizioneLocazione||'')+'"/>'
+      +'</div></div></div>'
+      +'<div class="card"><div class="cb"><div class="sec">PERTINENZE</div>'
+      +'<div style="font-size:12px;color:#8E8E93;margin-bottom:10px">Solo pertinenze con dati catastali diversi (garage, cantina, posto auto).</div>'
+      +'<div id="pert-lista"></div>'
+      +'<button class="bd" style="margin-top:4px" onclick="addPert()">+ Aggiungi pertinenza</button>'
+      +'</div></div>';
+
   } else if (ncntStep===4) {
     h='<div class="card"><div class="cb"><div class="sec">LOCATORI</div><div id="nlocs">';
     ncntD.locatori.forEach(function(_,i){ h+=pbBlock('l',i); });
@@ -931,11 +947,64 @@ function leggiPersone(t){
   }
 }
 
+
+function togglePorzione() {
+  var sel = T('c3g'); var det = T('c3g-det');
+  if (sel && det) det.style.display = sel.value === 'porzione' ? '' : 'none';
+}
+
+function buildPertBlock(i, p) {
+  p = p || {};
+  return '<div class="pb" id="pert-'+i+'" style="margin-bottom:10px">'
+    +'<div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:8px">PERTINENZA '+(i+1)+'</div>'
+    +'<button class="pr" onclick="remPert('+i+')">✕</button>'
+    +'<span class="lbl">Tipo pertinenza</span>'
+    +'<select class="inp pert-tipo"><option value="">-- Seleziona --</option>'
+    +'<option '+(p.tipo==="Garage"?'selected':'')+'>Garage</option>'
+    +'<option '+(p.tipo==="Cantina"?'selected':'')+'>Cantina</option>'
+    +'<option '+(p.tipo==="Posto auto"?'selected':'')+'>Posto auto</option>'
+    +'<option '+(p.tipo==="Soffitta"?'selected':'')+'>Soffitta</option>'
+    +'<option '+(p.tipo==="Altro"?'selected':'')+'>Altro</option></select>'
+    +'<span class="lbl">Sezione catastale <span style="font-size:10px;color:#8E8E93;font-weight:500">(solo se presente)</span></span>'
+    +'<input type="text" class="inp pert-sez" placeholder="es. A oppure BO" value="'+(p.catSezione||'')+'"/>'
+    +'<div class="g2"><div><span class="lbl">Foglio</span><input type="text" class="inp pert-fog" value="'+(p.catFoglio||'')+'"/></div>'
+    +'<div><span class="lbl">Particella</span><input type="text" class="inp pert-par" value="'+(p.catParticella||'')+'"/></div></div>'
+    +'<span class="lbl">Subalterno</span><input type="text" class="inp pert-sub" value="'+(p.catSubalterno||'')+'"/>'
+    +'</div>';
+}
+
+function addPert() {
+  if (!ncntD.pertinenze) ncntD.pertinenze = [];
+  ncntD.pertinenze.push({});
+  var el = T('pert-lista'); if (!el) return;
+  el.innerHTML = ncntD.pertinenze.map(function(p,i){ return buildPertBlock(i,p); }).join('');
+}
+
+function remPert(i) {
+  if (!ncntD.pertinenze) return;
+  ncntD.pertinenze.splice(i,1);
+  var el = T('pert-lista'); if (!el) return;
+  el.innerHTML = ncntD.pertinenze.map(function(p,idx){ return buildPertBlock(idx,p); }).join('');
+}
+
+function leggiPertinenze() {
+  var blocks = document.querySelectorAll('#pert-lista .pb');
+  var out = [];
+  blocks.forEach(function(b) {
+    var g = function(cls){ var e=b.querySelector('.'+cls); return e?e.value||'':''; };
+    out.push({
+      tipo:g('pert-tipo'), catSezione:g('pert-sez'),
+      catFoglio:g('pert-fog'), catParticella:g('pert-par'), catSubalterno:g('pert-sub')
+    });
+  });
+  return out;
+}
+
 function ncntAvanti(){
   if(ncntStep===0){ncntD.tipo=(document.querySelector('input[name="ntipo"]:checked')||{}).value||'';if(!ncntD.tipo){alert('Seleziona il tipo');return;}}
   if(ncntStep===1){ncntD.duraDal=(T('c1a')||{}).value||'';ncntD.duraAl=(T('c1b')||{}).value||'';ncntD.duraMesi=(T('c1c')||{}).value||'';if(!ncntD.duraDal||!ncntD.duraAl){alert('Inserisci le date');return;}}
   if(ncntStep===2){ncntD.canoneMensile=(T('c2a')||{}).value||'';ncntD.canoneAnnuale=(T('c2b')||{}).value||'';ncntD.canoneIBAN=(T('c2c')||{}).value||'';ncntD.depositoImporto=(T('c2d')||{}).value||'';ncntD.depositoMesi=(T('c2e')||{}).value||'';if(!ncntD.canoneMensile){alert('Inserisci il canone');return;}}
-  if(ncntStep===3){ncntD.apeNumero=(T('c3a')||{}).value||'';ncntD.apeClasse=(T('c3b')||{}).value||'';ncntD.compCamere=(T('c3c')||{}).value||'';ncntD.compBagni=(T('c3d')||{}).value||'';}
+  if(ncntStep===3){ncntD.apeNumero=(T('c3a')||{}).value||'';ncntD.apeClasse=(T('c3b')||{}).value||'';ncntD.compCamere=(T('c3c')||{}).value||'';ncntD.compBagni=(T('c3d')||{}).value||'';var selTL=T('c3g');ncntD.tipoLocazione=selTL?selTL.value||'intero':'intero';ncntD.descrizioneLocazione=(T('c3h')||{}).value||'';ncntD.pertinenze=leggiPertinenze();}
   if(ncntStep===4) leggiPersone('l');
   if(ncntStep===5) leggiPersone('c');
   if(ncntStep===6) leggiPersone('g');
