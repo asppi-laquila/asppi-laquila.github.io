@@ -4,514 +4,277 @@
 <meta charset="UTF-8"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
 <meta name="theme-color" content="#0A1628"/>
-<title>ASPPI — Assistenza</title>
+<title>ASPPI — Assistenza Socio</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --orange:#E8631A; --orange-l:#FDF0E8;
-  --green:#16A34A;  --green-l:#ECFDF5;
-  --blue:#1A5FA8;   --blue-l:#EBF2FB;
-  --red:#DC2626;    --red-l:#FFF5F5;
-  --amber:#D97706;  --amber-l:#FFFBEB;
-  --navy:#0A1628;
+  --or:#E8631A; --orl:#FDF0E8;
+  --gr:#16A34A; --grl:#ECFDF5;
+  --bl:#1A5FA8; --bll:#EBF2FB;
+  --rd:#DC2626; --rdl:#FFF5F5;
+  --nv:#0A1628;
   --bg:#F2F2F7; --card:#fff;
-  --text:#1C1C1E; --text2:#8E8E93; --border:#E5E5EA;
+  --tx:#1C1C1E; --tx2:#8E8E93; --br:#E5E5EA;
 }
-body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);min-height:100vh;
-  -webkit-font-smoothing:antialiased;color:var(--text);padding-bottom:32px;}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);
+  min-height:100vh;-webkit-font-smoothing:antialiased;color:var(--tx);padding-bottom:32px;}
 
-/* ── TOP BAR ── */
-.top{
-  background:var(--navy);
-  padding:14px 16px;
-  display:flex;align-items:center;gap:10px;
-  position:sticky;top:0;z-index:200;
-  box-shadow:0 2px 16px rgba(0,0,0,0.3);
-}
-.top .back-btn{
-  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);
-  border-radius:10px;width:36px;height:36px;font-size:16px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;
-}
-.top .title-area{flex:1;}
-.top .tl{font-size:9px;font-weight:700;color:rgba(255,255,255,0.45);
-  letter-spacing:.14em;text-transform:uppercase;}
-.top .tt{font-size:15px;font-weight:800;color:#fff;}
-.top .admin-btn{
-  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);
-  border-radius:10px;padding:7px 12px;font-size:12px;font-weight:600;
-  color:rgba(255,255,255,0.8);cursor:pointer;font-family:inherit;flex-shrink:0;
-}
+/* TOP BAR */
+.top{background:var(--nv);padding:14px 16px;display:flex;align-items:center;gap:10px;
+  position:sticky;top:0;z-index:200;box-shadow:0 2px 16px rgba(0,0,0,.3);}
+.top-back{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+  border-radius:10px;min-width:44px;min-height:44px;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;}
+.top-title{flex:1;}
+.top-tl{font-size:9px;font-weight:700;color:rgba(255,255,255,.45);letter-spacing:.14em;text-transform:uppercase;}
+.top-tt{font-size:15px;font-weight:800;color:#fff;}
+.top-admin{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);
+  border-radius:10px;padding:0 14px;min-height:44px;font-size:12px;font-weight:700;
+  color:rgba(255,255,255,.85);cursor:pointer;font-family:inherit;white-space:nowrap;}
 
-/* ── SOCIO BANNER (quando c'è un socio attivo) ── */
-.socio-banner{
-  background:linear-gradient(135deg,var(--orange),#F5842A);
-  padding:14px 16px;
-  display:flex;align-items:center;gap:12px;
-}
-.socio-banner .sb-avatar{
-  width:42px;height:42px;background:rgba(255,255,255,0.2);
-  border-radius:12px;display:flex;align-items:center;justify-content:center;
-  font-size:20px;flex-shrink:0;
-}
-.socio-banner .sb-info{flex:1;}
-.socio-banner .sb-label{font-size:10px;font-weight:700;color:rgba(255,255,255,0.7);
-  text-transform:uppercase;letter-spacing:.1em;}
-.socio-banner .sb-nome{font-size:16px;font-weight:800;color:#fff;}
-.socio-banner .sb-meta{font-size:11px;color:rgba(255,255,255,0.7);margin-top:1px;}
-.socio-banner .sb-close{
-  background:rgba(255,255,255,0.15);border:none;border-radius:8px;
-  width:32px;height:32px;cursor:pointer;font-size:14px;color:#fff;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
+/* BANNER SOCIO */
+.soc-banner{background:linear-gradient(135deg,var(--or),#F5842A);
+  padding:14px 16px;display:flex;align-items:center;gap:12px;}
+.soc-av{width:42px;height:42px;background:rgba(255,255,255,.2);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.soc-info{flex:1;}
+.soc-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.1em;}
+.soc-nome{font-size:16px;font-weight:800;color:#fff;}
+.soc-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px;}
+.soc-close{background:rgba(255,255,255,.15);border:none;border-radius:8px;
+  width:36px;height:36px;cursor:pointer;font-size:16px;color:#fff;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 
-/* ── EMAIL MANCANTE AVVISO ── */
-.email-warn{
-  background:var(--amber-l);border-left:4px solid var(--amber);
-  padding:12px 16px;display:flex;align-items:center;gap:10px;
-  font-size:13px;color:#92400E;font-weight:500;
-}
-.email-warn button{
-  margin-left:auto;background:var(--amber);color:#fff;
-  border:none;border-radius:8px;padding:6px 12px;
-  font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0;
-}
-
-/* ── CONTENUTO PRINCIPALE ── */
+/* CONTENUTO */
 .content{padding:16px;}
+.pg{display:none;} .pg.on{display:block;}
 
-/* ── SEZIONE SELEZIONE SOCIO ── */
-.sel-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px;}
-.sel-sub{font-size:13px;color:var(--text2);margin-bottom:20px;}
-
-/* Ricerca */
-.search-box{
-  position:relative;margin-bottom:14px;
-}
-.search-box input{
-  width:100%;padding:14px 14px 14px 44px;
-  border-radius:14px;border:1.5px solid var(--border);
-  font-size:15px;color:var(--text);background:var(--card);
-  outline:none;font-family:inherit;
-  box-shadow:0 1px 8px rgba(0,0,0,0.06);
-  transition:border-color 0.2s;
-}
-.search-box input:focus{border-color:var(--orange);}
-.search-box .si{
-  position:absolute;left:14px;top:50%;transform:translateY(-50%);
-  font-size:18px;color:var(--text2);
-}
-.search-results{
-  background:var(--card);border-radius:14px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.1);
-  overflow:hidden;margin-bottom:14px;
-  display:none;
-}
-.search-result-item{
-  padding:13px 16px;border-bottom:1px solid var(--bg);
-  cursor:pointer;display:flex;align-items:center;gap:12px;
-  transition:background 0.1s;
-}
-.search-result-item:last-child{border-bottom:none;}
-.search-result-item:active{background:var(--bg);}
-.sri-avatar{
-  width:38px;height:38px;background:var(--orange-l);
-  border-radius:10px;display:flex;align-items:center;justify-content:center;
-  font-size:18px;flex-shrink:0;
-}
-.sri-nome{font-size:14px;font-weight:700;color:var(--text);}
-.sri-meta{font-size:12px;color:var(--text2);}
-.sri-arr{font-size:18px;color:#C7C7CC;margin-left:auto;}
-
-/* Divisore */
-.divider-or{
-  display:flex;align-items:center;gap:12px;margin:16px 0;
-}
-.divider-or::before,.divider-or::after{
-  content:'';flex:1;height:1px;background:var(--border);
-}
-.divider-or span{font-size:12px;font-weight:600;color:var(--text2);}
-
-/* ── CARDS ── */
+/* CARDS */
 .card{background:var(--card);border-radius:20px;margin-bottom:14px;
-  box-shadow:0 1px 10px rgba(0,0,0,0.06);overflow:hidden;}
+  box-shadow:0 1px 10px rgba(0,0,0,.06);overflow:hidden;}
 .cb{padding:18px;}
-.sec{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.06em;
+.sec{font-size:11px;font-weight:700;color:var(--tx2);letter-spacing:.06em;
   text-transform:uppercase;padding-bottom:10px;border-bottom:1px solid var(--bg);margin-bottom:14px;}
 
-/* ── FORM ── */
-.lbl{display:block;font-size:11px;font-weight:700;color:var(--text2);
+/* FORM */
+.lbl{display:block;font-size:11px;font-weight:700;color:var(--tx2);
   text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;margin-top:14px;}
 .lbl:first-child{margin-top:0;}
-.inp{
-  width:100%;padding:13px 15px;border-radius:12px;border:1.5px solid var(--border);
-  font-size:15px;color:var(--text);background:#F8F8FA;margin-bottom:0;
-  outline:none;font-family:inherit;transition:border-color 0.2s,background 0.2s;
-}
-.inp:focus{border-color:var(--orange);background:#fff;}
+.inp{width:100%;padding:13px 15px;border-radius:12px;border:1.5px solid var(--br);
+  font-size:15px;color:var(--tx);background:#F8F8FA;outline:none;font-family:inherit;
+  transition:border-color .2s,background .2s;}
+.inp:focus{border-color:var(--or);background:#fff;}
 select.inp{cursor:pointer;}
-textarea.inp{min-height:90px;resize:vertical;}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.opt-badge{
-  display:inline-block;background:var(--bg);color:var(--text2);
-  font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;
-  margin-left:6px;vertical-align:middle;
-}
+.opt{display:inline-block;background:var(--bg);color:var(--tx2);
+  font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;margin-left:6px;}
 
-/* ── BOTTONI ── */
-.bp{
-  width:100%;padding:15px;background:var(--orange);color:#fff;border:none;
-  border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;
-  margin-bottom:10px;font-family:inherit;
-  box-shadow:0 3px 12px rgba(232,99,26,0.22);
-  transition:opacity 0.2s,transform 0.15s;
-}
-.bp:active{opacity:0.85;transform:scale(0.98);}
-.bs{
-  width:100%;padding:14px;background:transparent;color:var(--text);
-  border:1.5px solid var(--border);border-radius:14px;font-size:15px;
-  font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit;
-}
-.bs:active{background:var(--bg);}
-.bd{
-  width:100%;padding:14px;background:transparent;color:var(--orange);
-  border:1.5px solid var(--orange);border-radius:14px;font-size:15px;
-  font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit;
-}
+/* BOTTONI */
+.bp{width:100%;padding:15px;background:var(--or);color:#fff;border:none;
+  border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;
+  font-family:inherit;box-shadow:0 3px 12px rgba(232,99,26,.22);transition:opacity .2s,transform .15s;}
+.bp:active{opacity:.85;transform:scale(.98);}
+.bs{width:100%;padding:13px;background:transparent;color:var(--tx);
+  border:1.5px solid var(--br);border-radius:14px;font-size:14px;font-weight:600;
+  cursor:pointer;margin-bottom:10px;font-family:inherit;}
+.bd{width:100%;padding:13px;background:transparent;color:var(--or);
+  border:1.5px solid var(--or);border-radius:14px;font-size:14px;font-weight:600;
+  cursor:pointer;margin-bottom:10px;font-family:inherit;}
 
-/* ── ALERT ── */
-.errbox{background:var(--red-l);border-radius:12px;padding:12px 15px;
-  font-size:13px;color:var(--red);font-weight:600;margin-top:12px;display:none;}
-.infog{background:var(--green-l);border-radius:12px;padding:12px 15px;
-  font-size:13px;color:var(--green);font-weight:600;margin-top:12px;}
-.infob{background:var(--blue-l);border-radius:12px;padding:12px 15px;
-  font-size:13px;color:var(--blue);font-weight:600;margin-bottom:12px;}
+/* ALERTS */
+.err{background:var(--rdl);border-radius:12px;padding:12px 15px;
+  font-size:13px;color:var(--rd);font-weight:600;margin-top:12px;display:none;}
+.ok{background:var(--grl);border-radius:12px;padding:12px 15px;
+  font-size:13px;color:var(--gr);font-weight:600;margin-top:12px;display:none;}
 .info{background:var(--bg);border-radius:12px;padding:14px;
-  font-size:13px;color:var(--text2);text-align:center;}
+  font-size:13px;color:var(--tx2);text-align:center;}
+.infob{background:var(--bll);border-radius:12px;padding:12px 15px;
+  font-size:13px;color:var(--bl);font-weight:600;margin-bottom:12px;}
 
-/* ── TAB NAV OPERATIVA ── */
-.op-tabs{
-  display:flex;background:var(--card);border-bottom:1px solid var(--bg);
-  position:sticky;top:64px;z-index:100;
-  box-shadow:0 1px 8px rgba(0,0,0,0.06);
-}
-.op-tab{
-  flex:1;padding:13px 4px;border:none;background:transparent;
-  font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;
-  border-bottom:2px solid transparent;font-family:inherit;
-  transition:color 0.2s,border-color 0.2s;
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-}
-.op-tab .ot-ic{font-size:18px;}
-.op-tab.on{color:var(--orange);border-bottom-color:var(--orange);}
-
-/* ── OVERLAYS ── */
-.ov{display:none;position:fixed;inset:0;background:var(--bg);z-index:300;overflow-y:auto;}
-.ov.on{display:block;}
-.oh{
-  background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);
-  padding:14px 18px;display:flex;justify-content:space-between;align-items:center;
-  position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(0,0,0,0.06);
-}
-.ohlbl{font-size:9px;font-weight:700;color:var(--orange);letter-spacing:.12em;text-transform:uppercase;}
-.ohttl{font-size:17px;font-weight:700;color:var(--text);}
-.exbtn{background:#F2F2F7;border:none;border-radius:20px;padding:7px 14px;
-  font-size:12px;font-weight:600;color:var(--text);cursor:pointer;font-family:inherit;}
-
-/* ── ROWS ── */
+/* ROWS */
 .row{display:flex;overflow:hidden;border-radius:14px;margin-bottom:10px;
-  box-shadow:0 1px 8px rgba(0,0,0,0.06);cursor:pointer;background:var(--card);transition:transform 0.15s;}
-.row:active{transform:scale(0.98);}
+  box-shadow:0 1px 8px rgba(0,0,0,.06);cursor:pointer;background:var(--card);
+  transition:transform .15s;}
+.row:active{transform:scale(.98);}
 .bar{width:4px;flex-shrink:0;}
 .rb{flex:1;padding:13px 14px;}
-.rt{font-size:14px;font-weight:700;color:var(--text);}
-.rs{font-size:12px;color:var(--text2);margin-top:2px;}
+.rt{font-size:14px;font-weight:700;color:var(--tx);}
+.rs{font-size:12px;color:var(--tx2);margin-top:2px;}
+.rarr{display:flex;align-items:center;padding-right:14px;color:#C7C7CC;font-size:18px;}
+
+/* BADGE */
 .bdg{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
 
-/* ── STEP PROGRESS ── */
-.prog{display:flex;gap:4px;padding:12px 16px 0;}
-.pd{height:3px;flex:1;border-radius:2px;background:var(--bg);transition:background 0.3s;}
-.snav{
-  position:fixed;bottom:0;left:0;right:0;padding:12px 16px 32px;
-  background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);
-  border-top:1px solid rgba(0,0,0,0.07);z-index:400;
-}
+/* SEARCH */
+.srch-wrap{position:relative;margin-bottom:10px;}
+.srch-wrap input{width:100%;padding:13px 14px 13px 42px;border-radius:14px;
+  border:1.5px solid var(--br);font-size:14px;outline:none;font-family:inherit;
+  background:var(--card);color:var(--tx);transition:border-color .2s;}
+.srch-wrap input:focus{border-color:var(--or);}
+.srch-ic{position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  font-size:16px;color:var(--tx2);}
 
-/* ── CHECKBOX ── */
-.cr{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;cursor:pointer;line-height:1.4;}
-.cb2{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--border);
-  background:#F8F8FA;display:flex;align-items:center;justify-content:center;
-  font-size:12px;flex-shrink:0;margin-top:1px;transition:all 0.15s;}
-.cb2.on{background:var(--orange);border-color:var(--orange);color:#fff;}
-
-/* ── PERSONA BLOCK ── */
+/* PERSONA BLOCK */
 .pb{background:#F8F8FA;border-radius:13px;padding:14px;margin-bottom:10px;position:relative;}
 .pr{position:absolute;top:10px;right:10px;background:var(--bg);border:none;border-radius:8px;
   width:28px;height:28px;font-size:13px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;color:var(--text2);}
+  display:flex;align-items:center;justify-content:center;color:var(--tx2);}
 
-/* ── LOG SESSIONE ── */
-.log-item{
-  display:flex;align-items:flex-start;gap:10px;
-  padding:10px 0;border-bottom:1px solid var(--bg);
-}
-.log-item:last-child{border-bottom:none;}
-.log-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:4px;}
-.log-text{font-size:13px;color:var(--text);flex:1;}
-.log-time{font-size:11px;color:var(--text2);flex-shrink:0;}
+/* CHECKBOX */
+.cr{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;cursor:pointer;line-height:1.4;}
+.cb2{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--br);
+  background:#F8F8FA;display:flex;align-items:center;justify-content:center;
+  font-size:12px;flex-shrink:0;margin-top:1px;transition:all .15s;}
+.cb2.on{background:var(--or);border-color:var(--or);color:#fff;}
 
-/* ── SLOT CALENDAR (riuso da socio.html) ── */
-.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;}
-.cl{text-align:center;font-size:11px;font-weight:700;color:var(--text2);padding:4px 0;}
-.cd{height:36px;width:100%;display:flex;align-items:center;justify-content:center;
-  border-radius:8px;font-size:13px;font-weight:500;color:#C7C7CC;}
-.cd.av{color:var(--text);cursor:pointer;font-weight:600;}
-.cd.tod{background:var(--bg);color:var(--orange);font-weight:700;}
-.cd.sel{background:var(--orange);color:#fff;font-weight:700;}
-.cd.un{color:var(--border);}
-.sg{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
-.sb{padding:10px 16px;border-radius:11px;border:1.5px solid var(--border);background:#fff;
-  font-size:14px;font-weight:600;cursor:pointer;color:var(--text);font-family:inherit;}
-.sb.sel{background:var(--orange);border-color:var(--orange);color:#fff;}
-.sb.bsy{background:var(--bg);color:var(--text2);cursor:default;text-decoration:line-through;}
+/* STEP PROGRESS */
+.prog{display:flex;gap:4px;padding:12px 16px 0;}
+.pd{height:3px;flex:1;border-radius:2px;background:var(--bg);transition:background .3s;}
+.snav{position:fixed;bottom:0;left:0;right:0;padding:12px 16px 32px;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(20px);
+  border-top:1px solid rgba(0,0,0,.07);z-index:400;}
 
-/* ── SCHEDA SOCIO (nel tab profilo) ── */
-.val{font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px;}
+/* OVERLAYS */
+.ov{display:none;position:fixed;inset:0;background:var(--bg);z-index:300;overflow-y:auto;}
+.ov.on{display:block;}
+.oh{background:rgba(255,255,255,.96);backdrop-filter:blur(20px);padding:14px 18px;
+  display:flex;justify-content:space-between;align-items:center;
+  position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(0,0,0,.06);}
+.ohlbl{font-size:9px;font-weight:700;color:var(--or);letter-spacing:.12em;text-transform:uppercase;}
+.ohttl{font-size:17px;font-weight:700;color:var(--tx);}
+.exbtn{background:#F2F2F7;border:none;border-radius:20px;padding:7px 14px;
+  font-size:12px;font-weight:600;color:var(--tx);cursor:pointer;font-family:inherit;}
 </style>
 </head>
 <body>
 
 <!-- TOP BAR -->
 <div class="top" id="top-bar">
-  <button class="back-btn" onclick="window.location.href='admin.html'">←</button>
-  <div class="title-area">
-    <div class="tl">ASPPI L'Aquila</div>
-    <div class="tt" id="top-title">🤝 Assistenza</div>
+  <button class="top-back" onclick="window.location.href='admin.html'">←</button>
+  <div class="top-title">
+    <div class="top-tl">ASPPI L'Aquila</div>
+    <div class="top-tt" id="top-tt">🤝 Assistenza Socio</div>
   </div>
-  <button class="admin-btn" onclick="window.location.href='admin.html'" style="min-height:44px;padding:0 16px">← Admin</button>
+  <button class="top-admin" onclick="window.location.href='admin.html'">← Admin</button>
 </div>
 
 <!-- BANNER SOCIO ATTIVO -->
-<div id="socio-banner" style="display:none">
-  <div class="socio-banner">
-    <div class="sb-avatar">👤</div>
-    <div class="sb-info">
-      <div class="sb-label">Sessione assistenza</div>
-      <div class="sb-nome" id="ban-nome">—</div>
-      <div class="sb-meta" id="ban-meta">—</div>
+<div id="soc-banner" style="display:none">
+  <div class="soc-banner">
+    <div class="soc-av">👤</div>
+    <div class="soc-info">
+      <div class="soc-lbl">Sessione assistenza attiva</div>
+      <div class="soc-nome" id="ban-nome">—</div>
+      <div class="soc-sub" id="ban-sub">—</div>
     </div>
-    <button class="sb-close" onclick="chiudiSocio()" title="Chiudi sessione e scegli altro socio">✕</button>
-  </div>
-  <div id="email-warn" class="email-warn" style="display:none">
-    ⚠️ Email non inserita — il socio non potrà accedere autonomamente
-    <button onclick="apriModificaEmail()">Aggiungi email</button>
+    <button class="soc-close" onclick="chiudiSocio()" title="Cambia socio">✕</button>
   </div>
 </div>
 
-<!-- ════════════ SCHERMATA SELEZIONE ════════════ -->
-<div id="scr-selezione" class="content">
-  <div class="sel-title">🤝 Assistenza Socio</div>
-  <div class="sel-sub">Cerca un socio esistente oppure registrane uno nuovo</div>
+<!-- ════ SCHERMATA 1: SELEZIONE SOCIO ════ -->
+<div id="pg-sel" class="pg on">
+<div class="content">
 
-  <!-- Ricerca -->
-  <div class="search-box">
-    <span class="si">🔍</span>
-    <input type="text" id="search-socio" placeholder="Nome, cognome, email o codice fiscale..."
-      oninput="cercaSocio(this.value)"/>
-  </div>
-  <div style="display:flex;gap:8px;margin-bottom:10px">
-    <button onclick="caricaTuttiSoci()"
-      style="flex:1;padding:11px;background:var(--navy);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
-      📋 Mostra tutti i soci
-    </button>
-    <button onclick="document.getElementById('search-socio').value='';document.getElementById('search-results').style.display='none'"
-      style="padding:11px 16px;background:#F2F2F7;color:var(--text);border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
-      ✕
-    </button>
-  </div>
-  <div class="search-results" id="search-results"></div>
+  <div style="font-size:22px;font-weight:800;color:var(--tx);margin-bottom:4px">Assistenza Socio</div>
+  <div style="font-size:13px;color:var(--tx2);margin-bottom:20px">Seleziona un socio o registrane uno nuovo</div>
 
-  <div class="divider-or"><span>oppure</span></div>
+  <!-- Aggiungi nuovo socio -->
+  <button class="bp" onclick="apriNuovoSocio()" style="display:flex;align-items:center;gap:10px;justify-content:center">
+    <span style="font-size:20px">+</span> Aggiungi nuovo socio
+  </button>
 
-  <!-- Nuovo socio -->
-  <div class="card"><div class="cb">
-    <div class="sec">NUOVO SOCIO</div>
-    <div class="infob">Compila i dati anagrafici. L'email è opzionale ma necessaria per permettere l'accesso autonomo al portale.</div>
-
-    <div class="g2">
-      <div>
-        <span class="lbl">Nome *</span>
-        <input type="text" class="inp" id="ns-nome" placeholder="MARIO"/>
+  <!-- Lista soci -->
+  <div class="card">
+    <div class="cb">
+      <div class="sec">SOCI REGISTRATI</div>
+      <div class="srch-wrap">
+        <span class="srch-ic">🔍</span>
+        <input type="text" id="srch-soci" placeholder="Filtra per nome, cognome, email, CF..."
+          oninput="filtraSoci(this.value)"/>
       </div>
-      <div>
-        <span class="lbl">Cognome *</span>
-        <input type="text" class="inp" id="ns-cog" placeholder="ROSSI"/>
-      </div>
+      <div id="soci-count" style="font-size:12px;color:var(--tx2);margin-bottom:10px"></div>
+      <div id="lista-soci"><div class="info">⏳ Caricamento soci...</div></div>
     </div>
+  </div>
 
+</div>
+</div>
+
+<!-- ════ SCHERMATA 2: OPERATIVA ════ -->
+<div id="pg-op" class="pg">
+<div class="content">
+
+  <div style="font-size:18px;font-weight:800;color:var(--tx);margin-bottom:4px">Immobili e Contratti</div>
+  <div style="font-size:13px;color:var(--tx2);margin-bottom:14px" id="op-sub">—</div>
+
+  <button class="bd" onclick="apriNuovoApt()">+ Aggiungi immobile</button>
+
+  <div id="op-lista-imm"><div class="info">Caricamento...</div></div>
+
+</div>
+</div>
+
+<!-- ════ OV: NUOVO SOCIO ════ -->
+<div id="ov-ns" class="ov">
+  <div class="oh">
+    <div><div class="ohlbl">ASSISTENZA</div><div class="ohttl">Nuovo socio</div></div>
+    <button class="exbtn" onclick="chiudiOv('ov-ns')">✕ Annulla</button>
+  </div>
+  <div style="padding:16px">
+  <div class="card"><div class="cb">
+    <div class="sec">DATI ANAGRAFICI</div>
+    <div class="infob">L'email è opzionale. Se inserita, il socio può registrarsi autonomamente e trovare tutto già pronto.</div>
+    <div class="g2">
+      <div><span class="lbl">Nome *</span><input type="text" class="inp" id="ns-nome" placeholder="MARIO"/></div>
+      <div><span class="lbl">Cognome *</span><input type="text" class="inp" id="ns-cog" placeholder="ROSSI"/></div>
+    </div>
     <span class="lbl">Nome visualizzato / Ragione sociale *</span>
-    <input type="text" class="inp" id="ns-display" placeholder="es. Mario Rossi oppure Agenzia Rossi"/>
-
+    <input type="text" class="inp" id="ns-disp" placeholder="Mario Rossi o Agenzia Rossi"/>
     <span class="lbl">Codice Fiscale *</span>
     <input type="text" class="inp" id="ns-cf" placeholder="RSSMRA70A01G878X"
       style="font-family:monospace;text-transform:uppercase" maxlength="16"/>
-
     <div class="g2">
-      <div>
-        <span class="lbl">Data di nascita</span>
-        <input type="text" class="inp" id="ns-dtn" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/>
-      </div>
-      <div>
-        <span class="lbl">Luogo di nascita</span>
-        <input type="text" class="inp" id="ns-lng" placeholder="L'AQUILA"/>
-      </div>
+      <div><span class="lbl">Data nascita</span><input type="text" class="inp" id="ns-dtn" placeholder="gg/mm/aaaa" maxlength="10" oninput="ad(this)"/></div>
+      <div><span class="lbl">Luogo nascita</span><input type="text" class="inp" id="ns-lng" placeholder="L'AQUILA"/></div>
     </div>
-
-    <span class="lbl">Comune di residenza</span>
+    <span class="lbl">Comune residenza</span>
     <input type="text" class="inp" id="ns-res" placeholder="L'AQUILA"/>
-
     <span class="lbl">Via e n. civico</span>
     <input type="text" class="inp" id="ns-via" placeholder="VIA ROMA 1"/>
-
     <span class="lbl">Telefono</span>
     <input type="text" class="inp" id="ns-tel" placeholder="+39 333 000 0000"/>
-
-    <span class="lbl">Email <span class="opt-badge">OPZIONALE</span></span>
+    <span class="lbl">Email <span class="opt">OPZIONALE</span></span>
     <input type="email" class="inp" id="ns-email" placeholder="mario.rossi@email.com"/>
-    <div style="font-size:11px;color:var(--text2);margin-top:4px;margin-bottom:0;line-height:1.5">
-      Se inserita, il socio potrà registrarsi autonomamente e trovare tutte le pratiche già pronte.
-    </div>
-
-    <div class="errbox" id="ns-err"></div>
-    <button class="bp" style="margin-top:16px" onclick="creaNuovoSocio()">Registra e avvia assistenza →</button>
+    <div class="err" id="ns-err"></div>
+    <button class="bp" style="margin-top:16px" onclick="creaSocio()">Registra e avvia assistenza →</button>
   </div></div>
+  </div>
 </div>
 
-<!-- ════════════ SCHERMATA OPERATIVA ════════════ -->
-<div id="scr-operativa" style="display:none">
-
-  <!-- Tab nav -->
-  <div class="op-tabs">
-    <button class="op-tab on" id="otab-immobili" onclick="switchOpTab('immobili')">
-      <span class="ot-ic">🏠</span><span>Immobili</span>
-    </button>
-    <button class="op-tab" id="otab-contratti" onclick="switchOpTab('contratti')">
-      <span class="ot-ic">📋</span><span>Contratti</span>
-    </button>
-    <button class="op-tab" id="otab-prenota" onclick="switchOpTab('prenota')">
-      <span class="ot-ic">📅</span><span>Prenota</span>
-    </button>
-    <button class="op-tab" id="otab-profilo" onclick="switchOpTab('profilo')">
-      <span class="ot-ic">👤</span><span>Profilo</span>
-    </button>
-    <button class="op-tab" id="otab-log" onclick="switchOpTab('log')">
-      <span class="ot-ic">📝</span><span>Log</span>
-    </button>
+<!-- ════ OV: APPARTAMENTO DETTAGLIO ════ -->
+<div id="ov-apt" class="ov">
+  <div class="oh">
+    <div><div class="ohlbl">IMMOBILE</div><div class="ohttl" id="oa-ttl">—</div></div>
+    <button class="exbtn" onclick="chiudiOv('ov-apt')">← Indietro</button>
   </div>
-
-  <!-- Tab: IMMOBILI -->
-  <div id="opg-immobili" class="content">
-    <div style="font-size:18px;font-weight:800;margin-bottom:4px">Immobili</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:14px">Tocca per gestire i contratti</div>
-    <div id="op-limm"><div class="info">Caricamento...</div></div>
-    <button class="bd" onclick="apriNuovoApt()">+ Aggiungi nuovo immobile</button>
-  </div>
-
-  <!-- Tab: CONTRATTI -->
-  <div id="opg-contratti" class="content" style="display:none">
-    <div style="font-size:18px;font-weight:800;margin-bottom:4px">Pratiche</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:14px">Tutte le pratiche del socio</div>
-    <div id="op-lprat"><div class="info">Caricamento...</div></div>
-  </div>
-
-  <!-- Tab: PRENOTA -->
-  <div id="opg-prenota" class="content" style="display:none">
-    <div style="font-size:18px;font-weight:800;margin-bottom:4px">Prenotazione</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:14px">Prenota un appuntamento per il socio</div>
-    <div id="op-cal-ok" style="display:none;text-align:center;padding:40px 0">
-      <div style="font-size:64px;margin-bottom:16px">✅</div>
-      <div style="font-size:20px;font-weight:800;margin-bottom:8px">Appuntamento prenotato!</div>
-      <div id="op-cal-rie" style="font-size:14px;color:var(--text2);margin-bottom:16px"></div>
-      <button class="bs" onclick="resetPren()" style="max-width:200px;margin:0 auto">Prenota un altro</button>
-    </div>
-    <div id="op-cal-form">
-      <div class="card"><div class="cb">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <button onclick="calPrev()" style="width:36px;height:36px;background:var(--bg);border:none;border-radius:10px;cursor:pointer;font-size:16px">‹</button>
-          <div style="font-size:15px;font-weight:700" id="cal-mese-lbl"></div>
-          <button onclick="calNext()" style="width:36px;height:36px;background:var(--bg);border:none;border-radius:10px;cursor:pointer;font-size:16px">›</button>
-        </div>
-        <div class="cg" id="cal-lbl-row"></div>
-        <div class="cg" id="cal-days"></div>
-      </div></div>
-      <div id="op-slot-sec" style="display:none">
-        <div class="card"><div class="cb">
-          <div style="font-size:13px;font-weight:700;margin-bottom:10px" id="op-slot-ttl">Orari disponibili</div>
-          <div class="sg" id="op-slot-grid"></div>
-        </div></div>
-      </div>
-      <div id="op-rie" style="display:none">
-        <div class="card"><div class="cb">
-          <div class="sec">CONFERMA PRENOTAZIONE</div>
-          <div class="lbl">Data e ora</div>
-          <div class="val" id="op-data-ora"></div>
-          <label class="lbl">Motivo *</label>
-          <select class="inp" id="op-motivo">
-            <option value="">-- Seleziona --</option>
-            <option>Nuovo contratto di locazione</option>
-            <option>Rinnovo / proroga contratto</option>
-            <option>Subentro o cessione contratto</option>
-            <option>Consulenza affitto</option>
-            <option>Registrazione contratto</option>
-            <option>Ritiro documenti</option>
-            <option>Altro</option>
-          </select>
-          <div class="errbox" id="op-pren-err"></div>
-          <button class="bp" onclick="confermaPren()">Conferma appuntamento</button>
-        </div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tab: PROFILO -->
-  <div id="opg-profilo" class="content" style="display:none">
-    <div style="font-size:18px;font-weight:800;margin-bottom:14px">Dati del socio</div>
+  <div style="padding:16px">
     <div class="card"><div class="cb">
-      <div class="sec">DATI ANAGRAFICI</div>
-      <div class="lbl">Nome e Cognome</div><div class="val" id="op-pr-nome"></div>
-      <div class="lbl">Codice Fiscale</div><div class="val" id="op-pr-cf" style="font-family:monospace"></div>
-      <div class="lbl">Data di nascita</div><div class="val" id="op-pr-dtn"></div>
-      <div class="lbl">Luogo di nascita</div><div class="val" id="op-pr-lng"></div>
-      <div class="lbl">Comune di residenza</div><div class="val" id="op-pr-res"></div>
-      <div class="lbl">Via e n. civico</div><div class="val" id="op-pr-via"></div>
-      <div class="lbl">Telefono</div><div class="val" id="op-pr-tel"></div>
-      <div class="lbl">Email</div><div class="val" id="op-pr-email"></div>
-      <button class="bs" onclick="apriModificaSocio()" style="margin-top:4px">✏️ Modifica dati</button>
+      <div class="sec">DATI</div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:4px">Indirizzo</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:12px" id="oa-ind">—</div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:4px">Categoria catastale</div>
+      <div style="font-size:14px;font-weight:600" id="oa-cat">—</div>
     </div></div>
-    <div class="card"><div class="cb">
-      <div class="sec">TESSERA</div>
-      <div id="op-pr-tessera"><div class="info">Caricamento...</div></div>
-    </div></div>
-    <div class="card"><div class="cb">
-      <div class="sec">PAGAMENTI</div>
-      <div id="op-pr-pagamenti"><div class="info">Caricamento...</div></div>
-    </div></div>
+    <div style="font-size:17px;font-weight:800;margin-bottom:10px">Contratti</div>
+    <div id="oa-cnts"></div>
+    <button class="bp" onclick="apriNuovoCnt()">+ Nuovo contratto</button>
+    <button class="bs" id="btn-del-apt" style="color:var(--rd);border-color:var(--rdl)">🗑️ Rimuovi immobile</button>
   </div>
-
-  <!-- Tab: LOG -->
-  <div id="opg-log" class="content" style="display:none">
-    <div style="font-size:18px;font-weight:800;margin-bottom:4px">Log sessione</div>
-    <div style="font-size:13px;color:var(--text2);margin-bottom:14px">Operazioni eseguite in questa sessione</div>
-    <div class="card"><div class="cb" id="log-lista">
-      <div class="info">Nessuna operazione ancora.</div>
-    </div></div>
-  </div>
-
 </div>
 
-<!-- ════════════ OV: NUOVO APPARTAMENTO ════════════ -->
+<!-- ════ OV: NUOVO APPARTAMENTO wizard 3 step ════ -->
 <div id="ov-napt" class="ov">
   <div class="oh">
     <div><div class="ohlbl">NUOVO IMMOBILE</div><div class="ohttl" id="napt-ttl">Passo 1 di 3</div></div>
@@ -522,623 +285,452 @@ textarea.inp{min-height:90px;resize:vertical;}
   <div class="snav"><button class="bp" id="napt-btn" onclick="naptAvanti()">Avanti</button></div>
 </div>
 
-<!-- ════════════ OV: APPARTAMENTO DETTAGLIO ════════════ -->
-<div id="ov-apt" class="ov">
+<!-- ════ OV: CONTRATTO DETTAGLIO ════ -->
+<div id="ov-cnt" class="ov">
   <div class="oh">
-    <div><div class="ohlbl">IMMOBILE</div><div class="ohttl" id="oa-ttl"></div></div>
-    <button class="exbtn" onclick="chiudiOv('ov-apt')">← Indietro</button>
+    <div><div class="ohlbl">CONTRATTO</div><div class="ohttl" id="oc-ttl">—</div></div>
+    <button class="exbtn" onclick="chiudiOv('ov-cnt')">← Indietro</button>
   </div>
   <div style="padding:16px">
     <div class="card"><div class="cb">
-      <div class="sec">DATI</div>
-      <div class="lbl">Categoria</div><div class="val" id="oa-cat"></div>
-      <div class="lbl">Indirizzo</div><div class="val" id="oa-ind"></div>
+      <div class="sec">DATI PRINCIPALI</div>
+      <div class="g2">
+        <div><div style="font-size:11px;color:var(--tx2)">Tipo</div><div style="font-size:14px;font-weight:700" id="oc-tipo">—</div></div>
+        <div><div style="font-size:11px;color:var(--tx2)">Stato</div><div style="font-size:14px;font-weight:700" id="oc-stato">—</div></div>
+        <div><div style="font-size:11px;color:var(--tx2)">Dal</div><div style="font-size:14px;font-weight:700" id="oc-dal">—</div></div>
+        <div><div style="font-size:11px;color:var(--tx2)">Al</div><div style="font-size:14px;font-weight:700" id="oc-al">—</div></div>
+      </div>
+      <div style="font-size:11px;color:var(--tx2);margin-top:4px">Canone mensile</div>
+      <div style="font-size:14px;font-weight:700" id="oc-canone">—</div>
     </div></div>
-    <div style="font-size:17px;font-weight:800;margin-bottom:10px">Contratti</div>
-    <div id="oa-cnts"></div>
-    <button class="bp" onclick="apriNuovoCnt()">+ Nuovo contratto</button>
-    <button class="bs" id="btn-del-apt-as" style="color:var(--red);border-color:var(--red-l)">🗑️ Rimuovi immobile</button>
+    <div style="font-size:15px;font-weight:800;margin-bottom:10px">Adempimenti</div>
+    <div class="row" id="btn-proroga-cnt">
+      <div class="bar" style="background:var(--bl)"></div>
+      <div class="rb"><div class="rt">🔄 Proroga</div><div class="rs">Estendi la durata del contratto</div></div>
+      <div class="rarr">›</div>
+    </div>
+    <div class="row" id="btn-subentro-cnt">
+      <div class="bar" style="background:var(--gr)"></div>
+      <div class="rb"><div class="rt">👤 Subentro conduttore</div><div class="rs">Nuovo conduttore subentra</div></div>
+      <div class="rarr">›</div>
+    </div>
+    <div class="row" id="btn-cessione-cnt">
+      <div class="bar" style="background:var(--or)"></div>
+      <div class="rb"><div class="rt">📤 Cessione</div><div class="rs">Cede il contratto a terzi</div></div>
+      <div class="rarr">›</div>
+    </div>
+    <button class="bs" id="btn-elimina-cnt" style="color:var(--rd);border-color:var(--rdl);margin-top:4px">🗑️ Elimina pratica</button>
   </div>
 </div>
 
-<!-- ════════════ OV: NUOVO CONTRATTO ════════════ -->
+<!-- ════ OV: NUOVO CONTRATTO wizard 9 step ════ -->
 <div id="ov-ncnt" class="ov">
   <div class="oh">
     <div><div class="ohlbl" id="ncnt-lbl">NUOVO CONTRATTO</div><div class="ohttl" id="ncnt-ttl">Passo 1 di 9</div></div>
-    <button class="exbtn" id="btn-ncnt-back" onclick="ncntBack()">← Indietro</button>
+    <button class="exbtn" id="ncnt-back-btn" onclick="ncntBack()">← Indietro</button>
   </div>
   <div class="prog" id="ncnt-prog"></div>
   <div style="padding:16px 16px 100px" id="ncnt-body"></div>
   <div class="snav"><button class="bp" id="ncnt-btn" onclick="ncntAvanti()">Avanti</button></div>
 </div>
 
-<!-- ════════════ OV: DETTAGLIO CONTRATTO ════════════ -->
-<div id="ov-cnt" class="ov">
+<!-- ════ OV: ADEMPIMENTO ════ -->
+<div id="ov-adm" class="ov">
   <div class="oh">
-    <div><div class="ohlbl">CONTRATTO</div><div class="ohttl" id="oc-ttl"></div></div>
-    <button class="exbtn" onclick="chiudiOv('ov-cnt')">← Indietro</button>
+    <div><div class="ohlbl" id="adm-lbl">ADEMPIMENTO</div><div class="ohttl" id="adm-ttl">—</div></div>
+    <button class="exbtn" onclick="chiudiOv('ov-adm')">← Indietro</button>
   </div>
-  <div style="padding:16px">
-    <div class="card"><div class="cb">
-      <div class="sec">DATI</div>
-      <div class="lbl">Tipo</div><div class="val" id="oc-tipo"></div>
-      <div class="g2">
-        <div><div class="lbl">Dal</div><div class="val" id="oc-dal"></div></div>
-        <div><div class="lbl">Al</div><div class="val" id="oc-al"></div></div>
-      </div>
-      <div class="lbl">Canone mensile</div><div class="val" id="oc-canone"></div>
-      <div class="lbl">Deposito</div><div class="val" id="oc-dep"></div>
-    </div></div>
-    <button class="bs" id="btn-elimina-cnt-as" style="color:var(--red);border-color:var(--red-l)">🗑️ Elimina pratica</button>
-  </div>
-</div>
-
-<!-- ════════════ OV: MODIFICA EMAIL ════════════ -->
-<div id="ov-email" class="ov">
-  <div class="oh">
-    <div><div class="ohlbl">PROFILO</div><div class="ohttl">Aggiungi email</div></div>
-    <button class="exbtn" onclick="chiudiOv('ov-email')">← Indietro</button>
-  </div>
-  <div style="padding:16px">
-    <div class="card"><div class="cb">
-      <div class="sec">EMAIL DEL SOCIO</div>
-      <div class="infob">Una volta inserita, il socio potrà registrarsi autonomamente con questa email e trovare tutte le pratiche già pronte.</div>
-      <span class="lbl">Indirizzo email</span>
-      <input type="email" class="inp" id="email-inp" placeholder="mario.rossi@email.com"/>
-      <div class="errbox" id="email-err"></div>
-      <div id="email-ok" class="infog" style="display:none">✅ Email aggiornata!</div>
-      <button class="bp" style="margin-top:14px" onclick="salvaEmail()">Salva email</button>
-    </div></div>
-  </div>
-</div>
-
-<!-- ════════════ OV: MODIFICA SOCIO ════════════ -->
-<div id="ov-mod-socio" class="ov">
-  <div class="oh">
-    <div><div class="ohlbl">PROFILO</div><div class="ohttl">Modifica dati</div></div>
-    <button class="exbtn" onclick="chiudiOv('ov-mod-socio')">← Indietro</button>
-  </div>
-  <div style="padding:16px">
-    <div class="card"><div class="cb">
-      <div class="sec">DATI ANAGRAFICI</div>
-      <span class="lbl">Nome *</span><input type="text" class="inp" id="ms-nome"/>
-      <span class="lbl">Cognome *</span><input type="text" class="inp" id="ms-cog"/>
-      <span class="lbl">Codice Fiscale</span><input type="text" class="inp" id="ms-cf" style="font-family:monospace;text-transform:uppercase" maxlength="16"/>
-      <span class="lbl">Data di nascita</span><input type="text" class="inp" id="ms-dtn" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/>
-      <span class="lbl">Luogo di nascita</span><input type="text" class="inp" id="ms-lng"/>
-      <span class="lbl">Comune di residenza</span><input type="text" class="inp" id="ms-res"/>
-      <span class="lbl">Via e n. civico</span><input type="text" class="inp" id="ms-via"/>
-      <span class="lbl">Telefono</span><input type="text" class="inp" id="ms-tel"/>
-      <span class="lbl">Email <span class="opt-badge">OPZIONALE</span></span>
-      <input type="email" class="inp" id="ms-email"/>
-      <div class="errbox" id="ms-err"></div>
-      <div id="ms-ok" class="infog" style="display:none">✅ Dati aggiornati!</div>
-      <button class="bp" style="margin-top:14px" onclick="salvaModificaSocio()">Salva dati</button>
-    </div></div>
-  </div>
+  <div style="padding:16px" id="adm-body"></div>
 </div>
 
 <script>
-// ════════════════════════════════════════════════════════════
-// ASPPI — ASSISTENZA
-// Sessione operatore: accesso admin, operazioni per conto socio
-// ════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════
+// ASPPI ASSISTENZA — v3
+// Accesso admin, operazioni per conto socio
+// ════════════════════════════════════════════
+var API    = 'https://rough-resonance-cba6.asppilaquila.workers.dev';
+var ATOKEN = 'ASPPI_ADMIN_asppi2025laquila';
 
-var API     = "https://rough-resonance-cba6.asppilaquila.workers.dev";
-var ATOKEN  = "ASPPI_ADMIN_asppi2025laquila";
+var SOCIO       = null;   // socio selezionato
+var ALL_SOCI    = [];     // cache lista soci
+var ALL_APT     = [];     // tutti gli appartamenti (filtro client-side)
+var ALL_CNT     = [];     // tutti i contratti (filtro client-side)
+var curApt      = null;
+var curCnt      = null;
+var naptStep    = 0; var naptD = {};
+var ncntStep    = 0; var ncntD = {};
+var NLABELS     = ['Tipo','Durata','Canone','Immobile','Locatori','Conduttori','Garanti','Note','Privacy'];
 
-// Stato sessione
-var SOCIO   = null;  // profilo socio corrente
-var D       = { appartamenti:[], contratti:[], prenotazioni:[], slot:[], slotMatrix:{}, chiusure:[] };
-var LOG     = [];    // log operazioni sessione
-
-// Calendario
-var calDay=null, calSlot=null;
-var calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
-var MESI=['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
-
-// Wizard appartamento
-var naptStep=0, naptD={};
-// Wizard contratto
-var ncntStep=0, ncntD={};
-var NLABELS=['Tipo','Durata','Canone','Immobile','Locatori','Conduttori','Garanti','Note','Privacy'];
-
-// Curre apt/cnt
-var curApt=null, curCnt=null;
-
-// ── INIT ─────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────
 window.onload = function() {
   if (localStorage.getItem('asppi_admin_ok') !== 'yes') {
     window.location.replace('index.html'); return;
   }
   // Ripristina socio da sessione precedente
   try {
-    var stored = JSON.parse(localStorage.getItem('asppi_assistenza_socio') || 'null');
-    if (stored && stored.id) {
-      SOCIO = stored;
-      mostraSchermataOperativa();
-    }
+    var st = JSON.parse(localStorage.getItem('asppi_assistenza_socio') || 'null');
+    if (st && st.id) { SOCIO = st; mostraOperativa(); }
   } catch(e) {}
 
-  // Carica slot e chiusure
-  apiCall('getSlot', {}, function(err, r) {
-    if (!err && r && r.ok) {
-      D.slotMatrix = r.slotMatrix || {};
-      D.slot = r.orari || [];
-    }
-    initCal();
-  });
-  apiCall('getChiusure', {}, function(err, r) {
-    if (!err && r && r.ok) D.chiusure = r.data || [];
-  });
+  caricaSoci();
 };
 
-// ── NAVIGAZIONE ───────────────────────────────────────────────
-function tornaAdmin() {
-  window.location.href = 'admin.html';
-}
-
-function chiudiSocio() {
-  if (!confirm('Chiudere la sessione con ' + (SOCIO ? SOCIO.nome : 'il socio') + '?')) return;
-  SOCIO = null;
-  localStorage.removeItem('asppi_assistenza_socio');
-  D = { appartamenti:[], contratti:[], prenotazioni:[], slot:D.slot, slotMatrix:D.slotMatrix, chiusure:D.chiusure };
-  LOG = [];
-  document.getElementById('scr-operativa').style.display = 'none';
-  document.getElementById('scr-selezione').style.display = 'block';
-  document.getElementById('socio-banner').style.display = 'none';
-  document.getElementById('top-title').textContent = '🤝 Assistenza';
-  // Pulisci form nuovo socio
-  ['ns-nome','ns-cog','ns-display','ns-cf','ns-dtn','ns-lng','ns-res','ns-via','ns-tel','ns-email']
-    .forEach(function(id){ var e=document.getElementById(id); if(e) e.value=''; });
-  document.getElementById('search-socio').value = '';
-  document.getElementById('search-results').style.display = 'none';
-}
-
-function apriOv(id) { var e=document.getElementById(id); if(e){e.className='ov on';e.scrollTop=0;} }
-function chiudiOv(id) { var e=document.getElementById(id); if(e) e.className='ov'; }
+// ── UTILS ─────────────────────────────────────
 function T(id) { return document.getElementById(id); }
-function fmtDate(d) {
+function ad(inp) {
+  var v = inp.value.replace(/[^0-9]/g,'');
+  if (v.length > 2) v = v.substring(0,2) + '/' + v.substring(2);
+  if (v.length > 5) v = v.substring(0,5) + '/' + v.substring(5);
+  inp.value = v.substring(0,10);
+}
+function fmt(d) {
   if (!d) return '—';
-  if (typeof d === 'string' && d.indexOf('T') > -1) {
+  if (typeof d === 'string' && d.includes('T')) {
     var p = d.substring(0,10).split('-'); return p[2]+'/'+p[1]+'/'+p[0];
   }
-  return d || '—';
+  return d;
 }
-function pad(n) { return n < 10 ? '0'+n : ''+n; }
+function apriOv(id) { var e=T(id); if(e){e.className='ov on';e.scrollTop=0;} }
+function chiudiOv(id) { var e=T(id); if(e) e.className='ov'; }
+function showErr(id, msg) { var e=T(id); if(e){e.textContent=msg;e.style.display=msg?'':'none';} }
 
-// ── API ───────────────────────────────────────────────────────
-function apiCall(action, data, cb) {
-  var payload = { action: action, token: ATOKEN };
-  if (data) for (var k in data) { if (data.hasOwnProperty(k)) payload[k] = data[k]; }
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', API, true);
-  xhr.setRequestHeader('Content-Type', 'text/plain');
-  xhr.timeout = 25000;
-  xhr.onload = function() {
-    try { cb(null, JSON.parse(xhr.responseText)); }
-    catch(e) { cb('Risposta non valida'); }
-  };
-  xhr.onerror = function() { cb('Errore connessione'); };
-  xhr.ontimeout = function() { cb('Timeout'); };
-  xhr.send(JSON.stringify(payload));
-}
-
-// ── LOG SESSIONE ──────────────────────────────────────────────
-function addLog(msg) {
-  var ora = new Date().toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'});
-  LOG.push({ msg: msg, ora: ora });
-  var el = T('log-lista');
-  if (el) {
-    if (LOG.length === 1) el.innerHTML = '';
-    var div = document.createElement('div');
-    div.className = 'log-item';
-    div.innerHTML = '<div class="log-dot"></div>'
-      + '<div class="log-text">' + msg + '</div>'
-      + '<div class="log-time">' + ora + '</div>';
-    el.insertBefore(div, el.firstChild);
-  }
-}
-
-// ── RICERCA SOCIO ─────────────────────────────────────────────
-function cercaSocio(q) {
-  var el = T('search-results');
-  if (!q || q.length < 2) { el.style.display = 'none'; return; }
-  el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--text2)">🔍 Ricerca in corso...</div>';
-  el.style.display = 'block';
+// ── API ───────────────────────────────────────
+function api(action, data, cb) {
+  var payload = Object.assign({ action: action, token: ATOKEN }, data || {});
   fetch(API, {
     method: 'POST',
-    headers: {'Content-Type':'text/plain'},
-    body: JSON.stringify({ action: 'getUtenti', token: ATOKEN }),
+    headers: {'Content-Type': 'text/plain'},
+    body: JSON.stringify(payload),
     redirect: 'follow'
   })
-  .then(function(res){ return res.text(); })
-  .then(function(text){
+  .then(function(r){ return r.text(); })
+  .then(function(txt){
     var r;
-    try { r = JSON.parse(text); } catch(e) {
-      r = { ok: false, error: 'Risposta non valida dal server' };
-    }
-    if (!r || !r.ok) {
-      el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--red)">❌ ' + (r&&r.error||'Errore connessione') + '</div>';
-      el.style.display = 'block'; return;
-    }
-    var utenti = r.data || [];
-    var ql = q.toLowerCase();
-    var found = utenti.filter(function(u) {
-      return (u.nome||'').toLowerCase().includes(ql)
-          || (u.cognome||'').toLowerCase().includes(ql)
-          || (u.displayName||'').toLowerCase().includes(ql)
-          || (u.email||'').toLowerCase().includes(ql)
-          || (u.cf||'').toLowerCase().includes(ql);
-    });
-    if (!found.length) {
-      el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--text2)">Nessun risultato per "' + q + '" — ' + utenti.length + ' soci totali</div>';
-      el.style.display = 'block'; return;
-    }
-    el.innerHTML = '';
-    found.slice(0, 8).forEach(function(u) {
-      var div = document.createElement('div');
-      div.className = 'search-result-item';
-      div.innerHTML = '<div class="sri-avatar">👤</div>'
-        + '<div><div class="sri-nome">' + (u.displayName || ((u.nome||'') + ' ' + (u.cognome||'')).trim()) + '</div>'
-        + '<div class="sri-meta">' + (u.email || 'Email non inserita') + (u.cf ? ' · ' + u.cf : '') + '</div></div>'
-        + '<div class="sri-arr">›</div>';
-      div.addEventListener('click', function(){ selezionaSocio(u); });
-      el.appendChild(div);
-    });
-    el.style.display = 'block';
+    try { r = JSON.parse(txt); } catch(e) { r = {ok:false, error:'Risposta non valida: '+txt.substring(0,80)}; }
+    cb(null, r);
   })
-  .catch(function(err2){
-    el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--red)">❌ Connessione fallita: ' + err2.message + '</div>';
-    el.style.display = 'block';
-  });
+  .catch(function(e){ cb(e.message); });
 }
 
-function selezionaSocio(u) {
-  SOCIO = u;
-  localStorage.setItem('asppi_assistenza_socio', JSON.stringify(SOCIO));
-  addLog('Sessione avviata per ' + (SOCIO.displayName || SOCIO.nome));
-  mostraSchermataOperativa();
-  caricaDatiSocio();
-}
-
-function caricaTuttiSoci() {
-  var el = T('search-results');
-  var inp = T('search-socio');
-  if (inp) inp.value = '';
-  el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--text2)">⏳ Caricamento soci...</div>';
-  el.style.display = 'block';
-
-  fetch(API, {
-    method: 'POST',
-    headers: {'Content-Type':'text/plain'},
-    body: JSON.stringify({ action: 'getUtenti', token: ATOKEN }),
-    redirect: 'follow'
-  })
-  .then(function(res){ return res.text(); })
-  .then(function(text){
-    var r;
-    try { r = JSON.parse(text); } catch(e) {
-      el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--red)">❌ Risposta non valida: ' + text.substring(0,120) + '</div>';
-      el.style.display = 'block'; return;
+// ── SOCI ──────────────────────────────────────
+function caricaSoci() {
+  T('lista-soci').innerHTML = '<div class="info">⏳ Caricamento...</div>';
+  api('getUtenti', {}, function(err, r) {
+    if (err || !r || !r.ok) {
+      T('lista-soci').innerHTML = '<div class="info" style="color:var(--rd)">❌ ' + (err || (r&&r.error) || 'Errore') + '</div>';
+      return;
     }
-    if (!r || !r.ok) {
-      el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--red)">❌ ' + (r&&r.error||'Errore sconosciuto') + '</div>';
-      el.style.display = 'block'; return;
-    }
-    var utenti = (r.data || []).sort(function(a,b){
+    ALL_SOCI = (r.data || []).sort(function(a,b){
       return ((a.cognome||a.nome||'')).localeCompare((b.cognome||b.nome||''));
     });
-    if (!utenti.length) {
-      el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--text2)">Nessun socio registrato.</div>';
-      el.style.display = 'block'; return;
-    }
-    el.innerHTML = '<div style="padding:10px 14px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #F2F2F7">' + utenti.length + ' SOCI REGISTRATI</div>';
-    utenti.forEach(function(u) {
-      var div = document.createElement('div');
-      div.className = 'search-result-item';
-      var nome = u.displayName || ((u.nome||'') + ' ' + (u.cognome||'')).trim();
-      div.innerHTML = '<div class="sri-avatar">👤</div>'
-        + '<div style="flex:1"><div class="sri-nome">' + nome + '</div>'
-        + '<div class="sri-meta">' + (u.email||'Email non inserita') + (u.cf?' · '+u.cf:'') + '</div></div>'
-        + '<div class="sri-arr">›</div>';
-      div.addEventListener('click', function(){ selezionaSocio(u); });
-      el.appendChild(div);
-    });
-    el.style.display = 'block';
-    // Abilita ricerca live dopo il caricamento
-    if (inp) inp.oninput = function(){ filtraSociCaricati(this.value, utenti); };
-  })
-  .catch(function(err2){
-    el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--red)">❌ Connessione fallita: ' + err2.message + '</div>';
-    el.style.display = 'block';
+    renderSoci(ALL_SOCI);
   });
 }
 
-function filtraSociCaricati(q, utenti) {
-  var el = T('search-results'); if (!el) return;
+function renderSoci(lista) {
+  var el = T('lista-soci'); var cnt = T('soci-count');
+  if (cnt) cnt.textContent = lista.length + ' soci' + (lista.length !== ALL_SOCI.length ? ' (filtrati su '+ALL_SOCI.length+' totali)' : '');
+  if (!lista.length) { el.innerHTML = '<div class="info">Nessun socio trovato.</div>'; return; }
+  el.innerHTML = '';
+  lista.forEach(function(u) {
+    var nome = u.displayName || ((u.nome||'') + ' ' + (u.cognome||'')).trim();
+    var div = document.createElement('div'); div.className = 'row';
+    var bar = document.createElement('div'); bar.className = 'bar'; bar.style.background = '#E8631A';
+    var rb  = document.createElement('div'); rb.className = 'rb';
+    rb.innerHTML = '<div class="rt">' + nome + '</div>'
+      + '<div class="rs">' + (u.email || 'Email non inserita') + (u.cf ? ' · ' + u.cf : '') + '</div>';
+    var arr = document.createElement('div'); arr.className = 'rarr'; arr.textContent = '›';
+    div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
+    div.addEventListener('click', (function(u){ return function(){ selezionaSocio(u); }; })(u));
+    el.appendChild(div);
+  });
+}
+
+function filtraSoci(q) {
+  if (!q) { renderSoci(ALL_SOCI); return; }
   var ql = q.toLowerCase();
-  var found = !q ? utenti : utenti.filter(function(u){
+  renderSoci(ALL_SOCI.filter(function(u){
     return (u.nome||'').toLowerCase().includes(ql)
         || (u.cognome||'').toLowerCase().includes(ql)
         || (u.displayName||'').toLowerCase().includes(ql)
         || (u.email||'').toLowerCase().includes(ql)
         || (u.cf||'').toLowerCase().includes(ql);
-  });
-  el.innerHTML = '<div style="padding:10px 14px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #F2F2F7">' + found.length + ' RISULTATI</div>';
-  found.forEach(function(u) {
-    var div = document.createElement('div');
-    div.className = 'search-result-item';
-    var nome = u.displayName || ((u.nome||'') + ' ' + (u.cognome||'')).trim();
-    div.innerHTML = '<div class="sri-avatar">👤</div>'
-      + '<div style="flex:1"><div class="sri-nome">' + nome + '</div>'
-      + '<div class="sri-meta">' + (u.email||'Email non inserita') + (u.cf?' · '+u.cf:'') + '</div></div>'
-      + '<div class="sri-arr">›</div>';
-    div.addEventListener('click', function(){ selezionaSocio(u); });
-    el.appendChild(div);
-  });
-  el.style.display = 'block';
+  }));
 }
 
+// ── SELEZIONE SOCIO ───────────────────────────
+function selezionaSocio(u) {
+  SOCIO = u;
+  localStorage.setItem('asppi_assistenza_socio', JSON.stringify(SOCIO));
+  mostraOperativa();
+  caricaDatiSocio();
+}
 
-// ── CREA NUOVO SOCIO ─────────────────────────────────────────
-function creaNuovoSocio() {
-  var nome    = (T('ns-nome')||{}).value.trim();
-  var cog     = (T('ns-cog')||{}).value.trim();
-  var display = (T('ns-display')||{}).value.trim();
-  var cf      = (T('ns-cf')||{}).value.trim();
-  var email   = (T('ns-email')||{}).value.trim();
-  var errEl   = T('ns-err');
-  if (errEl) errEl.style.display = 'none';
+function chiudiSocio() {
+  SOCIO = null;
+  localStorage.removeItem('asppi_assistenza_socio');
+  ALL_APT = []; ALL_CNT = [];
+  T('pg-sel').className = 'pg on';
+  T('pg-op').className  = 'pg';
+  T('soc-banner').style.display = 'none';
+  T('top-tt').textContent = '🤝 Assistenza Socio';
+  T('srch-soci').value = '';
+  renderSoci(ALL_SOCI);
+}
 
-  if (!nome || !cog || !display || !cf) {
-    if (errEl) { errEl.textContent = 'Nome, cognome, nome visualizzato e codice fiscale sono obbligatori'; errEl.style.display = ''; }
-    return;
-  }
+function mostraOperativa() {
+  if (!SOCIO) return;
+  var nome = SOCIO.displayName || ((SOCIO.nome||'') + ' ' + (SOCIO.cognome||'')).trim();
+  T('ban-nome').textContent = nome;
+  T('ban-sub').textContent  = (SOCIO.email || 'Email non inserita') + (SOCIO.cf ? ' · ' + SOCIO.cf : '');
+  T('soc-banner').style.display = 'block';
+  T('top-tt').textContent = '🤝 ' + (SOCIO.nome || nome);
+  T('op-sub').textContent = 'Operando per: ' + nome;
+  T('pg-sel').className = 'pg';
+  T('pg-op').className  = 'pg on';
+}
 
-  var dati = {
-    nome: nome, cognome: cog, displayName: display, cf: cf,
-    dataNascita:     (T('ns-dtn')||{}).value.trim(),
-    luogoNascita:    (T('ns-lng')||{}).value.trim(),
-    comuneResidenza: (T('ns-res')||{}).value.trim(),
-    viaResidenza:    (T('ns-via')||{}).value.trim(),
-    telefono:        (T('ns-tel')||{}).value.trim(),
-    email:           email,
-    preRegistrato:   true,
-  };
-
-  var btn = document.querySelector('#scr-selezione .bp');
-  if (btn) { btn.textContent = 'Registrazione in corso...'; btn.disabled = true; }
-
-  apiCall('createOrFindSocio', dati, function(err, r) {
-    if (btn) { btn.textContent = 'Registra e avvia assistenza →'; btn.disabled = false; }
+// ── CARICA DATI SOCIO ─────────────────────────
+function caricaDatiSocio() {
+  T('op-lista-imm').innerHTML = '<div class="info">Caricamento...</div>';
+  // Carica tutti gli appartamenti con token admin (filtra client-side per userId)
+  api('getAppartamenti', {}, function(err, r) {
     if (err || !r || !r.ok) {
-      if (errEl) { errEl.textContent = (r && r.error) || err || 'Errore. Riprova.'; errEl.style.display = ''; }
+      T('op-lista-imm').innerHTML = '<div class="info" style="color:var(--rd)">❌ ' + (err||(r&&r.error)||'Errore') + '</div>';
       return;
     }
-    SOCIO = r.socio;
-    localStorage.setItem('asppi_assistenza_socio', JSON.stringify(SOCIO));
-    addLog(r.trovato ? 'Socio trovato: ' + SOCIO.nome : 'Nuovo socio creato: ' + SOCIO.nome);
-    mostraSchermataOperativa();
-    caricaDatiSocio();
+    ALL_APT = (r.data || []).filter(function(a) {
+      return a.userId === SOCIO.id &&
+        a.rimosso !== true && String(a.rimosso).toLowerCase() !== 'true';
+    });
+    // Ora carica contratti
+    api('getContratti', {}, function(err2, r2) {
+      ALL_CNT = (!err2 && r2 && r2.ok) ? (r2.data || []).filter(function(c){
+        return c.userId === SOCIO.id &&
+          c.eliminato !== true && String(c.eliminato).toLowerCase() !== 'true';
+      }) : [];
+      renderImmobili();
+    });
   });
 }
 
-// ── SCHERMATA OPERATIVA ───────────────────────────────────────
-function mostraSchermataOperativa() {
-  T('scr-selezione').style.display = 'none';
-  T('scr-operativa').style.display = 'block';
-  T('socio-banner').style.display = 'block';
-
-  var nomeDisplay = SOCIO.displayName || ((SOCIO.nome||'') + ' ' + (SOCIO.cognome||'')).trim();
-  T('ban-nome').textContent = nomeDisplay;
-  T('ban-meta').textContent = (SOCIO.email || 'Email non inserita') + (SOCIO.cf ? ' · ' + SOCIO.cf : '');
-  T('top-title').textContent = '🤝 ' + (SOCIO.nome || 'Assistenza');
-
-  // Avviso email mancante
-  if (!SOCIO.email) {
-    T('email-warn').style.display = 'flex';
-  } else {
-    T('email-warn').style.display = 'none';
-  }
-
-  // Aggiorna profilo tab
-  T('op-pr-nome').textContent = ((SOCIO.nome||'') + ' ' + (SOCIO.cognome||'')).trim() || '—';
-  T('op-pr-cf').textContent   = SOCIO.cf || '—';
-  T('op-pr-dtn').textContent  = SOCIO.dataNascita || '—';
-  T('op-pr-lng').textContent  = SOCIO.luogoNascita || '—';
-  T('op-pr-res').textContent  = SOCIO.comuneResidenza || '—';
-  T('op-pr-via').textContent  = SOCIO.viaResidenza || '—';
-  T('op-pr-tel').textContent  = SOCIO.telefono || '—';
-  T('op-pr-email').textContent = SOCIO.email || '—';
-}
-
-function switchOpTab(id) {
-  ['immobili','contratti','prenota','profilo','log'].forEach(function(t) {
-    var pg = T('opg-'+t); var tb = T('otab-'+t);
-    if (pg) pg.style.display = t === id ? '' : 'none';
-    if (tb) tb.className = 'op-tab' + (t === id ? ' on' : '');
-  });
-  if (id === 'profilo') caricaProfiloSocio();
-}
-
-// ── CARICA DATI SOCIO ─────────────────────────────────────────
-function caricaDatiSocio() {
-  // Appartamenti
-  apiCall('getAppartamentiSocio', { userId: SOCIO.id }, function(err, r) {
-    D.appartamenti = (!err && r && r.ok) ? r.data || [] : [];
-    renderImmobili();
-  });
-  // Contratti
-  apiCall('getContrattiSocio', { userId: SOCIO.id }, function(err, r) {
-    D.contratti = (!err && r && r.ok) ? r.data || [] : [];
-    renderContratti();
-  });
-  // Prenotazioni
-  apiCall('getPrenotazioniSocio', { userId: SOCIO.id }, function(err, r) {
-    D.prenotazioni = (!err && r && r.ok) ? r.data || [] : [];
-  });
-}
-
-// ── RENDER IMMOBILI ───────────────────────────────────────────
+// ── RENDER IMMOBILI ───────────────────────────
 function renderImmobili() {
-  var el = T('op-limm'); if (!el) return;
+  var el = T('op-lista-imm'); if (!el) return;
+  if (!ALL_APT.length) {
+    el.innerHTML = '<div class="info">Nessun immobile ancora.<br><br>Usa il pulsante sopra per aggiungerne uno.</div>';
+    return;
+  }
   el.innerHTML = '';
-  var lista = D.appartamenti.filter(function(a) {
-    var r = a.rimosso; return !r || String(r).toLowerCase() === 'false' || r === 0;
-  });
-  if (!lista.length) { el.innerHTML = '<div class="info">Nessun immobile ancora.</div>'; return; }
-  lista.forEach(function(a) {
-    var cnts = D.contratti.filter(function(c) { return c.appartamentoId === a.id; });
-    var att  = cnts.some(function(c) { return c.stato !== 'completato'; });
+  ALL_APT.forEach(function(a) {
+    var cnts = ALL_CNT.filter(function(c){ return c.appartamentoId === a.id; });
+    var att  = cnts.some(function(c){ return c.stato !== 'completato'; });
     var div  = document.createElement('div'); div.className = 'row';
-    var bar  = document.createElement('div'); bar.className = 'bar'; bar.style.background = att ? '#16A34A' : '#8E8E93';
+    var bar  = document.createElement('div'); bar.className = 'bar';
+    bar.style.background = att ? '#16A34A' : '#8E8E93';
     var rb   = document.createElement('div'); rb.className = 'rb';
-    rb.innerHTML = '<div class="rt">' + (a.nome||'Immobile') + '</div>'
-      + '<div class="rs">' + (a.indirizzo||a.via||'') + ' · ' + cnts.length + ' contratti</div>';
-    var arr = document.createElement('div'); arr.textContent = '›';
-    arr.style.cssText = 'display:flex;align-items:center;padding-right:14px;color:#C7C7CC;font-size:18px;';
+    rb.innerHTML = '<div class="rt">' + (a.nome || 'Immobile') + '</div>'
+      + '<div class="rs">' + (a.indirizzo || a.via || '—') + ' · ' + cnts.length + ' contratt' + (cnts.length===1?'o':'i') + '</div>';
+    var arr  = document.createElement('div'); arr.className = 'rarr'; arr.textContent = '›';
     div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
-    div.addEventListener('click', (function(apt) { return function() { apriApt(apt); }; })(a));
+    div.addEventListener('click', (function(apt){ return function(){ apriApt(apt); }; })(a));
     el.appendChild(div);
   });
 }
 
-function renderContratti() {
-  var el = T('op-lprat'); if (!el) return;
-  el.innerHTML = '';
-  var lista = D.contratti.filter(function(c) {
-    var e = c.eliminato; return !e || String(e).toLowerCase() === 'false';
-  });
-  if (!lista.length) { el.innerHTML = '<div class="info">Nessuna pratica ancora.</div>'; return; }
-  lista.forEach(function(ct) {
-    var col = ct.stato==='completato'?'#16A34A':ct.stato==='lavorazione'?'#1A5FA8':'#E8631A';
-    var lbl = ct.stato==='completato'?'Completato':ct.stato==='lavorazione'?'In lavorazione':'In attesa';
-    var div = document.createElement('div'); div.className = 'row';
-    var bar = document.createElement('div'); bar.className = 'bar'; bar.style.background = col;
-    var rb  = document.createElement('div'); rb.className = 'rb';
-    rb.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">'
-      + '<div class="rt">' + (ct.tipo||'Contratto') + '</div>'
-      + '<span class="bdg" style="color:'+col+';background:'+col+'22">' + lbl + '</span></div>'
-      + '<div class="rs">' + fmtDate(ct.duraDal) + ' → ' + fmtDate(ct.duraAl) + '</div>';
-    var arr = document.createElement('div'); arr.textContent = '›';
-    arr.style.cssText = 'display:flex;align-items:center;padding-right:14px;color:#C7C7CC;font-size:18px;';
-    div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
-    div.addEventListener('click', (function(cid) { return function() { apriCnt(cid); }; })(ct.id));
-    el.appendChild(div);
-  });
-}
-
-// ── APPARTAMENTO ──────────────────────────────────────────────
+// ── APPARTAMENTO ──────────────────────────────
 function apriApt(a) {
   curApt = a;
   T('oa-ttl').textContent = a.nome || 'Immobile';
-  T('oa-cat').textContent = a.catCategoria || '—';
   T('oa-ind').textContent = a.indirizzo || a.via || '—';
-  var cnts = D.contratti.filter(function(c) { return c.appartamentoId === a.id; });
+  T('oa-cat').textContent = a.catCategoria || '—';
   var el = T('oa-cnts'); el.innerHTML = '';
-  if (!cnts.length) { el.innerHTML = '<div class="info" style="margin-bottom:12px">Nessun contratto ancora.</div>'; }
-  else {
+  var cnts = ALL_CNT.filter(function(c){ return c.appartamentoId === a.id; });
+  if (!cnts.length) {
+    el.innerHTML = '<div class="info" style="margin-bottom:12px">Nessun contratto ancora.</div>';
+  } else {
     cnts.forEach(function(ct) {
-      var div = document.createElement('div'); div.className = 'row'; div.style.marginBottom = '10px';
-      var bar = document.createElement('div'); bar.className = 'bar';
-      bar.style.background = ct.stato === 'completato' ? '#8E8E93' : '#E8631A';
-      var rb = document.createElement('div'); rb.className = 'rb';
-      rb.innerHTML = '<div class="rt">' + (ct.tipo||'Contratto') + '</div>'
-        + '<div class="rs">' + fmtDate(ct.duraDal) + ' → ' + fmtDate(ct.duraAl) + '</div>';
-      var arr = document.createElement('div'); arr.textContent = '›';
-      arr.style.cssText = 'display:flex;align-items:center;padding-right:14px;color:#C7C7CC;font-size:18px;';
+      var col = ct.stato==='completato'?'#8E8E93':ct.stato==='lavorazione'?'#1A5FA8':'#E8631A';
+      var lbl = ct.stato==='completato'?'Completato':ct.stato==='lavorazione'?'In lavorazione':'In attesa';
+      var div = document.createElement('div'); div.className = 'row';
+      var bar = document.createElement('div'); bar.className = 'bar'; bar.style.background = col;
+      var rb  = document.createElement('div'); rb.className = 'rb';
+      rb.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">'
+        + '<div class="rt">' + (ct.tipo||'Contratto') + '</div>'
+        + '<span class="bdg" style="color:'+col+';background:'+col+'22">'+lbl+'</span></div>'
+        + '<div class="rs">' + fmt(ct.duraDal) + ' → ' + fmt(ct.duraAl) + '</div>';
+      var arr = document.createElement('div'); arr.className = 'rarr'; arr.textContent = '›';
       div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
-      div.addEventListener('click', (function(cid) { return function() { apriCnt(cid); }; })(ct.id));
+      div.addEventListener('click', (function(ct){ return function(){ apriCnt(ct); }; })(ct));
       el.appendChild(div);
     });
   }
-  T('btn-del-apt-as').onclick = function() { eliminaApt(a); };
+  T('btn-del-apt').onclick = function(){ eliminaApt(a); };
   apriOv('ov-apt');
 }
 
 function eliminaApt(a) {
-  if (!confirm('Rimuovere "' + a.nome + '"?')) return;
-  a.rimosso = true;
-  apiCall('saveAppartamento', { data: a, userId: SOCIO.id }, function(err, r) {
+  if (!confirm('Rimuovere "' + (a.nome||'questo immobile') + '"?')) return;
+  api('saveAppartamento', { data: Object.assign({}, a, {rimosso:true, userId:SOCIO.id}) }, function(err,r){
     if (!err && r && r.ok) {
-      addLog('Immobile rimosso: ' + a.nome);
-      chiudiOv('ov-apt');
-      caricaDatiSocio();
-    } else { alert('Errore: ' + ((r && r.error) || err)); }
+      chiudiOv('ov-apt'); caricaDatiSocio();
+    } else { alert('Errore: ' + ((r&&r.error)||err||'Riprova')); }
   });
 }
 
-// ── CONTRATTO ────────────────────────────────────────────────
-function apriCnt(id) {
-  var ct = D.contratti.find(function(c) { return c.id === id; });
-  if (!ct) return;
+// ── CONTRATTO DETTAGLIO ───────────────────────
+function apriCnt(ct) {
   curCnt = ct;
-  T('oc-ttl').textContent    = ct.tipo || '—';
+  T('oc-ttl').textContent    = ct.nomeContratto || ct.tipo || '—';
   T('oc-tipo').textContent   = ct.tipo || '—';
-  T('oc-dal').textContent    = fmtDate(ct.duraDal);
-  T('oc-al').textContent     = fmtDate(ct.duraAl);
+  var col = ct.stato==='completato'?'#8E8E93':ct.stato==='lavorazione'?'#1A5FA8':'#E8631A';
+  var lbl = ct.stato==='completato'?'Completato':ct.stato==='lavorazione'?'In lavorazione':ct.stato==='da_firmare'?'Da firmare':'In attesa';
+  T('oc-stato').textContent  = lbl; T('oc-stato').style.color = col;
+  T('oc-dal').textContent    = fmt(ct.duraDal);
+  T('oc-al').textContent     = fmt(ct.duraAl);
   T('oc-canone').textContent = ct.canoneMensile ? '€ ' + ct.canoneMensile + '/mese' : '—';
-  T('oc-dep').textContent    = ct.depositoImporto ? '€ ' + ct.depositoImporto : '—';
-  T('btn-elimina-cnt-as').onclick = function() { eliminaCnt(ct); };
+  T('btn-proroga-cnt').onclick  = function(){ apriAdm('proroga'); };
+  T('btn-subentro-cnt').onclick = function(){ apriAdm('subentro'); };
+  T('btn-cessione-cnt').onclick = function(){ apriAdm('cessione'); };
+  T('btn-elimina-cnt').onclick  = function(){ eliminaCnt(ct); };
   apriOv('ov-cnt');
 }
 
 function eliminaCnt(ct) {
-  if (!confirm('Eliminare questa pratica? Non reversibile.')) return;
-  ct.eliminato = true;
-  apiCall('saveContratto', { data: ct, userId: SOCIO.id }, function(err, r) {
+  if (!confirm('Eliminare questa pratica?')) return;
+  api('saveContratto', { data: Object.assign({}, ct, {eliminato:true, userId:SOCIO.id}) }, function(err,r){
     if (!err && r && r.ok) {
-      addLog('Pratica eliminata: ' + (ct.tipo || ct.id));
-      chiudiOv('ov-cnt'); chiudiOv('ov-apt');
-      caricaDatiSocio();
-    } else { alert('Errore: ' + ((r && r.error) || err)); }
+      chiudiOv('ov-cnt'); chiudiOv('ov-apt'); caricaDatiSocio();
+    } else { alert('Errore: ' + ((r&&r.error)||err||'Riprova')); }
   });
 }
 
-// ── NUOVO APPARTAMENTO (wizard 3 step) ────────────────────────
-function apriNuovoApt() { naptStep = 0; naptD = {}; renderNapt(); apriOv('ov-napt'); }
+// ── ADEMPIMENTO ───────────────────────────────
+function apriAdm(tipo) {
+  if (!curCnt) return;
+  var titoli = { proroga:'Proroga contratto', subentro:'Subentro conduttore', cessione:'Cessione contratto' };
+  T('adm-lbl').textContent  = tipo.toUpperCase();
+  T('adm-ttl').textContent  = titoli[tipo] || tipo;
+  var body = T('adm-body');
+
+  if (tipo === 'proroga') {
+    body.innerHTML = '<div class="card"><div class="cb">'
+      + '<div class="sec">NUOVA SCADENZA</div>'
+      + '<div class="infob">La proroga estende il contratto. Inserisci la nuova data di fine.</div>'
+      + '<span class="lbl">Nuova data fine *</span>'
+      + '<input type="text" class="inp" id="adm-data" placeholder="gg/mm/aaaa" maxlength="10" oninput="ad(this)"/>'
+      + '<span class="lbl">Note</span>'
+      + '<input type="text" class="inp" id="adm-note" placeholder="es. Proroga annuale"/>'
+      + '<div class="err" id="adm-err"></div>'
+      + '<div class="ok" id="adm-ok">✅ Proroga registrata!</div>'
+      + '<button class="bp" style="margin-top:14px" onclick="salvaAdm(\'proroga\')">Salva proroga</button>'
+      + '</div></div>';
+  } else if (tipo === 'subentro') {
+    body.innerHTML = '<div class="card"><div class="cb">'
+      + '<div class="sec">NUOVO CONDUTTORE</div>'
+      + '<div class="infob">Inserisci i dati del conduttore subentrante.</div>'
+      + '<span class="lbl">Nome e Cognome *</span>'
+      + '<input type="text" class="inp" id="adm-nc" placeholder="MARIO ROSSI"/>'
+      + '<span class="lbl">Codice Fiscale</span>'
+      + '<input type="text" class="inp" id="adm-cf" placeholder="RSSMRA80A01G878X" style="font-family:monospace"/>'
+      + '<span class="lbl">Data subentro *</span>'
+      + '<input type="text" class="inp" id="adm-data" placeholder="gg/mm/aaaa" maxlength="10" oninput="ad(this)"/>'
+      + '<div class="err" id="adm-err"></div>'
+      + '<div class="ok" id="adm-ok">✅ Subentro registrato!</div>'
+      + '<button class="bp" style="margin-top:14px" onclick="salvaAdm(\'subentro\')">Salva subentro</button>'
+      + '</div></div>';
+  } else {
+    body.innerHTML = '<div class="card"><div class="cb">'
+      + '<div class="sec">CESSIONE CONTRATTO</div>'
+      + '<div class="infob">Inserisci i dati del cessionario.</div>'
+      + '<span class="lbl">Nome e Cognome cessionario *</span>'
+      + '<input type="text" class="inp" id="adm-nc" placeholder="LUIGI VERDI"/>'
+      + '<span class="lbl">Codice Fiscale cessionario</span>'
+      + '<input type="text" class="inp" id="adm-cf" placeholder="VRDLGU85B01G878X" style="font-family:monospace"/>'
+      + '<span class="lbl">Data cessione *</span>'
+      + '<input type="text" class="inp" id="adm-data" placeholder="gg/mm/aaaa" maxlength="10" oninput="ad(this)"/>'
+      + '<div class="err" id="adm-err"></div>'
+      + '<div class="ok" id="adm-ok">✅ Cessione registrata!</div>'
+      + '<button class="bp" style="margin-top:14px" onclick="salvaAdm(\'cessione\')">Salva cessione</button>'
+      + '</div></div>';
+  }
+  apriOv('ov-adm');
+}
+
+function salvaAdm(tipo) {
+  var data  = (T('adm-data')||{}).value || '';
+  var nc    = (T('adm-nc')||{}).value || '';
+  var cf    = (T('adm-cf')||{}).value || '';
+  var note  = (T('adm-note')||{}).value || '';
+  if (!data) { showErr('adm-err', 'Inserisci la data'); return; }
+  if ((tipo==='subentro'||tipo==='cessione') && !nc) { showErr('adm-err', 'Inserisci il nome'); return; }
+  showErr('adm-err', '');
+
+  // Aggiorna il contratto con i nuovi dati
+  var cnt = Object.assign({}, curCnt, { userId: SOCIO.id });
+  if (tipo === 'proroga') {
+    cnt.duraAl = data;
+    cnt.note = (cnt.note ? cnt.note + '\n' : '') + 'Proroga al ' + data + (note ? ': ' + note : '');
+    // Ricalcola mesi
+    try {
+      var p1 = (cnt.duraDal||'').split('/'), p2 = data.split('/');
+      var m = (parseInt(p2[2])-parseInt(p1[2]))*12 + (parseInt(p2[1])-parseInt(p1[1]));
+      cnt.duraMesi = m;
+      cnt.canoneAnnuale = (parseFloat((cnt.canoneMensile||'0').replace(',','.'))*12).toFixed(2).replace('.',',');
+    } catch(e){}
+  } else {
+    cnt.note = (cnt.note ? cnt.note + '\n' : '') + tipo.charAt(0).toUpperCase()+tipo.slice(1) + ': ' + nc + (cf?' (CF:'+cf+')':'') + ' dal ' + data;
+  }
+
+  api('saveContratto', { data: cnt }, function(err, r) {
+    if (!err && r && r.ok) {
+      var okEl = T('adm-ok'); if(okEl) okEl.style.display = '';
+      setTimeout(function(){
+        chiudiOv('ov-adm'); chiudiOv('ov-cnt'); chiudiOv('ov-apt');
+        caricaDatiSocio();
+      }, 1500);
+    } else { showErr('adm-err', (r&&r.error)||err||'Errore'); }
+  });
+}
+
+// ── NUOVO APPARTAMENTO wizard ─────────────────
+function apriNuovoApt() { naptStep=0; naptD={}; renderNapt(); apriOv('ov-napt'); }
 
 function renderNapt() {
   T('napt-ttl').textContent = 'Passo ' + (naptStep+1) + ' di 3';
-  var prog = T('napt-prog'); if (prog) {
-    prog.innerHTML = '';
-    for (var i=0; i<3; i++) {
-      var d = document.createElement('div'); d.className = 'pd';
-      d.style.background = i < naptStep ? '#16A34A' : i === naptStep ? '#E8631A' : '';
-      prog.appendChild(d);
-    }
+  var prog = T('napt-prog'); prog.innerHTML = '';
+  for (var i=0;i<3;i++) {
+    var d=document.createElement('div'); d.className='pd';
+    d.style.background=i<naptStep?'#16A34A':i===naptStep?'#E8631A':'';
+    prog.appendChild(d);
   }
-  var body = T('napt-body'); var btn = T('napt-btn'); if (!body || !btn) return;
+  T('napt-btn').textContent = naptStep < 2 ? 'Avanti' : 'Salva immobile';
+  var body = T('napt-body');
   if (naptStep === 0) {
     body.innerHTML = '<div class="card"><div class="cb"><div class="sec">NOME IMMOBILE</div>'
-      + '<div class="infob">Es. Casa Garibaldi, Bilocale centro</div>'
       + '<span class="lbl">Nome immobile *</span>'
       + '<input type="text" class="inp" id="n0" placeholder="es. Casa Garibaldi" value="'+(naptD.nome||'')+'"/>'
       + '</div></div>';
-    btn.textContent = 'Avanti: Dati immobile';
   } else if (naptStep === 1) {
-    body.innerHTML = '<div class="card"><div class="cb"><div class="sec">DATI IMMOBILE</div>'
-      + '<span class="lbl">Comune</span><input type="text" class="inp" id="n1" placeholder="L AQUILA" value="'+(naptD.comune||'')+'"/>'
-      + '<span class="lbl">Via e n. civico</span><input type="text" class="inp" id="n2" placeholder="VIA GARIBALDI 15" value="'+(naptD.via||'')+'"/>'
+    body.innerHTML = '<div class="card"><div class="cb"><div class="sec">INDIRIZZO</div>'
+      + '<span class="lbl">Comune</span><input type="text" class="inp" id="n1" value="'+(naptD.comune||'')+'" placeholder="L AQUILA"/>'
+      + '<span class="lbl">Via e n. civico</span><input type="text" class="inp" id="n2" value="'+(naptD.via||'')+'" placeholder="VIA GARIBALDI 15"/>'
       + '<div class="g2"><div><span class="lbl">Piano</span><input type="text" class="inp" id="n3" value="'+(naptD.piano||'')+'"/></div>'
       + '<div><span class="lbl">Interno</span><input type="text" class="inp" id="n4" value="'+(naptD.interno||'')+'"/></div></div>'
-      + '<div class="sec" style="margin-top:4px">DATI CATASTALI</div>'
-      + '<div class="g2"><div><span class="lbl">Categoria</span><input type="text" class="inp" id="n5" placeholder="A/2" value="'+(naptD.catCategoria||'')+'"/></div>'
-      + '<div><span class="lbl">Rendita</span><input type="text" class="inp" id="n6" placeholder="450,00" value="'+(naptD.catRendita||'')+'"/></div>'
-      + '<div><span class="lbl">Foglio</span><input type="text" class="inp" id="n7" placeholder="45" value="'+(naptD.catFoglio||'')+'"/></div>'
-      + '<div><span class="lbl">Particella</span><input type="text" class="inp" id="n8" placeholder="123" value="'+(naptD.catParticella||'')+'"/></div></div>'
+      + '</div></div><div class="card"><div class="cb"><div class="sec">DATI CATASTALI</div>'
+      + '<div class="g2"><div><span class="lbl">Categoria</span><input type="text" class="inp" id="n5" value="'+(naptD.catCategoria||'')+'" placeholder="A/2"/></div>'
+      + '<div><span class="lbl">Rendita €</span><input type="text" class="inp" id="n6" value="'+(naptD.catRendita||'')+'" placeholder="450,00"/></div>'
+      + '<div><span class="lbl">Foglio</span><input type="text" class="inp" id="n7" value="'+(naptD.catFoglio||'')+'"/></div>'
+      + '<div><span class="lbl">Particella</span><input type="text" class="inp" id="n8" value="'+(naptD.catParticella||'')+'"/></div></div>'
       + '<span class="lbl">Subalterno</span><input type="text" class="inp" id="n9" value="'+(naptD.catSubalterno||'')+'"/>'
       + '</div></div>';
-    btn.textContent = 'Avanti: Locatore';
   } else {
     body.innerHTML = '<div class="card"><div class="cb"><div class="sec">LOCATORE</div>'
-      + '<span class="lbl">Nome e Cognome</span><input type="text" class="inp" id="na" placeholder="MARIO ROSSI" value="'+(naptD.locNome||'')+'"/>'
-      + '<span class="lbl">Codice Fiscale</span><input type="text" class="inp" id="nb2" placeholder="RSSMRA70A01G878X" style="font-family:monospace" value="'+(naptD.locCF||'')+'"/>'
-      + '<span class="lbl">Indirizzo residenza</span><input type="text" class="inp" id="nc2" placeholder="VIA ROMA 1, L\'AQUILA" value="'+(naptD.locResidenza||'')+'"/>'
-      + '<span class="lbl">Telefono</span><input type="text" class="inp" id="nd" placeholder="+39 333 111 2222" value="'+(naptD.locTel||'')+'"/>'
+      + '<span class="lbl">Nome e Cognome</span><input type="text" class="inp" id="na" value="'+(naptD.locNome||'')+'" placeholder="MARIO ROSSI"/>'
+      + '<span class="lbl">Codice Fiscale</span><input type="text" class="inp" id="nb2" value="'+(naptD.locCF||'')+'" placeholder="RSSMRA70A01G878X" style="font-family:monospace"/>'
+      + '<span class="lbl">Indirizzo residenza</span><input type="text" class="inp" id="nc2" value="'+(naptD.locResidenza||'')+'" placeholder="VIA ROMA 1, L\'AQUILA"/>'
+      + '<span class="lbl">Telefono</span><input type="text" class="inp" id="nd" value="'+(naptD.locTel||'')+'" placeholder="+39 333 111 2222"/>'
       + '</div></div>';
-    btn.textContent = 'Salva immobile';
   }
 }
 
@@ -1152,30 +744,28 @@ function naptAvanti() {
     naptD.catCategoria=(T('n5')||{}).value||''; naptD.catRendita=(T('n6')||{}).value||'';
     naptD.catFoglio=(T('n7')||{}).value||''; naptD.catParticella=(T('n8')||{}).value||'';
     naptD.catSubalterno=(T('n9')||{}).value||'';
-    naptD.indirizzo=(naptD.via||'')+', '+(naptD.comune||'');
+    naptD.indirizzo = (naptD.via||'') + (naptD.comune?', '+naptD.comune:'');
   } else {
     naptD.locNome=(T('na')||{}).value||''; naptD.locCF=(T('nb2')||{}).value||'';
     naptD.locResidenza=(T('nc2')||{}).value||''; naptD.locTel=(T('nd')||{}).value||'';
     naptD.userId = SOCIO.id;
-    apiCall('saveAppartamento', { data: naptD, userId: SOCIO.id }, function(err, r) {
+    api('saveAppartamento', { data: naptD }, function(err,r){
       if (!err && r && r.ok) {
-        addLog('Immobile creato: ' + naptD.nome);
         chiudiOv('ov-napt'); naptStep=0; naptD={};
         caricaDatiSocio();
-      } else { alert('Errore: ' + ((r && r.error) || err)); }
+      } else { alert('Errore: ' + ((r&&r.error)||err||'Riprova')); }
     });
     return;
   }
   naptStep++; renderNapt();
 }
 
-// ── NUOVO CONTRATTO (wizard 9 step — stesso di socio.html) ────
+// ── NUOVO CONTRATTO wizard 9 step ─────────────
 function apriNuovoCnt() {
   ncntStep = 0;
-  ncntD = { appartamentoId: curApt ? curApt.id : '', userId: SOCIO.id, locatori:[{}], conduttori:[{}], garanti:[] };
+  ncntD = { appartamentoId: curApt?curApt.id:'', userId:SOCIO.id, locatori:[{}], conduttori:[{}], garanti:[] };
   T('ncnt-lbl').textContent = curApt ? curApt.nome : 'NUOVO CONTRATTO';
-  renderNcnt();
-  apriOv('ov-ncnt');
+  renderNcnt(); apriOv('ov-ncnt');
 }
 
 function ncntBack() {
@@ -1184,133 +774,128 @@ function ncntBack() {
 }
 
 function renderNcnt() {
-  T('ncnt-ttl').textContent = NLABELS[ncntStep] + ' - ' + (ncntStep+1) + '/9';
-  var btn = T('btn-ncnt-back');
-  if (btn) btn.textContent = ncntStep === 0 ? 'Annulla' : '← Indietro';
-  var nbtn = T('ncnt-btn');
-  if (nbtn) nbtn.textContent = ncntStep < 8 ? 'Avanti: ' + (NLABELS[ncntStep+1]||'') : 'Invia richiesta';
-  var prog = T('ncnt-prog');
-  if (prog) {
-    prog.innerHTML = '';
-    for (var i=0; i<9; i++) {
-      var d=document.createElement('div'); d.className='pd';
-      d.style.background=i<ncntStep?'#16A34A':i===ncntStep?'#E8631A':'';
-      prog.appendChild(d);
-    }
+  T('ncnt-ttl').textContent = NLABELS[ncntStep] + ' — ' + (ncntStep+1) + '/9';
+  T('ncnt-back-btn').textContent = ncntStep === 0 ? '✕ Annulla' : '← Indietro';
+  T('ncnt-btn').textContent = ncntStep < 8 ? 'Avanti: ' + (NLABELS[ncntStep+1]||'') : 'Salva pratica';
+  var prog = T('ncnt-prog'); prog.innerHTML = '';
+  for (var i=0;i<9;i++){
+    var d=document.createElement('div'); d.className='pd';
+    d.style.background=i<ncntStep?'#16A34A':i===ncntStep?'#E8631A':'';
+    prog.appendChild(d);
   }
-  var body = T('ncnt-body'); if (!body) return;
-  body.innerHTML = buildNcntStep();
+  T('ncnt-body').innerHTML = buildStep();
 }
 
-function buildNcntStep() {
-  var h='';
-  if(ncntStep===0){
+function buildStep() {
+  var h = '';
+  if (ncntStep===0) {
     h='<div class="card"><div class="cb"><div class="sec">TIPO DI CONTRATTO</div>';
-    [{id:'Tipo A',d:'Locazione agevolata - 3+2 anni'},{id:'Tipo B',d:'Transitorio lavoratori - max 18 mesi'},{id:'Tipo C',d:'Transitorio studenti - 6-36 mesi'}].forEach(function(t){
+    [{id:'Tipo A',d:'Locazione agevolata — 3+2 anni'},
+     {id:'Tipo B',d:'Transitorio lavoratori — max 18 mesi'},
+     {id:'Tipo C',d:'Transitorio studenti — 6-36 mesi'}].forEach(function(t){
       var sel=ncntD.tipo===t.id;
       h+='<label style="display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;margin-bottom:8px;cursor:pointer;border:2px solid '+(sel?'#E8631A':'#E5E5EA')+';background:'+(sel?'#FDF0E8':'#fff')+'">'
         +'<input type="radio" name="ntipo" value="'+t.id+'" '+(sel?'checked':'')+' style="width:auto;margin:0;accent-color:#E8631A"/>'
         +'<div><div style="font-size:14px;font-weight:800">'+t.id+'</div><div style="font-size:12px;color:#8E8E93">'+t.d+'</div></div></label>';
     });
     h+='</div></div>';
-  } else if(ncntStep===1){
+  } else if (ncntStep===1) {
     h='<div class="card"><div class="cb"><div class="sec">DURATA</div>'
-      +'<span class="lbl">Data inizio *</span><input type="text" class="inp" id="c1a" placeholder="gg/mm/aaaa" maxlength="10" value="'+(ncntD.duraDal||'')+'" oninput="autoDate(this)" onblur="calcMesi()"/>'
-      +'<span class="lbl">Data fine *</span><input type="text" class="inp" id="c1b" placeholder="gg/mm/aaaa" maxlength="10" value="'+(ncntD.duraAl||'')+'" oninput="autoDate(this)" onblur="calcMesi()"/>'
+      +'<span class="lbl">Data inizio *</span><input type="text" class="inp" id="c1a" placeholder="gg/mm/aaaa" maxlength="10" value="'+(ncntD.duraDal||'')+'" oninput="ad(this)" onblur="calcMesi()"/>'
+      +'<span class="lbl">Data fine *</span><input type="text" class="inp" id="c1b" placeholder="gg/mm/aaaa" maxlength="10" value="'+(ncntD.duraAl||'')+'" oninput="ad(this)" onblur="calcMesi()"/>'
       +'<span class="lbl">N. mensilità (automatico)</span><input type="text" class="inp" id="c1c" value="'+(ncntD.duraMesi||'')+'" readonly style="background:#F8F7F5;color:#8E8E93"/>'
       +'</div></div>';
-  } else if(ncntStep===2){
+  } else if (ncntStep===2) {
     h='<div class="card"><div class="cb"><div class="sec">CANONE</div>'
       +'<span class="lbl">Canone mensile € *</span><input type="text" class="inp" id="c2a" placeholder="es. 580,00" value="'+(ncntD.canoneMensile||'')+'" oninput="calcAnn()"/>'
       +'<span class="lbl">Canone annuale (automatico)</span><input type="text" class="inp" id="c2b" value="'+(ncntD.canoneAnnuale||'')+'" readonly style="background:#F8F7F5;color:#8E8E93"/>'
       +'<span class="lbl">IBAN locatore (opz.)</span><input type="text" class="inp" id="c2c" value="'+(ncntD.canoneIBAN||'')+'"/>'
       +'</div></div><div class="card"><div class="cb"><div class="sec">DEPOSITO</div>'
-      +'<span class="lbl">Importo € *</span><input type="text" class="inp" id="c2d" value="'+(ncntD.depositoImporto||'')+'"/>'
+      +'<span class="lbl">Importo €</span><input type="text" class="inp" id="c2d" value="'+(ncntD.depositoImporto||'')+'"/>'
       +'<span class="lbl">N. mensilità</span><input type="text" class="inp" id="c2e" value="'+(ncntD.depositoMesi||'')+'"/>'
-      +'</div></div><div class="card"><div class="cb"><div class="sec">ONERI ACCESSORI</div>'
-      +'<span class="lbl">Oneri mensili €</span><input type="text" class="inp" id="c2f" value="'+(ncntD.oneriMensili||'')+'"/>'
       +'</div></div>';
-  } else if(ncntStep===3){
+  } else if (ncntStep===3) {
     h='<div class="card"><div class="cb"><div class="sec">DATI IMMOBILE</div>'
       +'<span class="lbl">N. certificato APE</span><input type="text" class="inp" id="c3a" value="'+(ncntD.apeNumero||'')+'"/>'
       +'<span class="lbl">Classe energetica *</span><input type="text" class="inp" id="c3b" placeholder="es. D" value="'+(ncntD.apeClasse||'')+'"/>'
-      +'<div class="g2"><div><span class="lbl">Camere</span><input type="text" class="inp" id="c3c" value="'+(ncntD.compCamere||'')+'"/></div>'
-      +'<div><span class="lbl">Cucina</span><input type="text" class="inp" id="c3d" value="'+(ncntD.compCucina||'')+'"/></div>'
-      +'<div><span class="lbl">Bagni</span><input type="text" class="inp" id="c3e" value="'+(ncntD.compBagni||'')+'"/></div>'
-      +'<div><span class="lbl">Balconi</span><input type="text" class="inp" id="c3f" value="'+(ncntD.compBalconi||'')+'"/></div></div>'
-      +'</div></div>';
-  } else if(ncntStep===4){
+      +'<div class="g2">'
+      +'<div><span class="lbl">Camere</span><input type="text" class="inp" id="c3c" value="'+(ncntD.compCamere||'')+'"/></div>'
+      +'<div><span class="lbl">Bagni</span><input type="text" class="inp" id="c3d" value="'+(ncntD.compBagni||'')+'"/></div>'
+      +'</div></div></div>';
+  } else if (ncntStep===4) {
     h='<div class="card"><div class="cb"><div class="sec">LOCATORI</div><div id="nlocs">';
     ncntD.locatori.forEach(function(_,i){ h+=pbBlock('l',i); });
     h+='</div><button class="bd" style="margin-top:4px" onclick="addP(\'l\')">+ Aggiungi locatore</button></div></div>';
-  } else if(ncntStep===5){
+  } else if (ncntStep===5) {
     h='<div class="card"><div class="cb"><div class="sec">CONDUTTORI</div>'
-      +(ncntD.tipo==='Tipo B'?'<div class="infob">Tipo B: indicare motivo transitorietà.</div>':''  )
-      +(ncntD.tipo==='Tipo C'?'<div class="infob">Tipo C: indicare facoltà e matricola.</div>':'')
+      +(ncntD.tipo==='Tipo B'||ncntD.tipo==='Tipo C'?'<div class="infob">Indicare motivo/facoltà e matricola nel campo apposito.</div>':'')
       +'<div id="ncons">';
     ncntD.conduttori.forEach(function(_,i){ h+=pbBlock('c',i); });
     h+='</div><button class="bd" style="margin-top:4px" onclick="addP(\'c\')">+ Aggiungi conduttore</button></div></div>';
-  } else if(ncntStep===6){
+  } else if (ncntStep===6) {
     h='<div class="card"><div class="cb"><div class="sec">GARANTI (opzionali)</div><div id="ngars">';
     ncntD.garanti.forEach(function(_,i){ h+=pbBlock('g',i); });
     h+='</div><button class="bd" style="margin-top:4px" onclick="addP(\'g\')">+ Aggiungi garante</button></div></div>';
-  } else if(ncntStep===7){
+  } else if (ncntStep===7) {
     h='<div class="card"><div class="cb"><div class="sec">NOTE</div>'
-      +'<textarea class="inp" id="c7a" placeholder="Clausole particolari...">'+(ncntD.note||'')+'</textarea>'
+      +'<textarea class="inp" id="c7a" placeholder="Clausole particolari..." style="min-height:100px">'+(ncntD.note||'')+'</textarea>'
       +'</div></div>';
-  } else if(ncntStep===8){
+  } else {
     var gs=['g1','g2','g3','g4'];
-    var testi=["Ho ricevuto e compreso l'informativa (art. 13 GDPR).","Presto consenso al trattamento tramite AI.","Sono legittimato a fornire i dati di tutti i soggetti.","Presto consenso al trasferimento dati extra-UE."];
+    var tt=["Ho ricevuto e compreso l'informativa (art. 13 GDPR).",
+            "Presto consenso al trattamento tramite AI.",
+            "Sono legittimato a fornire i dati di tutti i soggetti.",
+            "Presto consenso al trasferimento dati extra-UE."];
     h='<div class="card"><div class="cb"><div class="sec">CONSENSO DATI (GDPR)</div>';
     gs.forEach(function(g,i){
       h+='<div class="cr" onclick="togG(\''+g+'\')"><div class="cb2 '+(ncntD[g]?'on':'')+'" id="'+g+'-b">'+(ncntD[g]?'✓':'')+'</div>'
-        +'<div style="font-size:13px;line-height:1.5">'+testi[i]+'</div></div>';
+        +'<div style="font-size:13px;line-height:1.5">'+tt[i]+'</div></div>';
     });
     h+='</div></div><div class="card"><div class="cb"><div class="sec">RIEPILOGO</div>';
-    [['Tipo',ncntD.tipo||'—'],['Locatori',(ncntD.locatori||[]).length],['Conduttori',(ncntD.conduttori||[]).length],['Garanti',(ncntD.garanti||[]).length||'Nessuno']].forEach(function(r){
+    [['Tipo',ncntD.tipo||'—'],['Dal',ncntD.duraDal||'—'],['Al',ncntD.duraAl||'—'],
+     ['Canone','€ '+(ncntD.canoneMensile||'—')+'/mese'],
+     ['Locatori',(ncntD.locatori||[]).length],['Conduttori',(ncntD.conduttori||[]).length]].forEach(function(row){
       h+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F2F2F7">'
-        +'<span style="font-size:12px;color:#8E8E93">'+r[0]+'</span>'
-        +'<span style="font-size:13px;font-weight:700">'+r[1]+'</span></div>';
+        +'<span style="font-size:12px;color:#8E8E93">'+row[0]+'</span>'
+        +'<span style="font-size:13px;font-weight:700">'+row[1]+'</span></div>';
     });
     h+='</div></div>';
   }
   return h;
 }
 
-function togG(id) {
+function togG(id){
   ncntD[id]=!ncntD[id];
   var b=T(id+'-b'); if(b){b.className='cb2'+(ncntD[id]?' on':'');b.innerHTML=ncntD[id]?'✓':'';}
 }
 
-function pbBlock(t,i) {
-  var isL=t==='l',isG=t==='g';
-  var lbl=isL?'LOCATORE':isG?'GARANTE':'CONDUTTORE';
+function pbBlock(t,i){
+  var lbl=t==='l'?'LOCATORE':t==='g'?'GARANTE':'CONDUTTORE';
   var showMot=t==='c'&&(ncntD.tipo==='Tipo B'||ncntD.tipo==='Tipo C');
   var h='<div class="pb" id="pb-'+t+'-'+i+'">'
     +'<div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:10px">'+lbl+' '+(i+1)+'</div>'
     +'<button class="pr" onclick="remP(\''+t+'\','+i+')">✕</button>'
     +'<span class="lbl">Cognome</span><input type="text" class="inp pb-cog" placeholder="ROSSI"/>'
     +'<span class="lbl">Nome</span><input type="text" class="inp pb-nom" placeholder="MARIO"/>'
-    +'<div class="g2"><div><span class="lbl">Luogo nascita</span><input type="text" class="inp pb-lng" placeholder="L AQUILA"/></div>'
-    +'<div><span class="lbl">Data nascita</span><input type="text" class="inp pb-dtn" placeholder="01/01/1980" maxlength="10" oninput="autoDate(this)"/></div></div>'
-    +'<span class="lbl">Codice Fiscale</span><input type="text" class="inp pb-cf" placeholder="RSSMRA80A01G878X" style="font-family:monospace"/>'
-    +'<span class="lbl">Comune residenza</span><input type="text" class="inp pb-res" placeholder="L AQUILA"/>'
-    +'<span class="lbl">Via e n. civico</span><input type="text" class="inp pb-via" placeholder="VIA ROMA 1"/>'
+    +'<div class="g2"><div><span class="lbl">Luogo nascita</span><input type="text" class="inp pb-lng"/></div>'
+    +'<div><span class="lbl">Data nascita</span><input type="text" class="inp pb-dtn" placeholder="gg/mm/aaaa" maxlength="10" oninput="ad(this)"/></div></div>'
+    +'<span class="lbl">Codice Fiscale</span><input type="text" class="inp pb-cf" style="font-family:monospace"/>'
+    +'<span class="lbl">Comune residenza</span><input type="text" class="inp pb-res"/>'
+    +'<span class="lbl">Via e n. civico</span><input type="text" class="inp pb-via"/>'
     +'<div class="sec" style="margin-top:10px;margin-bottom:8px">DOCUMENTO</div>'
-    +'<span class="lbl">Tipo documento</span><select class="inp pb-doctipo"><option value="">-- Seleziona --</option><option>Carta di identità</option><option>Passaporto</option><option>Patente di guida</option></select>'
-    +'<span class="lbl">Numero documento</span><input type="text" class="inp pb-docnum" placeholder="CA00000AA"/>'
-    +'<div class="g2"><div><span class="lbl">Data rilascio</span><input type="text" class="inp pb-docril" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/></div>'
-    +'<div><span class="lbl">Data scadenza</span><input type="text" class="inp pb-docsca" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/></div></div>'
+    +'<span class="lbl">Tipo</span><select class="inp pb-doctipo"><option value="">-- Seleziona --</option><option>Carta di identità</option><option>Passaporto</option><option>Patente di guida</option></select>'
+    +'<span class="lbl">Numero</span><input type="text" class="inp pb-docnum"/>'
+    +'<div class="g2"><div><span class="lbl">Rilascio</span><input type="text" class="inp pb-docril" placeholder="gg/mm/aaaa" maxlength="10" oninput="ad(this)"/></div>'
+    +'<div><span class="lbl">Scadenza</span><input type="text" class="inp pb-docsca" placeholder="gg/mm/aaaa" maxlength="10" oninput="ad(this)"/></div></div>'
     +'<span class="lbl">Rilasciato da</span><input type="text" class="inp pb-docente" placeholder="Comune di L\'AQUILA"/>';
-  if(isL) h+='<span class="lbl">Titolo</span><input type="text" class="inp pb-tit" placeholder="Proprietario"/>'
+  if(t==='l') h+='<span class="lbl">Titolo</span><input type="text" class="inp pb-tit" placeholder="Proprietario"/>'
     +'<div class="g2"><div><span class="lbl">Quota %</span><input type="text" class="inp pb-quo" placeholder="100"/></div>'
     +'<div><span class="lbl">Cedolare</span><select class="inp pb-ced"><option>Si</option><option>No</option></select></div></div>';
-  if(showMot) h+='<span class="lbl">Motivo/Facoltà e matricola</span><input type="text" class="inp pb-mot" placeholder="es. Ingegneria 123456"/>';
-  if(isG) h+='<span class="lbl">Conduttore riferimento</span><input type="text" class="inp pb-cr2" placeholder="es. Mario Rossi"/>';
+  if(showMot) h+='<span class="lbl">Motivo/Facoltà e matricola</span><input type="text" class="inp pb-mot"/>';
   h+='</div>'; return h;
 }
 
-function addP(t) {
+function addP(t){
   var map={l:'nlocs',c:'ncons',g:'ngars'};
   var arr=t==='l'?ncntD.locatori:t==='c'?ncntD.conduttori:ncntD.garanti;
   arr.push({});
@@ -1318,7 +903,7 @@ function addP(t) {
   el.innerHTML=''; arr.forEach(function(_,i){ el.innerHTML+=pbBlock(t,i); });
 }
 
-function remP(t,i) {
+function remP(t,i){
   var arr=t==='l'?ncntD.locatori:t==='c'?ncntD.conduttori:ncntD.garanti;
   if((t==='l'||t==='c')&&arr.length<=1) return;
   arr.splice(i,1);
@@ -1327,50 +912,46 @@ function remP(t,i) {
   el.innerHTML=''; arr.forEach(function(_,i2){ el.innerHTML+=pbBlock(t,i2); });
 }
 
-function leggiPersone(t) {
+function leggiPersone(t){
   var map={l:'nlocs',c:'ncons',g:'ngars'};
   var arr=t==='l'?ncntD.locatori:t==='c'?ncntD.conduttori:ncntD.garanti;
   var container=T(map[t]); if(!container) return;
   var blocks=container.querySelectorAll('.pb');
   for(var i=0;i<blocks.length&&i<arr.length;i++){
     var b=blocks[i];
-    var get=function(cls){var el=b.querySelector('.'+cls);return el?el.value||'':'';};
-    arr[i].cognome=get('pb-cog'); arr[i].nome=get('pb-nom');
-    arr[i].luogoNascita=get('pb-lng'); arr[i].dataNascita=get('pb-dtn');
-    arr[i].cf=get('pb-cf'); arr[i].comuneResidenza=get('pb-res');
-    arr[i].viaResidenza=get('pb-via');
-    var docTipoEl=b.querySelector('.pb-doctipo');
-    arr[i].docTipo=docTipoEl?docTipoEl.value||'':'';
-    arr[i].docNum=get('pb-docnum'); arr[i].docRilascio=get('pb-docril');
-    arr[i].docScadenza=get('pb-docsca'); arr[i].docEnte=get('pb-docente');
-    if(t==='l'){arr[i].titolo=get('pb-tit');arr[i].quota=get('pb-quo');var cedEl=b.querySelector('.pb-ced');arr[i].cedolare=cedEl?cedEl.value||'':'';}}
-    if(t==='c') arr[i].mot=get('pb-mot');
-    if(t==='g') arr[i].cr2=get('pb-cr2');
+    var g=function(cls){var e=b.querySelector('.'+cls);return e?e.value||'':'';}; 
+    arr[i].cognome=g('pb-cog'); arr[i].nome=g('pb-nom');
+    arr[i].luogoNascita=g('pb-lng'); arr[i].dataNascita=g('pb-dtn');
+    arr[i].cf=g('pb-cf'); arr[i].comuneResidenza=g('pb-res'); arr[i].viaResidenza=g('pb-via');
+    var dt=b.querySelector('.pb-doctipo'); arr[i].docTipo=dt?dt.value||'':'';
+    arr[i].docNum=g('pb-docnum'); arr[i].docRilascio=g('pb-docril');
+    arr[i].docScadenza=g('pb-docsca'); arr[i].docEnte=g('pb-docente');
+    if(t==='l'){arr[i].titolo=g('pb-tit');arr[i].quota=g('pb-quo');var ce=b.querySelector('.pb-ced');arr[i].cedolare=ce?ce.value||'':'';}
+    if(t==='c') arr[i].mot=g('pb-mot');
   }
 }
 
-function ncntAvanti() {
+function ncntAvanti(){
   if(ncntStep===0){ncntD.tipo=(document.querySelector('input[name="ntipo"]:checked')||{}).value||'';if(!ncntD.tipo){alert('Seleziona il tipo');return;}}
   if(ncntStep===1){ncntD.duraDal=(T('c1a')||{}).value||'';ncntD.duraAl=(T('c1b')||{}).value||'';ncntD.duraMesi=(T('c1c')||{}).value||'';if(!ncntD.duraDal||!ncntD.duraAl){alert('Inserisci le date');return;}}
-  if(ncntStep===2){ncntD.canoneMensile=(T('c2a')||{}).value||'';ncntD.canoneAnnuale=(T('c2b')||{}).value||'';ncntD.canoneIBAN=(T('c2c')||{}).value||'';ncntD.depositoImporto=(T('c2d')||{}).value||'';ncntD.depositoMesi=(T('c2e')||{}).value||'';ncntD.oneriMensili=(T('c2f')||{}).value||'';if(!ncntD.canoneMensile){alert('Inserisci il canone');return;}}
-  if(ncntStep===3){ncntD.apeNumero=(T('c3a')||{}).value||'';ncntD.apeClasse=(T('c3b')||{}).value||'';ncntD.compCamere=(T('c3c')||{}).value||'';ncntD.compCucina=(T('c3d')||{}).value||'';ncntD.compBagni=(T('c3e')||{}).value||'';ncntD.compBalconi=(T('c3f')||{}).value||'';}
+  if(ncntStep===2){ncntD.canoneMensile=(T('c2a')||{}).value||'';ncntD.canoneAnnuale=(T('c2b')||{}).value||'';ncntD.canoneIBAN=(T('c2c')||{}).value||'';ncntD.depositoImporto=(T('c2d')||{}).value||'';ncntD.depositoMesi=(T('c2e')||{}).value||'';if(!ncntD.canoneMensile){alert('Inserisci il canone');return;}}
+  if(ncntStep===3){ncntD.apeNumero=(T('c3a')||{}).value||'';ncntD.apeClasse=(T('c3b')||{}).value||'';ncntD.compCamere=(T('c3c')||{}).value||'';ncntD.compBagni=(T('c3d')||{}).value||'';}
   if(ncntStep===4) leggiPersone('l');
   if(ncntStep===5) leggiPersone('c');
   if(ncntStep===6) leggiPersone('g');
   if(ncntStep===7){ncntD.note=(T('c7a')||{}).value||'';}
   if(ncntStep===8){
     if(!ncntD.g1||!ncntD.g2||!ncntD.g3||!ncntD.g4){alert('Accetta tutti e 4 i consensi GDPR');return;}
-    var locs=ncntD.locatori||[],cons=ncntD.conduttori||[];
+    var locs=ncntD.locatori||[], cons=ncntD.conduttori||[];
     var cogL=(locs[0]&&(locs[0].cognome||locs[0].nome))||'';
     var cogC=(cons[0]&&(cons[0].cognome||cons[0].nome))||'';
     ncntD.nomeContratto=cogL&&cogC?'CNT_'+cogL+'_'+cogC:(ncntD.tipo||'Contratto');
     ncntD.userId = SOCIO.id;
-    apiCall('saveContratto',{data:ncntD, userId:SOCIO.id},function(err,r){
+    api('saveContratto', { data: ncntD }, function(err,r){
       if(!err&&r&&r.ok){
-        addLog('Contratto creato: '+ncntD.nomeContratto);
-        chiudiOv('ov-ncnt');chiudiOv('ov-apt');
+        chiudiOv('ov-ncnt'); chiudiOv('ov-apt');
         caricaDatiSocio();
-        alert('Pratica creata! Il socio la vedrà nel suo portale.');
+        alert('✅ Pratica creata! Il socio la vedrà nel suo portale.');
       } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
     });
     return;
@@ -1378,14 +959,7 @@ function ncntAvanti() {
   ncntStep++; renderNcnt();
 }
 
-function autoDate(inp) {
-  var v=inp.value.replace(/[^0-9]/g,'');
-  if(v.length>2) v=v.substring(0,2)+'/'+v.substring(2);
-  if(v.length>5) v=v.substring(0,5)+'/'+v.substring(5);
-  inp.value=v.substring(0,10);
-}
-
-function calcMesi() {
+function calcMesi(){
   var a=(T('c1a')||{}).value||'',b=(T('c1b')||{}).value||'';
   if(a.length<10||b.length<10) return;
   try {
@@ -1396,240 +970,52 @@ function calcMesi() {
   }catch(e){}
 }
 
-function calcAnn() {
+function calcAnn(){
   var m=parseInt((T('c1c')||{}).value||ncntD.duraMesi||0);
   var v=parseFloat(((T('c2a')||{}).value||'0').replace(',','.'));
   if(m>0&&v>0){var a=(v*m).toFixed(2).replace('.',',');var el=T('c2b');if(el)el.value=a;ncntD.canoneAnnuale=a;}
 }
 
-// ── CALENDARIO PRENOTAZIONE ───────────────────────────────────
-function initCal() {
-  var el=T('cal-lbl-row'); if(!el) return;
-  el.innerHTML='';
-  ['L','M','M','G','V','S','D'].forEach(function(g){
-    var d=document.createElement('div');d.className='cl';d.textContent=g;el.appendChild(d);
-  });
-  renderCal();
+// ── NUOVO SOCIO ───────────────────────────────
+function apriNuovoSocio() {
+  ['ns-nome','ns-cog','ns-disp','ns-cf','ns-dtn','ns-lng','ns-res','ns-via','ns-tel','ns-email']
+    .forEach(function(id){ var e=T(id); if(e) e.value=''; });
+  showErr('ns-err','');
+  apriOv('ov-ns');
 }
 
-function renderCal() {
-  var el=T('cal-days'); if(!el) return;
-  var now=new Date(), y=calYear, m=calMonth;
-  T('cal-mese-lbl').textContent = MESI[m]+' '+y;
-  var offset=(new Date(y,m,1).getDay()||7)-1;
-  var days=new Date(y,m+1,0).getDate();
-  el.innerHTML='';
-  for(var i=0;i<offset;i++){el.appendChild(document.createElement('div'));}
-  var today=now.getDate(),todayY=now.getFullYear(),todayM=now.getMonth();
-  for(var d=1;d<=days;d++){
-    var ds=pad(d)+'/'+pad(m+1)+'/'+y;
-    var dw=new Date(y,m,d).getDay();
-    var past=new Date(y,m,d)<new Date(todayY,todayM,today);
-    var giorniMap={'1':'Lun','2':'Mar','3':'Mer','4':'Gio','5':'Ven','6':'Sab','0':'Dom'};
-    var nomeG=giorniMap[String(dw)];
-    var giornoOk=false;
-    if(D.slotMatrix&&D.slotMatrix[nomeG]){
-      var og=D.slotMatrix[nomeG];
-      giornoOk=Object.keys(og).some(function(o){return og[o]===true;});
-    }
-    var inCh=false;
-    if(D.chiusure&&D.chiusure.length){
-      var dg=new Date(y,m,d);
-      D.chiusure.forEach(function(ch){
-        if(!ch.dal||!ch.al)return;
-        var pD=function(s){var p=String(s).split('/');if(p.length===3)return new Date(parseInt(p[2]),parseInt(p[1])-1,parseInt(p[0]));return new Date(s);};
-        if(dg>=pD(ch.dal)&&dg<=pD(ch.al)) inCh=true;
-      });
-    }
-    var av=!past&&!(dw===0||dw===6)&&giornoOk&&!inCh;
-    var div=document.createElement('div');
-    var sel=calDay===ds,tod=(d===today&&y===todayY&&m===todayM);
-    div.className='cd'+(sel?' sel':tod&&av?' tod':av?' av':' un');
-    div.textContent=d;
-    if(av) div.addEventListener('click',(function(day){return function(){selDay(day);};})(ds));
-    el.appendChild(div);
-  }
-}
+function creaSocio() {
+  var nome  = (T('ns-nome')||{}).value.trim();
+  var cog   = (T('ns-cog')||{}).value.trim();
+  var disp  = (T('ns-disp')||{}).value.trim();
+  var cf    = (T('ns-cf')||{}).value.trim();
+  showErr('ns-err','');
+  if (!nome||!cog||!disp||!cf) { showErr('ns-err','Nome, cognome, nome visualizzato e CF sono obbligatori'); return; }
 
-function calPrev(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}calDay=null;calSlot=null;renderCal();T('op-slot-sec').style.display='none';T('op-rie').style.display='none';}
-function calNext(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}calDay=null;calSlot=null;renderCal();T('op-slot-sec').style.display='none';T('op-rie').style.display='none';}
-
-function selDay(ds) {
-  calDay=ds; calSlot=null; renderCal();
-  T('op-slot-ttl').textContent='Orari disponibili — '+ds;
-  T('op-slot-sec').style.display=''; T('op-rie').style.display='none';
-  var occ=[];
-  D.prenotazioni.forEach(function(p){if(p.data===ds&&p.stato==='confermata')occ.push(p.ora);});
-  var parts=ds.split('/');
-  var dateObj=new Date(parseInt(parts[2]),parseInt(parts[1])-1,parseInt(parts[0]));
-  var gm={'1':'Lun','2':'Mar','3':'Mer','4':'Gio','5':'Ven','6':'Sab','0':'Dom'};
-  renderSlots(occ, gm[dateObj.getDay()]);
-}
-
-function renderSlots(occ, giorno) {
-  var slots=[];
-  if(D.slotMatrix&&giorno&&D.slotMatrix[giorno]){
-    slots=Object.keys(D.slotMatrix[giorno]).filter(function(o){return D.slotMatrix[giorno][o];}).sort();
-  }
-  if(!slots.length) slots=D.slot.length?D.slot:['09:00','09:30','10:00','10:30','11:00','11:30','15:00','15:30','16:00','16:30','17:00'];
-  var el=T('op-slot-grid'); if(!el) return; el.innerHTML='';
-  slots.forEach(function(s){
-    var bsy=occ.indexOf(s)>-1,sel=calSlot===s;
-    var btn=document.createElement('button');
-    btn.className='sb'+(sel?' sel':'')+(bsy?' bsy':'');
-    btn.textContent=s;
-    if(!bsy) btn.addEventListener('click',(function(sl){return function(){selSlot(sl);};})(s));
-    el.appendChild(btn);
-  });
-}
-
-function selSlot(s) {
-  calSlot=s; renderCal();
-  T('op-data-ora').textContent=calDay+' — ore '+s;
-  T('op-rie').style.display='';
-  var errEl=T('op-pren-err'); if(errEl) errEl.style.display='none';
-}
-
-function confermaPren() {
-  var mot=(T('op-motivo')||{}).value||'';
-  var errEl=T('op-pren-err');
-  if(!mot){if(errEl){errEl.textContent='Seleziona il motivo';errEl.style.display='';}return;}
-  if(!calDay||!calSlot){if(errEl){errEl.textContent='Seleziona data e orario';errEl.style.display='';}return;}
-
-  // Costruiamo la prenotazione a nome del socio
-  apiCall('savePrenotazioneAssistenza', {
-    userId:SOCIO.id, nomeUtente:(SOCIO.nome||'')+' '+(SOCIO.cognome||''),
-    emailUtente:SOCIO.email||'', telUtente:SOCIO.telefono||'',
-    data:calDay, ora:calSlot, motivo:mot
-  }, function(err,r){
-    if(!err&&r&&r.ok){
-      addLog('Appuntamento prenotato: '+calDay+' ore '+calSlot);
-      T('op-cal-rie').textContent='Prenotato per il '+calDay+' ore '+calSlot+' — In attesa di conferma';
-      T('op-cal-ok').style.display=''; T('op-cal-form').style.display='none';
-    } else {
-      if(errEl){errEl.textContent=(r&&r.error)||err||'Errore';errEl.style.display='';}
-    }
-  });
-}
-
-function resetPren() {
-  calDay=null; calSlot=null;
-  T('op-cal-ok').style.display='none'; T('op-cal-form').style.display='';
-  T('op-slot-sec').style.display='none'; T('op-rie').style.display='none';
-  renderCal();
-}
-
-// ── PROFILO SOCIO ────────────────────────────────────────────
-function caricaProfiloSocio() {
-  // Tessera
-  apiCall('getTessere', {}, function(err, r) {
-    var el=T('op-pr-tessera'); if(!el) return;
-    var tessere=(!err&&r&&r.ok)?r.data||[]:[];
-    var anno=new Date().getFullYear();
-    var mia=tessere.filter(function(t){return t.userId===SOCIO.id&&String(t.anno)===String(anno);});
-    if(mia.length){
-      el.innerHTML='<div class="infog">✅ Tessera '+anno+' valida — '+mia[0].numeroTessera+'</div>';
-    } else {
-      el.innerHTML='<div class="info">Nessuna tessera per il '+anno+'.</div>';
-    }
-  });
-  // Pagamenti
-  apiCall('getStrategiaEconomica', {userId:SOCIO.id}, function(err, r) {
-    var el=T('op-pr-pagamenti'); if(!el) return;
-    if(!err&&r&&r.ok&&r.dettaglio&&r.dettaglio.length){
-      var h='';
-      r.dettaglio.forEach(function(l){
-        var pagato=l.stato==='confermato';
-        var col=pagato?'#16A34A':'#E8631A';
-        var lbl=pagato?'Pagato':l.stato==='bonifico_dichiarato'?'Bonifico in verifica':'Da pagare';
-        h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #F2F2F7">'
-          +'<div><div style="font-size:13px;font-weight:600">'+l.tipo+'</div>'
-          +'<div style="font-size:11px;color:var(--text2)">'+lbl+'</div></div>'
-          +'<span style="font-size:15px;font-weight:800;color:'+col+'">€ '+l.importo+'</span></div>';
-      });
-      if(r.saldo>0) h+='<div style="display:flex;justify-content:space-between;padding:10px 0 4px">'
-        +'<span style="font-weight:800">SALDO</span>'
-        +'<span style="font-size:16px;font-weight:800;color:var(--red)">€ '+r.saldo+'</span></div>';
-      el.innerHTML=h;
-    } else {
-      el.innerHTML='<div class="info">Nessun pagamento registrato.</div>';
-    }
-  });
-}
-
-// ── MODIFICA EMAIL ────────────────────────────────────────────
-function apriModificaEmail() {
-  T('email-inp').value = SOCIO.email || '';
-  T('email-err').style.display = 'none';
-  T('email-ok').style.display = 'none';
-  apriOv('ov-email');
-}
-
-function salvaEmail() {
-  var email = (T('email-inp').value || '').trim();
-  var errEl = T('email-err');
-  if (!email || !email.includes('@')) {
-    errEl.textContent = 'Inserisci un indirizzo email valido';
-    errEl.style.display = ''; return;
-  }
-  apiCall('updateUtente', { token: ATOKEN, userId: SOCIO.id, email: email }, function(err, r) {
-    if (!err && r && r.ok) {
-      SOCIO.email = email;
-      localStorage.setItem('asppi_assistenza_socio', JSON.stringify(SOCIO));
-      T('email-ok').style.display = '';
-      T('email-err').style.display = 'none';
-      T('ban-meta').textContent = email + (SOCIO.cf ? ' · ' + SOCIO.cf : '');
-      T('op-pr-email').textContent = email;
-      T('email-warn').style.display = 'none';
-      addLog('Email aggiunta: ' + email);
-      setTimeout(function() { chiudiOv('ov-email'); }, 1500);
-    } else {
-      errEl.textContent = (r && r.error) || err || 'Errore';
-      errEl.style.display = '';
-    }
-  });
-}
-
-// ── MODIFICA SOCIO ────────────────────────────────────────────
-function apriModificaSocio() {
-  var set = function(id, val) { var e=T(id); if(e) e.value=val||''; };
-  set('ms-nome', SOCIO.nome); set('ms-cog', SOCIO.cognome);
-  set('ms-cf', SOCIO.cf); set('ms-dtn', SOCIO.dataNascita);
-  set('ms-lng', SOCIO.luogoNascita); set('ms-res', SOCIO.comuneResidenza);
-  set('ms-via', SOCIO.viaResidenza); set('ms-tel', SOCIO.telefono);
-  set('ms-email', SOCIO.email);
-  T('ms-err').style.display = 'none';
-  T('ms-ok').style.display = 'none';
-  apriOv('ov-mod-socio');
-}
-
-function salvaModificaSocio() {
-  var get = function(id){ return (T(id)||{}).value||''; };
-  var nome=get('ms-nome'), cog=get('ms-cog');
-  var errEl=T('ms-err');
-  if (!nome||!cog) { errEl.textContent='Nome e cognome obbligatori'; errEl.style.display=''; return; }
   var dati = {
-    userId: SOCIO.id,
-    nome:nome, cognome:cog, cf:get('ms-cf'),
-    dataNascita:get('ms-dtn'), luogoNascita:get('ms-lng'),
-    comuneResidenza:get('ms-res'), viaResidenza:get('ms-via'),
-    telefono:get('ms-tel'), email:get('ms-email')
+    nome:nome, cognome:cog, displayName:disp, cf:cf,
+    dataNascita:(T('ns-dtn')||{}).value||'',
+    luogoNascita:(T('ns-lng')||{}).value||'',
+    comuneResidenza:(T('ns-res')||{}).value||'',
+    viaResidenza:(T('ns-via')||{}).value||'',
+    telefono:(T('ns-tel')||{}).value||'',
+    email:(T('ns-email')||{}).value.trim()||'',
+    preRegistrato:true
   };
-  apiCall('updateUtenteAdmin', dati, function(err,r) {
-    if (!err&&r&&r.ok) {
-      Object.assign(SOCIO, dati);
-      localStorage.setItem('asppi_assistenza_socio', JSON.stringify(SOCIO));
-      // Aggiorna display
-      T('ban-nome').textContent = (nome+' '+cog).trim();
-      T('ban-meta').textContent = (SOCIO.email||'Email non inserita')+(SOCIO.cf?' · '+SOCIO.cf:'');
-      T('op-pr-nome').textContent = (nome+' '+cog).trim();
-      T('op-pr-cf').textContent = dati.cf; T('op-pr-dtn').textContent = dati.dataNascita;
-      T('op-pr-email').textContent = dati.email||'—';
-      T('email-warn').style.display = dati.email ? 'none' : 'flex';
-      T('ms-ok').style.display = '';
-      addLog('Dati aggiornati per ' + nome + ' ' + cog);
-      setTimeout(function(){ chiudiOv('ov-mod-socio'); }, 1500);
-    } else { errEl.textContent=(r&&r.error)||err||'Errore'; errEl.style.display=''; }
+
+  var btn = T('ov-ns').querySelector('.bp');
+  if(btn){btn.textContent='Registrazione...';btn.disabled=true;}
+
+  api('createOrFindSocio', dati, function(err,r){
+    if(btn){btn.textContent='Registra e avvia assistenza →';btn.disabled=false;}
+    if(err||!r||!r.ok){ showErr('ns-err',(r&&r.error)||err||'Errore'); return; }
+    SOCIO = r.socio;
+    localStorage.setItem('asppi_assistenza_socio', JSON.stringify(SOCIO));
+    // Aggiorna lista locale
+    if (!r.trovato) ALL_SOCI.push(SOCIO);
+    chiudiOv('ov-ns');
+    mostraOperativa();
+    caricaDatiSocio();
   });
 }
 </script>
