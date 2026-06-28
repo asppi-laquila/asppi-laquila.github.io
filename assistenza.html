@@ -321,6 +321,16 @@ textarea.inp{min-height:90px;resize:vertical;}
     <input type="text" id="search-socio" placeholder="Nome, cognome, email o codice fiscale..."
       oninput="cercaSocio(this.value)"/>
   </div>
+  <div style="display:flex;gap:8px;margin-bottom:10px">
+    <button onclick="caricaTuttiSoci()"
+      style="flex:1;padding:11px;background:var(--navy);color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+      📋 Mostra tutti i soci
+    </button>
+    <button onclick="document.getElementById('search-socio').value='';document.getElementById('search-results').style.display='none'"
+      style="padding:11px 16px;background:#F2F2F7;color:var(--text);border:none;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
+      ✕
+    </button>
+  </div>
   <div class="search-results" id="search-results"></div>
 
   <div class="divider-or"><span>oppure</span></div>
@@ -791,6 +801,85 @@ function selezionaSocio(u) {
   mostraSchermataOperativa();
   caricaDatiSocio();
 }
+
+function caricaTuttiSoci() {
+  var el = T('search-results');
+  var inp = T('search-socio');
+  if (inp) inp.value = '';
+  el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--text2)">⏳ Caricamento soci...</div>';
+  el.style.display = 'block';
+
+  fetch(API, {
+    method: 'POST',
+    headers: {'Content-Type':'text/plain'},
+    body: JSON.stringify({ action: 'getUtenti', token: ATOKEN }),
+    redirect: 'follow'
+  })
+  .then(function(res){ return res.text(); })
+  .then(function(text){
+    var r;
+    try { r = JSON.parse(text); } catch(e) {
+      el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--red)">❌ Risposta non valida: ' + text.substring(0,120) + '</div>';
+      el.style.display = 'block'; return;
+    }
+    if (!r || !r.ok) {
+      el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--red)">❌ ' + (r&&r.error||'Errore sconosciuto') + '</div>';
+      el.style.display = 'block'; return;
+    }
+    var utenti = (r.data || []).sort(function(a,b){
+      return ((a.cognome||a.nome||'')).localeCompare((b.cognome||b.nome||''));
+    });
+    if (!utenti.length) {
+      el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--text2)">Nessun socio registrato.</div>';
+      el.style.display = 'block'; return;
+    }
+    el.innerHTML = '<div style="padding:10px 14px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #F2F2F7">' + utenti.length + ' SOCI REGISTRATI</div>';
+    utenti.forEach(function(u) {
+      var div = document.createElement('div');
+      div.className = 'search-result-item';
+      var nome = u.displayName || ((u.nome||'') + ' ' + (u.cognome||'')).trim();
+      div.innerHTML = '<div class="sri-avatar">👤</div>'
+        + '<div style="flex:1"><div class="sri-nome">' + nome + '</div>'
+        + '<div class="sri-meta">' + (u.email||'Email non inserita') + (u.cf?' · '+u.cf:'') + '</div></div>'
+        + '<div class="sri-arr">›</div>';
+      div.addEventListener('click', function(){ selezionaSocio(u); });
+      el.appendChild(div);
+    });
+    el.style.display = 'block';
+    // Abilita ricerca live dopo il caricamento
+    if (inp) inp.oninput = function(){ filtraSociCaricati(this.value, utenti); };
+  })
+  .catch(function(err2){
+    el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--red)">❌ Connessione fallita: ' + err2.message + '</div>';
+    el.style.display = 'block';
+  });
+}
+
+function filtraSociCaricati(q, utenti) {
+  var el = T('search-results'); if (!el) return;
+  var ql = q.toLowerCase();
+  var found = !q ? utenti : utenti.filter(function(u){
+    return (u.nome||'').toLowerCase().includes(ql)
+        || (u.cognome||'').toLowerCase().includes(ql)
+        || (u.displayName||'').toLowerCase().includes(ql)
+        || (u.email||'').toLowerCase().includes(ql)
+        || (u.cf||'').toLowerCase().includes(ql);
+  });
+  el.innerHTML = '<div style="padding:10px 14px;font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid #F2F2F7">' + found.length + ' RISULTATI</div>';
+  found.forEach(function(u) {
+    var div = document.createElement('div');
+    div.className = 'search-result-item';
+    var nome = u.displayName || ((u.nome||'') + ' ' + (u.cognome||'')).trim();
+    div.innerHTML = '<div class="sri-avatar">👤</div>'
+      + '<div style="flex:1"><div class="sri-nome">' + nome + '</div>'
+      + '<div class="sri-meta">' + (u.email||'Email non inserita') + (u.cf?' · '+u.cf:'') + '</div></div>'
+      + '<div class="sri-arr">›</div>';
+    div.addEventListener('click', function(){ selezionaSocio(u); });
+    el.appendChild(div);
+  });
+  el.style.display = 'block';
+}
+
 
 // ── CREA NUOVO SOCIO ─────────────────────────────────────────
 function creaNuovoSocio() {
