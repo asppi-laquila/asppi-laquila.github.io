@@ -319,7 +319,7 @@ body{
 <body>
 
 <!-- SCELTA -->
-<div id="pg-scelta" class="page on">
+<div id="pg-scelta" class="page">
   <div class="splash-hero">
     <img src="LOGO-NAZIONALE.png" alt="ASPPI"/>
     <div class="splash-city">L'Aquila</div>
@@ -351,7 +351,7 @@ body{
 </div>
 
 <!-- LOGIN SOCI -->
-<div id="pg-login" class="page">
+<div id="pg-login" class="page on">
   <div class="login-header">
     <div class="login-header-top">
       <img src="LOGO-NAZIONALE.png" alt="ASPPI"/>
@@ -393,7 +393,9 @@ body{
 
       <button class="btn-primary" onclick="doLogin()" id="acc-btn">Accedi</button>
       <button class="btn-link" onclick="mostra('pg-forgot')">Password dimenticata?</button>
-      <button class="btn-secondary" onclick="mostra('pg-scelta')">← Indietro</button>
+      <div class="form-divider" style="margin-top:8px">
+        Sei l'amministratore? <a href="#" onclick="mostra('pg-admin-login');return false;">Accesso admin →</a>
+      </div>
     </div>
 
     <!-- REGISTRATI -->
@@ -457,7 +459,9 @@ body{
       </div>
 
       <button class="btn-primary" onclick="doRegister()">Crea account</button>
-      <button class="btn-secondary" onclick="mostra('pg-scelta')">← Indietro</button>
+      <div class="form-divider" style="margin-top:8px">
+        Sei l'amministratore? <a href="#" onclick="mostra('pg-admin-login');return false;">Accesso admin →</a>
+      </div>
     </div>
 
   </div>
