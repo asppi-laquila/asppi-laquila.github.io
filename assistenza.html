@@ -265,8 +265,8 @@ textarea.inp{min-height:90px;resize:vertical;}
 /* ── SLOT CALENDAR (riuso da socio.html) ── */
 .cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;}
 .cl{text-align:center;font-size:11px;font-weight:700;color:var(--text2);padding:4px 0;}
-.cd{aspect-ratio:1;display:flex;align-items:center;justify-content:center;
-  border-radius:50%;font-size:13px;font-weight:500;color:#C7C7CC;}
+.cd{height:36px;width:100%;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;font-size:13px;font-weight:500;color:#C7C7CC;}
 .cd.av{color:var(--text);cursor:pointer;font-weight:600;}
 .cd.tod{background:var(--bg);color:var(--orange);font-weight:700;}
 .cd.sel{background:var(--orange);color:#fff;font-weight:700;}
@@ -285,12 +285,12 @@ textarea.inp{min-height:90px;resize:vertical;}
 
 <!-- TOP BAR -->
 <div class="top" id="top-bar">
-  <button class="back-btn" onclick="tornaAdmin()">←</button>
+  <button class="back-btn" onclick="window.location.href='admin.html'">←</button>
   <div class="title-area">
     <div class="tl">ASPPI L'Aquila</div>
     <div class="tt" id="top-title">🤝 Assistenza</div>
   </div>
-  <button class="admin-btn" onclick="tornaAdmin()">← Admin</button>
+  <button class="admin-btn" onclick="window.location.href='admin.html'" style="min-height:44px;padding:0 16px">← Admin</button>
 </div>
 
 <!-- BANNER SOCIO ATTIVO -->
@@ -734,8 +734,13 @@ function addLog(msg) {
 function cercaSocio(q) {
   var el = T('search-results');
   if (!q || q.length < 2) { el.style.display = 'none'; return; }
+  el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--text2)">🔍 Ricerca in corso...</div>';
+  el.style.display = 'block';
   apiCall('getUtenti', {}, function(err, r) {
-    if (err || !r || !r.ok) { el.style.display = 'none'; return; }
+    if (err || !r || !r.ok) {
+      el.innerHTML = '<div class="search-result-item" style="cursor:default;color:var(--red)">❌ Errore: ' + (err||((r&&r.error)||'Riprova')) + '</div>';
+      el.style.display = 'block'; return;
+    }
     var utenti = r.data || [];
     var ql = q.toLowerCase();
     var found = utenti.filter(function(u) {

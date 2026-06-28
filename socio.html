@@ -312,11 +312,11 @@ textarea.inp{min-height:100px;resize:vertical;}
 }
 
 /* ── CALENDAR ── */
-.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;}
-.cl{text-align:center;font-size:11px;font-weight:700;color:var(--text2);padding:4px 0;}
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px;}
+.cl{text-align:center;font-size:10px;font-weight:700;color:var(--text2);padding:3px 0;}
 .cd{
-  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
-  border-radius:50%;font-size:13px;font-weight:500;color:#C7C7CC;
+  height:36px;width:100%;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;font-size:13px;font-weight:500;color:#C7C7CC;
 }
 .cd.av{color:var(--text);cursor:pointer;font-weight:600;}
 .cd.av:active{background:var(--bg);}
@@ -815,7 +815,7 @@ textarea.inp{min-height:100px;resize:vertical;}
 </div>
 
 <!-- BOTTOM NAV -->
-<nav class="nav">
+<nav class="nav"><button id="nb-chat" style="display:none"></button>
   <button class="nb on" id="nb-home"><span class="ic">🏡</span><span class="lb">Home</span></button>
   <button class="nb" id="nb-immobili"><span class="ic">🏘️</span><span class="lb">Immobili</span></button>
   <button class="nb" id="nb-vantaggi"><span class="ic">⭐</span><span class="lb">Vantaggi</span></button>
@@ -1120,7 +1120,7 @@ function bindAll() {
 
 // ── NAV ───────────────────────────────────────────────────────
 function navTo(id) {
-  var pages = ['home','immobili','vantaggi','prenota','profilo'];
+  var pages = ['home','immobili','vantaggi','prenota','profilo','chat'];
   for (var i=0; i<pages.length; i++) {
     var pg = T('p-'+pages[i]);
     var nb = T('nb-'+pages[i]);
