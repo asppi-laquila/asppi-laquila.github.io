@@ -3,250 +3,539 @@
 <head>
 <meta charset="UTF-8"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<meta name="theme-color" content="#0D1B2A"/>
+<meta name="theme-color" content="#0A1628"/>
 <title>ASPPI Admin</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',-apple-system,sans-serif;background:#F2F2F7;min-height:100vh;padding-bottom:90px;-webkit-font-smoothing:antialiased;color:#1D1D1F;}
 
-/* TOP BAR */
+:root{
+  --orange:#E8631A;
+  --orange-l:#FDF0E8;
+  --green:#16A34A;
+  --green-l:#ECFDF5;
+  --blue:#1A5FA8;
+  --blue-l:#EBF2FB;
+  --red:#DC2626;
+  --red-l:#FFF5F5;
+  --purple:#7C3AED;
+  --navy:#0A1628;
+  --bg:#F2F2F7;
+  --card:#FFFFFF;
+  --text:#1C1C1E;
+  --text2:#8E8E93;
+  --border:#E5E5EA;
+  --r-lg:20px;
+  --r-md:14px;
+  --r-sm:10px;
+}
+
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg);min-height:100vh;padding-bottom:90px;
+  -webkit-font-smoothing:antialiased;color:var(--text);
+}
+
+/* ── TOP BAR ── */
 .top{
-  background:rgba(255,255,255,0.92);
-  backdrop-filter:blur(20px);
-  padding:12px 20px;
+  background:var(--navy);
+  padding:14px 20px;
   display:flex;justify-content:space-between;align-items:center;
   position:sticky;top:0;z-index:200;
-  border-bottom:1px solid rgba(0,0,0,0.06);
+  box-shadow:0 2px 16px rgba(0,0,0,0.3);
 }
-.tl{font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.1em;text-transform:uppercase;}
-.tt{font-size:15px;font-weight:800;color:#1D1D1F;}
-.exbtn{background:rgba(0,0,0,0.06);border:none;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:600;color:#1D1D1F;cursor:pointer;font-family:inherit;}
+.top .tl{font-size:9px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:.14em;text-transform:uppercase;}
+.top .tt{font-size:15px;font-weight:800;color:#fff;letter-spacing:-.2px;}
+.exbtn{
+  background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);
+  border-radius:20px;padding:7px 16px;font-size:12px;font-weight:600;
+  color:rgba(255,255,255,0.8);cursor:pointer;font-family:inherit;
+}
 
-/* NAV */
-.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,0.08);display:flex;padding:8px 0 24px;z-index:200;}
-.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;border:none;background:transparent;cursor:pointer;padding:6px 0;transition:transform 0.15s;}
-.nb:active{transform:scale(0.9);}
-.nb .ic{font-size:22px;opacity:0.3;transition:opacity 0.2s;line-height:1;}
-.nb .lb{font-size:9px;color:#8E8E93;font-weight:500;font-family:inherit;}
+/* ── BOTTOM NAV ── */
+.nav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--navy);
+  display:flex;padding:8px 0 24px;z-index:200;
+  box-shadow:0 -1px 0 rgba(255,255,255,0.06);
+}
+.nb{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;
+  border:none;background:transparent;cursor:pointer;padding:6px 2px;
+  transition:transform 0.15s;
+}
+.nb:active{transform:scale(0.88);}
+.nb .ic{font-size:20px;line-height:1;opacity:0.4;transition:opacity 0.2s;}
+.nb .lb{font-size:9px;color:rgba(255,255,255,0.4);font-weight:500;font-family:inherit;transition:color 0.2s;letter-spacing:-.1px;}
 .nb.on .ic{opacity:1;}
-.nb.on .lb{color:#E8631A;font-weight:700;}
+.nb.on .lb{color:var(--orange);font-weight:700;}
 
-/* PAGES */
+/* ── PAGES ── */
 .pg{display:none;padding:16px;}
 .pg.on{display:block;}
 
-/* CARDS */
-.card{background:#fff;border-radius:20px;margin-bottom:14px;box-shadow:0 2px 16px rgba(0,0,0,0.06);overflow:hidden;}
+/* ── CARDS ── */
+.card{background:var(--card);border-radius:var(--r-lg);margin-bottom:14px;box-shadow:0 1px 10px rgba(0,0,0,0.06);overflow:hidden;}
 .cb{padding:18px;}
 
-/* SECTION */
-.sec{font-size:11px;font-weight:700;color:#E8631A;letter-spacing:.1em;text-transform:uppercase;padding-bottom:10px;border-bottom:1px solid #F2F2F7;margin-bottom:16px;}
+/* ── SECTION ── */
+.sec{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.06em;text-transform:uppercase;padding-bottom:10px;border-bottom:1px solid var(--bg);margin-bottom:14px;}
 
-/* ROWS */
-.row{display:flex;overflow:hidden;border-radius:16px;margin-bottom:10px;box-shadow:0 2px 12px rgba(0,0,0,0.06);cursor:pointer;background:#fff;transition:transform 0.15s;}
+/* ── ROWS ── */
+.row{display:flex;overflow:hidden;border-radius:var(--r-md);margin-bottom:10px;box-shadow:0 1px 8px rgba(0,0,0,0.06);cursor:pointer;background:var(--card);transition:transform 0.15s;}
 .row:active{transform:scale(0.98);}
 .bar{width:4px;flex-shrink:0;}
-.rb{flex:1;padding:14px 16px;}
+.rb{flex:1;padding:13px 14px;}
 .ra{display:flex;align-items:center;padding-right:14px;color:#C7C7CC;font-size:18px;}
-.rt{font-size:15px;font-weight:700;color:#1D1D1F;}
-.rs{font-size:12px;color:#8E8E93;margin-top:3px;}
+.rt{font-size:14px;font-weight:700;color:var(--text);}
+.rs{font-size:12px;color:var(--text2);margin-top:2px;}
 
-/* LABELS */
-.lbl{display:block;font-size:12px;font-weight:600;color:#8E8E93;margin-bottom:5px;letter-spacing:.02em;}
-.inp{width:100%;padding:13px 15px;border-radius:12px;border:1.5px solid #E5E5EA;font-size:15px;color:#1D1D1F;background:#F8F8FA;margin-bottom:14px;outline:none;font-family:inherit;transition:border-color 0.2s,background 0.2s;}
-.inp:focus{border-color:#E8631A;background:#fff;}
+/* ── LABELS / VALUES ── */
+.lbl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;letter-spacing:.02em;}
+.val{font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;}
+
+/* ── INPUTS ── */
+.inp{width:100%;padding:13px 15px;border-radius:12px;border:1.5px solid var(--border);font-size:15px;color:var(--text);background:#F8F8FA;margin-bottom:14px;outline:none;font-family:inherit;transition:border-color 0.2s,background 0.2s;}
+.inp:focus{border-color:var(--orange);background:#fff;}
 select.inp{cursor:pointer;}
 textarea.inp{min-height:90px;resize:vertical;}
 
-/* BUTTONS */
-.bp{width:100%;padding:15px;background:#E8631A;color:#fff;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;font-family:inherit;transition:opacity 0.2s,transform 0.15s;}
+/* ── BUTTONS ── */
+.bp{width:100%;padding:14px;background:var(--orange);color:#fff;border:none;border-radius:var(--r-md);font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;font-family:inherit;transition:opacity 0.2s,transform 0.15s;box-shadow:0 3px 12px rgba(232,99,26,0.2);}
 .bp:active{opacity:0.85;transform:scale(0.98);}
-.bs{width:100%;padding:14px;background:transparent;color:#1D1D1F;border:1.5px solid #E5E5EA;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit;}
-.bd{width:100%;padding:14px;background:transparent;color:#E8631A;border:1.5px solid #E8631A;border-radius:14px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit;}
+.bs{width:100%;padding:13px;background:transparent;color:var(--text);border:1.5px solid var(--border);border-radius:var(--r-md);font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit;transition:background 0.15s;}
+.bs:active{background:var(--bg);}
+.bd{width:100%;padding:13px;background:transparent;color:var(--orange);border:1.5px solid var(--orange);border-radius:var(--r-md);font-size:14px;font-weight:600;cursor:pointer;margin-bottom:10px;font-family:inherit;}
 
-/* OVERLAYS */
-.ov{display:none;position:fixed;inset:0;background:#F2F2F7;z-index:300;overflow-y:auto;}
+/* ── OVERLAYS ── */
+.ov{display:none;position:fixed;inset:0;background:var(--bg);z-index:300;overflow-y:auto;}
 .ov.on{display:block;}
-.oh{background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(0,0,0,0.06);}
-.ohlbl{font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.1em;text-transform:uppercase;}
-.ohttl{font-size:17px;font-weight:700;color:#1D1D1F;}
+.oh{background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);padding:14px 18px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(0,0,0,0.06);}
+.ohlbl{font-size:9px;font-weight:700;color:var(--orange);letter-spacing:.12em;text-transform:uppercase;}
+.ohttl{font-size:17px;font-weight:700;color:var(--text);}
 
-/* BADGES */
-.bdg{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
-.info{background:#F2F2F7;border-radius:12px;padding:14px;font-size:13px;color:#8E8E93;text-align:center;}
-.infog{background:#EBF9F1;border-radius:12px;padding:12px 15px;font-size:13px;color:#1A7A4A;font-weight:600;margin-bottom:12px;display:none;}
-.infob{background:#EBF2FB;border-radius:12px;padding:12px 15px;font-size:13px;color:#1A5FA8;font-weight:600;margin-bottom:12px;}
-.infor{background:#FDF0E8;border-radius:12px;padding:12px 15px;font-size:13px;color:#E8631A;font-weight:600;margin-bottom:12px;}
-.errbox{background:#FFF0F0;border-radius:12px;padding:12px 15px;font-size:13px;color:#C0392B;font-weight:600;margin-bottom:12px;display:none;}
+/* ── BADGES ── */
+.bdg{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.info{background:var(--bg);border-radius:12px;padding:14px;font-size:13px;color:var(--text2);text-align:center;}
+.infog{background:var(--green-l);border-radius:12px;padding:12px 15px;font-size:13px;color:var(--green);font-weight:600;margin-bottom:12px;display:none;}
+.infob{background:var(--blue-l);border-radius:12px;padding:12px 15px;font-size:13px;color:var(--blue);font-weight:600;margin-bottom:12px;}
+.infor{background:var(--orange-l);border-radius:12px;padding:12px 15px;font-size:13px;color:var(--orange);font-weight:600;margin-bottom:12px;}
+.errbox{background:var(--red-l);border-radius:12px;padding:12px 15px;font-size:13px;color:var(--red);font-weight:600;margin-bottom:12px;display:none;}
 
-/* GRID */
+/* ── GRID ── */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.frow{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.frow{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
 
-/* FILTRI */
-.fbtn{padding:8px 14px;border-radius:20px;border:1.5px solid #E5E5EA;background:#fff;font-size:12px;font-weight:600;cursor:pointer;color:#1D1D1F;font-family:inherit;transition:all 0.15s;}
-.fbtn.on{background:#E8631A;border-color:#E8631A;color:#fff;}
+/* ── FILTER BUTTONS ── */
+.fb{
+  padding:7px 14px;border-radius:20px;
+  border:1.5px solid var(--border);background:var(--card);
+  font-size:12px;font-weight:600;cursor:pointer;
+  color:var(--text);font-family:inherit;transition:all 0.15s;
+}
+.fb.on{background:var(--orange);border-color:var(--orange);color:#fff;}
+/* old class names used in JS */
+.fbtn{padding:7px 14px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);font-size:12px;font-weight:600;cursor:pointer;color:var(--text);font-family:inherit;}
+.fbtn.on{background:var(--orange);border-color:var(--orange);color:#fff;}
+.fb.off{background:var(--card);border-color:var(--border);color:var(--text);}
 
-/* TABS */
-.tabbtn{flex:1;padding:11px;border:none;background:transparent;font-size:13px;font-weight:600;color:#8E8E93;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;transition:color 0.2s,border-color 0.2s;}
-.tabbtn.on{color:#E8631A;border-bottom-color:#E8631A;}
-.tabrow{display:flex;border-bottom:1px solid #F2F2F7;margin-bottom:16px;}
+/* ── TABS ── */
+.tabbtn{flex:1;padding:11px;border:none;background:transparent;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;transition:color 0.2s,border-color 0.2s;}
+.tabbtn.on{color:var(--orange);border-bottom-color:var(--orange);}
+.tabrow{display:flex;border-bottom:1px solid var(--bg);margin-bottom:16px;}
 
-/* SLOT */
-.sbt{padding:9px 14px;border-radius:10px;border:1.5px solid #E5E5EA;background:#fff;font-size:13px;font-weight:600;cursor:pointer;color:#1D1D1F;font-family:inherit;transition:all 0.15s;}
-.sbt.on{background:#E8631A;border-color:#E8631A;color:#fff;}
-.gbtn{padding:9px 16px;border-radius:10px;border:1.5px solid #E5E5EA;background:#fff;font-size:13px;font-weight:600;cursor:pointer;color:#1D1D1F;font-family:inherit;transition:all 0.15s;}
-.gbtn.on{background:#1A3A8F;border-color:#1A3A8F;color:#fff;}
-.grow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
-.sg{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
-.sl{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+/* ── SLOT TABLE ── */
+.sbt{padding:8px 13px;border-radius:9px;border:1.5px solid var(--border);background:var(--card);font-size:13px;font-weight:600;cursor:pointer;color:var(--text);font-family:inherit;transition:all 0.15s;}
+.sbt.on{background:var(--orange);border-color:var(--orange);color:#fff;}
+.gbtn{padding:8px 14px;border-radius:9px;border:1.5px solid var(--border);background:var(--card);font-size:13px;font-weight:600;cursor:pointer;color:var(--text);font-family:inherit;}
+.gbtn.on{background:var(--navy);border-color:var(--navy);color:#fff;}
+.grow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.sg{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.sl{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
 
-/* STAT CARDS */
+/* ── CHAT ── */
+.cms{min-height:200px;max-height:calc(100vh - 260px);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;}
+.bbl{max-width:75%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.4;}
+.bm{background:var(--orange);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+.bo{background:#fff;color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.bt{font-size:11px;color:var(--text2);margin-bottom:4px;}
+.ci{display:flex;gap:8px;padding:12px 16px 32px;background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,0.07);position:sticky;bottom:0;}
+.ci .inp{margin-bottom:0;flex:1;}
+.cs{width:44px;height:44px;background:var(--orange);color:#fff;border:none;border-radius:12px;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+
+/* ══════════════════════════════════════
+   HOME ADMIN — STAT CARDS
+══════════════════════════════════════ */
+.stat-row{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:10px;margin-bottom:16px;
+}
+.stat-card{
+  background:var(--card);border-radius:18px;
+  padding:16px 12px;text-align:center;
+  box-shadow:0 1px 10px rgba(0,0,0,0.06);
+  cursor:pointer;transition:transform 0.15s;
+  position:relative;overflow:hidden;
+}
+.stat-card:active{transform:scale(0.96);}
+.stat-card::before{
+  content:'';position:absolute;inset:0;
+  border-radius:18px;opacity:0.07;
+}
+.stat-card.s-blue::before{background:var(--blue);}
+.stat-card.s-orange::before{background:var(--orange);}
+.stat-card.s-green::before{background:var(--green);}
+.stat-num{font-size:32px;font-weight:900;line-height:1;letter-spacing:-1px;}
+.stat-card.s-blue .stat-num{color:var(--blue);}
+.stat-card.s-orange .stat-num{color:var(--orange);}
+.stat-card.s-green .stat-num{color:var(--green);}
+.stat-lbl{font-size:11px;color:var(--text2);font-weight:600;margin-top:5px;}
+
+/* ── SEARCH BAR ── */
+.search-wrap{position:relative;margin-bottom:12px;}
+.search-wrap input{
+  width:100%;padding:12px 14px 12px 42px;
+  border-radius:13px;border:1.5px solid var(--border);
+  font-size:14px;outline:none;font-family:inherit;
+  background:var(--card);color:var(--text);
+  transition:border-color 0.2s;
+}
+.search-wrap input:focus{border-color:var(--orange);}
+.search-wrap .search-icon{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  font-size:16px;color:var(--text2);
+}
+#global-results{
+  display:none;background:var(--card);border-radius:13px;
+  box-shadow:0 4px 20px rgba(0,0,0,.1);margin-bottom:12px;
+  overflow:hidden;max-height:280px;overflow-y:auto;
+}
+
+/* ── ALERT CARD ── */
+.alert-card{
+  border-radius:14px;padding:14px 16px;margin-bottom:10px;
+  border-left:4px solid;
+  display:flex;justify-content:space-between;align-items:center;
+  cursor:pointer;
+}
+.alert-urgent{background:var(--red-l);border-color:var(--red);}
+.alert-warn{background:var(--orange-l);border-color:var(--orange);}
+.alert-info{background:var(--blue-l);border-color:var(--blue);}
+
+/* ── PENDING BANNER (prenotazioni in attesa) ── */
+.pending-banner{
+  background:linear-gradient(135deg,var(--orange),#F5842A);
+  border-radius:16px;padding:16px;margin-bottom:12px;
+  display:flex;align-items:center;gap:12px;
+  cursor:pointer;
+}
+.pending-banner .pb-icon{
+  width:46px;height:46px;background:rgba(255,255,255,0.2);
+  border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:24px;flex-shrink:0;
+}
+.pending-banner .pb-text .pb-count{font-size:20px;font-weight:800;color:#fff;}
+.pending-banner .pb-text .pb-label{font-size:12px;color:rgba(255,255,255,0.8);font-weight:500;}
+.pending-banner .pb-arr{margin-left:auto;font-size:22px;color:rgba(255,255,255,0.6);}
+
+/* ── SECTION HEADER ── */
+.page-title{font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px;letter-spacing:-.3px;}
+.page-sub{font-size:13px;color:var(--text2);margin-bottom:16px;}
+
+/* ── EXPORT BUTTON ── */
+.export-btn{
+  width:100%;padding:13px;
+  background:var(--navy);color:#fff;border:none;
+  border-radius:13px;font-size:13px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:inherit;margin-bottom:14px;
+  transition:opacity 0.2s;
+}
+.export-btn:active{opacity:0.85;}
+
+/* ── STAT BADGE (accanto al nome) ── */
+.count-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--orange);color:#fff;
+  font-size:11px;font-weight:800;
+  min-width:20px;height:20px;padding:0 6px;
+  border-radius:10px;margin-left:6px;
+}
+
+/* ── PERSONA BLOCK (dentro pratiche) ── */
+.pb{background:#F8F8FA;border-radius:13px;padding:14px;margin-bottom:10px;position:relative;}
+.pr{position:absolute;top:10px;right:10px;background:var(--bg);border:none;border-radius:8px;width:28px;height:28px;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);}
+
+/* ── CHECKBOX ── */
+.cr{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;cursor:pointer;line-height:1.4;}
+.cb2{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--border);background:#F8F8FA;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:1px;transition:all 0.15s;}
+.cb2.on{background:var(--orange);border-color:var(--orange);color:#fff;}
+
+/* ── STEP PROGRESS ── */
+.prog{display:flex;gap:4px;padding:12px 16px 0;}
+.pd{height:3px;flex:1;border-radius:2px;background:var(--bg);transition:background 0.3s;}
+.snav{position:fixed;bottom:0;left:0;right:0;padding:12px 16px 32px;background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,0.07);z-index:400;}
+
+/* ── SLOT TABLE ── */
+#slot-table{border-collapse:collapse;width:100%;min-width:320px;}
+#slot-table th,#slot-table td{
+  padding:8px 6px;text-align:center;font-size:12px;
+  border:1px solid var(--border);
+}
+#slot-table th{background:var(--bg);font-weight:700;color:var(--text2);}
+#slot-table td{cursor:pointer;transition:background 0.15s;}
+#slot-table td.active{background:var(--orange);color:#fff;font-weight:700;}
+#slot-table td:hover{background:var(--orange-l);}
+
+/* ── STAT (vecchie classi usate in JS) ── */
 .stat{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
-.s{background:#fff;border-radius:16px;padding:16px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.06);cursor:pointer;transition:transform 0.15s;}
+.s{background:var(--card);border-radius:16px;padding:16px;text-align:center;box-shadow:0 1px 10px rgba(0,0,0,0.06);cursor:pointer;transition:transform 0.15s;}
 .s:active{transform:scale(0.97);}
 .sn{font-size:28px;font-weight:800;line-height:1;}
-.sl{font-size:11px;color:#8E8E93;font-weight:500;margin-top:4px;}
 .sb2{text-align:center;}
+
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
+<!-- TOP BAR -->
 <div class="top">
-  <div><div class="tl">ASPPI L'Aquila - Admin</div><div class="tt">Simeoni Maurizio</div></div>
-  <button class="exbtn" id="btn-esci">Esci</button>
+  <div>
+    <div class="tl">ASPPI L'Aquila · Admin</div>
+    <div class="tt">Simeoni Maurizio</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button id="btn-assistenza" onclick="vaiAssistenza()"
+      style="background:var(--orange);border:none;border-radius:10px;padding:7px 14px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;font-family:inherit;">
+      🤝 <span id="btn-ass-label">Assistenza</span>
+    </button>
+    <button class="exbtn" id="btn-esci">Esci</button>
+  </div>
 </div>
 
-<!-- HOME -->
+<!-- ════════════ HOME ════════════ -->
 <div id="p-home" class="pg on">
 
-  <!-- Bottone export -->
-  <div style="margin-bottom:16px">
-    <button id="btn-esporta-db" style="width:100%;padding:12px;background:#1A3A8F;color:#fff;border:none;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
-      <span>&#128196;</span><span>Scarica database completo Excel</span>
-    </button>
-    <div id="export-status" style="display:none;font-size:12px;color:#8A8A8A;text-align:center;margin-top:4px"></div>
-  </div>
+  <!-- Export -->
+  <button id="btn-esporta-db" class="export-btn">
+    📊 Scarica database completo Excel
+  </button>
+  <div id="export-status" style="display:none;font-size:12px;color:var(--text2);text-align:center;margin-top:-10px;margin-bottom:10px"></div>
 
-  <!-- Statistiche rapide -->
-  <div id="h-pren-attesa"></div>
-  <div id="h-alert-box"></div>
-
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
-    <div class="card" style="margin:0;cursor:pointer" onclick="document.getElementById('nb-soci').click()">
-      <div class="cb" style="text-align:center;padding:14px 8px">
-        <div style="font-size:28px;font-weight:800;color:#1A3A8F" id="sh-soci">—</div>
-        <div style="font-size:11px;color:#8A8A8A;font-weight:600">Soci</div>
-      </div>
+  <!-- Stat cards -->
+  <div class="stat-row">
+    <div class="stat-card s-blue" onclick="document.getElementById('nb-soci').click()">
+      <div class="stat-num" id="sh-soci">—</div>
+      <div class="stat-lbl">Soci</div>
     </div>
-    <div class="card" style="margin:0;cursor:pointer" onclick="document.getElementById('nb-prat').click()">
-      <div class="cb" style="text-align:center;padding:14px 8px">
-        <div style="font-size:28px;font-weight:800;color:#E8631A" id="sh-att">—</div>
-        <div style="font-size:11px;color:#8A8A8A;font-weight:600">In attesa</div>
-      </div>
+    <div class="stat-card s-orange" onclick="document.getElementById('nb-prat').click()">
+      <div class="stat-num" id="sh-att">—</div>
+      <div class="stat-lbl">In attesa</div>
     </div>
-    <div class="card" style="margin:0;cursor:pointer" onclick="document.getElementById('nb-pag').click()">
-      <div class="cb" style="text-align:center;padding:14px 8px">
-        <div style="font-size:28px;font-weight:800;color:#2D7A4F" id="sh-inc">—</div>
-        <div style="font-size:11px;color:#8A8A8A;font-weight:600">Incassato</div>
-      </div>
+    <div class="stat-card s-green" onclick="document.getElementById('nb-pag').click()">
+      <div class="stat-num" id="sh-inc">—</div>
+      <div class="stat-lbl">Incassato €</div>
     </div>
   </div>
 
   <!-- Ricerca globale -->
-  <div style="position:relative;margin-bottom:12px">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
     <input type="text" id="global-search" placeholder="Cerca soci, pratiche, pagamenti..."
-      style="width:100%;padding:12px 14px 12px 42px;border-radius:12px;border:1.5px solid #e5e5e5;font-size:14px;outline:none;font-family:inherit;background:#fff"
       oninput="globalSearch(this.value)"/>
-    <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:#8A8A8A">&#128269;</span>
   </div>
-  <div id="global-results" style="display:none;background:#fff;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.1);margin-bottom:12px;overflow:hidden;max-height:300px;overflow-y:auto"></div>
+  <div id="global-results"></div>
 
   <!-- Alert urgenti -->
+  <div id="h-pren-attesa"></div>
+  <div id="h-alert-box"></div>
   <div id="h-alerts"></div>
 
-  <!-- Prossimi appuntamenti (nascosti ma usati da renderHome) -->
+  <!-- Nascosti ma usati da renderHome -->
   <div id="h-prens" style="display:none"></div>
   <div id="h-prats" style="display:none"></div>
 
 </div>
 
-<!-- PRATICHE -->
+<!-- ════════════ PRATICHE ════════════ -->
 <div id="p-prat" class="pg">
+  <div class="page-title">Pratiche</div>
   <div class="frow" id="prat-filtri"></div>
   <div id="l-prat"><div class="info">Caricamento...</div></div>
 </div>
 
-<!-- CHAT -->
-<div id="p-chat" class="pg">
-  <div id="l-chat"><div class="info">Caricamento...</div></div>
+<!-- ════════════ CHAT ════════════ -->
+<div id="p-chat" class="pg" style="padding:0">
+  <div style="padding:16px 16px 8px">
+    <div class="page-title">Chat soci</div>
+  </div>
+  <div id="l-chat"><div class="info" style="margin:0 16px">Caricamento...</div></div>
 </div>
 
-<!-- SOCI E TESSERE -->
+<!-- ════════════ SOCI ════════════ -->
 <div id="p-soci" class="pg">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <div style="font-size:18px;font-weight:800;color:#1A1A1A">Soci e Tessere</div>
-
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div class="page-title" style="margin-bottom:0">Soci e Tessere</div>
   </div>
-  <div style="display:flex;gap:8px;margin-bottom:12px">
-    <div style="position:relative;flex:1">
-      <input type="text" id="soci-search" placeholder="Cerca socio..." 
-        style="width:100%;padding:11px 14px 11px 38px;border-radius:10px;border:1.5px solid #e5e5e5;font-size:14px;outline:none;font-family:inherit"
+  <div style="display:flex;gap:8px;margin-bottom:10px">
+    <div class="search-wrap" style="flex:1;margin-bottom:0">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="soci-search" placeholder="Cerca socio..."
         oninput="filtraSociRicerca(this.value)"/>
-      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px;color:#8A8A8A">&#128269;</span>
     </div>
     <select id="soci-campo" onchange="filtraSociRicerca(document.getElementById('soci-search').value)"
-      style="padding:0 10px;border-radius:10px;border:1.5px solid #e5e5e5;font-size:13px;color:#1A1A1A;background:#fff;cursor:pointer;outline:none">
-      <option value="tutti">Tutti i campi</option>
-      <option value="nome">Nome / Cognome</option>
-      <option value="display">Ragione sociale</option>
+      style="padding:0 10px;border-radius:12px;border:1.5px solid var(--border);font-size:13px;color:var(--text);background:var(--card);cursor:pointer;outline:none">
+      <option value="tutti">Tutti</option>
+      <option value="nome">Nome</option>
+      <option value="display">Ragione soc.</option>
       <option value="email">Email</option>
-      <option value="cf">Codice fiscale</option>
+      <option value="cf">C.F.</option>
     </select>
   </div>
   <div class="frow" id="soci-filtri"></div>
-  <div id="soci-count" style="font-size:12px;color:#8A8A8A;margin-bottom:8px"></div>
+  <div id="soci-count" style="font-size:12px;color:var(--text2);margin-bottom:8px"></div>
   <div id="l-soci"><div class="info">Caricamento...</div></div>
 </div>
 
-<!-- PAGAMENTI -->
+<!-- ════════════ PAGAMENTI ════════════ -->
 <div id="p-pag" class="pg">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <div style="font-size:18px;font-weight:800;color:#1A1A1A">Gestione Pagamenti</div>
-    <div style="display:flex;gap:6px">
-      <button id="btn-promemoria-pag" style="background:#E8631A;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">&#128232; Promemoria</button>
-
-    </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div class="page-title" style="margin-bottom:0">Pagamenti</div>
+    <button id="btn-promemoria-pag"
+      style="background:var(--orange);color:#fff;border:none;border-radius:10px;padding:8px 14px;font-size:12px;font-weight:700;cursor:pointer">
+      📨 Promemoria
+    </button>
   </div>
-  <div style="display:flex;gap:8px;margin-bottom:12px">
-    <div style="position:relative;flex:1">
+  <div style="display:flex;gap:8px;margin-bottom:10px">
+    <div class="search-wrap" style="flex:1;margin-bottom:0">
+      <span class="search-icon">🔍</span>
       <input type="text" id="pag-search" placeholder="Cerca socio..."
-        style="width:100%;padding:11px 14px 11px 38px;border-radius:10px;border:1.5px solid #e5e5e5;font-size:14px;outline:none;font-family:inherit"
         oninput="cercaPagamenti(this.value)"/>
-      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:15px;color:#8A8A8A">&#128269;</span>
     </div>
     <select id="pag-campo" onchange="cercaPagamenti(document.getElementById('pag-search').value)"
-      style="padding:0 10px;border-radius:10px;border:1.5px solid #e5e5e5;font-size:13px;color:#1A1A1A;background:#fff;cursor:pointer;outline:none">
-      <option value="tutti">Tutti i campi</option>
-      <option value="display">Nome / Ragione sociale</option>
+      style="padding:0 10px;border-radius:12px;border:1.5px solid var(--border);font-size:13px;color:var(--text);background:var(--card);cursor:pointer;outline:none">
+      <option value="tutti">Tutti</option>
+      <option value="display">Nome</option>
       <option value="email">Email</option>
     </select>
   </div>
   <div class="frow" id="pag-filtri"></div>
-  <div id="pag-count" style="font-size:12px;color:#8A8A8A;margin-bottom:8px"></div>
+  <div id="pag-count" style="font-size:12px;color:var(--text2);margin-bottom:8px"></div>
   <div id="pag-totali" style="display:flex;gap:10px;margin-bottom:12px"></div>
   <div id="l-pag"><div class="info">Caricamento...</div></div>
 </div>
 
-<!-- OV DETTAGLIO SOCIO -->
+<!-- ════════════ PRENOTAZIONI ════════════ -->
+<div id="p-pren" class="pg">
+  <div class="page-title">Prenotazioni</div>
+  <div class="frow" id="pren-filtri"></div>
+  <div id="l-pren"><div class="info">Caricamento...</div></div>
+</div>
+
+<!-- ════════════ SERVIZI ════════════ -->
+<div id="p-srv" class="pg">
+  <div class="page-title">Servizi e Tariffe</div>
+
+  <div class="card"><div class="cb">
+    <div class="sec">TARIFFE BASE</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Modificabili in qualsiasi momento</div>
+    <div class="g2">
+      <div><label class="lbl">Primo tesseramento €</label><input type="text" class="inp" id="tar-new" placeholder="55"/></div>
+      <div><label class="lbl">Rinnovo tessera €</label><input type="text" class="inp" id="tar-ren" placeholder="50"/></div>
+      <div><label class="lbl">Contratto extra €</label><input type="text" class="inp" id="tar-cnt" placeholder="25"/></div>
+      <div><label class="lbl">Adempimento extra €</label><input type="text" class="inp" id="tar-adm" placeholder="15"/></div>
+    </div>
+    <div class="infog" id="tar-ok">✅ Tariffe aggiornate!</div>
+    <button class="bp" id="btn-salva-tariffe">Salva tariffe</button>
+  </div></div>
+
+  <div class="card"><div class="cb">
+    <div class="sec">SERVIZI AGGIUNTIVI</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Visibili ai soci nella sezione vantaggi</div>
+    <div id="l-servizi"><div class="info">Caricamento...</div></div>
+    <button class="bd" id="btn-nuovo-servizio" style="margin-top:8px">+ Aggiungi servizio</button>
+  </div></div>
+</div>
+
+<!-- ════════════ IMPOSTAZIONI ════════════ -->
+<div id="p-imp" class="pg">
+  <div class="page-title">Impostazioni</div>
+
+  <div class="card"><div class="cb">
+    <div class="sec">ORARI RICEVIMENTO</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Tocca le celle per attivare/disattivare ogni orario per giorno</div>
+    <div style="overflow-x:auto;margin-bottom:14px">
+      <table id="slot-table">
+        <thead id="slot-thead"></thead>
+        <tbody id="slot-tbody"></tbody>
+      </table>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
+      <input type="text" id="slot-new-ora" class="inp" placeholder="es. 09:00" style="margin:0;flex:1"/>
+      <button class="bp" id="btn-aggiungi-slot" style="width:auto;padding:0 18px;margin:0;height:46px">+</button>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;margin-bottom:6px">Durata appuntamento</div>
+    <div id="slot-durata-grid" style="display:flex;gap:6px;margin-bottom:14px"></div>
+    <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px">Periodi di chiusura / Ferie</div>
+    <div id="slot-chiusure" style="margin-bottom:10px"></div>
+    <div class="g2" style="margin-bottom:8px">
+      <div><label class="lbl">Dal</label><input type="text" id="ch-dal" class="inp" placeholder="gg/mm/aaaa" style="margin:0" oninput="autoDateAdmin(this)"/></div>
+      <div><label class="lbl">Al</label><input type="text" id="ch-al" class="inp" placeholder="gg/mm/aaaa" style="margin:0" oninput="autoDateAdmin(this)"/></div>
+    </div>
+    <input type="text" id="ch-mot" class="inp" placeholder="Motivo (es. Ferie agosto)" style="margin-bottom:8px"/>
+    <button class="bs" id="btn-add-ch">+ Aggiungi periodo chiusura</button>
+  </div></div>
+
+  <div class="card"><div class="cb">
+    <div class="sec">DOCUMENTI E ALLEGATI</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">I soci possono scaricare questi documenti dall'app</div>
+    <div id="l-documenti"><div class="info">Caricamento...</div></div>
+    <button class="bd" id="btn-nuovo-doc" style="margin-top:8px">+ Carica nuovo documento</button>
+  </div></div>
+
+  <div class="card"><div class="cb">
+    <div class="sec">BACHECA AVVISI</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Gli avvisi appaiono in home per tutti i soci</div>
+    <div id="l-avvisi"><div class="info">Caricamento...</div></div>
+    <button class="bd" id="btn-nuovo-avviso" style="margin-top:8px">+ Nuovo avviso</button>
+  </div></div>
+
+  <div class="card"><div class="cb">
+    <div class="sec">BACKUP DATABASE</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Copia di sicurezza su Google Drive</div>
+    <div class="infog" id="backup-ok"></div>
+    <button class="bp" id="btn-backup">💾 Esegui backup ora</button>
+  </div></div>
+
+  <div class="card"><div class="cb">
+    <div class="sec">IBAN PER BONIFICI</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Visibile ai soci nella sezione pagamenti</div>
+    <label class="lbl">Intestato a</label>
+    <input type="text" class="inp" id="iban-intestato" placeholder="es. ASPPI L'Aquila"/>
+    <label class="lbl">IBAN</label>
+    <input type="text" class="inp" id="iban-valore" placeholder="IT60 X054 2811 1010 0000 0123 456"/>
+    <label class="lbl">Causale suggerita</label>
+    <input type="text" class="inp" id="iban-causale" placeholder="es. Tesseramento ASPPI 2026 - [Nome Cognome]"/>
+    <div class="infog" id="iban-ok">✅ IBAN salvato!</div>
+    <button class="bp" id="btn-salva-iban">Salva IBAN</button>
+  </div></div>
+
+  <div class="card"><div class="cb">
+    <div class="sec">SICUREZZA</div>
+    <label class="lbl">Nuova password admin</label>
+    <input type="password" class="inp" id="new-adm-pwd" placeholder="Nuova password"/>
+    <div class="infog" id="adm-pwd-ok">✅ Password aggiornata!</div>
+    <button class="bp" id="btn-cambia-pwd-admin">Cambia password</button>
+  </div></div>
+</div>
+
+<!-- ════════════ OV: DETTAGLIO SOCIO ════════════ -->
 <div id="ov-socio" class="ov">
   <div class="oh">
     <div><div class="ohlbl">SOCIO</div><div class="ohttl" id="os-ttl"></div></div>
-    <button class="exbtn" id="btn-chiudi-socio">&#8592; Chiudi</button>
+    <button class="exbtn" id="btn-chiudi-socio">← Chiudi</button>
   </div>
   <div style="padding:16px">
     <div class="card"><div class="cb">
@@ -261,20 +550,23 @@ textarea.inp{min-height:90px;resize:vertical;}
       <div class="lbl">Email</div><div class="val" id="os-email"></div>
       <div class="lbl">Registrato il</div><div class="val" id="os-data"></div>
     </div></div>
+
     <div class="card"><div class="cb">
       <div class="sec">TESSERA ASPPI</div>
       <div id="os-tessera-info" class="info">Nessuna tessera assegnata</div>
       <label class="lbl">Numero tessera</label>
       <input type="text" class="inp" id="os-tes-num" placeholder="es. ASPPI-2026-00001" style="font-family:monospace"/>
-      <label class="lbl">Anno validita</label>
+      <label class="lbl">Anno validità</label>
       <input type="text" class="inp" id="os-tes-anno" placeholder="2026"/>
-      <div class="infog" id="os-tes-ok" style="display:none">&#9989; Tessera salvata!</div>
+      <div class="infog" id="os-tes-ok">✅ Tessera salvata!</div>
       <button class="bp" id="btn-salva-tessera">Salva tessera</button>
     </div></div>
+
     <div class="card"><div class="cb">
       <div class="sec">SITUAZIONE ECONOMICA</div>
       <div id="os-economia"><div class="info">Caricamento...</div></div>
     </div></div>
+
     <div class="card"><div class="cb">
       <div class="sec">REGISTRA PAGAMENTO</div>
       <label class="lbl">Tipo</label>
@@ -303,128 +595,121 @@ textarea.inp{min-height:90px;resize:vertical;}
       </div>
       <label class="lbl">Note (opzionale)</label>
       <input type="text" class="inp" id="os-pag-note" placeholder="es. Tesseramento 2026"/>
-      <div class="infog" id="os-pag-ok" style="display:none">&#9989; Pagamento registrato!</div>
+      <div class="infog" id="os-pag-ok">✅ Pagamento registrato!</div>
       <button class="bp" id="btn-registra-pag">Registra pagamento</button>
-      <button class="bs" id="btn-promemoria-singolo" style="margin-top:8px">&#128232; Invia promemoria a questo socio</button>
+      <button class="bs" id="btn-promemoria-singolo" style="margin-top:4px">📨 Invia promemoria a questo socio</button>
     </div></div>
+
     <div class="card"><div class="cb">
       <div class="sec">STORICO PAGAMENTI</div>
       <div id="os-pag-lista"><div class="info">Caricamento...</div></div>
     </div></div>
-    <button class="bs" id="btn-elimina-socio" style="color:#C0392B;border-color:#FDEEEC;margin-top:8px">&#128465; Elimina socio</button>
+
+    <button class="bs" id="btn-elimina-socio" style="color:var(--red);border-color:var(--red-l);margin-top:4px">🗑️ Elimina socio</button>
   </div>
 </div>
 
-<!-- SERVIZI -->
-<div id="p-srv" class="pg">
-  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Servizi e Tariffe</div>
-
-  <!-- Tariffe base -->
-  <div class="card"><div class="cb">
-    <div class="sec">TARIFFE BASE</div>
-    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Modificabili in qualsiasi momento</div>
-    <div class="g2">
-      <div><label class="lbl">Primo tesseramento €</label><input type="text" class="inp" id="tar-new" placeholder="55"/></div>
-      <div><label class="lbl">Rinnovo tessera €</label><input type="text" class="inp" id="tar-ren" placeholder="50"/></div>
-      <div><label class="lbl">Contratto extra €</label><input type="text" class="inp" id="tar-cnt" placeholder="25"/></div>
-      <div><label class="lbl">Adempimento extra €</label><input type="text" class="inp" id="tar-adm" placeholder="15"/></div>
-    </div>
-    <div class="infog" id="tar-ok" style="display:none">&#9989; Tariffe aggiornate!</div>
-    <button class="bp" id="btn-salva-tariffe">Salva tariffe</button>
-  </div></div>
-
-  <!-- Servizi aggiuntivi -->
-  <div class="card"><div class="cb">
-    <div class="sec">SERVIZI AGGIUNTIVI</div>
-    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Servizi e scontistiche visibili ai soci</div>
-    <div id="l-servizi"><div class="info">Caricamento...</div></div>
-    <button class="bd" id="btn-nuovo-servizio" style="margin-top:8px">+ Aggiungi servizio</button>
-  </div></div>
+<!-- ════════════ OV: PRENOTAZIONE ════════════ -->
+<div id="ov-pren" class="ov">
+  <div class="oh">
+    <div><div class="ohlbl">APPUNTAMENTO</div><div class="ohttl" id="op-ttl"></div></div>
+    <button class="exbtn" id="btn-chiudi-op">← Chiudi</button>
+  </div>
+  <div style="padding:16px">
+    <div class="card"><div class="cb">
+      <div class="sec">APPUNTAMENTO</div>
+      <div class="lbl">Data e ora</div><div class="val" id="op-data"></div>
+      <div class="lbl">Stato</div><div class="val" id="op-stato"></div>
+    </div></div>
+    <div class="card"><div class="cb">
+      <div class="sec">DATI SOCIO</div>
+      <div class="lbl">Nome</div><div class="val" id="op-nome"></div>
+      <div class="lbl">Email</div><div class="val" id="op-email"></div>
+      <div class="lbl">Motivo</div><div class="val" id="op-motivo"></div>
+    </div></div>
+    <div class="infog" id="op-ok">✅ Appuntamento cancellato</div>
+    <button class="bp" id="btn-cancella-pren" style="background:var(--red);box-shadow:0 3px 12px rgba(220,38,38,0.2)">Cancella appuntamento</button>
+  </div>
 </div>
 
-<!-- IMPOSTAZIONI -->
-<div id="p-imp" class="pg">
-  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Impostazioni</div>
+<!-- ════════════ OV: PRATICA ════════════ -->
+<div id="ov-prat" class="ov">
+  <div class="oh">
+    <div><div class="ohlbl" id="opr-lbl">PRATICA</div><div class="ohttl" id="opr-ttl"></div></div>
+    <button class="exbtn" id="btn-chiudi-opr">← Chiudi</button>
+  </div>
+  <div class="tabrow">
+    <button class="tabbtn on" id="tab-dati">📋 Dati</button>
+    <button class="tabbtn" id="tab-chat">💬 Chat</button>
+    <button class="tabbtn" id="tab-contratto">📄 Contratto</button>
+  </div>
 
-  <!-- Slot appuntamenti -->
-  <div class="card"><div class="cb">
-    <div class="sec">ORARI RICEVIMENTO</div>
-    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Clicca ogni cella per attivare/disattivare orario per quel giorno</div>
-    <div style="overflow-x:auto;margin-bottom:16px">
-      <table id="slot-table" style="border-collapse:collapse;width:100%;min-width:320px">
-        <thead id="slot-thead"></thead>
-        <tbody id="slot-tbody"></tbody>
-      </table>
+  <div id="tab-dati-body" style="padding:16px">
+    <div id="opr-modificato" class="infor" style="display:none">⚠️ Contratto modificato dal socio il <span id="opr-data-mod"></span></div>
+    <div class="card"><div class="cb">
+      <div class="sec">NOME CONTRATTO</div>
+      <div class="val" id="opr-nome-cnt" style="font-family:monospace"></div>
+      <div class="lbl">Tipo</div><div class="val" id="opr-tipo"></div>
+      <div class="lbl">Stato attuale</div><div class="val" id="opr-stato"></div>
+      <label class="lbl">Aggiorna stato</label>
+      <select class="inp" id="opr-stato-sel">
+        <option value="richiesta">In attesa</option>
+        <option value="lavorazione">In lavorazione</option>
+        <option value="da_firmare">Da firmare</option>
+        <option value="completato">✅ Completato (archivia)</option>
+      </select>
+      <button class="bp" id="btn-aggiorna-stato">Aggiorna stato</button>
+      <div class="infog" id="opr-ok" style="margin-top:4px">✅ Stato aggiornato!</div>
+      <button class="bs" id="btn-elimina-prat" style="color:var(--red);border-color:var(--red-l);margin-top:4px">🗑️ Elimina pratica</button>
     </div>
-    <div style="display:flex;gap:8px;margin-bottom:16px;align-items:center">
-      <input type="text" id="slot-new-ora" class="inp" placeholder="Aggiungi orario es. 09:00" style="margin:0;flex:1"/>
-      <button class="bp" id="btn-aggiungi-slot" style="width:auto;padding:0 16px;margin:0">+</button>
+    <div class="cb" style="padding-top:0">
+      <div class="sec">NOTE INTERNE</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px">Visibili solo all'admin</div>
+      <textarea class="inp" id="opr-note-interne" placeholder="Note riservate sulla pratica..." style="min-height:80px"></textarea>
+      <button class="bp" id="btn-salva-note">Salva note</button>
+      <div class="infog" id="opr-note-ok">✅ Note salvate!</div>
+    </div></div>
+
+    <div class="card"><div class="cb">
+      <div class="sec">DURATA E CANONE</div>
+      <div class="g2">
+        <div><div class="lbl">Dal</div><div class="val" id="opr-dal"></div></div>
+        <div><div class="lbl">Al</div><div class="val" id="opr-al"></div></div>
+      </div>
+      <div class="lbl">Canone mensile</div><div class="val" id="opr-canone"></div>
+      <div class="lbl">Deposito</div><div class="val" id="opr-dep"></div>
+    </div></div>
+
+    <div class="card"><div class="cb"><div class="sec">LOCATORI</div><div id="opr-locs"></div></div></div>
+    <div class="card"><div class="cb"><div class="sec">CONDUTTORI</div><div id="opr-cons"></div></div></div>
+    <div class="card"><div class="cb"><div class="sec">ALTRI DATI</div><div id="opr-extra"></div></div></div>
+  </div>
+
+  <div id="tc-contratto" style="display:none;padding:16px">
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="bp" id="btn-copia-dati" style="flex:1">📋 Copia dati per skill</button>
+      <button class="bd" id="btn-scarica-dati" style="flex:1">📄 Scarica .txt</button>
     </div>
-    <div style="font-size:11px;font-weight:700;color:#8A8A8A;text-transform:uppercase;margin-bottom:6px">Durata appuntamento</div>
-    <div id="slot-durata-grid" style="display:flex;gap:6px;margin-bottom:16px"></div>
-    <div style="font-size:13px;font-weight:700;color:#1A1A1A;margin-bottom:8px">Periodi di chiusura / Ferie</div>
-    <div id="slot-chiusure" style="margin-bottom:8px"></div>
-    <div class="g2" style="margin-bottom:8px">
-      <div><label class="lbl">Dal</label><input type="text" id="ch-dal" class="inp" placeholder="gg/mm/aaaa" style="margin:0" oninput="autoDateAdmin(this)"/></div>
-      <div><label class="lbl">Al</label><input type="text" id="ch-al" class="inp" placeholder="gg/mm/aaaa" style="margin:0" oninput="autoDateAdmin(this)"/></div>
+    <div id="dati-contratto-box"
+      style="background:#F8F7F5;border-radius:12px;padding:14px;font-size:12px;font-family:monospace;white-space:pre-wrap;line-height:1.6;max-height:400px;overflow-y:auto;border:1px solid var(--border)">
+      Clicca per generare i dati...
     </div>
-    <input type="text" id="ch-mot" class="inp" placeholder="Motivo (es. Ferie agosto)" style="margin-bottom:8px"/>
-    <button class="bs" id="btn-add-ch">+ Aggiungi periodo chiusura</button>
-  </div></div>
+  </div>
 
-  <!-- Allegati / Documenti multipli -->
-  <div class="card"><div class="cb">
-    <div class="sec">DOCUMENTI E ALLEGATI</div>
-    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">I soci possono scaricare questi documenti dall'app</div>
-    <div id="l-documenti"><div class="info">Caricamento...</div></div>
-    <button class="bd" id="btn-nuovo-doc" style="margin-top:8px">+ Carica nuovo documento</button>
-  </div></div>
-
-  <!-- Bacheca avvisi -->
-  <div class="card"><div class="cb">
-    <div class="sec">BACHECA AVVISI</div>
-    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Gli avvisi appaiono in home per tutti i soci</div>
-    <div id="l-avvisi"><div class="info">Caricamento...</div></div>
-    <button class="bd" id="btn-nuovo-avviso" style="margin-top:8px">+ Nuovo avviso</button>
-  </div></div>
-
-  <!-- Backup -->
-  <div class="card"><div class="cb">
-    <div class="sec">BACKUP DATABASE</div>
-    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Copia di sicurezza su Google Drive</div>
-    <div class="infog" id="backup-ok" style="display:none"></div>
-    <button class="bp" id="btn-backup">&#128190; Esegui backup ora</button>
-  </div></div>
-
-  <!-- IBAN per bonifici -->
-  <div class="card"><div class="cb">
-    <div class="sec">IBAN PER BONIFICI</div>
-    <div style="font-size:12px;color:#8A8A8A;margin-bottom:12px">Visibile ai soci nella sezione pagamenti</div>
-    <label class="lbl">Intestato a</label>
-    <input type="text" class="inp" id="iban-intestato" placeholder="es. ASPPI L'Aquila"/>
-    <label class="lbl">IBAN</label>
-    <input type="text" class="inp" id="iban-valore" placeholder="IT60 X054 2811 1010 0000 0123 456"/>
-    <label class="lbl">Causale suggerita</label>
-    <input type="text" class="inp" id="iban-causale" placeholder="es. Tesseramento ASPPI 2026 - [Nome Cognome]"/>
-    <div class="infog" id="iban-ok" style="display:none">&#9989; IBAN salvato!</div>
-    <button class="bp" id="btn-salva-iban">Salva IBAN</button>
-  </div></div>
-
-  <!-- Cambio password -->
-  <div class="card"><div class="cb">
-    <div class="sec">SICUREZZA</div>
-    <label class="lbl">Nuova password admin</label>
-    <input type="password" class="inp" id="new-adm-pwd" placeholder="Nuova password"/>
-    <div class="infog" id="adm-pwd-ok" style="display:none">&#9989; Password aggiornata!</div>
-    <button class="bp" id="btn-cambia-pwd-admin">Cambia password</button>
-  </div></div>
+  <div id="tab-chat-body" style="display:none">
+    <div class="cms" id="admin-msgs"></div>
+    <div class="ci">
+      <input type="text" class="inp" id="admin-chat-inp" placeholder="Rispondi al socio..."/>
+      <button class="cs" id="btn-admin-send">›</button>
+    </div>
+  </div>
 </div>
 
-<!-- OV DOCUMENTO -->
+<!-- ════════════ OV: DOCUMENTO ════════════ -->
 <div id="ov-documento" class="ov">
   <div class="oh">
     <div><div class="ohlbl">DOCUMENTO</div><div class="ohttl" id="doc-ttl">Nuovo documento</div></div>
-    <button class="exbtn" id="btn-chiudi-doc">&#8592; Indietro</button>
+    <button class="exbtn" id="btn-chiudi-doc">← Indietro</button>
   </div>
   <div style="padding:16px">
     <div class="card"><div class="cb">
@@ -436,18 +721,18 @@ textarea.inp{min-height:90px;resize:vertical;}
       <label class="lbl">Carica file (PDF, Word, Excel)</label>
       <input type="file" id="doc-file" accept=".pdf,.doc,.docx,.xls,.xlsx" style="width:100%;margin-bottom:12px;font-size:13px"/>
       <div class="infob" id="doc-upload-info" style="display:none">Caricamento in corso...</div>
-      <div class="infog" id="doc-upload-ok" style="display:none">&#9989; Documento caricato!</div>
+      <div class="infog" id="doc-upload-ok">✅ Documento caricato!</div>
       <div class="errbox" id="doc-err"></div>
       <button class="bp" id="btn-upload-doc">Carica documento</button>
     </div></div>
   </div>
 </div>
 
-<!-- OV AVVISO -->
+<!-- ════════════ OV: AVVISO ════════════ -->
 <div id="ov-avviso" class="ov">
   <div class="oh">
     <div><div class="ohlbl">AVVISO</div><div class="ohttl" id="avv-ttl">Nuovo avviso</div></div>
-    <button class="exbtn" id="btn-chiudi-avviso">&#8592; Indietro</button>
+    <button class="exbtn" id="btn-chiudi-avviso">← Indietro</button>
   </div>
   <div style="padding:16px">
     <div class="card"><div class="cb">
@@ -460,22 +745,22 @@ textarea.inp{min-height:90px;resize:vertical;}
         <div><label class="lbl">Valido dal</label><input type="text" class="inp" id="avv-dal" placeholder="gg/mm/aaaa" oninput="autoDateAdmin(this)"/></div>
         <div><label class="lbl">Valido al</label><input type="text" class="inp" id="avv-al" placeholder="gg/mm/aaaa" oninput="autoDateAdmin(this)"/></div>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;cursor:pointer" onclick="toggleAvvAttivo()">
-        <div id="avv-attivo-box" style="width:20px;height:20px;border-radius:6px;border:2px solid #E8631A;background:#E8631A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">&#10003;</div>
-        <span style="font-size:13px;font-weight:600">Avviso attivo (visibile ai soci)</span>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;cursor:pointer" onclick="toggleAvvAttivo()">
+        <div id="avv-attivo-box" style="width:22px;height:22px;border-radius:7px;background:var(--orange);border:2px solid var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">✓</div>
+        <span style="font-size:13px;font-weight:600;color:var(--text)">Avviso attivo (visibile ai soci)</span>
       </div>
-      <div class="infog" id="avv-ok" style="display:none">&#9989; Avviso salvato!</div>
+      <div class="infog" id="avv-ok">✅ Avviso salvato!</div>
       <button class="bp" id="btn-salva-avviso">Salva avviso</button>
-      <button class="bs" id="btn-elimina-avviso" style="color:#C0392B;border-color:#FDEEEC;display:none">&#128465; Elimina avviso</button>
+      <button class="bs" id="btn-elimina-avviso" style="color:var(--red);border-color:var(--red-l);display:none">🗑️ Elimina avviso</button>
     </div></div>
   </div>
 </div>
 
-<!-- OV NUOVO/MODIFICA SERVIZIO -->
+<!-- ════════════ OV: SERVIZIO ════════════ -->
 <div id="ov-servizio" class="ov">
   <div class="oh">
     <div><div class="ohlbl">SERVIZIO</div><div class="ohttl" id="srv-ttl">Nuovo servizio</div></div>
-    <button class="exbtn" id="btn-chiudi-servizio">&#8592; Indietro</button>
+    <button class="exbtn" id="btn-chiudi-servizio">← Indietro</button>
   </div>
   <div style="padding:16px">
     <div class="card"><div class="cb">
@@ -497,113 +782,19 @@ textarea.inp{min-height:90px;resize:vertical;}
       </div>
       <label class="lbl">Ordine visualizzazione</label>
       <input type="text" class="inp" id="srv-ordine" placeholder="es. 1"/>
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;cursor:pointer" onclick="toggleSrvAttivo()">
-        <div id="srv-attivo-box" style="width:20px;height:20px;border-radius:6px;border:2px solid #E8631A;background:#E8631A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700">&#10003;</div>
-        <span style="font-size:13px;font-weight:600">Servizio attivo (visibile ai soci)</span>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;cursor:pointer" onclick="toggleSrvAttivo()">
+        <div id="srv-attivo-box" style="width:22px;height:22px;border-radius:7px;background:var(--orange);border:2px solid var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700">✓</div>
+        <span style="font-size:13px;font-weight:600;color:var(--text)">Servizio attivo (visibile ai soci)</span>
       </div>
-      <div class="infog" id="srv-ok" style="display:none">&#9989; Servizio salvato!</div>
+      <div class="infog" id="srv-ok">✅ Servizio salvato!</div>
       <button class="bp" id="btn-salva-servizio">Salva servizio</button>
-      <button class="bs" id="btn-elimina-servizio" style="color:#C0392B;border-color:#FDEEEC;display:none">&#128465; Elimina servizio</button>
+      <button class="bs" id="btn-elimina-servizio" style="color:var(--red);border-color:var(--red-l);display:none">🗑️ Elimina servizio</button>
     </div></div>
   </div>
 </div>
 
-<!-- PRENOTAZIONI ADMIN -->
-<div id="p-pren" class="pg">
-  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Prenotazioni</div>
-  <div class="frow" id="pren-filtri"></div>
-  <div id="l-pren"><div class="info">Caricamento...</div></div>
-</div>
-
-
-<!-- OV PRENOTAZIONE -->
-<div id="ov-pren" class="ov">
-  <div class="oh">
-    <div><div class="ohlbl">APPUNTAMENTO</div><div class="ohttl" id="op-ttl"></div></div>
-    <button class="exbtn" id="btn-chiudi-op">&#8592; Chiudi</button>
-  </div>
-  <div style="padding:16px">
-    <div class="card"><div class="cb">
-      <div class="sec">APPUNTAMENTO</div>
-      <div class="lbl">Data e ora</div><div class="val" id="op-data"></div>
-      <div class="lbl">Stato</div><div class="val" id="op-stato"></div>
-    </div></div>
-    <div class="card"><div class="cb">
-      <div class="sec">DATI SOCIO</div>
-      <div class="lbl">Nome</div><div class="val" id="op-nome"></div>
-      <div class="lbl">Email</div><div class="val" id="op-email"></div>
-      <div class="lbl">Motivo</div><div class="val" id="op-motivo"></div>
-    </div></div>
-    <div class="infog" id="op-ok" style="display:none">&#9989; Appuntamento cancellato</div>
-    <button class="bp" id="btn-cancella-pren" style="background:#C0392B">Cancella appuntamento</button>
-  </div>
-</div>
-
-<!-- OV PRATICA -->
-<div id="ov-prat" class="ov">
-  <div class="oh">
-    <div><div class="ohlbl" id="opr-lbl">PRATICA</div><div class="ohttl" id="opr-ttl"></div></div>
-    <button class="exbtn" id="btn-chiudi-opr">&#8592; Chiudi</button>
-  </div>
-  <div class="tabrow">
-    <button class="tabbtn on" id="tab-dati">&#128203; Dati</button>
-    <button class="tabbtn" id="tab-chat">&#128172; Chat</button>
-    <button class="tabbtn" id="tab-contratto">&#128196; Contratto</button>
-  </div>
-  <div id="tab-dati-body" style="padding:16px">
-    <div id="opr-modificato" class="infor" style="display:none">&#9888; Questo contratto e stato modificato dal socio il <span id="opr-data-mod"></span></div>
-    <div class="card"><div class="cb">
-      <div class="sec">NOME CONTRATTO</div>
-      <div class="val" id="opr-nome-cnt" style="font-family:monospace"></div>
-      <div class="lbl">Tipo</div><div class="val" id="opr-tipo"></div>
-      <div class="lbl">Stato</div><div class="val" id="opr-stato"></div>
-      <label class="lbl">Aggiorna stato</label>
-      <select class="inp" id="opr-stato-sel">
-        <option value="richiesta">In attesa</option>
-        <option value="lavorazione">In lavorazione</option>
-        <option value="da_firmare">Da firmare</option>
-        <option value="completato">&#9989; Completato (archivia)</option>
-      </select>
-      <button class="bp" id="btn-aggiorna-stato">Aggiorna stato</button>
-      <div class="infog" id="opr-ok" style="display:none;margin-top:8px">&#9989; Stato aggiornato!</div>
-      <button class="bs" id="btn-elimina-prat" style="color:#C0392B;border-color:#FDEEEC;margin-top:8px">&#128465; Elimina pratica</button>
-    </div>
-    <div class="cb">
-      <div class="sec">NOTE INTERNE</div>
-      <div style="font-size:11px;color:#8A8A8A;margin-bottom:8px">Visibili solo all'admin</div>
-      <textarea class="inp" id="opr-note-interne" placeholder="Note riservate sulla pratica..." style="min-height:80px"></textarea>
-      <button class="bp" id="btn-salva-note">Salva note</button>
-      <div class="infog" id="opr-note-ok" style="display:none">&#9989; Note salvate!</div>
-    </div></div>
-    <div class="card"><div class="cb">
-      <div class="sec">DURATA E CANONE</div>
-      <div class="lbl">Dal</div><div class="val" id="opr-dal"></div>
-      <div class="lbl">Al</div><div class="val" id="opr-al"></div>
-      <div class="lbl">Canone mensile</div><div class="val" id="opr-canone"></div>
-      <div class="lbl">Deposito</div><div class="val" id="opr-dep"></div>
-    </div></div>
-    <div class="card"><div class="cb"><div class="sec">LOCATORI</div><div id="opr-locs"></div></div></div>
-    <div class="card"><div class="cb"><div class="sec">CONDUTTORI</div><div id="opr-cons"></div></div></div>
-    <div class="card"><div class="cb"><div class="sec">ALTRI DATI CONTRATTO</div><div id="opr-extra"></div></div></div>
-  </div>
-  <div id="tc-contratto" style="display:none;padding:16px">
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      <button class="bp" id="btn-copia-dati" style="flex:1">&#128203; Copia dati per skill</button>
-      <button class="bd" id="btn-scarica-dati" style="flex:1">&#128196; Scarica .txt</button>
-    </div>
-    <div id="dati-contratto-box" style="background:#F8F7F5;border-radius:10px;padding:14px;font-size:12px;font-family:monospace;white-space:pre-wrap;line-height:1.6;max-height:400px;overflow-y:auto;border:1px solid #e5e5e5">Clicca per generare i dati...</div>
-  </div>
-
-  <div id="tab-chat-body" style="display:none">
-    <div class="cms" id="admin-msgs"></div>
-    <div class="ci">
-      <input type="text" class="inp" id="admin-chat-inp" placeholder="Rispondi al socio..." style="margin-bottom:0"/>
-      <button class="cs" id="btn-admin-send">&#8250;</button>
-    </div>
-  </div>
-</div>
-
-<div class="nav">
+<!-- ════════════ BOTTOM NAV ════════════ -->
+<nav class="nav">
   <button class="nb on" id="nb-home"><span class="ic">📊</span><span class="lb">Home</span></button>
   <button class="nb" id="nb-prat"><span class="ic">📋</span><span class="lb">Pratiche</span></button>
   <button class="nb" id="nb-soci"><span class="ic">👥</span><span class="lb">Soci</span></button>
@@ -611,7 +802,8 @@ textarea.inp{min-height:90px;resize:vertical;}
   <button class="nb" id="nb-pren"><span class="ic">📅</span><span class="lb">Appunt.</span></button>
   <button class="nb" id="nb-srv"><span class="ic">⭐</span><span class="lb">Servizi</span></button>
   <button class="nb" id="nb-imp"><span class="ic">⚙️</span><span class="lb">Imp.</span></button>
-</div>
+</nav>
+
 
 <script>
 var API = "https://rough-resonance-cba6.asppilaquila.workers.dev";
@@ -5392,6 +5584,23 @@ function salvaTuttiSlot() {
     if(err||!r||!r.ok) alert('Errore salvataggio');
   });
 }
+
+
+// ── ASSISTENZA ────────────────────────────────────────────────
+function vaiAssistenza() {
+  window.location.href = 'assistenza.html';
+}
+
+// Aggiorna etichetta pulsante se c'è un socio in sessione
+(function() {
+  try {
+    var stored = JSON.parse(localStorage.getItem('asppi_assistenza_socio') || 'null');
+    if (stored && stored.nome) {
+      var btn = document.getElementById('btn-ass-label');
+      if (btn) btn.textContent = stored.nome;
+    }
+  } catch(e) {}
+})();
 
 </script>
 </body>

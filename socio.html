@@ -4,94 +4,98 @@
 <meta charset="UTF-8"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#E8631A"/>
 <title>ASPPI L'Aquila — Portale Soci</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
 *{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --orange: #E8631A;
+  --orange-light: #FDF0E8;
+  --green: #16A34A;
+  --green-light: #ECFDF5;
+  --blue: #1A5FA8;
+  --blue-light: #EBF2FB;
+  --red: #DC2626;
+  --red-light: #FFF0F0;
+  --bg: #F2F2F7;
+  --card: #FFFFFF;
+  --text: #1C1C1E;
+  --text2: #8E8E93;
+  --border: #E5E5EA;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+}
 
 body{
   font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
-  background:#F2F2F7;
+  background:var(--bg);
   min-height:100vh;
   padding-bottom:90px;
-  color:#1D1D1F;
+  color:var(--text);
   -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
 }
 
 /* ── TOP BAR ── */
 .top-bar{
-  background:rgba(255,255,255,0.92);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
+  background:rgba(255,255,255,0.94);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
   padding:12px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  position:sticky;
-  top:0;
-  z-index:200;
+  display:flex;justify-content:space-between;align-items:center;
+  position:sticky;top:0;z-index:200;
   border-bottom:1px solid rgba(0,0,0,0.06);
 }
 .top-bar .logo-wrap{display:flex;align-items:center;gap:10px;}
-.top-bar img{height:32px;}
-.top-bar .divider{width:1px;height:28px;background:#e5e5e5;}
-.top-bar .city{font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.1em;text-transform:uppercase;}
-.top-bar .username{font-size:13px;font-weight:700;color:#1D1D1F;}
-.top-bar .exit-btn{
-  background:rgba(0,0,0,0.06);
-  border:none;
-  border-radius:20px;
-  padding:6px 14px;
-  font-size:12px;
-  font-weight:600;
-  color:#1D1D1F;
-  cursor:pointer;
-  font-family:inherit;
+.top-bar img{height:30px;}
+.top-bar .divider{width:1px;height:24px;background:#E5E5EA;}
+.top-bar .city{font-size:9px;font-weight:700;color:var(--orange);letter-spacing:.12em;text-transform:uppercase;}
+.top-bar .username{font-size:13px;font-weight:700;color:var(--text);}
+.exit-btn{
+  background:#F2F2F7;border:none;border-radius:20px;
+  padding:7px 14px;font-size:12px;font-weight:600;color:var(--text);
+  cursor:pointer;font-family:inherit;
 }
 
 /* ── BOTTOM NAV ── */
 .nav{
-  position:fixed;
-  bottom:0;left:0;right:0;
-  background:rgba(255,255,255,0.95);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  border-top:1px solid rgba(0,0,0,0.08);
-  display:flex;
-  padding:8px 0 24px;
-  z-index:200;
+  position:fixed;bottom:0;left:0;right:0;
+  background:rgba(255,255,255,0.96);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border-top:1px solid rgba(0,0,0,0.07);
+  display:flex;padding:8px 4px 24px;z-index:200;
 }
 .nb{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:4px;
-  border:none;
-  background:transparent;
-  cursor:pointer;
-  padding:6px 0;
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  border:none;background:transparent;cursor:pointer;padding:6px 0;
   transition:transform 0.15s ease;
 }
-.nb:active{transform:scale(0.92);}
-.nb .ic{
-  font-size:24px;
-  opacity:0.3;
-  transition:opacity 0.2s;
-  line-height:1;
-}
+.nb:active{transform:scale(0.88);}
+.nb .ic{font-size:22px;line-height:1;transition:transform 0.2s;}
 .nb .lb{
-  font-size:10px;
-  color:#8A8A8A;
-  font-weight:500;
-  font-family:inherit;
-  transition:color 0.2s;
+  font-size:10px;color:var(--text2);font-weight:500;
+  font-family:inherit;transition:color 0.2s;
+  letter-spacing:-.1px;
 }
-.nb.on .ic{opacity:1;}
-.nb.on .lb{color:#E8631A;font-weight:700;}
+.nb.on .ic{transform:scale(1.1);}
+.nb.on .lb{color:var(--orange);font-weight:700;}
+/* Pill indicator */
+.nb.on::before{
+  content:'';
+  display:block;
+  width:20px;height:3px;
+  background:var(--orange);
+  border-radius:0 0 3px 3px;
+  position:absolute;top:0;
+  margin-top:0;
+}
+.nav{position:relative;}
+.nav{position:fixed;}
 
 /* ── PAGES ── */
 .pg{display:none;padding:16px 16px 8px;}
@@ -99,275 +103,309 @@ body{
 
 /* ── CARDS ── */
 .card{
-  background:#fff;
-  border-radius:20px;
+  background:var(--card);
+  border-radius:var(--radius-lg);
   margin-bottom:14px;
-  box-shadow:0 2px 16px rgba(0,0,0,0.06);
+  box-shadow:0 1px 12px rgba(0,0,0,0.06);
   overflow:hidden;
 }
 .cb{padding:18px;}
 
-/* ── SECTION TITLE ── */
+/* ── SECTION HEADER ── */
 .sec{
-  font-size:11px;
-  font-weight:700;
-  color:#E8631A;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  padding-bottom:10px;
-  border-bottom:1px solid #F2F2F7;
-  margin-bottom:16px;
+  font-size:11px;font-weight:700;color:var(--text2);
+  letter-spacing:.06em;text-transform:uppercase;
+  padding-bottom:10px;border-bottom:1px solid var(--bg);
+  margin-bottom:14px;
 }
 
-/* ── ROWS (pratiche, immobili) ── */
+/* ── LIST ROWS ── */
 .row{
-  display:flex;
-  overflow:hidden;
-  border-radius:16px;
+  display:flex;overflow:hidden;border-radius:var(--radius-md);
   margin-bottom:10px;
-  box-shadow:0 2px 12px rgba(0,0,0,0.06);
-  cursor:pointer;
-  background:#fff;
+  box-shadow:0 1px 8px rgba(0,0,0,0.06);
+  cursor:pointer;background:var(--card);
   transition:transform 0.15s ease, box-shadow 0.15s ease;
 }
-.row:active{transform:scale(0.98);box-shadow:0 1px 6px rgba(0,0,0,0.08);}
-.bar{width:4px;flex-shrink:0;background:#E8631A;}
-.rb{flex:1;padding:14px 16px;}
+.row:active{transform:scale(0.98);box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.bar{width:4px;flex-shrink:0;background:var(--orange);}
+.rb{flex:1;padding:13px 14px;}
 .ra{display:flex;align-items:center;padding-right:14px;color:#C7C7CC;font-size:18px;}
-.rt{font-size:15px;font-weight:700;color:#1D1D1F;}
-.rs{font-size:12px;color:#8E8E93;margin-top:3px;}
+.rt{font-size:14px;font-weight:700;color:var(--text);}
+.rs{font-size:12px;color:var(--text2);margin-top:2px;}
 
-/* ── LABELS & INPUTS ── */
+/* ── LABELS & VALUES ── */
 .lbl{
-  display:block;
-  font-size:12px;
-  font-weight:600;
-  color:#8E8E93;
-  margin-bottom:5px;
-  letter-spacing:.02em;
+  display:block;font-size:11px;font-weight:600;color:var(--text2);
+  margin-bottom:4px;letter-spacing:.02em;
 }
-.val{font-size:15px;font-weight:600;color:#1D1D1F;margin-bottom:14px;}
+.val{font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px;}
+
+/* ── INPUTS ── */
 .inp{
-  width:100%;
-  padding:13px 15px;
-  border-radius:12px;
-  border:1.5px solid #E5E5EA;
-  font-size:15px;
-  color:#1D1D1F;
-  background:#F8F8FA;
-  margin-bottom:14px;
-  outline:none;
-  font-family:inherit;
+  width:100%;padding:13px 15px;
+  border-radius:12px;border:1.5px solid var(--border);
+  font-size:15px;color:var(--text);background:#F8F8FA;
+  margin-bottom:14px;outline:none;font-family:inherit;
   transition:border-color 0.2s, background 0.2s;
 }
-.inp:focus{border-color:#E8631A;background:#fff;}
+.inp:focus{border-color:var(--orange);background:#fff;}
 select.inp{cursor:pointer;}
 textarea.inp{min-height:100px;resize:vertical;}
 
 /* ── BUTTONS ── */
 .bp{
-  width:100%;
-  padding:15px;
-  background:#E8631A;
-  color:#fff;
-  border:none;
-  border-radius:14px;
-  font-size:16px;
-  font-weight:700;
-  cursor:pointer;
-  margin-bottom:10px;
-  font-family:inherit;
+  width:100%;padding:15px;
+  background:var(--orange);color:#fff;border:none;
+  border-radius:14px;font-size:16px;font-weight:700;
+  cursor:pointer;margin-bottom:10px;font-family:inherit;
   transition:opacity 0.2s, transform 0.15s;
-  letter-spacing:-.01em;
+  box-shadow:0 3px 12px rgba(232,99,26,0.22);
 }
 .bp:active{opacity:0.85;transform:scale(0.98);}
 .bs{
-  width:100%;
-  padding:14px;
-  background:transparent;
-  color:#1D1D1F;
-  border:1.5px solid #E5E5EA;
-  border-radius:14px;
-  font-size:15px;
-  font-weight:600;
-  cursor:pointer;
-  margin-bottom:10px;
-  font-family:inherit;
+  width:100%;padding:14px;background:transparent;
+  color:var(--text);border:1.5px solid var(--border);
+  border-radius:14px;font-size:15px;font-weight:600;
+  cursor:pointer;margin-bottom:10px;font-family:inherit;
   transition:background 0.15s;
 }
-.bs:active{background:#F2F2F7;}
+.bs:active{background:var(--bg);}
 .bd{
-  width:100%;
-  padding:14px;
-  background:transparent;
-  color:#E8631A;
-  border:1.5px solid #E8631A;
-  border-radius:14px;
-  font-size:15px;
-  font-weight:600;
-  cursor:pointer;
-  margin-bottom:10px;
-  font-family:inherit;
+  width:100%;padding:14px;background:transparent;
+  color:var(--orange);border:1.5px solid var(--orange);
+  border-radius:14px;font-size:15px;font-weight:600;
+  cursor:pointer;margin-bottom:10px;font-family:inherit;
 }
 
 /* ── OVERLAYS ── */
 .ov{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:#F2F2F7;
-  z-index:300;
-  overflow-y:auto;
+  display:none;position:fixed;inset:0;
+  background:var(--bg);z-index:300;overflow-y:auto;
 }
 .ov.on{display:block;}
 .oh{
-  background:rgba(255,255,255,0.92);
-  backdrop-filter:blur(20px);
-  padding:14px 18px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  position:sticky;
-  top:0;
-  z-index:10;
-  border-bottom:1px solid rgba(0,0,0,0.06);
+  background:rgba(255,255,255,0.94);backdrop-filter:blur(24px);
+  padding:14px 18px;display:flex;justify-content:space-between;align-items:center;
+  position:sticky;top:0;z-index:10;border-bottom:1px solid rgba(0,0,0,0.06);
 }
-.ohlbl{font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.1em;text-transform:uppercase;}
-.ohttl{font-size:17px;font-weight:700;color:#1D1D1F;}
+.ohlbl{font-size:9px;font-weight:700;color:var(--orange);letter-spacing:.12em;text-transform:uppercase;}
+.ohttl{font-size:17px;font-weight:700;color:var(--text);}
 .exbtn{
-  background:rgba(0,0,0,0.06);
-  border:none;
-  border-radius:20px;
-  padding:7px 14px;
-  font-size:12px;
-  font-weight:600;
-  color:#1D1D1F;
-  cursor:pointer;
-  font-family:inherit;
+  background:#F2F2F7;border:none;border-radius:20px;
+  padding:7px 14px;font-size:12px;font-weight:600;
+  color:var(--text);cursor:pointer;font-family:inherit;
 }
 
 /* ── BADGES ── */
 .bdg{
-  font-size:11px;
-  font-weight:700;
-  padding:3px 9px;
-  border-radius:20px;
-  background:#FDF0E8;
-  color:#E8631A;
+  font-size:11px;font-weight:700;padding:3px 9px;
+  border-radius:20px;background:var(--orange-light);color:var(--orange);
 }
-.infog{
-  background:#EBF9F1;
-  border-radius:12px;
-  padding:12px 15px;
-  font-size:13px;
-  color:#1A7A4A;
-  font-weight:600;
-  margin-bottom:12px;
-}
-.info{
-  background:#F2F2F7;
-  border-radius:12px;
-  padding:14px;
-  font-size:13px;
-  color:#8E8E93;
-  text-align:center;
-}
-.infob{
-  background:#EBF2FB;
-  border-radius:12px;
-  padding:12px 15px;
-  font-size:13px;
-  color:#1A5FA8;
-  font-weight:600;
-  margin-bottom:12px;
-}
-.err,.errbox{
-  background:#FFF0F0;
-  border-radius:12px;
-  padding:12px 15px;
-  font-size:13px;
-  color:#C0392B;
-  font-weight:600;
-  margin-bottom:12px;
-  display:none;
-}
+
+/* ── ALERTS ── */
+.infog{background:var(--green-light);border-radius:12px;padding:12px 15px;font-size:13px;color:var(--green);font-weight:600;margin-bottom:12px;}
+.info{background:var(--bg);border-radius:12px;padding:14px;font-size:13px;color:var(--text2);text-align:center;}
+.infob{background:var(--blue-light);border-radius:12px;padding:12px 15px;font-size:13px;color:var(--blue);font-weight:600;margin-bottom:12px;}
+.err,.errbox{background:var(--red-light);border-radius:12px;padding:12px 15px;font-size:13px;color:var(--red);font-weight:600;margin-bottom:12px;display:none;}
 
 /* ── GRID ── */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 
-/* ── CALENDAR ── */
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:12px;}
-.cd{
-  aspect-ratio:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:50%;
-  font-size:13px;
-  font-weight:500;
-  color:#C7C7CC;
+/* ── HOME — HERO CARD ── */
+.home-hero{
+  background:linear-gradient(135deg, #1C1C1E 0%, #2C2C2E 100%);
+  border-radius:24px;
+  padding:22px;
+  margin-bottom:16px;
+  position:relative;
+  overflow:hidden;
 }
-.cd.av{
-  color:#1D1D1F;
-  cursor:pointer;
-  font-weight:600;
-  transition:background 0.15s;
+.home-hero::before{
+  content:'';position:absolute;
+  top:-60px;right:-40px;
+  width:200px;height:200px;
+  background:radial-gradient(circle, rgba(232,99,26,0.35) 0%, transparent 70%);
+  pointer-events:none;
 }
-.cd.av:hover{background:#F2F2F7;}
-.cd.tod{background:#F2F2F7;color:#E8631A;font-weight:700;}
-.cd.sel{background:#E8631A;color:#fff;font-weight:700;}
-.cd.un{color:#C7C7CC;}
+.home-hero::after{
+  content:'';position:absolute;
+  bottom:-40px;left:-30px;
+  width:140px;height:140px;
+  background:radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+  pointer-events:none;
+}
+.home-hero .greeting{
+  font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;
+}
+.home-hero .hero-name{
+  font-size:26px;font-weight:800;color:#fff;
+  letter-spacing:-.5px;margin-bottom:12px;
+}
+.home-hero .hero-badge{display:flex;align-items:center;gap:6px;}
+.home-hero .hero-tessera{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:20px;padding:5px 12px;
+  font-size:12px;font-weight:700;color:rgba(255,255,255,0.85);
+}
 
-/* ── SLOT BUTTONS ── */
-.sbt{
-  padding:12px 16px;
-  border-radius:12px;
-  border:1.5px solid #E5E5EA;
-  background:#fff;
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-  color:#1D1D1F;
-  transition:all 0.15s;
-  font-family:inherit;
+/* ── HOME — APP ICONS GRID (stile Apple) ── */
+.app-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:16px;
+  margin-bottom:16px;
 }
-.sbt.on{background:#E8631A;border-color:#E8631A;color:#fff;}
+.app-icon{
+  display:flex;flex-direction:column;
+  align-items:center;gap:6px;
+  cursor:pointer;
+  transition:transform 0.15s;
+  background:none;border:none;font-family:inherit;
+  padding:0;
+}
+.app-icon:active{transform:scale(0.88);}
+.app-icon .ai-bg{
+  width:62px;height:62px;
+  border-radius:16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:30px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.1);
+  transition:box-shadow 0.15s;
+}
+.app-icon:active .ai-bg{box-shadow:0 1px 4px rgba(0,0,0,0.08);}
+.app-icon .ai-label{
+  font-size:11px;font-weight:600;color:var(--text);
+  text-align:center;line-height:1.2;
+}
+
+.ai-orange{background:linear-gradient(135deg,#FF6B35,#E8631A);}
+.ai-dark{background:linear-gradient(135deg,#2C2C2E,#1C1C1E);}
+.ai-blue{background:linear-gradient(135deg,#2C5FD4,#1A3A8F);}
+.ai-green{background:linear-gradient(135deg,#27AE60,#16A34A);}
+.ai-purple{background:linear-gradient(135deg,#8B5CF6,#6D28D9);}
+.ai-teal{background:linear-gradient(135deg,#14B8A6,#0D9488);}
+.ai-red{background:linear(135deg,#EF4444,#DC2626);}
+.ai-gray{background:linear-gradient(135deg,#9CA3AF,#6B7280);}
+
+/* ── HOME — PAGAMENTI BANNER ── */
+.pag-banner{
+  border-radius:16px;padding:14px 16px;margin-bottom:12px;
+  display:flex;justify-content:space-between;align-items:center;
+  cursor:pointer;
+}
+.pag-banner.dovuto{background:#FFF0F0;border-left:4px solid var(--red);}
+.pag-banner.ok{background:var(--green-light);border-left:4px solid var(--green);}
+
+/* ── HOME — PRATICHE ── */
+.home-section-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:10px;
+}
+.home-section-title{font-size:17px;font-weight:800;color:var(--text);}
+.home-section-link{
+  font-size:13px;font-weight:600;color:var(--orange);
+  background:none;border:none;cursor:pointer;font-family:inherit;
+}
+
+/* ── CALENDAR ── */
+.cg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px;}
+.cl{text-align:center;font-size:11px;font-weight:700;color:var(--text2);padding:4px 0;}
+.cd{
+  aspect-ratio:1;display:flex;align-items:center;justify-content:center;
+  border-radius:50%;font-size:13px;font-weight:500;color:#C7C7CC;
+}
+.cd.av{color:var(--text);cursor:pointer;font-weight:600;}
+.cd.av:active{background:var(--bg);}
+.cd.tod{background:var(--bg);color:var(--orange);font-weight:700;}
+.cd.sel{background:var(--orange);color:#fff;font-weight:700;}
+.cd.un{color:var(--border);}
+
+/* ── SLOT ── */
+.sg{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
+.sb{
+  padding:10px 16px;border-radius:11px;
+  border:1.5px solid var(--border);background:#fff;
+  font-size:14px;font-weight:600;cursor:pointer;
+  color:var(--text);transition:all 0.15s;font-family:inherit;
+}
+.sb.sel{background:var(--orange);border-color:var(--orange);color:#fff;}
+.sb.bsy{background:var(--bg);color:var(--text2);cursor:default;text-decoration:line-through;}
 
 /* ── TABS ── */
 .tabbtn{
-  flex:1;
-  padding:10px;
-  border:none;
-  background:transparent;
-  font-size:13px;
-  font-weight:600;
-  color:#8E8E93;
-  cursor:pointer;
-  border-bottom:2px solid transparent;
-  font-family:inherit;
+  flex:1;padding:11px;border:none;background:transparent;
+  font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;
+  border-bottom:2px solid transparent;font-family:inherit;
   transition:color 0.2s, border-color 0.2s;
 }
-.tabbtn.on{color:#E8631A;border-bottom-color:#E8631A;}
-.tabrow{display:flex;border-bottom:1px solid #F2F2F7;margin-bottom:16px;}
+.tabbtn.on{color:var(--orange);border-bottom-color:var(--orange);}
+.tabrow{display:flex;border-bottom:1px solid var(--bg);margin-bottom:16px;}
 
-/* ── FORM STEPS ── */
-.step-dot{
-  width:8px;height:8px;
-  border-radius:50%;
-  background:#E5E5EA;
-  transition:background 0.2s, transform 0.2s;
-}
-.step-dot.on{background:#E8631A;transform:scale(1.3);}
+/* ── PROGRESS STEPS ── */
+.prog{display:flex;gap:4px;padding:12px 16px 0;}
+.pd{height:3px;flex:1;border-radius:2px;background:var(--bg);transition:background 0.3s;}
 
-/* ── HOME CARDS ── */
-.home-card{
-  border-radius:20px;
-  padding:20px;
-  cursor:pointer;
-  position:relative;
-  overflow:hidden;
-  transition:transform 0.15s ease;
+/* ── STEP NAV ── */
+.snav{
+  position:fixed;bottom:0;left:0;right:0;
+  padding:12px 16px 32px;
+  background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);
+  border-top:1px solid rgba(0,0,0,0.07);
+  z-index:400;
 }
+
+/* ── PERSONA BLOCK ── */
+.pb{
+  background:#F8F8FA;border-radius:14px;
+  padding:16px;margin-bottom:12px;position:relative;
+}
+.pr{
+  position:absolute;top:12px;right:12px;
+  background:#F2F2F7;border:none;border-radius:8px;
+  width:28px;height:28px;font-size:13px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--text2);
+}
+
+/* ── CHECKBOX ── */
+.cr{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;cursor:pointer;line-height:1.4;}
+.cb2{
+  width:22px;height:22px;border-radius:7px;border:1.5px solid var(--border);
+  background:#F8F8FA;display:flex;align-items:center;justify-content:center;
+  font-size:12px;flex-shrink:0;transition:all 0.15s;margin-top:1px;
+}
+.cb2.on{background:var(--orange);border-color:var(--orange);color:#fff;}
+
+/* ── CHAT ── */
+.cms{min-height:200px;max-height:calc(100vh - 200px);overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;}
+.bbl{max-width:75%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.4;}
+.bm{background:var(--orange);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+.bo{background:#fff;color:var(--text);align-self:flex-start;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,0.06);}
+.bt{font-size:11px;color:var(--text2);margin-bottom:4px;}
+.ci{display:flex;gap:8px;padding:12px 16px 32px;background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,0.07);position:sticky;bottom:0;}
+.ci .inp{margin-bottom:0;flex:1;}
+.cs{width:44px;height:44px;background:var(--orange);color:#fff;border:none;border-radius:12px;font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+
+/* ── TESSERA CARD ── */
+.tessera-card{
+  background:linear-gradient(135deg,#1A3A8F,#E8631A);
+  border-radius:var(--radius-lg);padding:20px;color:#fff;
+  margin-bottom:14px;position:relative;overflow:hidden;
+}
+.tessera-card::before{
+  content:'';position:absolute;top:-40px;right:-40px;
+  width:160px;height:160px;background:rgba(255,255,255,0.07);border-radius:50%;
+}
+.tc-label{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;opacity:0.75;}
+.tc-num{font-size:26px;font-weight:800;letter-spacing:.06em;margin:6px 0;}
+.tc-anno{font-size:12px;opacity:0.7;}
+
+/* ── HOME CARD (vecchie, usate in vantaggi ecc) ── */
+.home-card{border-radius:var(--radius-lg);padding:20px;cursor:pointer;position:relative;overflow:hidden;transition:transform 0.15s;}
 .home-card:active{transform:scale(0.97);}
 .home-card-orange{background:linear-gradient(135deg,#E8631A,#F5842A);}
 .home-card-dark{background:linear-gradient(135deg,#1D1D1F,#2C2C2E);}
@@ -377,28 +415,6 @@ textarea.inp{min-height:100px;resize:vertical;}
 .home-card .hc-title{font-size:17px;font-weight:700;color:#fff;}
 .home-card .hc-sub{font-size:12px;color:rgba(255,255,255,0.75);margin-top:3px;}
 .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
-
-/* ── TESSERA ── */
-.tessera-card{
-  background:linear-gradient(135deg,#1A3A8F,#E8631A);
-  border-radius:20px;
-  padding:20px;
-  color:#fff;
-  margin-bottom:14px;
-  position:relative;
-  overflow:hidden;
-}
-.tessera-card::before{
-  content:'';
-  position:absolute;
-  top:-40px;right:-40px;
-  width:160px;height:160px;
-  background:rgba(255,255,255,0.08);
-  border-radius:50%;
-}
-.tessera-card .tc-label{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;opacity:0.8;}
-.tessera-card .tc-num{font-size:26px;font-weight:800;letter-spacing:.08em;margin:6px 0;}
-.tessera-card .tc-anno{font-size:12px;opacity:0.75;}
 </style>
 </head>
 <body>
@@ -417,85 +433,116 @@ textarea.inp{min-height:100px;resize:vertical;}
 
 <!-- HOME -->
 <div id="p-home" class="pg on">
-  <div style="margin-bottom:16px">
-    <div style="font-size:12px;color:#8A8A8A">Benvenuto,</div>
-    <div style="font-size:22px;font-weight:800;color:#1A1A1A" id="hnome">Socio</div>
-    <div id="h-tessera-badge" style="margin-top:8px"></div>
-  </div>
-  <div id="h-pagamenti-card" style="display:none;background:#fff;border-radius:14px;padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);cursor:pointer" onclick="navTo('profilo');caricaProfilo()">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div style="font-size:11px;font-weight:700;color:#8A8A8A;text-transform:uppercase;letter-spacing:.08em">Situazione pagamenti</div>
-        <div id="h-pag-riepilogo" style="font-size:14px;font-weight:700;color:#1A1A1A;margin-top:2px"></div>
+
+  <!-- Hero card -->
+  <div class="home-hero">
+    <div class="greeting">Benvenuto</div>
+    <div class="hero-name" id="hnome">Socio</div>
+    <div class="hero-badge">
+      <div id="h-tessera-badge"></div>
+    </div>
+    <div id="h-pagamenti-card" style="display:none;margin-top:10px;background:rgba(255,255,255,0.1);border-radius:12px;padding:10px 14px;cursor:pointer;border:1px solid rgba(255,255,255,0.15)" onclick="navTo('profilo');caricaProfilo()">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:.08em">Situazione pagamenti</div>
+          <div id="h-pag-riepilogo" style="font-size:14px;font-weight:700;color:#fff;margin-top:2px"></div>
+        </div>
+        <span style="font-size:20px;color:rgba(255,255,255,0.5)">›</span>
       </div>
-      <span style="font-size:20px;color:#8A8A8A">&#8250;</span>
     </div>
   </div>
-  <div style="display:flex;gap:10px;margin-bottom:12px">
-    <button id="btn-prenota-home" style="flex:1;border:none;border-radius:16px;padding:20px 14px;cursor:pointer;background:linear-gradient(135deg,#E8631A,#C94F0F);color:#fff;text-align:left">
-      <div style="font-size:26px;margin-bottom:8px">&#128197;</div>
-      <div style="font-size:14px;font-weight:800">Prenota</div>
-      <div style="font-size:11px;opacity:.8">Appuntamento</div>
+
+  <!-- App icons grid stile Apple -->
+  <div class="app-grid">
+    <button class="app-icon" id="btn-prenota-home">
+      <div class="ai-bg ai-orange">📅</div>
+      <span class="ai-label">Prenota</span>
     </button>
-    <button id="btn-imm-home" style="flex:1;border:none;border-radius:16px;padding:20px 14px;cursor:pointer;background:#1A1A1A;color:#fff;text-align:left">
-      <div style="font-size:26px;margin-bottom:8px">&#127970;</div>
-      <div style="font-size:14px;font-weight:800">Immobili</div>
-      <div style="font-size:11px;opacity:.6">e contratti</div>
+    <button class="app-icon" id="btn-imm-home">
+      <div class="ai-bg ai-dark">🏠</div>
+      <span class="ai-label">Immobili</span>
+    </button>
+    <button class="app-icon" id="btn-vantaggi-home">
+      <div class="ai-bg ai-blue">⭐</div>
+      <span class="ai-label">Vantaggi</span>
+    </button>
+    <button class="app-icon" id="btn-chat-home">
+      <div class="ai-bg ai-green">💬</div>
+      <span class="ai-label">Chat</span>
+    </button>
+    <button class="app-icon" id="btn-profilo-home">
+      <div class="ai-bg ai-purple">👤</div>
+      <span class="ai-label">Profilo</span>
+    </button>
+    <button class="app-icon" id="btn-pag-home">
+      <div class="ai-bg ai-teal">💳</div>
+      <span class="ai-label">Pagamenti</span>
+    </button>
+    <button class="app-icon" id="btn-doc-home">
+      <div class="ai-bg ai-gray">📄</div>
+      <span class="ai-label">Documenti</span>
+    </button>
+    <button class="app-icon" id="btn-news-home">
+      <div class="ai-bg" style="background:linear-gradient(135deg,#F59E0B,#D97706)">📢</div>
+      <span class="ai-label">Avvisi</span>
     </button>
   </div>
-  <button id="btn-vantaggi-home" style="width:100%;border:none;border-radius:16px;padding:14px 18px;cursor:pointer;background:linear-gradient(135deg,#2D7A4F,#1A5C3A);color:#fff;text-align:left;display:flex;align-items:center;gap:12px;margin-bottom:20px">
-    <span style="font-size:28px">&#11088;</span>
-    <div><div style="font-size:14px;font-weight:800">I tuoi vantaggi ASPPI</div><div style="font-size:11px;opacity:.8">Servizi e scontistiche riservati</div></div>
-    <span style="margin-left:auto;font-size:20px;opacity:.7">&#8250;</span>
-  </button>
-  <div id="h-avvisi" style="margin-bottom:12px"></div>
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-    <div style="font-size:14px;font-weight:800;color:#1A1A1A">Le tue pratiche</div>
-    <button id="btn-storico" style="background:none;border:none;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer">Storico &#8250;</button>
+
+  <!-- Avvisi -->
+  <div id="h-avvisi" style="margin-bottom:4px"></div>
+
+  <!-- Pratiche -->
+  <div class="home-section-header">
+    <div class="home-section-title">Le tue pratiche</div>
+    <button class="home-section-link" id="btn-storico">Storico ›</button>
   </div>
-  <div id="hpratiche"><div class="info">Caricamento in corso...</div></div>
+  <div id="hpratiche"><div class="info">Caricamento...</div></div>
   <div id="hstorico" style="display:none">
-    <div style="font-size:13px;font-weight:700;color:#8A8A8A;margin:12px 0 8px">Pratiche completate</div>
+    <div style="font-size:13px;font-weight:700;color:var(--text2);margin:12px 0 8px">Pratiche completate</div>
     <div id="hpratiche-completate"></div>
   </div>
 </div>
 
 <!-- IMMOBILI -->
 <div id="p-immobili" class="pg">
-  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:4px">I miei immobili</div>
-  <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px">Tocca per gestire i contratti</div>
+  <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px">I miei immobili</div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Tocca per gestire i contratti</div>
   <div id="limm"><div class="info">Caricamento...</div></div>
   <button class="bd" id="btn-nuovo-apt">+ Aggiungi nuovo immobile</button>
 </div>
 
 <!-- PRENOTA -->
 <div id="p-prenota" class="pg">
-  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:4px">Prenota appuntamento</div>
-  <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px">Scegli giorno e orario</div>
+  <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px">Appuntamento</div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Scegli giorno e orario</div>
   <div style="max-width:500px">
-  <div id="p-cal-ok" style="display:none;text-align:center;padding:40px 20px">
-    <div style="font-size:56px;margin-bottom:16px">&#9989;</div>
-    <div style="font-size:20px;font-weight:800;color:#1A1A1A;margin-bottom:8px">Appuntamento confermato!</div>
-    <div style="font-size:14px;color:#8A8A8A;margin-bottom:16px" id="p-cal-rie"></div>
-    <div class="info">&#128205; ASPPI L'Aquila - C.so Vittorio Emanuele 9</div>
-    <button class="bs" id="btn-altra-pren" style="width:200px;margin:0 auto">Prenota un altro</button>
+  <div id="p-cal-ok" style="display:none;text-align:center;padding:48px 20px">
+    <div style="font-size:64px;margin-bottom:16px">✅</div>
+    <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px">Richiesta inviata!</div>
+    <div style="font-size:14px;color:var(--text2);margin-bottom:16px" id="p-cal-rie"></div>
+    <div class="infob" style="text-align:left">📍 ASPPI L'Aquila - C.so Vittorio Emanuele 9</div>
+    <button class="bs" id="btn-altra-pren" style="max-width:220px;margin:0 auto">Prenota un altro</button>
   </div>
   <div id="p-cal-form">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-    <button onclick="calPrev()" style="background:none;border:1px solid #e5e5e5;border-radius:8px;padding:4px 12px;cursor:pointer;font-size:16px">&#8249;</button>
-    <div style="font-size:13px;font-weight:700;color:#1A1A1A" id="cal-mese-lbl"></div>
-    <button onclick="calNext()" style="background:none;border:1px solid #e5e5e5;border-radius:8px;padding:4px 12px;cursor:pointer;font-size:16px">&#8250;</button>
-  </div>
-    <div class="cg" id="cal-lbl-row"></div>
-    <div class="cg" id="cal-days"></div>
+    <div class="card"><div class="cb">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <button onclick="calPrev()" style="width:36px;height:36px;background:var(--bg);border:none;border-radius:10px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">‹</button>
+        <div style="font-size:15px;font-weight:700;color:var(--text)" id="cal-mese-lbl"></div>
+        <button onclick="calNext()" style="width:36px;height:36px;background:var(--bg);border:none;border-radius:10px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">›</button>
+      </div>
+      <div class="cg" id="cal-lbl-row"></div>
+      <div class="cg" id="cal-days"></div>
+    </div></div>
     <div id="p-slot-sec" style="display:none">
-      <div style="font-size:13px;font-weight:700;color:#1A1A1A;margin-bottom:10px" id="p-slot-ttl">Orari disponibili</div>
-      <div class="sg" id="p-slot-grid"></div>
+      <div class="card"><div class="cb">
+        <div class="sec" id="p-slot-ttl">Orari disponibili</div>
+        <div class="sg" id="p-slot-grid"></div>
+      </div></div>
     </div>
     <div id="p-rie" style="display:none">
       <div class="card"><div class="cb">
         <div class="sec">CONFERMA PRENOTAZIONE</div>
-        <div class="lbl">Data e ora</div><div class="val" id="p-data-ora"></div>
+        <div class="lbl">Data e ora selezionata</div><div class="val" id="p-data-ora"></div>
         <label class="lbl">Motivo della visita *</label>
         <select class="inp" id="p-motivo">
           <option value="">-- Seleziona --</option>
@@ -517,37 +564,33 @@ textarea.inp{min-height:100px;resize:vertical;}
 
 <!-- VANTAGGI -->
 <div id="p-vantaggi" class="pg">
-  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:4px">I tuoi vantaggi</div>
-  <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px">Servizi e scontistiche riservati ai soci ASPPI</div>
-
-  <!-- Documenti -->
+  <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px">I tuoi vantaggi</div>
+  <div style="font-size:13px;color:var(--text2);margin-bottom:16px">Servizi riservati ai soci ASPPI</div>
   <div id="v-docs-card" style="display:none">
     <div class="card"><div class="cb">
       <div class="sec">DOCUMENTI DISPONIBILI</div>
       <div id="v-docs-list"></div>
     </div></div>
   </div>
-
-  <!-- Lista servizi -->
   <div id="v-servizi"><div class="info">Caricamento...</div></div>
 </div>
 
 <!-- CHAT -->
-<div id="p-chat" class="pg">
-  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:4px">Chat con lo studio</div>
-  <div style="font-size:12px;color:#8A8A8A;margin-bottom:16px">Scrivi liberamente allo studio ASPPI</div>
-  <div class="cms" id="lchat-msgs" style="background:#fff;border-radius:14px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)"></div>
-  <div class="ci" style="background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
-    <input type="text" class="inp" id="chat-free-inp" placeholder="Scrivi un messaggio..." style="margin-bottom:0"/>
-    <button class="cs" id="btn-send-free">&#8250;</button>
+<div id="p-chat" class="pg" style="padding:0">
+  <div style="padding:16px 16px 8px">
+    <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px">Chat con lo studio</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:8px">Scrivi allo studio ASPPI</div>
+  </div>
+  <div class="cms" id="lchat-msgs"></div>
+  <div class="ci">
+    <input type="text" class="inp" id="chat-free-inp" placeholder="Scrivi un messaggio..."/>
+    <button class="cs" id="btn-send-free">›</button>
   </div>
 </div>
 
 <!-- PROFILO -->
 <div id="p-profilo" class="pg">
-  <div style="font-size:18px;font-weight:800;color:#1A1A1A;margin-bottom:16px">Il mio profilo</div>
-  
-  <!-- Dati anagrafici -->
+  <div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:16px">Il mio profilo</div>
   <div class="card"><div class="cb">
     <div class="sec">DATI PERSONALI</div>
     <div class="lbl">Nome e Cognome</div><div class="val" id="pr-nome"></div>
@@ -558,35 +601,33 @@ textarea.inp{min-height:100px;resize:vertical;}
     <div class="lbl">Via e n. civico</div><div class="val" id="pr-via"></div>
     <div class="lbl">Telefono</div><div class="val" id="pr-tel"></div>
     <div class="lbl">Email</div><div class="val" id="pr-email"></div>
-    <button id="btn-modifica-anagrafica" style="width:100%;text-align:left;background:none;border:1px solid #e5e5e5;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;color:#1A5FA8;margin-top:8px">&#9998; Modifica dati personali</button>
+    <button id="btn-modifica-anagrafica" style="width:100%;text-align:left;background:none;border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--blue);margin-top:4px">✏️ Modifica dati personali</button>
   </div></div>
 
-  <!-- Tessera -->
   <div class="card"><div class="cb">
     <div class="sec">TESSERA ASPPI</div>
     <div id="pr-tessera"><div class="info">Caricamento...</div></div>
   </div></div>
 
-  <!-- Pagamenti -->
   <div class="card"><div class="cb">
     <div class="sec">PAGAMENTI</div>
     <div id="pr-pagamenti"><div class="info">Caricamento...</div></div>
-    <button id="btn-dichiara-bonifico" style="display:none;width:100%;padding:11px;border-radius:10px;border:none;background:#2D7A4F;color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">&#128197; Ho effettuato il bonifico</button>
+    <button id="btn-dichiara-bonifico" style="display:none;width:100%;padding:12px;border-radius:11px;border:none;background:var(--green);color:#fff;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px">📅 Ho effettuato il bonifico</button>
   </div></div>
 
-  <!-- Sicurezza -->
   <div class="card"><div class="cb">
     <div class="sec">SICUREZZA</div>
-    <button id="btn-apri-pwd" style="width:100%;text-align:left;background:none;border:1px solid #e5e5e5;border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;color:#1A1A1A">&#128273; Cambia password</button>
+    <button id="btn-apri-pwd" style="width:100%;text-align:left;background:none;border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text)">🔑 Cambia password</button>
   </div></div>
-  <button class="bs" id="btn-esci-profilo" style="color:#C0392B;border-color:#FDEEEC;margin-top:8px">Esci dall'account</button>
+
+  <button class="bs" id="btn-esci-profilo" style="color:var(--red);border-color:#FDEEEC;margin-top:4px">Esci dall'account</button>
 </div>
 
 <!-- OV MODIFICA ANAGRAFICA -->
 <div id="ov-anagrafica" class="ov">
   <div class="oh">
-    <div><div class="ohlbl">PROFILO</div><div class="ohttl">Modifica dati personali</div></div>
-    <button class="exbtn" id="btn-chiudi-anagrafica">&#8592; Indietro</button>
+    <div><div class="ohlbl">PROFILO</div><div class="ohttl">Modifica dati</div></div>
+    <button class="exbtn" id="btn-chiudi-anagrafica">← Indietro</button>
   </div>
   <div style="padding:16px">
     <div class="card"><div class="cb">
@@ -601,7 +642,7 @@ textarea.inp{min-height:100px;resize:vertical;}
       <label class="lbl">Via e n. civico</label><input type="text" class="inp" id="an-via"/>
       <label class="lbl">Telefono</label><input type="text" class="inp" id="an-tel"/>
       <div class="errbox" id="an-err"></div>
-      <div class="infog" id="an-ok" style="display:none">&#9989; Dati aggiornati!</div>
+      <div class="infog" id="an-ok" style="display:none">✅ Dati aggiornati!</div>
       <button class="bp" id="btn-salva-anagrafica">Salva dati</button>
     </div></div>
   </div>
@@ -611,7 +652,7 @@ textarea.inp{min-height:100px;resize:vertical;}
 <div id="ov-bonifico" class="ov">
   <div class="oh">
     <div><div class="ohlbl">PAGAMENTO</div><div class="ohttl">Dichiara bonifico</div></div>
-    <button class="exbtn" id="btn-chiudi-bonifico">&#8592; Indietro</button>
+    <button class="exbtn" id="btn-chiudi-bonifico">← Indietro</button>
   </div>
   <div style="padding:16px">
     <div class="card"><div class="cb">
@@ -622,7 +663,7 @@ textarea.inp{min-height:100px;resize:vertical;}
       <label class="lbl">Numero riferimento/CRO (opzionale)</label><input type="text" class="inp" id="bon-rif" placeholder="es. CRO123456789"/>
       <label class="lbl">Note (opzionale)</label><input type="text" class="inp" id="bon-note" placeholder="es. Tesseramento 2026"/>
       <div class="errbox" id="bon-err"></div>
-      <div class="infog" id="bon-ok" style="display:none">&#9989; Dichiarazione inviata! Lo studio verifichera il pagamento.</div>
+      <div class="infog" id="bon-ok" style="display:none">✅ Dichiarazione inviata! Lo studio verificherà il pagamento.</div>
       <button class="bp" id="btn-invia-bonifico">Invia dichiarazione</button>
     </div></div>
   </div>
@@ -632,7 +673,7 @@ textarea.inp{min-height:100px;resize:vertical;}
 <div id="ov-apt" class="ov">
   <div class="oh">
     <div><div class="ohlbl">IMMOBILE</div><div class="ohttl" id="oa-ttl"></div></div>
-    <button class="exbtn" id="btn-chiudi-apt">&#8592; Indietro</button>
+    <button class="exbtn" id="btn-chiudi-apt">← Indietro</button>
   </div>
   <div style="padding:16px">
     <div class="card"><div class="cb">
@@ -648,11 +689,11 @@ textarea.inp{min-height:100px;resize:vertical;}
       <div class="lbl">Nome</div><div class="val" id="oa-loc"></div>
       <div class="lbl">CF</div><div class="val" id="oa-cf" style="font-family:monospace"></div>
     </div></div>
-    <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin-bottom:10px">Contratti</div>
+    <div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:10px">Contratti</div>
     <div id="oa-cnts"></div>
     <button class="bp" id="btn-nuovo-cnt">+ Nuovo contratto</button>
-    <button class="bs" id="btn-mod-apt">&#9998; Modifica nome immobile</button>
-    <button class="bs" id="btn-del-apt" style="color:#C0392B;border-color:#FDEEEC">&#128465; Rimuovi immobile</button>
+    <button class="bs" id="btn-mod-apt">✏️ Modifica nome immobile</button>
+    <button class="bs" id="btn-del-apt" style="color:var(--red);border-color:#FDEEEC">🗑️ Rimuovi immobile</button>
   </div>
 </div>
 
@@ -660,7 +701,7 @@ textarea.inp{min-height:100px;resize:vertical;}
 <div id="ov-cnt" class="ov">
   <div class="oh">
     <div><div class="ohlbl" id="oc-lbl">CONTRATTO</div><div class="ohttl" id="oc-ttl"></div></div>
-    <button class="exbtn" id="btn-chiudi-cnt">&#8592; Indietro</button>
+    <button class="exbtn" id="btn-chiudi-cnt">← Indietro</button>
   </div>
   <div style="padding:16px">
     <div class="card"><div class="cb">
@@ -680,16 +721,16 @@ textarea.inp{min-height:100px;resize:vertical;}
       <label class="lbl">Aggiorna TAJ</label>
       <input type="text" class="inp" id="oc-taj-inp" placeholder="es. AQ2024A12345"/>
       <button class="bp" id="btn-salva-taj">Salva TAJ</button>
-      <div class="infog" id="oc-taj-ok" style="display:none">&#9989; TAJ aggiornato!</div>
+      <div class="infog" id="oc-taj-ok" style="display:none">✅ TAJ aggiornato!</div>
     </div></div>
-    <div style="font-size:14px;font-weight:800;color:#1A1A1A;margin-bottom:10px">Richiedi adempimento</div>
-    <div class="row" id="btn-proroga"><div class="bar"></div><div class="rb"><div class="rt">&#128260; Proroga</div><div class="rs">Estendi la durata</div></div><div style="display:flex;align-items:center;padding-right:14px;color:#8A8A8A">&#8250;</div></div>
-    <div class="row" id="btn-subentro"><div class="bar"></div><div class="rb"><div class="rt">&#128100; Subentro</div><div class="rs">Nuovo conduttore subentra</div></div><div style="display:flex;align-items:center;padding-right:14px;color:#8A8A8A">&#8250;</div></div>
-    <div class="row" id="btn-cessione"><div class="bar"></div><div class="rb"><div class="rt">&#128228; Cessione</div><div class="rs">Cede il contratto a terzi</div></div><div style="display:flex;align-items:center;padding-right:14px;color:#8A8A8A">&#8250;</div></div>
-    <button class="bs" id="btn-chat-cnt">&#128172; Chat con lo studio</button>
-    <button class="bs" id="btn-modifica-cnt" style="color:#1A5FA8;border-color:#EBF2FB">&#9998; Modifica contratto</button>
-    <button class="bs" id="btn-elimina-cnt" style="color:#C0392B;border-color:#FDEEEC">&#128465; Elimina pratica</button>
-    <button class="bs" id="btn-rinnova-cnt" style="color:#2D7A4F;border-color:#EBF5F0;display:none">&#128260; Rinnova contratto</button>
+    <div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:10px">Richiedi adempimento</div>
+    <div class="row" id="btn-proroga"><div class="bar"></div><div class="rb"><div class="rt">🔄 Proroga</div><div class="rs">Estendi la durata</div></div><div style="display:flex;align-items:center;padding-right:14px;color:#8A8A8A">›</div></div>
+    <div class="row" id="btn-subentro"><div class="bar"></div><div class="rb"><div class="rt">👤 Subentro</div><div class="rs">Nuovo conduttore subentra</div></div><div style="display:flex;align-items:center;padding-right:14px;color:#8A8A8A">›</div></div>
+    <div class="row" id="btn-cessione"><div class="bar"></div><div class="rb"><div class="rt">📤 Cessione</div><div class="rs">Cede il contratto a terzi</div></div><div style="display:flex;align-items:center;padding-right:14px;color:#8A8A8A">›</div></div>
+    <button class="bs" id="btn-chat-cnt">💬 Chat con lo studio</button>
+    <button class="bs" id="btn-modifica-cnt" style="color:var(--blue);border-color:var(--blue-light)">✏️ Modifica contratto</button>
+    <button class="bs" id="btn-elimina-cnt" style="color:var(--red);border-color:#FDEEEC">🗑️ Elimina pratica</button>
+    <button class="bs" id="btn-rinnova-cnt" style="color:var(--green);border-color:var(--green-light);display:none">🔄 Rinnova contratto</button>
   </div>
 </div>
 
@@ -697,21 +738,21 @@ textarea.inp{min-height:100px;resize:vertical;}
 <div id="ov-adm" class="ov">
   <div class="oh">
     <div><div class="ohlbl" id="oadm-lbl">ADEMPIMENTO</div><div class="ohttl" id="oadm-ttl"></div></div>
-    <button class="exbtn" id="btn-chiudi-adm">&#8592; Indietro</button>
+    <button class="exbtn" id="btn-chiudi-adm">← Indietro</button>
   </div>
   <div style="padding:16px" id="oadm-body"></div>
 </div>
 
 <!-- OV CHAT CONTRATTO -->
-<div id="ov-chat" class="ov">
+<div id="ov-chat" class="ov" style="display:flex;flex-direction:column">
   <div class="oh">
     <div><div class="ohlbl" id="ochat-lbl">CHAT</div><div class="ohttl" id="ochat-ttl">Con lo studio</div></div>
-    <button class="exbtn" id="btn-chiudi-chat">&#8592; Indietro</button>
+    <button class="exbtn" id="btn-chiudi-chat">← Indietro</button>
   </div>
-  <div class="cms" id="ochat-msgs"></div>
+  <div class="cms" id="ochat-msgs" style="flex:1"></div>
   <div class="ci">
-    <input type="text" class="inp" id="chat-cnt-inp" placeholder="Scrivi un messaggio..." style="margin-bottom:0"/>
-    <button class="cs" id="btn-send-cnt">&#8250;</button>
+    <input type="text" class="inp" id="chat-cnt-inp" placeholder="Scrivi un messaggio..."/>
+    <button class="cs" id="btn-send-cnt">›</button>
   </div>
 </div>
 
@@ -719,7 +760,7 @@ textarea.inp{min-height:100px;resize:vertical;}
 <div id="ov-napt" class="ov">
   <div class="oh">
     <div><div class="ohlbl">NUOVO IMMOBILE</div><div class="ohttl" id="napt-ttl">Passo 1 di 3</div></div>
-    <button class="exbtn" id="btn-annulla-napt">&#10005; Annulla</button>
+    <button class="exbtn" id="btn-annulla-napt">✕ Annulla</button>
   </div>
   <div class="prog" id="napt-prog"></div>
   <div style="padding:16px 16px 100px" id="napt-body"></div>
@@ -730,14 +771,14 @@ textarea.inp{min-height:100px;resize:vertical;}
 <div id="ov-mod-apt" class="ov">
   <div class="oh">
     <div><div class="ohlbl">MODIFICA</div><div class="ohttl" id="mapt-ttl"></div></div>
-    <button class="exbtn" id="btn-chiudi-mod-apt">&#8592; Indietro</button>
+    <button class="exbtn" id="btn-chiudi-mod-apt">← Indietro</button>
   </div>
   <div style="padding:16px">
     <div class="card"><div class="cb">
       <div class="sec">MODIFICA NOME</div>
       <label class="lbl">Nuovo nome immobile</label>
       <input type="text" class="inp" id="mapt-nome"/>
-      <div class="infog" id="mapt-ok" style="display:none">&#9989; Nome aggiornato!</div>
+      <div class="infog" id="mapt-ok" style="display:none">✅ Nome aggiornato!</div>
       <button class="bp" id="btn-salva-mod-apt">Salva nome</button>
     </div></div>
   </div>
@@ -747,7 +788,7 @@ textarea.inp{min-height:100px;resize:vertical;}
 <div id="ov-ncnt" class="ov">
   <div class="oh">
     <div><div class="ohlbl" id="ncnt-lbl">NUOVO CONTRATTO</div><div class="ohttl" id="ncnt-ttl">Passo 1 di 9</div></div>
-    <button class="exbtn" id="btn-ncnt-back">&#8592; Indietro</button>
+    <button class="exbtn" id="btn-ncnt-back">← Indietro</button>
   </div>
   <div class="prog" id="ncnt-prog"></div>
   <div style="padding:16px 16px 100px" id="ncnt-body"></div>
@@ -758,7 +799,7 @@ textarea.inp{min-height:100px;resize:vertical;}
 <div id="ov-pwd" class="ov">
   <div class="oh">
     <div><div class="ohlbl">SICUREZZA</div><div class="ohttl">Cambia password</div></div>
-    <button class="exbtn" id="btn-chiudi-pwd">&#8592; Indietro</button>
+    <button class="exbtn" id="btn-chiudi-pwd">← Indietro</button>
   </div>
   <div style="padding:16px">
     <div class="card"><div class="cb">
@@ -767,19 +808,21 @@ textarea.inp{min-height:100px;resize:vertical;}
       <label class="lbl">Nuova password</label><input type="password" class="inp" id="cp-new"/>
       <label class="lbl">Conferma nuova password</label><input type="password" class="inp" id="cp-new2"/>
       <div class="errbox" id="cp-err"></div>
-      <div class="infog" id="cp-ok" style="display:none">&#9989; Password aggiornata!</div>
+      <div class="infog" id="cp-ok" style="display:none">✅ Password aggiornata!</div>
       <button class="bp" id="btn-salva-pwd">Salva nuova password</button>
     </div></div>
   </div>
 </div>
 
-<div class="nav">
-  <button class="nb on" id="nb-home"><span class="ic">&#127968;</span><span class="lb">Home</span></button>
-  <button class="nb" id="nb-immobili"><span class="ic">&#127962;</span><span class="lb">Immobili</span></button>
-  <button class="nb" id="nb-vantaggi"><span class="ic">&#11088;</span><span class="lb">Vantaggi</span></button>
-  <button class="nb" id="nb-prenota"><span class="ic">&#128197;</span><span class="lb">Prenota</span></button>
-  <button class="nb" id="nb-profilo"><span class="ic">&#128100;</span><span class="lb">Profilo</span></button>
-</div>
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <button class="nb on" id="nb-home"><span class="ic">🏡</span><span class="lb">Home</span></button>
+  <button class="nb" id="nb-immobili"><span class="ic">🏘️</span><span class="lb">Immobili</span></button>
+  <button class="nb" id="nb-vantaggi"><span class="ic">⭐</span><span class="lb">Vantaggi</span></button>
+  <button class="nb" id="nb-prenota"><span class="ic">📅</span><span class="lb">Prenota</span></button>
+  <button class="nb" id="nb-profilo"><span class="ic">👤</span><span class="lb">Profilo</span></button>
+</nav>
+
 
 <script>
 var API = "https://rough-resonance-cba6.asppilaquila.workers.dev";
@@ -823,6 +866,19 @@ window.onload = function() {
   document.getElementById('pr-tel').textContent = S.user.telefono || '—';
 
   bindAll();
+
+// ── BIND EXTRA ICONE HOME ─────────────────────────────────────
+(function(){
+  function mayBind(id, fn){ var e=T(id); if(e) e.addEventListener('click', fn); }
+  mayBind('btn-chat-home', function(){ navTo('chat'); caricaChatLibera(); });
+  mayBind('btn-profilo-home', function(){ navTo('profilo'); caricaProfilo(); });
+  mayBind('btn-pag-home', function(){ navTo('profilo'); caricaProfilo(); });
+  mayBind('btn-doc-home', function(){ navTo('vantaggi'); caricaVantaggi(); });
+  mayBind('btn-news-home', function(){
+    var el=T('h-avvisi');
+    if(el) el.scrollIntoView({behavior:'smooth'});
+  });
+})();
   initCal();
   caricaDati();
 

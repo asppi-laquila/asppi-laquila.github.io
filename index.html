@@ -3,243 +3,556 @@
 <head>
 <meta charset="UTF-8"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <meta name="theme-color" content="#E8631A"/>
 <title>ASPPI L'Aquila</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Inter',-apple-system,sans-serif;background:#F2F2F7;min-height:100vh;-webkit-font-smoothing:antialiased;}
-.pg{display:none;padding:20px;max-width:420px;margin:0 auto;}
-.pg.on{display:block;}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:#F2F2F7;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
 
-/* Splash */
-.splash{min-height:50vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:#fff;padding:48px 28px 32px;border-radius:0 0 32px 32px;margin-bottom:24px;box-shadow:0 4px 24px rgba(0,0,0,0.06);}
-.splash img{width:75%;max-width:280px;margin-bottom:20px;}
-.splash-city{font-size:13px;font-weight:700;color:#E8631A;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px;}
-.splash-sub{font-size:14px;color:#8E8E93;}
+/* ── PAGES ── */
+.page{display:none;min-height:100vh;}
+.page.on{display:block;}
 
-/* Buttons */
-.btn-main{
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  width:100%;padding:17px;
+/* ══════════════════════════════════════
+   PAGINA SCELTA (SPLASH)
+══════════════════════════════════════ */
+#pg-scelta{
+  background:linear-gradient(160deg, #fff 0%, #FFF6F1 100%);
+  display:flex;flex-direction:column;min-height:100vh;
+}
+
+.splash-hero{
+  flex:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px 32px 40px;
+  text-align:center;
+}
+.splash-hero img{
+  width:180px;
+  margin-bottom:28px;
+  filter:drop-shadow(0 8px 24px rgba(232,99,26,0.18));
+}
+.splash-city{
+  display:inline-block;
+  font-size:11px;font-weight:700;
+  color:#E8631A;letter-spacing:.14em;text-transform:uppercase;
+  background:#FDF0E8;
+  padding:5px 14px;border-radius:20px;
+  margin-bottom:12px;
+}
+.splash-claim{
+  font-size:28px;font-weight:800;color:#1C1C1E;
+  line-height:1.2;margin-bottom:8px;
+  letter-spacing:-.4px;
+}
+.splash-sub{font-size:15px;color:#8E8E93;font-weight:400;line-height:1.5;}
+
+.splash-actions{
+  padding:24px 24px 48px;
+  display:flex;flex-direction:column;gap:12px;
+}
+
+/* Bottone primario grande */
+.btn-splash-primary{
+  display:flex;align-items:center;
+  padding:0 24px;height:60px;
   background:#E8631A;color:#fff;
-  border:none;border-radius:16px;
-  font-size:17px;font-weight:700;
-  cursor:pointer;margin-bottom:12px;
-  font-family:inherit;
-  transition:opacity 0.2s, transform 0.15s;
+  border:none;border-radius:18px;
+  font-size:17px;font-weight:700;font-family:inherit;
+  cursor:pointer;text-align:left;gap:16px;
+  box-shadow:0 4px 20px rgba(232,99,26,0.3);
+  transition:transform 0.15s, box-shadow 0.15s;
 }
-.btn-main:active{opacity:0.85;transform:scale(0.98);}
-.btn-sec{
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  width:100%;padding:16px;
-  background:#fff;color:#1D1D1F;
-  border:1.5px solid #E5E5EA;border-radius:16px;
-  font-size:16px;font-weight:600;
-  cursor:pointer;margin-bottom:12px;
-  font-family:inherit;
+.btn-splash-primary:active{transform:scale(0.97);box-shadow:0 2px 10px rgba(232,99,26,0.2);}
+.btn-splash-primary .btn-icon{
+  width:38px;height:38px;
+  background:rgba(255,255,255,0.22);
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.btn-splash-primary .btn-text{flex:1;}
+.btn-splash-primary .btn-title{display:block;font-size:16px;font-weight:700;}
+.btn-splash-primary .btn-sub{display:block;font-size:12px;opacity:0.75;font-weight:500;margin-top:1px;}
+.btn-splash-primary .btn-arr{font-size:20px;opacity:0.6;}
+
+.btn-splash-secondary{
+  display:flex;align-items:center;
+  padding:0 24px;height:60px;
+  background:#fff;color:#1C1C1E;
+  border:1.5px solid #E5E5EA;border-radius:18px;
+  font-size:17px;font-weight:600;font-family:inherit;
+  cursor:pointer;text-align:left;gap:16px;
+  box-shadow:0 2px 12px rgba(0,0,0,0.06);
+  transition:transform 0.15s;
+}
+.btn-splash-secondary:active{transform:scale(0.97);}
+.btn-splash-secondary .btn-icon{
+  width:38px;height:38px;
+  background:#F2F2F7;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.btn-splash-secondary .btn-text{flex:1;}
+.btn-splash-secondary .btn-title{display:block;font-size:15px;font-weight:700;}
+.btn-splash-secondary .btn-sub{display:block;font-size:12px;color:#8E8E93;font-weight:500;margin-top:1px;}
+.btn-splash-secondary .btn-arr{font-size:20px;color:#C7C7CC;}
+
+.splash-footer{
+  text-align:center;font-size:12px;color:#C7C7CC;
+  padding:0 24px 24px;line-height:1.6;
 }
 
-/* Form */
-.form-card{background:#fff;border-radius:24px;padding:24px;box-shadow:0 2px 20px rgba(0,0,0,0.06);margin-bottom:16px;}
-.form-title{font-size:24px;font-weight:800;color:#1D1D1F;margin-bottom:6px;}
-.form-sub{font-size:14px;color:#8E8E93;margin-bottom:24px;}
-label{display:block;font-size:12px;font-weight:600;color:#8E8E93;margin-bottom:5px;letter-spacing:.02em;text-transform:uppercase;}
-input[type=text],input[type=email],input[type=password],input[type=tel],select{
-  width:100%;padding:14px 15px;
-  border-radius:12px;border:1.5px solid #E5E5EA;
-  font-size:15px;color:#1D1D1F;background:#F8F8FA;
-  margin-bottom:14px;outline:none;font-family:inherit;
+/* ══════════════════════════════════════
+   LOGIN SOCI
+══════════════════════════════════════ */
+#pg-login{background:#F2F2F7;}
+
+.login-header{
+  background:#fff;
+  padding:20px 24px 0;
+  border-bottom:1px solid #F2F2F7;
+}
+.login-header-top{
+  display:flex;align-items:center;gap:14px;
+  padding-bottom:20px;
+  border-bottom:1px solid #F2F2F7;
+}
+.login-header-top img{height:40px;}
+.login-header-top .lh-divider{width:1px;height:32px;background:#E5E5EA;}
+.login-header-top .lh-text .lh-city{
+  font-size:10px;font-weight:700;color:#E8631A;letter-spacing:.1em;text-transform:uppercase;
+}
+.login-header-top .lh-text .lh-name{font-size:15px;font-weight:700;color:#1C1C1E;}
+
+/* Tabs stile iOS segmented */
+.seg-tabs{
+  display:flex;gap:4px;
+  background:#F2F2F7;
+  border-radius:12px;padding:3px;
+  margin:20px 24px 0;
+}
+.seg-tab{
+  flex:1;padding:8px;
+  border:none;border-radius:9px;background:transparent;
+  font-size:14px;font-weight:600;color:#8E8E93;
+  cursor:pointer;font-family:inherit;
+  transition:all 0.2s;
+}
+.seg-tab.on{
+  background:#fff;color:#1C1C1E;
+  box-shadow:0 1px 4px rgba(0,0,0,0.1);
+}
+
+.login-body{padding:20px 24px 40px;}
+
+.login-card{
+  background:#fff;
+  border-radius:20px;
+  padding:22px;
+  box-shadow:0 2px 16px rgba(0,0,0,0.06);
+}
+
+.fc-label{
+  display:block;font-size:11px;font-weight:700;
+  color:#8E8E93;text-transform:uppercase;letter-spacing:.04em;
+  margin-bottom:6px;margin-top:16px;
+}
+.fc-label:first-child{margin-top:0;}
+
+.fc-inp{
+  width:100%;padding:14px 16px;
+  border-radius:13px;border:1.5px solid #E5E5EA;
+  font-size:15px;color:#1C1C1E;background:#F8F8FA;
+  outline:none;font-family:inherit;
   transition:border-color 0.2s, background 0.2s;
 }
-input:focus,select:focus{border-color:#E8631A;background:#fff;}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-.err{background:#FFF0F0;border-radius:12px;padding:12px 15px;font-size:13px;color:#C0392B;font-weight:600;margin-bottom:12px;display:none;}
-.infog{background:#EBF9F1;border-radius:12px;padding:12px 15px;font-size:13px;color:#1A7A4A;font-weight:600;margin-bottom:12px;display:none;}
-.cr{display:flex;align-items:center;gap:10px;margin-bottom:16px;cursor:pointer;}
-.cb-box{width:22px;height:22px;border-radius:7px;border:1.5px solid #E5E5EA;background:#F8F8FA;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
-.footer-txt{text-align:center;font-size:12px;color:#8E8E93;margin-top:16px;}
-.footer-txt a{color:#E8631A;text-decoration:none;font-weight:600;}
-
-/* Password eye */
+.fc-inp:focus{border-color:#E8631A;background:#fff;}
 .pwd-wrap{position:relative;}
-.pwd-wrap input{padding-right:48px;}
-.pwd-eye{position:absolute;right:14px;top:50%;transform:translateY(-60%);background:none;border:none;cursor:pointer;font-size:18px;color:#8E8E93;}
+.pwd-wrap .fc-inp{padding-right:48px;}
+.pwd-eye{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;
+  font-size:18px;color:#8E8E93;padding:4px;
+}
 
-/* Admin login header */
-.admin-hdr{background:#fff;text-align:center;padding:36px 28px 24px;border-radius:0 0 32px 32px;margin-bottom:24px;box-shadow:0 4px 24px rgba(0,0,0,0.06);}
-.admin-hdr img{width:70%;max-width:240px;margin-bottom:16px;}
-.admin-hdr h1{font-size:22px;font-weight:800;color:#1D1D1F;}
-.admin-hdr p{font-size:14px;color:#8E8E93;margin-top:4px;}
-.admin-info{background:#F2F2F7;border-radius:14px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;font-size:13px;color:#1D1D1F;font-weight:500;}
+.fc-err{
+  background:#FFF0F0;border-radius:11px;
+  padding:11px 14px;font-size:13px;color:#C0392B;font-weight:600;
+  margin-top:12px;display:none;
+}
+.fc-ok{
+  background:#ECFDF5;border-radius:11px;
+  padding:11px 14px;font-size:13px;color:#16A34A;font-weight:600;
+  margin-top:12px;display:none;
+}
+
+.fc-check{
+  display:flex;align-items:center;gap:10px;
+  margin-top:16px;cursor:pointer;
+}
+.fc-check-box{
+  width:22px;height:22px;border-radius:7px;
+  border:1.5px solid #D1D1D6;background:#F8F8FA;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;flex-shrink:0;transition:all 0.15s;
+}
+.fc-check-box.on{background:#E8631A;border-color:#E8631A;color:#fff;}
+.fc-check span{font-size:13px;color:#1C1C1E;font-weight:500;}
+
+/* Bottoni form */
+.btn-primary{
+  width:100%;height:52px;margin-top:20px;
+  background:#E8631A;color:#fff;border:none;border-radius:14px;
+  font-size:16px;font-weight:700;font-family:inherit;
+  cursor:pointer;
+  box-shadow:0 4px 16px rgba(232,99,26,0.25);
+  transition:opacity 0.2s, transform 0.15s;
+}
+.btn-primary:active{opacity:0.85;transform:scale(0.98);}
+
+.btn-secondary{
+  width:100%;height:50px;margin-top:10px;
+  background:transparent;color:#1C1C1E;
+  border:1.5px solid #E5E5EA;border-radius:14px;
+  font-size:15px;font-weight:600;font-family:inherit;
+  cursor:pointer;transition:background 0.15s;
+}
+.btn-secondary:active{background:#F2F2F7;}
+
+.btn-link{
+  width:100%;height:44px;margin-top:4px;
+  background:none;border:none;
+  font-size:14px;font-weight:600;color:#E8631A;
+  cursor:pointer;font-family:inherit;
+}
+
+.form-divider{
+  text-align:center;font-size:12px;color:#C7C7CC;
+  margin-top:12px;
+}
+.form-divider a{color:#E8631A;text-decoration:none;font-weight:600;}
+
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.g2 .fc-label:first-child{margin-top:0;}
+
+/* ══════════════════════════════════════
+   RECUPERO PASSWORD
+══════════════════════════════════════ */
+#pg-forgot{background:#F2F2F7;}
+.back-header{
+  background:#fff;
+  padding:14px 20px;
+  display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid #F2F2F7;
+}
+.back-btn{
+  width:32px;height:32px;background:#F2F2F7;
+  border:none;border-radius:10px;
+  font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:#1C1C1E;
+}
+.back-header h2{font-size:17px;font-weight:700;color:#1C1C1E;}
+.forgot-body{padding:20px 24px 40px;}
+.info-card{
+  background:#EBF2FB;border-radius:13px;
+  padding:13px 16px;font-size:13px;color:#1A5FA8;
+  font-weight:500;margin-bottom:20px;line-height:1.5;
+}
+.code-inp{
+  width:100%;height:56px;
+  border-radius:13px;border:2px solid #E5E5EA;
+  font-size:24px;font-weight:700;text-align:center;
+  letter-spacing:.4em;color:#1C1C1E;background:#fff;
+  outline:none;font-family:inherit;
+  transition:border-color 0.2s;
+}
+.code-inp:focus{border-color:#E8631A;}
+
+/* ══════════════════════════════════════
+   ADMIN LOGIN
+══════════════════════════════════════ */
+#pg-admin-login{
+  background:linear-gradient(160deg,#0A1628 0%, #1A2A4A 100%);
+  min-height:100vh;display:flex;flex-direction:column;
+}
+.admin-splash{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:60px 32px 32px;text-align:center;
+}
+.admin-splash img{width:140px;margin-bottom:24px;}
+.admin-splash .adm-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:20px;padding:6px 14px;
+  font-size:12px;font-weight:700;color:rgba(255,255,255,0.8);
+  letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;
+}
+.admin-splash h1{font-size:26px;font-weight:800;color:#fff;margin-bottom:6px;}
+.admin-splash p{font-size:14px;color:rgba(255,255,255,0.5);}
+
+.admin-form-panel{
+  background:#fff;
+  border-radius:28px 28px 0 0;
+  padding:28px 24px 48px;
+}
+.admin-info-bar{
+  background:#F2F2F7;border-radius:12px;
+  padding:12px 16px;margin-bottom:20px;
+  display:flex;align-items:center;gap:10px;
+  font-size:13px;color:#1C1C1E;font-weight:500;
+}
+.admin-info-bar span{font-size:18px;}
+
 </style>
 </head>
 <body>
 
-<div class="wrap">
-
 <!-- SCELTA -->
 <div id="pg-scelta" class="page on">
-  <div class="splash">
+  <div class="splash-hero">
     <img src="LOGO-NAZIONALE.png" alt="ASPPI"/>
     <div class="splash-city">L'Aquila</div>
-    <div class="splash-sub">Portale riservato ai soci</div>
+    <div class="splash-claim">Il tuo portale<br>ASPPI</div>
+    <div class="splash-sub">Gestisci immobili, contratti<br>e appuntamenti in un click</div>
   </div>
-  <div class="body" style="display:flex;flex-direction:column;align-items:center;">
-    <button class="bp" style="max-width:280px;margin-bottom:10px" onclick="mostra('pg-login')">📱 Accesso Soci</button>
-    <button class="bs" style="max-width:280px" onclick="mostra('pg-admin-login')">🔧 Admin — Simeoni</button>
-    <p style="font-size:11px;color:#8A8A8A;margin-top:20px;text-align:center;max-width:260px;line-height:1.6">
-      Portale riservato ai soci ASPPI L'Aquila<br>
-      C.so Vittorio Emanuele 9 · +39 392 519 1490
-    </p>
+  <div class="splash-actions">
+    <button class="btn-splash-primary" onclick="mostra('pg-login')">
+      <div class="btn-icon">📱</div>
+      <div class="btn-text">
+        <span class="btn-title">Accesso Soci</span>
+        <span class="btn-sub">Immobili, contratti e prenotazioni</span>
+      </div>
+      <span class="btn-arr">›</span>
+    </button>
+    <button class="btn-splash-secondary" onclick="mostra('pg-admin-login')">
+      <div class="btn-icon">🔧</div>
+      <div class="btn-text">
+        <span class="btn-title">Admin — Simeoni</span>
+        <span class="btn-sub">Pannello amministratore</span>
+      </div>
+      <span class="btn-arr">›</span>
+    </button>
+  </div>
+  <div class="splash-footer">
+    Portale riservato ai soci ASPPI L'Aquila<br>
+    C.so Vittorio Emanuele 9 · +39 392 519 1490
   </div>
 </div>
 
 <!-- LOGIN SOCI -->
 <div id="pg-login" class="page">
-  <div class="hdr" style="background:#fff;border-bottom:2px solid #1A3A8F;padding:16px 28px;text-align:center">
-    <img src="LOGO-NAZIONALE.png" alt="ASPPI" style="height:50px;margin-bottom:8px"/>
-    <h1 style="color:#1A1A1A;font-size:18px">Portale Soci</h1>
-    <p style="color:#8A8A8A">Accedi al tuo account</p>
-  </div>
-  <div class="body">
-    <div class="tabs">
-      <button class="tab on" id="tab-acc" onclick="switchTab('acc')">Accedi</button>
-      <button class="tab" id="tab-reg" onclick="switchTab('reg')">Registrati</button>
+  <div class="login-header">
+    <div class="login-header-top">
+      <img src="LOGO-NAZIONALE.png" alt="ASPPI"/>
+      <div class="lh-divider"></div>
+      <div class="lh-text">
+        <div class="lh-city">L'Aquila</div>
+        <div class="lh-name">Portale Soci</div>
+      </div>
     </div>
+    <div class="seg-tabs" style="margin-bottom:0;padding-bottom:0">
+      <button class="seg-tab on" id="tab-acc" onclick="switchTab('acc')">Accedi</button>
+      <button class="seg-tab" id="tab-reg" onclick="switchTab('reg')">Registrati</button>
+    </div>
+  </div>
+
+  <div class="login-body">
 
     <!-- ACCEDI -->
-    <div id="form-acc">
-      <label>Email</label>
-      <input type="email" id="acc-email" placeholder="mario.rossi@email.com"/>
-      <label>Password</label>
-      <div style="position:relative">
-        <input type="password" id="acc-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" style="padding-right:44px"/>
-        <button type="button" onclick="togglePwd('acc-pwd','eye-acc')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:#8A8A8A" id="eye-acc">&#128065;</button>
+    <div id="form-acc" class="login-card">
+      <div style="font-size:22px;font-weight:800;color:#1C1C1E;margin-bottom:4px">Bentornato</div>
+      <div style="font-size:14px;color:#8E8E93;margin-bottom:20px">Accedi al tuo account ASPPI</div>
+
+      <span class="fc-label">Email</span>
+      <input type="email" class="fc-inp" id="acc-email" placeholder="mario.rossi@email.com"/>
+
+      <span class="fc-label">Password</span>
+      <div class="pwd-wrap">
+        <input type="password" class="fc-inp" id="acc-pwd" placeholder="••••••••"
+          onkeydown="if(event.key==='Enter')doLogin()"/>
+        <button type="button" class="pwd-eye" onclick="togglePwd('acc-pwd','eye-acc')" id="eye-acc">👁</button>
       </div>
-      <div class="err" id="acc-err"></div>
-      <div class="cr" onclick="toggleRem('rem-acc')">
-        <div class="cb" id="rem-acc-box"></div>
-        <span style="font-size:13px;color:#1A1A1A">Ricorda email e password</span>
+
+      <div class="fc-err" id="acc-err"></div>
+
+      <div class="fc-check" onclick="toggleRem('rem-acc')">
+        <div class="fc-check-box" id="rem-acc-box"></div>
+        <span>Ricorda email e password</span>
       </div>
-      <button class="bp" onclick="doLogin()" id="acc-btn">Accedi</button>
-      <button class="bl" onclick="mostra('pg-forgot')">Password dimenticata?</button>
-      <button class="bs" onclick="mostra('pg-scelta')">← Indietro</button>
+
+      <button class="btn-primary" onclick="doLogin()" id="acc-btn">Accedi</button>
+      <button class="btn-link" onclick="mostra('pg-forgot')">Password dimenticata?</button>
+      <button class="btn-secondary" onclick="mostra('pg-scelta')">← Indietro</button>
     </div>
 
     <!-- REGISTRATI -->
-    <div id="form-reg" style="display:none">
-      <label>Nome *</label><input type="text" id="reg-nome" placeholder="MARIO"/>
-      <label>Cognome *</label><input type="text" id="reg-cog" placeholder="ROSSI"/>
-      <label>Nome visualizzato / Ragione sociale *</label>
-      <input type="text" id="reg-display" placeholder="es. Agenzia Rossi Immobiliare oppure Mario Rossi"/>
-      <div style="font-size:11px;color:#8A8A8A;margin-top:-8px;margin-bottom:8px">Questo è il nome che vedrà l'amministratore nelle liste</div>
-      <label>Codice Fiscale *</label><input type="text" id="reg-cf" placeholder="RSSMRA70A01G878X" style="font-family:monospace;text-transform:uppercase" maxlength="16"/>
-      <label>Data di nascita *</label><input type="text" id="reg-dtn" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDateReg(this)"/>
-      <label>Luogo di nascita *</label><input type="text" id="reg-lng" placeholder="L'AQUILA"/>
-      <label>Comune di residenza *</label><input type="text" id="reg-res" placeholder="L'AQUILA"/>
-      <label>Via e n. civico *</label><input type="text" id="reg-via" placeholder="VIA ROMA 1"/>
-      <label>Telefono *</label><input type="text" id="reg-tel" placeholder="+39 333 000 0000"/>
-      <label>Email *</label><input type="email" id="reg-email" placeholder="mario.rossi@email.com"/>
-      <label>Password * (min. 8 caratteri)</label>
-      <div style="position:relative">
-        <input type="password" id="reg-pwd" placeholder="••••••••" style="padding-right:44px"/>
-        <button type="button" onclick="togglePwd('reg-pwd','eye-reg')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:#8A8A8A" id="eye-reg">&#128065;</button>
+    <div id="form-reg" class="login-card" style="display:none">
+      <div style="font-size:22px;font-weight:800;color:#1C1C1E;margin-bottom:4px">Crea account</div>
+      <div style="font-size:14px;color:#8E8E93;margin-bottom:20px">Registrati come socio ASPPI</div>
+
+      <div class="g2">
+        <div>
+          <span class="fc-label">Nome *</span>
+          <input type="text" class="fc-inp" id="reg-nome" placeholder="MARIO"/>
+        </div>
+        <div>
+          <span class="fc-label">Cognome *</span>
+          <input type="text" class="fc-inp" id="reg-cog" placeholder="ROSSI"/>
+        </div>
       </div>
-      <div class="err" id="reg-err"></div>
-      <div class="cr" onclick="toggleRem('rem-reg')">
-        <div class="cb" id="rem-reg-box"></div>
-        <span style="font-size:13px;color:#1A1A1A">Ricorda email e password</span>
+
+      <span class="fc-label">Nome visualizzato / Ragione sociale *</span>
+      <input type="text" class="fc-inp" id="reg-display" placeholder="es. Agenzia Rossi oppure Mario Rossi"/>
+      <div style="font-size:11px;color:#8E8E93;margin-top:-4px;margin-bottom:12px;line-height:1.5">Questo è il nome visibile nell'amministrazione</div>
+
+      <span class="fc-label">Codice Fiscale *</span>
+      <input type="text" class="fc-inp" id="reg-cf" placeholder="RSSMRA70A01G878X"
+        style="font-family:monospace;text-transform:uppercase" maxlength="16"/>
+
+      <div class="g2">
+        <div>
+          <span class="fc-label">Data di nascita *</span>
+          <input type="text" class="fc-inp" id="reg-dtn" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDateReg(this)"/>
+        </div>
+        <div>
+          <span class="fc-label">Luogo di nascita *</span>
+          <input type="text" class="fc-inp" id="reg-lng" placeholder="L'AQUILA"/>
+        </div>
       </div>
-      <button class="bp" onclick="doRegister()">Crea account</button>
-      <button class="bs" onclick="mostra('pg-scelta')">← Indietro</button>
+
+      <span class="fc-label">Comune di residenza *</span>
+      <input type="text" class="fc-inp" id="reg-res" placeholder="L'AQUILA"/>
+
+      <span class="fc-label">Via e n. civico *</span>
+      <input type="text" class="fc-inp" id="reg-via" placeholder="VIA ROMA 1"/>
+
+      <span class="fc-label">Telefono *</span>
+      <input type="text" class="fc-inp" id="reg-tel" placeholder="+39 333 000 0000"/>
+
+      <span class="fc-label">Email *</span>
+      <input type="email" class="fc-inp" id="reg-email" placeholder="mario.rossi@email.com"/>
+
+      <span class="fc-label">Password * (min. 8 caratteri)</span>
+      <div class="pwd-wrap">
+        <input type="password" class="fc-inp" id="reg-pwd" placeholder="••••••••"/>
+        <button type="button" class="pwd-eye" onclick="togglePwd('reg-pwd','eye-reg')" id="eye-reg">👁</button>
+      </div>
+
+      <div class="fc-err" id="reg-err"></div>
+
+      <div class="fc-check" onclick="toggleRem('rem-reg')">
+        <div class="fc-check-box" id="rem-reg-box"></div>
+        <span>Ricorda email e password</span>
+      </div>
+
+      <button class="btn-primary" onclick="doRegister()">Crea account</button>
+      <button class="btn-secondary" onclick="mostra('pg-scelta')">← Indietro</button>
     </div>
+
   </div>
 </div>
 
 <!-- RECUPERO PASSWORD -->
 <div id="pg-forgot" class="page">
-  <div class="hdr">
-    <div class="hdr-lbl">ASPPI L'Aquila</div>
-    <h1>Recupero password</h1>
+  <div class="back-header">
+    <button class="back-btn" onclick="mostra('pg-login')">←</button>
+    <h2>Recupero password</h2>
   </div>
-  <div class="body">
+  <div class="forgot-body">
+
     <div id="fp-s1">
-      <div class="info-box">📧 Inserisci la tua email. Ti invieremo un codice di 6 cifre.</div>
-      <label>La tua email</label>
-      <input type="email" id="fp-email" placeholder="mario.rossi@email.com"/>
-      <div class="err" id="fp-err1"></div>
-      <button class="bp" onclick="fpStep1()">Invia codice via email</button>
-      <button class="bs" onclick="mostra('pg-login')">← Torna al login</button>
+      <div class="info-card">📧 Inserisci la tua email. Ti invieremo un codice di verifica a 6 cifre.</div>
+      <div class="login-card">
+        <span class="fc-label">La tua email</span>
+        <input type="email" class="fc-inp" id="fp-email" placeholder="mario.rossi@email.com"/>
+        <div class="fc-err" id="fp-err1"></div>
+        <button class="btn-primary" onclick="fpStep1()">Invia codice</button>
+      </div>
     </div>
+
     <div id="fp-s2" style="display:none">
-      <div style="background:#EBF5F0;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#2D7A4F" id="fp-sent"></div>
-      <label>Codice di verifica (6 cifre)</label>
-      <input type="text" class="code-inp" id="fp-code" placeholder="000000" maxlength="6"/>
-      <div class="err" id="fp-err2"></div>
-      <button class="bp" onclick="fpStep2()">Verifica codice</button>
-      <button class="bs" onclick="fpReset()">← Cambia email</button>
+      <div class="fc-ok" id="fp-sent" style="display:block;margin-bottom:20px"></div>
+      <div class="login-card">
+        <span class="fc-label">Codice di verifica (6 cifre)</span>
+        <input type="text" class="code-inp" id="fp-code" placeholder="000000" maxlength="6"/>
+        <div class="fc-err" id="fp-err2"></div>
+        <button class="btn-primary" onclick="fpStep2()">Verifica codice</button>
+        <button class="btn-secondary" onclick="fpReset()">← Cambia email</button>
+      </div>
     </div>
+
     <div id="fp-s3" style="display:none">
-      <div class="info-box">🔑 Codice verificato! Scegli una nuova password.</div>
-      <label>Nuova password (min. 8 caratteri)</label>
-      <input type="password" id="fp-p1" placeholder="••••••••"/>
-      <label>Conferma nuova password</label>
-      <input type="password" id="fp-p2" placeholder="••••••••"/>
-      <div class="err" id="fp-err3"></div>
-      <button class="bp" onclick="fpStep3()">Salva nuova password</button>
+      <div class="info-card">🔑 Codice verificato! Scegli una nuova password.</div>
+      <div class="login-card">
+        <span class="fc-label">Nuova password (min. 8 caratteri)</span>
+        <input type="password" class="fc-inp" id="fp-p1" placeholder="••••••••"/>
+        <span class="fc-label">Conferma nuova password</span>
+        <input type="password" class="fc-inp" id="fp-p2" placeholder="••••••••"/>
+        <div class="fc-err" id="fp-err3"></div>
+        <button class="btn-primary" onclick="fpStep3()">Salva nuova password</button>
+      </div>
     </div>
-    <div id="fp-s4" style="display:none" class="center">
-      <div class="emoji">✅</div>
-      <h2 style="font-size:20px;font-weight:800;color:#1A1A1A;margin-bottom:8px">Password aggiornata!</h2>
-      <p style="font-size:13px;color:#8A8A8A;margin-bottom:24px">Ora puoi accedere con la nuova password.</p>
-      <button class="bp" style="max-width:200px;margin:0 auto" onclick="mostra('pg-login')">Vai al login</button>
+
+    <div id="fp-s4" style="display:none;text-align:center;padding:40px 0">
+      <div style="font-size:64px;margin-bottom:16px">✅</div>
+      <div style="font-size:22px;font-weight:800;color:#1C1C1E;margin-bottom:8px">Password aggiornata!</div>
+      <div style="font-size:14px;color:#8E8E93;margin-bottom:28px">Ora puoi accedere con la nuova password.</div>
+      <button class="btn-primary" style="max-width:200px;margin:0 auto;display:block" onclick="mostra('pg-login')">Vai al login</button>
     </div>
+
   </div>
 </div>
 
 <!-- ADMIN LOGIN -->
 <div id="pg-admin-login" class="page">
-  <div class="admin-hdr">
+  <div class="admin-splash">
     <img src="LOGO-NAZIONALE.png" alt="ASPPI"/>
-    <h1>Accesso riservato</h1>
+    <div class="adm-badge">🔒 Accesso riservato</div>
+    <h1>Pannello Admin</h1>
     <p>Solo personale autorizzato</p>
   </div>
-  <div class="body">
-    <div class="info-blue">🔒 Pannello riservato a Simeoni Maurizio</div>
-    <label>Password amministratore</label>
-    <div style="position:relative">
-      <input type="password" id="adm-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()" style="padding-right:44px"/>
-      <button type="button" onclick="togglePwd('adm-pwd','eye-adm')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:#8A8A8A" id="eye-adm">&#128065;</button>
+  <div class="admin-form-panel">
+    <div class="admin-info-bar">
+      <span>🛡️</span>
+      Riservato a Simeoni Maurizio
     </div>
-    <div class="err" id="adm-err"></div>
-    <div class="cr" onclick="toggleRem('rem-adm')">
-      <div class="cb" id="rem-adm-box"></div>
-      <span style="font-size:13px;color:#1A1A1A">Ricorda password su questo dispositivo</span>
+    <span class="fc-label">Password amministratore</span>
+    <div class="pwd-wrap">
+      <input type="password" class="fc-inp" id="adm-pwd" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+      <button type="button" class="pwd-eye" onclick="togglePwd('adm-pwd','eye-adm')" id="eye-adm">👁</button>
     </div>
-    <button class="bp nv" onclick="doAdminLogin()">Accedi al pannello</button>
-    <button class="bs" onclick="mostra('pg-scelta')">← Indietro</button>
-    <p style="font-size:11px;color:#8A8A8A;text-align:center;margin-top:20px">
+    <div class="fc-err" id="adm-err"></div>
+    <div class="fc-check" onclick="toggleRem('rem-adm')">
+      <div class="fc-check-box" id="rem-adm-box"></div>
+      <span>Ricorda password su questo dispositivo</span>
+    </div>
+    <button class="btn-primary" onclick="doAdminLogin()">Accedi al pannello</button>
+    <button class="btn-secondary" onclick="mostra('pg-scelta')">← Indietro</button>
+    <div style="text-align:center;font-size:12px;color:#8E8E93;margin-top:16px">
       centroserviziasppiaq@asppi.it
-    </p>
+    </div>
   </div>
 </div>
-
-</div><!-- end wrap -->
 
 <script>
 const API = "https://rough-resonance-cba6.asppilaquila.workers.dev";
 const ADM_PWD_DEFAULT = "Asppi2025!";
 
-// ── INIT: pulisci SEMPRE sessione all'avvio ──────────────────
 (function(){
-  // Cancella qualsiasi sessione esistente - login sempre obbligatorio
   localStorage.removeItem('asppi_session');
   localStorage.removeItem('asppi_admin_ok');
-
-  // Pre-compila solo se "Ricordami" era attivo
   try {
     const rem = JSON.parse(localStorage.getItem('asppi_remember')||'null');
     if(rem && rem.email) {
@@ -248,7 +561,6 @@ const ADM_PWD_DEFAULT = "Asppi2025!";
       setCheck('rem-acc', true);
     }
   } catch(e){}
-
   try {
     const admPwd = localStorage.getItem('asppi_admin_pwd');
     if(admPwd) {
@@ -256,8 +568,6 @@ const ADM_PWD_DEFAULT = "Asppi2025!";
       setCheck('rem-adm', true);
     }
   } catch(e){}
-
-  // Cancella service worker vecchi
   if('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(function(regs){
       regs.forEach(function(r){ r.unregister(); });
@@ -268,19 +578,13 @@ const ADM_PWD_DEFAULT = "Asppi2025!";
   }
 })();
 
-// ── NAVIGATION ───────────────────────────────────────────────
 function togglePwd(inputId, btnId) {
-    var inp = document.getElementById(inputId);
-    var btn = document.getElementById(btnId);
-    if (!inp) return;
-    if (inp.type === 'password') {
-      inp.type = 'text';
-      if (btn) btn.innerHTML = '&#128064;';
-    } else {
-      inp.type = 'password';
-      if (btn) btn.innerHTML = '&#128065;';
-    }
-  }
+  var inp = document.getElementById(inputId);
+  var btn = document.getElementById(btnId);
+  if (!inp) return;
+  if (inp.type === 'password') { inp.type = 'text'; if (btn) btn.innerHTML = '🫣'; }
+  else { inp.type = 'password'; if (btn) btn.innerHTML = '👁'; }
+}
 
 function mostra(id) {
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('on'); });
@@ -291,25 +595,20 @@ function mostra(id) {
 function switchTab(t) {
   document.getElementById('form-acc').style.display = t==='acc' ? '' : 'none';
   document.getElementById('form-reg').style.display = t==='reg' ? '' : 'none';
-  document.getElementById('tab-acc').className = 'tab' + (t==='acc'?' on':'');
-  document.getElementById('tab-reg').className = 'tab' + (t==='reg'?' on':'');
+  document.getElementById('tab-acc').className = 'seg-tab' + (t==='acc'?' on':'');
+  document.getElementById('tab-reg').className = 'seg-tab' + (t==='reg'?' on':'');
 }
 
-// ── CHECKBOX ─────────────────────────────────────────────────
 var checks = {};
-function toggleRem(id) {
-  checks[id] = !checks[id];
-  setCheck(id, checks[id]);
-}
+function toggleRem(id) { checks[id] = !checks[id]; setCheck(id, checks[id]); }
 function setCheck(id, val) {
   checks[id] = val;
   var box = document.getElementById(id+'-box');
   if(!box) return;
-  box.className = 'cb' + (val?' on':'');
+  box.className = 'fc-check-box' + (val?' on':'');
   box.textContent = val ? '✓' : '';
 }
 
-// ── ERROR ────────────────────────────────────────────────────
 function showErr(id, msg) {
   var el = document.getElementById(id);
   if(!el) return;
@@ -317,7 +616,6 @@ function showErr(id, msg) {
   el.style.display = msg ? '' : 'none';
 }
 
-// ── API ───────────────────────────────────────────────────────
 async function api(action, data) {
   try {
     var res = await fetch(API, {
@@ -334,7 +632,6 @@ async function api(action, data) {
   }
 }
 
-// ── LOGIN ────────────────────────────────────────────────────
 async function doLogin() {
   var email = document.getElementById('acc-email').value.trim();
   var pwd   = document.getElementById('acc-pwd').value;
@@ -353,22 +650,10 @@ async function doLogin() {
     localStorage.setItem('asppi_session', JSON.stringify({token:res.token, user:res}));
     window.location.href = 'socio.html';
   } else {
-    var errEl = document.getElementById('acc-err');
-    var msg = res.error || 'Credenziali non valide';
-    if (errEl) {
-      errEl.textContent = msg;
-      errEl.style.display = 'block';
-      errEl.style.background = '#FDEEEC';
-      errEl.style.color = '#C0392B';
-      errEl.style.padding = '10px 14px';
-      errEl.style.borderRadius = '10px';
-      errEl.style.marginBottom = '12px';
-      errEl.style.fontSize = '13px';
-    }
+    showErr('acc-err', res.error || 'Credenziali non valide');
   }
 }
 
-// ── REGISTER ─────────────────────────────────────────────────
 async function doRegister() {
   var nome    = (document.getElementById('reg-nome')   ||{}).value||'';
   var cog     = (document.getElementById('reg-cog')    ||{}).value||'';
@@ -383,8 +668,7 @@ async function doRegister() {
   var pwd     = (document.getElementById('reg-pwd')    ||{}).value||'';
   showErr('reg-err', '');
   if(!nome || !cog || !display || !email || !pwd) {
-    showErr('reg-err', 'Compila tutti i campi obbligatori');
-    return;
+    showErr('reg-err', 'Compila tutti i campi obbligatori'); return;
   }
   if(pwd.length < 8) { showErr('reg-err', 'La password deve essere di almeno 8 caratteri'); return; }
   var r = await api('register', {
@@ -404,27 +688,10 @@ async function doRegister() {
   }
 }
 
-// ── ADMIN LOGIN ───────────────────────────────────────────────
 function doAdminLogin() {
   var pwd = document.getElementById('adm-pwd').value;
-  var errEl = document.getElementById('adm-err');
-  
-  function mostraErrAdmin(msg) {
-    if (!errEl) return;
-    errEl.textContent = msg;
-    errEl.style.display = 'block';
-    errEl.style.background = '#FDEEEC';
-    errEl.style.color = '#C0392B';
-    errEl.style.padding = '10px 14px';
-    errEl.style.borderRadius = '10px';
-    errEl.style.marginBottom = '12px';
-    errEl.style.fontSize = '13px';
-  }
-
-  if (errEl) errEl.style.display = 'none';
-  
-  if (!pwd) { mostraErrAdmin('Inserisci la password amministratore'); return; }
-  
+  showErr('adm-err', '');
+  if (!pwd) { showErr('adm-err', 'Inserisci la password amministratore'); return; }
   var cur = localStorage.getItem('asppi_admin_custom_pwd') || ADM_PWD_DEFAULT;
   if(pwd === cur) {
     if(checks['rem-adm']) {
@@ -435,11 +702,10 @@ function doAdminLogin() {
     localStorage.setItem('asppi_admin_ok', 'yes');
     window.location.href = 'admin.html';
   } else {
-    mostraErrAdmin('Password non corretta. Riprova.');
+    showErr('adm-err', 'Password non corretta. Riprova.');
   }
 }
 
-// ── RECUPERO PASSWORD ─────────────────────────────────────────
 var fpCode = null, fpEmail = null;
 
 function fpReset() {
@@ -456,7 +722,9 @@ async function fpStep1() {
   var res = await api('requestPasswordReset', {email:email});
   if(res.ok) {
     fpCode = res.codice; fpEmail = email;
-    document.getElementById('fp-sent').textContent = '✅ Codice inviato a ' + email + '. Controlla anche lo spam.';
+    var el = document.getElementById('fp-sent');
+    el.textContent = '✅ Codice inviato a ' + email + '. Controlla anche lo spam.';
+    el.style.display = '';
     document.getElementById('fp-s1').style.display = 'none';
     document.getElementById('fp-s2').style.display = '';
   } else {
