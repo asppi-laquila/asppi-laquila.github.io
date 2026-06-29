@@ -349,6 +349,30 @@ body{
       <span class="btn-arr">›</span>
     </button>
   </div>
+  <!-- PULSANTE INSTALLA APP -->
+  <div id="install-wrap" style="padding:0 24px 8px;display:none">
+    <button id="btn-install"
+      style="width:100%;padding:16px;background:#0A1628;color:#fff;border:none;
+             border-radius:18px;font-size:15px;font-weight:700;cursor:pointer;
+             font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;
+             box-shadow:0 4px 16px rgba(10,22,40,0.3)">
+      📲 Installa l'app sul telefono
+    </button>
+  </div>
+
+  <!-- ISTRUZIONI iOS (solo iPhone) -->
+  <div id="ios-wrap" style="padding:0 24px 8px;display:none">
+    <div style="background:#0A1628;border-radius:18px;padding:16px 18px;color:#fff">
+      <div style="font-size:13px;font-weight:800;margin-bottom:10px">📲 Installa l'app — iPhone</div>
+      <div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.9">
+        1️⃣ Tocca <strong style="color:#fff">⬆️ Condividi</strong> in basso a Safari<br>
+        2️⃣ Scorri e tocca <strong style="color:#fff">"Aggiungi a schermata Home"</strong><br>
+        3️⃣ Tocca <strong style="color:#fff">Aggiungi</strong> in alto a destra<br>
+        <span style="color:rgba(255,255,255,.5);font-size:11px">L'icona ASPPI apparirà sul tuo telefono</span>
+      </div>
+    </div>
+  </div>
+
   <div class="splash-footer">
     Portale riservato ai soci ASPPI L'Aquila<br>
     C.so Vittorio Emanuele 9 · +39 392 519 1490
@@ -778,6 +802,48 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('/sw.js').catch(function(){});
   });
 }
+// ── PWA INSTALL BUTTON ─────────────────────────────────
+var deferredPrompt = null;
+
+// Android/Chrome: intercetta l'evento beforeinstallprompt
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Mostra il pulsante installa
+  var wrap = document.getElementById('install-wrap');
+  if (wrap) wrap.style.display = 'block';
+});
+
+// Click sul pulsante installa
+var btnInstall = document.getElementById('btn-install');
+if (btnInstall) {
+  btnInstall.addEventListener('click', function() {
+    if (deferredPrompt) {
+      // Android: mostra il prompt nativo
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(result) {
+        deferredPrompt = null;
+        var wrap = document.getElementById('install-wrap');
+        if (wrap) wrap.style.display = 'none';
+      });
+    }
+  });
+}
+
+// Dopo installazione rimuovi il pulsante
+window.addEventListener('appinstalled', function() {
+  var wrap = document.getElementById('install-wrap');
+  if (wrap) wrap.style.display = 'none';
+});
+
+// iOS: mostra istruzioni manuali se non è già installata
+var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+var isStandalone = window.navigator.standalone === true;
+if (isIOS && !isStandalone) {
+  var iosWrap = document.getElementById('ios-wrap');
+  if (iosWrap) iosWrap.style.display = 'block';
+}
+
 </script>
 </body>
 </html>
