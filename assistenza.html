@@ -823,7 +823,17 @@ function buildStep() {
       +'<div class="g2">'
       +'<div><span class="lbl">Camere</span><input type="text" class="inp" id="c3c" value="'+(ncntD.compCamere||'')+'"/></div>'
       +'<div><span class="lbl">Bagni</span><input type="text" class="inp" id="c3d" value="'+(ncntD.compBagni||'')+'"/></div>'
-      +'</div></div></div>'
+      +'</div>'
+      +'<span class="lbl">Elementi accessori (balconi, terrazzi...)</span>'
+      +'<input type="text" class="inp" id="c3x1" placeholder="es. balcone" value="'+(ncntD.elemAccessori||'')+'"/>'
+      +'<span class="lbl">Arredamento</span>'
+      +'<select class="inp" id="c3x2"><option value="si" '+(ncntD.ammobiliata==="si"?'selected':'')+'>Ammobiliata</option><option value="no" '+(ncntD.ammobiliata==="no"?'selected':'')+'>Non ammobiliata</option></select>'
+      +'<div class="g2"><div><span class="lbl">Tab. millesimali proprietà</span><input type="text" class="inp" id="c3x3" value="'+(ncntD.tabMillProp||'')+'"/></div>'
+      +'<div><span class="lbl">Riscaldamento</span><input type="text" class="inp" id="c3x4" value="'+(ncntD.tabMillRisc||'')+'"/></div></div>'
+      +'</div></div>'
+      +'<div class="card"><div class="cb"><div class="sec">STATO IMMOBILE</div>'
+      +'<textarea class="inp" id="c3x5" placeholder="es. buono stato locativo" style="min-height:70px">'+(ncntD.statoImmobile||'')+'</textarea>'
+      +'</div></div>'
       +'<div class="card"><div class="cb"><div class="sec">INTERO O PORZIONE</div>'
       +'<span class="lbl">Si affitta</span>'
       +'<select class="inp" id="c3g" onchange="togglePorzione()"><option value="intero" '+(ncntD.tipoLocazione==="porzione"?'':'selected')+'>Intero immobile</option>'
@@ -847,15 +857,36 @@ function buildStep() {
       +(ncntD.tipo==='Tipo B'||ncntD.tipo==='Tipo C'?'<div class="infob">Indicare motivo/facoltà e matricola nel campo apposito.</div>':'')
       +'<div id="ncons">';
     ncntD.conduttori.forEach(function(_,i){ h+=pbBlock('c',i); });
-    h+='</div><button class="bd" style="margin-top:4px" onclick="addP(\'c\')">+ Aggiungi conduttore</button></div></div>';
+    h+='</div><button class="bd" style="margin-top:4px" onclick="addP(\'c\')">+ Aggiungi conduttore</button>'
+      +'</div></div>';
+    h+='<div class="card"><div class="cb"><div class="sec">CONVIVENTI</div>'
+      +'<input type="text" class="inp" id="c5conv" placeholder="nessuno" value="'+(ncntD.conviventi||'nessuno')+'"/></div></div>';
   } else if (ncntStep===6) {
     h='<div class="card"><div class="cb"><div class="sec">GARANTI (opzionali)</div><div id="ngars">';
     ncntD.garanti.forEach(function(_,i){ h+=pbBlock('g',i); });
     h+='</div><button class="bd" style="margin-top:4px" onclick="addP(\'g\')">+ Aggiungi garante</button></div></div>';
   } else if (ncntStep===7) {
     h='<div class="card"><div class="cb"><div class="sec">NOTE</div>'
-      +'<textarea class="inp" id="c7a" placeholder="Clausole particolari..." style="min-height:100px">'+(ncntD.note||'')+'</textarea>'
+      +'<textarea class="inp" id="c7a" style="min-height:80px">'+(ncntD.note||'')+'</textarea>'
       +'</div></div>';
+    h+='<div class="card"><div class="cb"><div class="sec">ACCESSO (art. 13)</div>'
+      +'<input type="text" class="inp" id="c7b" placeholder="es. previo avviso telefonico" value="'+(ncntD.modalitaAccesso||'')+'"/></div></div>';
+    if(ncntD.tipo==='Tipo B'){
+      h+='<div class="card"><div class="cb"><div class="sec">ESIGENZA TRANSITORIETÀ</div>'
+        +'<span class="lbl">Chi dichiara</span><select class="inp" id="c7c"><option value="locatore" '+(ncntD.esigenzaTipo==="locatore"||!ncntD.esigenzaTipo?'selected':'')+'>Locatore</option><option value="conduttore" '+(ncntD.esigenzaTipo==="conduttore"?'selected':'')+'>Conduttore</option></select>'
+        +'<span class="lbl">Motivazione</span><select class="inp" id="c7d" onchange="toggleEsigenzaAltro()"><option value="">-- Seleziona --</option>'
+        +'<optgroup label="Locatore"><option value="destinare l\'immobile ad uso abitativo proprio o del coniuge/figli/parenti 2° grado">Uso proprio/familiare</option><option value="ristrutturazione con concessione già rilasciata">Ristrutturazione</option><option value="attesa di vendita con preliminare stipulato">Attesa vendita</option><option value="trasferimento temporaneo sede di lavoro">Trasferimento lavoro</option><option value="matrimonio proprio o dei figli">Matrimonio</option><option value="separazione o divorzio">Separazione/divorzio</option><option value="rientro dall\'estero">Rientro estero</option><option value="altro_loc">Altra...</option></optgroup>'
+        +'<optgroup label="Conduttore"><option value="trasferimento temporaneo sede di lavoro in Comune diverso">Trasferimento lavoro</option><option value="ricerca lavoro in Comune diverso">Ricerca lavoro</option><option value="separazione o divorzio">Separazione/divorzio</option><option value="uso come seconda casa">Seconda casa</option><option value="altro_con">Altra...</option></optgroup></select>'
+        +'<div id="c7d-altro" style="'+(ncntD.esigenzaMotivazione==="altro_loc"||ncntD.esigenzaMotivazione==="altro_con"?'':'display:none')+'">'
+        +'<span class="lbl">Descrivi</span><textarea class="inp" id="c7e" style="min-height:60px">'+(ncntD.esigenzaAltroTesto||'')+'</textarea></div>'
+        +'</div></div>';}
+    if(ncntD.tipo==='Tipo C'){
+      h+='<div class="card"><div class="cb"><div class="sec">UNIVERSITÀ</div>'
+        +'<span class="lbl">Ateneo</span><input type="text" class="inp" id="c7f" value="'+(ncntD.ateneo||'')+'"/>'
+        +'<span class="lbl">Facoltà</span><input type="text" class="inp" id="c7g" value="'+(ncntD.facolta||'')+'"/>'
+        +'<span class="lbl">Mesi max</span><input type="text" class="inp" id="c7h" value="'+(ncntD.mesiMax||'12')+'"/>'
+        +'</div></div>';}
+
   } else {
     var gs=['g1','g2','g3','g4'];
     var tt=["Ho ricevuto e compreso l'informativa (art. 13 GDPR).",
@@ -948,6 +979,10 @@ function leggiPersone(t){
 }
 
 
+function toggleEsigenzaAltro() {
+  var sel=T('c7d'); var det=T('c7d-altro');
+  if(sel&&det) det.style.display=(sel.value==='altro_loc'||sel.value==='altro_con')?'':'none';
+}
 function togglePorzione() {
   var sel = T('c3g'); var det = T('c3g-det');
   if (sel && det) det.style.display = sel.value === 'porzione' ? '' : 'none';
@@ -1004,11 +1039,11 @@ function ncntAvanti(){
   if(ncntStep===0){ncntD.tipo=(document.querySelector('input[name="ntipo"]:checked')||{}).value||'';if(!ncntD.tipo){alert('Seleziona il tipo');return;}}
   if(ncntStep===1){ncntD.duraDal=(T('c1a')||{}).value||'';ncntD.duraAl=(T('c1b')||{}).value||'';ncntD.duraMesi=(T('c1c')||{}).value||'';if(!ncntD.duraDal||!ncntD.duraAl){alert('Inserisci le date');return;}}
   if(ncntStep===2){ncntD.canoneMensile=(T('c2a')||{}).value||'';ncntD.canoneAnnuale=(T('c2b')||{}).value||'';ncntD.canoneIBAN=(T('c2c')||{}).value||'';ncntD.depositoImporto=(T('c2d')||{}).value||'';ncntD.depositoMesi=(T('c2e')||{}).value||'';if(!ncntD.canoneMensile){alert('Inserisci il canone');return;}}
-  if(ncntStep===3){ncntD.apeNumero=(T('c3a')||{}).value||'';ncntD.apeClasse=(T('c3b')||{}).value||'';ncntD.compCamere=(T('c3c')||{}).value||'';ncntD.compBagni=(T('c3d')||{}).value||'';var selTL=T('c3g');ncntD.tipoLocazione=selTL?selTL.value||'intero':'intero';ncntD.descrizioneLocazione=(T('c3h')||{}).value||'';ncntD.pertinenze=leggiPertinenze();}
+  if(ncntStep===3){ncntD.apeNumero=(T('c3a')||{}).value||'';ncntD.apeClasse=(T('c3b')||{}).value||'';ncntD.compCamere=(T('c3c')||{}).value||'';ncntD.compBagni=(T('c3d')||{}).value||'';ncntD.elemAccessori=(T('c3x1')||{}).value||'';var selAm2=T('c3x2');ncntD.ammobiliata=selAm2?selAm2.value:'si';ncntD.tabMillProp=(T('c3x3')||{}).value||'';ncntD.tabMillRisc=(T('c3x4')||{}).value||'';ncntD.statoImmobile=(T('c3x5')||{}).value||'';var selTL2=T('c3g');ncntD.tipoLocazione=selTL2?selTL2.value:'intero';ncntD.descrizioneLocazione=(T('c3h')||{}).value||'';ncntD.pertinenze=leggiPertinenze();}).value||'';ncntD.pertinenze=leggiPertinenze();}
   if(ncntStep===4) leggiPersone('l');
-  if(ncntStep===5) leggiPersone('c');
+  if(ncntStep===5){ leggiPersone('c'); ncntD.conviventi=(T('c5conv')||{}).value||'nessuno'; }
   if(ncntStep===6) leggiPersone('g');
-  if(ncntStep===7){ncntD.note=(T('c7a')||{}).value||'';}
+  if(ncntStep===7){ncntD.note=(T('c7a')||{}).value||'';ncntD.modalitaAccesso=(T('c7b')||{}).value||'';if(ncntD.tipo==='Tipo B'){var selEt=T('c7c');ncntD.esigenzaTipo=selEt?selEt.value:'locatore';var selEm=T('c7d');var emVal=selEm?selEm.value:'';ncntD.esigenzaMotivazione=emVal;ncntD.esigenzaAltroTesto=(emVal==='altro_loc'||emVal==='altro_con')?(T('c7e')||{}).value||'':'';}if(ncntD.tipo==='Tipo C'){ncntD.ateneo=(T('c7f')||{}).value||'';ncntD.facolta=(T('c7g')||{}).value||'';ncntD.mesiMax=(T('c7h')||{}).value||'12';}}
   if(ncntStep===8){
     if(!ncntD.g1||!ncntD.g2||!ncntD.g3||!ncntD.g4){alert('Accetta tutti e 4 i consensi GDPR');return;}
     var locs=ncntD.locatori||[], cons=ncntD.conduttori||[];
@@ -1087,6 +1122,46 @@ function creaSocio() {
     caricaDatiSocio();
   });
 }
+// ── GENERA CONTRATTO (assistenza) ─────────────────────────────
+function generaEStampaContrattoAs(ct) {
+  if (!ct) { alert('Nessun contratto selezionato'); return; }
+  var tipo = ct.tipo;
+  if (!tipo) { alert('Tipo contratto non definito'); return; }
+
+  var apt = ALL_APT.find(function(a){ return a.id === ct.appartamentoId; }) || {};
+
+  var dati = Object.assign({}, ct, {
+    comune: apt.comune || apt.indirizzo || '',
+    via: apt.via || '',
+    nCivico: apt.nCivico || '',
+    piano: apt.piano || '',
+    scala: apt.scala || '',
+    interno: apt.interno || '',
+    catSezione: apt.catSezione || '',
+    catFoglio: apt.catFoglio || '',
+    catParticella: apt.catParticella || '',
+    catSubalterno: apt.catSubalterno || '',
+    catCategoria: apt.catCategoria || '',
+    catRendita: apt.catRendita || '',
+    tabMillProp: apt.tabMillProp || '',
+    tabMillRisc: apt.tabMillRisc || '',
+    ammobiliata: apt.ammobiliata || '',
+  });
+
+  dati.pertTesto = function() {
+    if (!dati.pertinenze || !dati.pertinenze.length) return 'nessuna';
+    return dati.pertinenze.map(function(p){
+      return (p.tipo||'') + (p.catFoglio ? ' (Fg.'+p.catFoglio+' p.'+p.catParticella+' sub.'+p.catSubalterno+')' : '');
+    }).join(', ');
+  };
+
+  var html = generaContratto(dati, tipo);
+  var win = window.open('', '_blank');
+  if (win) { win.document.write(html); win.document.close(); }
+  else { alert('Il browser ha bloccato il popup. Consenti i popup per questo sito e riprova.'); }
+}
+
 </script>
+<script src="contratti_template.js"></script>
 </body>
 </html>
