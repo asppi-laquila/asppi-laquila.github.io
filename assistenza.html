@@ -1039,7 +1039,7 @@ function ncntAvanti(){
   if(ncntStep===0){ncntD.tipo=(document.querySelector('input[name="ntipo"]:checked')||{}).value||'';if(!ncntD.tipo){alert('Seleziona il tipo');return;}}
   if(ncntStep===1){ncntD.duraDal=(T('c1a')||{}).value||'';ncntD.duraAl=(T('c1b')||{}).value||'';ncntD.duraMesi=(T('c1c')||{}).value||'';if(!ncntD.duraDal||!ncntD.duraAl){alert('Inserisci le date');return;}}
   if(ncntStep===2){ncntD.canoneMensile=(T('c2a')||{}).value||'';ncntD.canoneAnnuale=(T('c2b')||{}).value||'';ncntD.canoneIBAN=(T('c2c')||{}).value||'';ncntD.depositoImporto=(T('c2d')||{}).value||'';ncntD.depositoMesi=(T('c2e')||{}).value||'';if(!ncntD.canoneMensile){alert('Inserisci il canone');return;}}
-  if(ncntStep===3){ncntD.apeNumero=(T('c3a')||{}).value||'';ncntD.apeClasse=(T('c3b')||{}).value||'';ncntD.compCamere=(T('c3c')||{}).value||'';ncntD.compBagni=(T('c3d')||{}).value||'';ncntD.elemAccessori=(T('c3x1')||{}).value||'';var selAm2=T('c3x2');ncntD.ammobiliata=selAm2?selAm2.value:'si';ncntD.tabMillProp=(T('c3x3')||{}).value||'';ncntD.tabMillRisc=(T('c3x4')||{}).value||'';ncntD.statoImmobile=(T('c3x5')||{}).value||'';var selTL2=T('c3g');ncntD.tipoLocazione=selTL2?selTL2.value:'intero';ncntD.descrizioneLocazione=(T('c3h')||{}).value||'';ncntD.pertinenze=leggiPertinenze();}).value||'';ncntD.pertinenze=leggiPertinenze();}
+  if(ncntStep===3){ncntD.apeNumero=(T('c3a')||{}).value||'';ncntD.apeClasse=(T('c3b')||{}).value||'';ncntD.compCamere=(T('c3c')||{}).value||'';ncntD.compBagni=(T('c3d')||{}).value||'';ncntD.elemAccessori=(T('c3x1')||{}).value||'';var selAm2=T('c3x2');ncntD.ammobiliata=selAm2?selAm2.value:'si';ncntD.tabMillProp=(T('c3x3')||{}).value||'';ncntD.tabMillRisc=(T('c3x4')||{}).value||'';ncntD.statoImmobile=(T('c3x5')||{}).value||'';var selTL2=T('c3g');ncntD.tipoLocazione=selTL2?selTL2.value:'intero';ncntD.descrizioneLocazione=(T('c3h')||{}).value||'';ncntD.pertinenze=leggiPertinenze();}
   if(ncntStep===4) leggiPersone('l');
   if(ncntStep===5){ leggiPersone('c'); ncntD.conviventi=(T('c5conv')||{}).value||'nessuno'; }
   if(ncntStep===6) leggiPersone('g');
@@ -1122,6 +1122,38 @@ function creaSocio() {
     caricaDatiSocio();
   });
 }
+// ── NUMERO IN LETTERE ────────────────────────────────────────
+function numLettere(n) {
+  if (!n) return '';
+  var s = String(n).trim().replace(/\./g,'').replace(',','.');
+  var parts = s.split('.');
+  var intero = parseInt(parts[0]) || 0;
+  var cent   = parts[1] ? String(parts[1]).padEnd(2,'0').substring(0,2) : '00';
+  var u = ['','uno','due','tre','quattro','cinque','sei','sette','otto','nove',
+           'dieci','undici','dodici','tredici','quattordici','quindici','sedici',
+           'diciassette','diciotto','diciannove'];
+  var d = ['','dieci','venti','trenta','quaranta','cinquanta',
+           'sessanta','settanta','ottanta','novanta'];
+  function c3(n) {
+    if (n===0) return '';
+    var r='';
+    if(n>=100){r+=(Math.floor(n/100)===1?'cento':u[Math.floor(n/100)]+'cento');n%=100;}
+    if(n>=20){var t=Math.floor(n/10),o=n%10;r+=(o===1||o===8)?d[t].slice(0,-1):d[t];r+=u[o];}
+    else r+=u[n];
+    return r;
+  }
+  function converti(n) {
+    if(n===0) return 'zero';
+    var r='';
+    if(n>=1000000){var m=Math.floor(n/1000000);r+=(m===1?'unmilione':c3(m)+'milioni');n%=1000000;}
+    if(n>=1000){var k=Math.floor(n/1000);r+=(k===1?'mille':c3(k)+'mila');n%=1000;}
+    r+=c3(n); return r;
+  }
+  var lett=converti(intero);
+  if(cent!=='00') lett+='e'+cent+'/100';
+  return lett;
+}
+
 // ── GENERA CONTRATTO (assistenza) ─────────────────────────────
 function generaEStampaContrattoAs(ct) {
   if (!ct) { alert('Nessun contratto selezionato'); return; }
@@ -1154,6 +1186,19 @@ function generaEStampaContrattoAs(ct) {
       return (p.tipo||'') + (p.catFoglio ? ' (Fg.'+p.catFoglio+' p.'+p.catParticella+' sub.'+p.catSubalterno+')' : '');
     }).join(', ');
   };
+  dati.canoneAnnualeLettere   = numLettere(dati.canoneAnnuale);
+  dati.canoneMensileLettere   = numLettere(dati.canoneMensile);
+  dati.depositoImportoLettere = numLettere(dati.depositoImporto);
+  dati.oneriMensiliLettere    = numLettere(dati.oneriMensili);
+  dati.duraMesiLettere        = numLettere(dati.duraMesi);
+  dati.primaRataImporto       = dati.canoneMensile;
+  dati.primaRataLettere       = dati.canoneMensileLettere;
+  dati.rateSuccessiveImporto  = dati.canoneMensile;
+  dati.rateSuccessiveLettere  = dati.canoneMensileLettere;
+  dati.nRateSuccessive        = dati.duraMesi ? String(parseInt(dati.duraMesi)-1) : '___';
+  if (dati.esigenzaMotivazione && (dati.esigenzaMotivazione==='altro_loc'||dati.esigenzaMotivazione==='altro_con')) {
+    dati.esigenzaMotivazione = dati.esigenzaAltroTesto || '';
+  }
 
   var html = generaContratto(dati, tipo);
   var win = window.open('', '_blank');

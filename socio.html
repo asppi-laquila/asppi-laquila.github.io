@@ -1768,7 +1768,7 @@ function buildNcntStep() {
         +'<option value="altro_con">Altra esigenza specifica conduttore...</option>'
         +'</optgroup>'
         +'</select>'
-        +'<div id="c7d-altro" style="'+(ncntD.esigenzaMotivazione&&ncntD.esigenzaMotivazione.startsWith(\'altro\')?'display:block':'display:none')+'">'
+        +'<div id="c7d-altro" style="'+(ncntD.esigenzaMotivazione&&(ncntD.esigenzaMotivazione==="altro_loc"||ncntD.esigenzaMotivazione==="altro_con")?'display:block':'display:none')+'">'
         +'<label class="lbl">Descrivi l\'esigenza specifica</label>'
         +'<textarea class="inp" id="c7e" placeholder="Descrizione esigenza..." style="min-height:60px">'+(ncntD.esigenzaAltroTesto||'')+'</textarea>'
         +'</div>'
@@ -2376,6 +2376,60 @@ function cambiaPwd() {
     } else {if(errEl){errEl.textContent=(r&&r.error)||err||'Errore';errEl.style.display='';}}
   });
 }
+// ── NUMERO IN LETTERE ────────────────────────────────────────
+function numLettere(n) {
+  // Converte un importo numerico in lettere italiane (formato it: punto=migliaia, virgola=decimali)
+  if (!n) return '';
+  var s = String(n).trim().replace(/\./g,'').replace(',','.');
+  var parts = s.split('.');
+  var intero = parseInt(parts[0]) || 0;
+  var cent   = parts[1] ? String(parts[1]).padEnd(2,'0').substring(0,2) : '00';
+  
+  var u = ['','uno','due','tre','quattro','cinque','sei','sette','otto','nove',
+           'dieci','undici','dodici','tredici','quattordici','quindici','sedici',
+           'diciassette','diciotto','diciannove'];
+  var d = ['','dieci','venti','trenta','quaranta','cinquanta',
+           'sessanta','settanta','ottanta','novanta'];
+  
+  function c3(n) {
+    if (n === 0) return '';
+    var r = '';
+    if (n >= 100) {
+      r += (Math.floor(n/100) === 1 ? 'cento' : u[Math.floor(n/100)] + 'cento');
+      n %= 100;
+    }
+    if (n >= 20) {
+      var t = Math.floor(n/10), o = n%10;
+      r += (o===1||o===8) ? d[t].slice(0,-1) : d[t];
+      r += u[o];
+    } else {
+      r += u[n];
+    }
+    return r;
+  }
+  
+  function converti(n) {
+    if (n === 0) return 'zero';
+    var r = '';
+    if (n >= 1000000) {
+      var m = Math.floor(n/1000000);
+      r += (m===1 ? 'unmilione' : c3(m)+'milioni');
+      n %= 1000000;
+    }
+    if (n >= 1000) {
+      var k = Math.floor(n/1000);
+      r += (k===1 ? 'mille' : c3(k)+'mila');
+      n %= 1000;
+    }
+    r += c3(n);
+    return r;
+  }
+  
+  var lett = converti(intero);
+  if (cent !== '00') lett += 'e' + cent + '/100';
+  return lett;
+}
+
 // ── GENERA CONTRATTO ─────────────────────────────────────────
 function generaEStampaContratto() {
   if (!curCnt) { alert('Nessun contratto selezionato'); return; }
@@ -2403,6 +2457,23 @@ function generaEStampaContratto() {
     tabMillRisc: apt.tabMillRisc || '',
     ammobiliata: apt.ammobiliata || '',
   });
+
+  // Calcola lettere importi
+  dati.canoneAnnualeLettere    = numLettere(dati.canoneAnnuale);
+  dati.canoneMensileLettere    = numLettere(dati.canoneMensile);
+  dati.depositoImportoLettere  = numLettere(dati.depositoImporto);
+  dati.oneriMensiliLettere     = numLettere(dati.oneriMensili);
+  dati.duraMesiLettere         = numLettere(dati.duraMesi);
+  // Per Tipo C: stessa rata per prima e successive (semplificato)
+  dati.primaRataImporto        = dati.canoneMensile;
+  dati.primaRataLettere        = dati.canoneMensileLettere;
+  dati.rateSuccessiveImporto   = dati.canoneMensile;
+  dati.rateSuccessiveLettere   = dati.canoneMensileLettere;
+  dati.nRateSuccessive         = dati.duraMesi ? String(parseInt(dati.duraMesi)-1) : '___';
+  // Esigenza Tipo B: se "altro" usa il testo libero
+  if (dati.esigenzaMotivazione && (dati.esigenzaMotivazione === 'altro_loc' || dati.esigenzaMotivazione === 'altro_con')) {
+    dati.esigenzaMotivazione = dati.esigenzaAltroTesto || '';
+  }
 
   // Helper pertinenze
   dati.pertTesto = function() {
