@@ -364,6 +364,7 @@ var curApt      = null;
 var curCnt      = null;
 var naptStep    = 0; var naptD = {};
 var ncntStep    = 0; var ncntD = {};
+var _lastCntDati = null;
 var NLABELS     = ['Tipo','Durata','Canone','Immobile','Locatori','Conduttori','Garanti','Note','Privacy'];
 
 // ── INIT ──────────────────────────────────────
@@ -1092,8 +1093,10 @@ function ncntAvanti(){
     var cogC=(cons[0]&&(cons[0].cognome||cons[0].nome))||'';
     ncntD.nomeContratto=cogL&&cogC?'CNT_'+cogL+'_'+cogC:(ncntD.tipo||'Contratto');
     ncntD.userId = SOCIO.id;
+    _lastCntDati = JSON.parse(JSON.stringify(ncntD));
     api('saveContratto', { data: ncntD }, function(err,r){
       if(!err&&r&&r.ok){
+        if(r.id) _lastCntDati.id = r.id;
         chiudiOv('ov-ncnt'); chiudiOv('ov-apt');
         caricaDatiSocio();
         alert('✅ Pratica creata! Il socio la vedrà nel suo portale.');
@@ -1198,12 +1201,15 @@ function numLettere(n) {
 // ── GENERA CONTRATTO (assistenza) ─────────────────────────────
 function generaEStampaContrattoAs(ct) {
   if (!ct) { alert('Nessun contratto selezionato'); return; }
-  var tipo = ct.tipo;
+  var srcCnt = (_lastCntDati && (_lastCntDati.id === ct.id || !ct.id))
+    ? Object.assign({}, ct, _lastCntDati)
+    : ct;
+  var tipo = srcCnt.tipo || ct.tipo;
   if (!tipo) { alert('Tipo contratto non definito'); return; }
 
-  var apt = ALL_APT.find(function(a){ return a.id === ct.appartamentoId; }) || {};
+  var apt = ALL_APT.find(function(a){ return a.id === (srcCnt.appartamentoId||ct.appartamentoId); }) || {};
 
-  var dati = Object.assign({}, ct, {
+  var dati = Object.assign({}, ct, srcCnt, {
     comune:        ct.comune        || apt.comune || '',
     via:           ct.via           || apt.via || '',
     nCivico:       ct.nCivico       || apt.nCivico || '',
