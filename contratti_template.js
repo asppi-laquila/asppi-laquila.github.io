@@ -101,7 +101,7 @@ function bloccoImmobile(d, allegato) {
   var scala   = v(d.scala    || apt.scala   || '', 40);
   var interno = v(d.interno  || apt.interno || '', 40);
   var vani    = v(d.compCamere || d.nVani || apt.nVani || apt.compCamere || '', 40);
-  var acc     = (d.elemAccessori && d.elemAccessori.trim()) ? d.elemAccessori.trim() : 'nessuno';
+  var acc     = (d.elemAccessori && String(d.elemAccessori||'').trim()) ? d.elemAccessori.trim() : 'nessuno';
   var arred   = d.ammobiliata === 'si' ? 'ammobiliata' : 'non ammobiliata';
   var sezione = v(d.catSezione || apt.catSezione || '', 40);
   var foglio  = vb(d.catFoglio  || apt.catFoglio  || '', 40);
@@ -150,9 +150,10 @@ function bloccoImmobile(d, allegato) {
   }
 
   var apeNum = v(d.apeNumero, 120);
+  var _apeN = d.apeNumero ? String(d.apeNumero).trim() : '';
   html += '<p>b) prestazione energetica: classe ' + classe +
     ' (come da informazioni ricevute dal conduttore già in sede di trattative)' +
-    (d.apeNumero && d.apeNumero.trim() ? ', attestato n. <b>' + apeNum + '</b>' : '') + ';</p>';
+    (_apeN ? ', attestato n. <b>' + apeNum + '</b>' : '') + ';</p>';
   html += '<p>c) sicurezza impianti: rispondenti alle normative in materia di sicurezza vigenti' +
     ' all\'epoca in cui gli stessi sono stati realizzati, che il conduttore accetta nello stato' +
     ' in cui si trovano;</p>';
@@ -520,7 +521,7 @@ function generaContratto_A(raw) {
     ' ordine all\'attestazione della prestazione energetica dell\'immobile.</p>';
 
   // ART 13
-  var modAccA = (d.modalitaAccesso && d.modalitaAccesso.trim()) ? d.modalitaAccesso.trim() : v('', 180);
+  var modAccA = (d.modalitaAccesso && String(d.modalitaAccesso||'').trim()) ? d.modalitaAccesso.trim() : v('', 180);
   html += '<p class="art">Articolo 13</p><p class="art-sub">(Accesso)</p>';
   html += '<p>Il conduttore deve consentire l\'accesso all\'unità immobiliare al locatore, al suo' +
     ' amministratore nonché ai loro incaricati ove gli stessi ne abbiano - motivandola - ragione.' +
@@ -630,12 +631,12 @@ function generaContratto_B(raw) {
     ' bisogno di alcuna disdetta.</p>';
 
   // ART 2
-  var esigente = (d.esigenzaTipo && d.esigenzaTipo.trim()) ? d.esigenzaTipo.trim() : v('', 80);
+  var esigente = (d.esigenzaTipo && String(d.esigenzaTipo||'').trim()) ? d.esigenzaTipo.trim() : v('', 80);
   var esigenzaFrase;
   if (d.esigenzaMotivazione === 'altro_loc' || d.esigenzaMotivazione === 'altro_con') {
-    esigenzaFrase = (d.esigenzaAltroTesto && d.esigenzaAltroTesto.trim()) ? d.esigenzaAltroTesto.trim() : v('', 300);
+    esigenzaFrase = (d.esigenzaAltroTesto && String(d.esigenzaAltroTesto||'').trim()) ? d.esigenzaAltroTesto.trim() : v('', 300);
   } else {
-    esigenzaFrase = (d.esigenzaMotivazione && d.esigenzaMotivazione.trim()) ? d.esigenzaMotivazione.trim() : v('', 300);
+    esigenzaFrase = (d.esigenzaMotivazione && String(d.esigenzaMotivazione||'').trim()) ? d.esigenzaMotivazione.trim() : v('', 300);
   }
   html += '<p class="art">Articolo 2</p>';
   html += '<p class="art-sub">(Esigenza del ' + esigente + ')</p>';
@@ -914,7 +915,7 @@ function generaContratto_C(raw) {
   var scala2  = v(d.scala || '', 40);
   var interno2= v(d.interno || '', 40);
   var vani    = v(d.compCamere || '', 40);
-  var acc2    = (d.elemAccessori && d.elemAccessori.trim()) ? d.elemAccessori.trim() : 'nessuno';
+  var acc2    = (d.elemAccessori && String(d.elemAccessori||'').trim()) ? d.elemAccessori.trim() : 'nessuno';
   var arred   = d.ammobiliata === 'si' ? 'ammobiliata' : 'non ammobiliata';
   var sezione = v(d.catSezione, 40);
   var foglio  = vb(d.catFoglio, 40);
@@ -1083,7 +1084,7 @@ function generaContratto_C(raw) {
     ' prestazione energetica dell\'immobile.</p>';
 
   // ART 14
-  var modAccC = (d.modalitaAccesso && d.modalitaAccesso.trim()) ? d.modalitaAccesso.trim() : v('', 180);
+  var modAccC = (d.modalitaAccesso && String(d.modalitaAccesso||'').trim()) ? d.modalitaAccesso.trim() : v('', 180);
   html += '<p class="art">Articolo 14</p><p class="art-sub">(Accesso)</p>';
   html += '<p>Il conduttore deve consentire l\'accesso all\'unità immobiliare al locatore, al suo' +
     ' amministratore nonché ai loro incaricati ove gli stessi ne abbiano - motivandola - ragione.' +
