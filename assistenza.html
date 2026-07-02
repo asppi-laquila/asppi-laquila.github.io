@@ -567,7 +567,7 @@ function apriApt(a) {
       var bar = document.createElement('div'); bar.className = 'bar'; bar.style.background = col;
       var rb  = document.createElement('div'); rb.className = 'rb';
       rb.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">'
-        + '<div class="rt">' + (ct.tipo||'Contratto') + '</div>'
+        + '<div class="rt">' + (ct.nomeContratto||ct.tipo||'Contratto') + '</div>'
         + '<span class="bdg" style="color:'+col+';background:'+col+'22">'+lbl+'</span></div>'
         + '<div class="rs">' + fmt(ct.duraDal) + ' → ' + fmt(ct.duraAl) + '</div>';
       var arr = document.createElement('div'); arr.className = 'rarr'; arr.textContent = '›';

@@ -1384,7 +1384,7 @@ function apriApt(id) {
       var div = document.createElement('div'); div.className='row'; div.style.marginBottom='10px';
       var bar = document.createElement('div'); bar.className='bar'; bar.style.background=ct.stato==='completato'?'#8A8A8A':'#E8631A';
       var rb = document.createElement('div'); rb.className='rb';
-      var rt = document.createElement('div'); rt.className='rt'; rt.textContent=ct.tipo||'Contratto';
+      var rt = document.createElement('div'); rt.className='rt'; rt.textContent=ct.nomeContratto||ct.tipo||'Contratto';
       var rs = document.createElement('div'); rs.className='rs';
       rs.textContent = fmtDate(ct.duraDal) + ' → ' + fmtDate(ct.duraAl);
       var arr = document.createElement('div'); arr.style.cssText='display:flex;align-items:center;padding-right:14px;color:#8A8A8A'; arr.textContent='›';
