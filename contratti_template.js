@@ -29,15 +29,14 @@ p{text-align:justify;margin-bottom:6pt;font-size:9pt;font-family:Verdana,Geneva,
 function fmtData(d) {
   if (!d) return '';
   var s = String(d).trim();
-  // Già in formato gg/mm/aaaa
+  // Già in formato gg/mm/aaaa — restituisci as-is
   if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
-  // Formato ISO o simile
-  try {
-    var dt = new Date(s);
-    if (!isNaN(dt)) {
-      return ('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2)+'/'+dt.getFullYear();
-    }
-  } catch(e) {}
+  // Formato ISO: 2026-07-01T22:00:00.000Z o 2026-07-01
+  // Leggi solo la parte data (yyyy-mm-dd) senza conversione fuso orario
+  var isoMatch = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (isoMatch) {
+    return isoMatch[3] + '/' + isoMatch[2] + '/' + isoMatch[1];
+  }
   return s;
 }
 
