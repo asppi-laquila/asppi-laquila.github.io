@@ -860,6 +860,7 @@ var curApt = null, curCnt = null, curChatId = null;
 var calDay = null, calSlot = null, calYear = new Date().getFullYear(), calMonth = new Date().getMonth();
 var naptStep = 0, naptD = {};
 var ncntStep = 0, ncntD = {};
+var _lastCntDati = null; // ultimi dati contratto wizard
 var MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 var NLABELS = ['Tipo','Durata','Canone','Immobile','Locatori','Conduttori','Garanti','Note','Privacy'];
 
@@ -2269,10 +2270,12 @@ function ncntAvanti() {
     var cogC=(cons[0]&&(cons[0].cognome||cons[0].nome))||'';
     ncntD.nomeContratto=cogL&&cogC?'CNT_'+cogL+'_'+cogC:(ncntD.tipo||'Contratto');
     if(ncntD._mod) ncntD.modificato=new Date().toISOString();
-    var _savedNcntD = JSON.parse(JSON.stringify(ncntD)); // copia locale per generazione immediata
+    _lastCntDati = JSON.parse(JSON.stringify(ncntD)); // copia globale per generazione immediata
     api('saveContratto',{data:ncntD},function(err,r){
-      if(!err&&r&&r.ok){chiudiOv('ov-ncnt');chiudiOv('ov-apt');chiudiOv('ov-cnt');caricaDati();navTo('home');alert(ncntD._mod?'Contratto modificato!':'Richiesta inviata!');}
-      else{alert('Errore: '+((r&&r.error)||err||'Riprova'));}
+      if(!err&&r&&r.ok){
+        if(r.id) _lastCntDati.id = r.id; // aggiorna l'id ricevuto dal server
+        chiudiOv('ov-ncnt');chiudiOv('ov-apt');chiudiOv('ov-cnt');caricaDati();navTo('home');alert(ncntD._mod?'Contratto modificato!':'Richiesta inviata!');
+      } else{alert('Errore: '+((r&&r.error)||err||'Riprova'));}
     });
     return;
   }
@@ -2707,9 +2710,9 @@ function numLettere(n) {
 // ── GENERA CONTRATTO ─────────────────────────────────────────
 function generaEStampaContratto() {
   if (!curCnt) { alert('Nessun contratto selezionato'); return; }
-  // Se abbiamo dati freschi del wizard (appena salvato), usali per completezza
-  var srcCnt = (typeof _savedNcntD !== 'undefined' && _savedNcntD && _savedNcntD.id === curCnt.id)
-    ? Object.assign({}, curCnt, _savedNcntD)
+  // Usa dati freschi del wizard se disponibili per questo contratto
+  var srcCnt = (_lastCntDati && (_lastCntDati.id === curCnt.id || !curCnt.id))
+    ? Object.assign({}, curCnt, _lastCntDati)
     : curCnt;
   var tipo = srcCnt.tipo || curCnt.tipo; // 'Tipo A', 'Tipo B', 'Tipo C'
   if (!tipo) { alert('Tipo contratto non definito'); return; }
