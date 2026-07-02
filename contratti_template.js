@@ -150,8 +150,10 @@ function bloccoImmobile(d, allegato) {
     });
   }
 
+  var apeNum = v(d.apeNumero, 120);
   html += '<p>b) prestazione energetica: classe ' + classe +
-    ' (come da informazioni ricevute dal conduttore già in sede di trattative);</p>';
+    ' (come da informazioni ricevute dal conduttore già in sede di trattative)' +
+    (d.apeNumero && d.apeNumero.trim() ? ', attestato n. <b>' + apeNum + '</b>' : '') + ';</p>';
   html += '<p>c) sicurezza impianti: rispondenti alle normative in materia di sicurezza vigenti' +
     ' all\'epoca in cui gli stessi sono stati realizzati, che il conduttore accetta nello stato' +
     ' in cui si trovano;</p>';
@@ -952,7 +954,8 @@ function generaContratto_C(raw) {
     });
   }
   html += '<p>b) prestazione energetica: <b>classe ' + classe + '</b>' +
-    ' (come da informazioni ricevute dal conduttore già in sede di trattative);</p>';
+    ' (come da informazioni ricevute dal conduttore già in sede di trattative)' +
+    (d.apeNumero && d.apeNumero.trim() ? ', attestato n. <b>' + v(d.apeNumero,120) + '</b>' : '') + ';</p>';
   html += '<p>c) sicurezza impianti: rispondenti alle normative in materia di sicurezza vigenti' +
     ' all\'epoca in cui gli stessi sono stati realizzati, che il conduttore accetta nello stato' +
     ' in cui si trovano;</p>';

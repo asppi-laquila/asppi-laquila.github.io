@@ -2269,6 +2269,7 @@ function ncntAvanti() {
     var cogC=(cons[0]&&(cons[0].cognome||cons[0].nome))||'';
     ncntD.nomeContratto=cogL&&cogC?'CNT_'+cogL+'_'+cogC:(ncntD.tipo||'Contratto');
     if(ncntD._mod) ncntD.modificato=new Date().toISOString();
+    var _savedNcntD = JSON.parse(JSON.stringify(ncntD)); // copia locale per generazione immediata
     api('saveContratto',{data:ncntD},function(err,r){
       if(!err&&r&&r.ok){chiudiOv('ov-ncnt');chiudiOv('ov-apt');chiudiOv('ov-cnt');caricaDati();navTo('home');alert(ncntD._mod?'Contratto modificato!':'Richiesta inviata!');}
       else{alert('Errore: '+((r&&r.error)||err||'Riprova'));}
@@ -2706,32 +2707,39 @@ function numLettere(n) {
 // ── GENERA CONTRATTO ─────────────────────────────────────────
 function generaEStampaContratto() {
   if (!curCnt) { alert('Nessun contratto selezionato'); return; }
-  var tipo = curCnt.tipo; // 'Tipo A', 'Tipo B', 'Tipo C'
+  // Se abbiamo dati freschi del wizard (appena salvato), usali per completezza
+  var srcCnt = (typeof _savedNcntD !== 'undefined' && _savedNcntD && _savedNcntD.id === curCnt.id)
+    ? Object.assign({}, curCnt, _savedNcntD)
+    : curCnt;
+  var tipo = srcCnt.tipo || curCnt.tipo; // 'Tipo A', 'Tipo B', 'Tipo C'
   if (!tipo) { alert('Tipo contratto non definito'); return; }
 
   // Trova l'appartamento collegato
-  var apt = D.appartamenti.find(function(a){ return a.id === curCnt.appartamentoId; }) || {};
+  var apt = D.appartamenti.find(function(a){ return a.id === (srcCnt.appartamentoId||curCnt.appartamentoId); }) || {};
 
-  // Assembla dati completi
-  var dati = Object.assign({}, curCnt, {
-    comune:       apt.comune || apt.indirizzo || '',
-    via:          apt.via || '',
-    nCivico:      apt.nCivico || '',
-    piano:        apt.piano || '',
-    scala:        apt.scala || '',
-    interno:      apt.interno || '',
-    compCamere:   apt.nVani || apt.compCamere || curCnt.compCamere || '',
-    catSezione:   apt.catSezione || '',
-    catFoglio:    apt.catFoglio || '',
-    catParticella:apt.catParticella || '',
-    catSubalterno:apt.catSubalterno || '',
-    catCategoria: apt.catCategoria || '',
-    catRendita:   apt.catRendita || '',
-    tabMillProp:  apt.tabMillProp || '',
-    tabMillRisc:  apt.tabMillRisc || '',
-    ammobiliata:  apt.ammobiliata || '',
-    // Locatori dall'appartamento se non già nel contratto
-    locatori:     (curCnt.locatori && curCnt.locatori.length) ? curCnt.locatori : (apt.locatori || []),
+  // Assembla dati completi — i campi del contratto hanno priorità su quelli apt
+  var dati = Object.assign({}, curCnt, srcCnt, {
+    // Campi immobile dall'apt (solo se non già nel contratto)
+    comune:        curCnt.comune       || apt.comune || '',
+    via:           curCnt.via          || apt.via || '',
+    nCivico:       curCnt.nCivico      || apt.nCivico || '',
+    piano:         curCnt.piano        || apt.piano || '',
+    scala:         curCnt.scala        || apt.scala || '',
+    interno:       curCnt.interno      || apt.interno || '',
+    compCamere:    curCnt.compCamere   || apt.nVani || apt.compCamere || '',
+    catSezione:    curCnt.catSezione   || apt.catSezione || '',
+    catFoglio:     curCnt.catFoglio    || apt.catFoglio || '',
+    catParticella: curCnt.catParticella|| apt.catParticella || '',
+    catSubalterno: curCnt.catSubalterno|| apt.catSubalterno || '',
+    catCategoria:  curCnt.catCategoria || apt.catCategoria || '',
+    catRendita:    curCnt.catRendita   || apt.catRendita || '',
+    tabMillProp:   curCnt.tabMillProp  || apt.tabMillProp || '',
+    tabMillRisc:   curCnt.tabMillRisc  || apt.tabMillRisc || '',
+    ammobiliata:   curCnt.ammobiliata  || apt.ammobiliata || '',
+    // Locatori: dal contratto se presenti, altrimenti dall'apt
+    locatori:      (curCnt.locatori && curCnt.locatori.length) ? curCnt.locatori : (apt.locatori || []),
+    // Pertinenze dal contratto
+    pertinenze:    curCnt.pertinenze   || [],
   });
 
   // Calcola lettere importi
