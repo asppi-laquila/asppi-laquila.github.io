@@ -989,7 +989,7 @@ function caricaDati() {
           div.style.cssText='background:#FDF0E8;border-radius:12px;padding:12px 14px;margin-bottom:8px;border-left:4px solid #E8631A';
           div.innerHTML='<div style="font-size:13px;font-weight:800;color:#E8631A;margin-bottom:4px">&#128226; '+a.titolo+'</div>'
             +(a.testo?'<div style="font-size:12px;color:#4A4A4A;line-height:1.5">'+a.testo+'</div>':'')
-            +(a.dataFine?'<div style="font-size:11px;color:#8A8A8A;margin-top:4px">Valido fino al '+a.dataFine+'</div>':'');
+            +(a.dataFine?'<div style="font-size:11px;color:#8A8A8A;margin-top:4px">Valido fino al '+fmtDate(a.dataFine)+'</div>':'');
           el.appendChild(div);
         });
       });
@@ -1292,15 +1292,8 @@ function renderHome() {
     var rb  = document.createElement('div'); rb.className='rb';
     var top = document.createElement('div'); top.style.cssText='display:flex;justify-content:space-between;align-items:center';
     var rt = document.createElement('div'); rt.className='rt';
-    // Calcola nome contratto
-    var nome = ct.tipo || 'Contratto';
-    try {
-      var locs = JSON.parse(ct.locatoriJSON||'[]');
-      var cons = JSON.parse(ct.conduttoriJSON||'[]');
-      var cogL = locs[0] && (locs[0].cognome||locs[0].nome) || '';
-      var cogC = cons[0] && (cons[0].cognome||cons[0].nome) || '';
-      if (cogL && cogC) nome = 'CNT_'+cogL+'_'+cogC;
-    } catch(e) {}
+    // Usa nomeContratto dal backend
+    var nome = ct.nomeContratto || ct.tipo || 'Contratto';
     rt.textContent = nome;
     var bdg = document.createElement('span'); bdg.className='bdg'; bdg.textContent=lbl;
     bdg.style.color=col; bdg.style.background=col+'22';
