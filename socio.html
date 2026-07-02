@@ -1746,7 +1746,9 @@ function naptAvanti() {
   } else {
     // Step 3: salva
     naptD.userId = S && S.user ? (S.user.userId||S.user.id||'') : '';
+    console.log('saveAppartamento payload:', JSON.stringify(naptD));
     api('saveAppartamento',{data:naptD},function(err,r){
+      console.log('saveAppartamento response:', JSON.stringify(r), 'err:', err);
       if(!err&&r&&r.ok){ chiudiOv('ov-napt'); naptStep=0; naptD={}; caricaDati(); }
       else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
     });
