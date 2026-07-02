@@ -762,17 +762,54 @@ textarea.inp{min-height:100px;resize:vertical;}
 <!-- OV MODIFICA APPARTAMENTO -->
 <div id="ov-mod-apt" class="ov">
   <div class="oh">
-    <div><div class="ohlbl">MODIFICA</div><div class="ohttl" id="mapt-ttl"></div></div>
+    <div><div class="ohlbl">MODIFICA IMMOBILE</div><div class="ohttl" id="mapt-ttl"></div></div>
     <button class="exbtn" id="btn-chiudi-mod-apt">← Indietro</button>
   </div>
-  <div style="padding:16px">
+  <div style="padding:16px 16px 100px">
     <div class="card"><div class="cb">
-      <div class="sec">MODIFICA NOME</div>
-      <label class="lbl">Nuovo nome immobile</label>
-      <input type="text" class="inp" id="mapt-nome"/>
-      <div class="infog" id="mapt-ok" style="display:none">✅ Nome aggiornato!</div>
-      <button class="bp" id="btn-salva-mod-apt">Salva nome</button>
+      <div class="sec">DATI IMMOBILE</div>
+      <label class="lbl">Nome immobile *</label>
+      <input type="text" class="inp" id="mapt-nome" placeholder="es. Casa Garibaldi"/>
+      <label class="lbl">Comune</label>
+      <input type="text" class="inp" id="mapt-comune" placeholder="L'AQUILA"/>
+      <label class="lbl">Via</label>
+      <input type="text" class="inp" id="mapt-via" placeholder="VIA GARIBALDI"/>
+      <label class="lbl">N° civico</label>
+      <input type="text" class="inp" id="mapt-nciv" placeholder="15"/>
+      <div class="g2">
+        <div><label class="lbl">Piano</label><input type="text" class="inp" id="mapt-piano"/></div>
+        <div><label class="lbl">Scala</label><input type="text" class="inp" id="mapt-scala"/></div>
+      </div>
+      <div class="g2">
+        <div><label class="lbl">Interno</label><input type="text" class="inp" id="mapt-interno"/></div>
+        <div><label class="lbl">N. vani</label><input type="text" class="inp" id="mapt-vani"/></div>
+      </div>
     </div></div>
+    <div class="card"><div class="cb">
+      <div class="sec">DATI CATASTALI</div>
+      <div class="g2">
+        <div><label class="lbl">Categoria</label><input type="text" class="inp" id="mapt-cat" placeholder="A/2"/></div>
+        <div><label class="lbl">Rendita €</label><input type="text" class="inp" id="mapt-rendita" placeholder="450,00"/></div>
+      </div>
+      <label class="lbl">Sezione <span style="font-size:10px;color:#8E8E93">(solo se presente)</span></label>
+      <input type="text" class="inp" id="mapt-sez" placeholder="es. A"/>
+      <div class="g2">
+        <div><label class="lbl">Foglio</label><input type="text" class="inp" id="mapt-foglio"/></div>
+        <div><label class="lbl">Particella</label><input type="text" class="inp" id="mapt-particella"/></div>
+      </div>
+      <label class="lbl">Subalterno</label>
+      <input type="text" class="inp" id="mapt-sub"/>
+    </div></div>
+    <div class="card"><div class="cb">
+      <div class="sec">LOCATORI</div>
+      <div id="mapt-locs"></div>
+      <button class="bd" style="margin-top:8px" onclick="addLocMod()">+ Aggiungi locatore</button>
+    </div></div>
+    <div class="err" id="mapt-err" style="display:none"></div>
+  </div>
+  <div style="position:fixed;bottom:0;left:0;right:0;padding:12px 16px 32px;background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.07);z-index:10">
+    <button class="bp" id="btn-salva-mod-apt">Salva modifiche</button>
+  </div>
   </div>
 </div>
 
@@ -1335,23 +1372,115 @@ function apriApt(id) {
 }
 
 function apriModApt() {
-  ST('mapt-ttl', curApt?curApt.nome:'');
-  var inp = T('mapt-nome'); if(inp) inp.value = curApt?curApt.nome:'';
-  SH('mapt-ok', false);
+  if (!curApt) return;
+  ST('mapt-ttl', curApt.nome || 'Immobile');
+  // Popola tutti i campi
+  var set = function(id, val){ var e=T(id); if(e) e.value=val||''; };
+  set('mapt-nome',     curApt.nome);
+  set('mapt-comune',   curApt.comune);
+  set('mapt-via',      curApt.via);
+  set('mapt-nciv',     curApt.nCivico);
+  set('mapt-piano',    curApt.piano);
+  set('mapt-scala',    curApt.scala);
+  set('mapt-interno',  curApt.interno);
+  set('mapt-vani',     curApt.nVani);
+  set('mapt-cat',      curApt.catCategoria);
+  set('mapt-rendita',  curApt.catRendita);
+  set('mapt-sez',      curApt.catSezione);
+  set('mapt-foglio',   curApt.catFoglio);
+  set('mapt-particella',curApt.catParticella);
+  set('mapt-sub',      curApt.catSubalterno);
+  // Popola locatori
+  var locs = curApt.locatori && curApt.locatori.length ? curApt.locatori : [{}];
+  var el = T('mapt-locs'); if (el) {
+    el.innerHTML = '';
+    locs.forEach(function(p,i){ el.innerHTML += pbBlock('l',i,p).replace(/remP\(/g,'remPMod('); });
+  }
+  if(T('mapt-err')) T('mapt-err').style.display='none';
   apriOv('ov-mod-apt');
 }
 
 function salvaModApt() {
-  var inp = T('mapt-nome'); if(!inp||!inp.value.trim()){alert('Inserisci un nome');return;}
-  curApt.nome = inp.value.trim();
+  var g = function(id){ var e=T(id); return e?e.value.trim():''; };
+  if (!g('mapt-nome')) { var err=T('mapt-err'); if(err){err.textContent='Inserisci il nome';err.style.display='';} return; }
+  // Leggi locatori dal DOM
+  var locsEl = T('mapt-locs');
+  var locatori = [];
+  if (locsEl) {
+    locsEl.querySelectorAll('.pb').forEach(function(b, i) {
+      var bg = function(cls){ var e=b.querySelector('.'+cls); return e?e.value||'':''; };
+      var dt = b.querySelector('.pb-doctipo');
+      var ced = b.querySelector('.pb-ced');
+      locatori.push({
+        cognome:bg('pb-cog'), nome:bg('pb-nom'),
+        luogoNascita:bg('pb-lng'), dataNascita:bg('pb-dtn'),
+        cf:bg('pb-cf'), comuneResidenza:bg('pb-res'), viaResidenza:bg('pb-via'),
+        docTipo:dt?dt.value:'', docNum:bg('pb-docnum'),
+        docRilascio:bg('pb-docril'), docScadenza:bg('pb-docsca'), docEnte:bg('pb-docente'),
+        titolo:bg('pb-tit'), quota:bg('pb-quo'), cedolare:ced?ced.value:''
+      });
+    });
+  }
+  // Aggiorna curApt
+  curApt.nome         = g('mapt-nome');
+  curApt.comune       = g('mapt-comune');
+  curApt.via          = g('mapt-via');
+  curApt.nCivico      = g('mapt-nciv');
+  curApt.piano        = g('mapt-piano');
+  curApt.scala        = g('mapt-scala');
+  curApt.interno      = g('mapt-interno');
+  curApt.nVani        = g('mapt-vani');
+  curApt.catCategoria = g('mapt-cat');
+  curApt.catRendita   = g('mapt-rendita');
+  curApt.catSezione   = g('mapt-sez');
+  curApt.catFoglio    = g('mapt-foglio');
+  curApt.catParticella= g('mapt-particella');
+  curApt.catSubalterno= g('mapt-sub');
+  curApt.locatori     = locatori;
+  curApt.indirizzo    = (curApt.via||'')+' n°'+(curApt.nCivico||'')+', '+(curApt.comune||'');
+
   api('saveAppartamento', {data:curApt}, function(err,r){
     if (!err&&r&&r.ok) {
-      SH('mapt-ok', true);
+      // Aggiorna cache locale
+      for(var i=0;i<D.appartamenti.length;i++){
+        if(D.appartamenti[i].id===curApt.id){ D.appartamenti[i]=curApt; break; }
+      }
+      chiudiOv('ov-mod-apt');
+      // Aggiorna intestazione overlay apt
       ST('oa-ttl', curApt.nome);
-      for(var i=0;i<D.appartamenti.length;i++){if(D.appartamenti[i].id===curApt.id){D.appartamenti[i].nome=curApt.nome;break;}}
+      var indEl=T('oa-ind'); if(indEl) indEl.textContent=curApt.indirizzo||curApt.via||'';
+      var catEl=T('oa-cat'); if(catEl) catEl.textContent=curApt.catCategoria||'';
       renderImmobili();
     } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
   });
+}
+
+function addLocMod() {
+  // Leggi locatori esistenti prima di aggiungere
+  var locsEl = T('mapt-locs'); if (!locsEl) return;
+  var existing = [];
+  locsEl.querySelectorAll('.pb').forEach(function(b,i){
+    var bg=function(cls){var e=b.querySelector('.'+cls);return e?e.value||'':'';}; 
+    var dt=b.querySelector('.pb-doctipo'); var ced=b.querySelector('.pb-ced');
+    existing.push({cognome:bg('pb-cog'),nome:bg('pb-nom'),luogoNascita:bg('pb-lng'),dataNascita:bg('pb-dtn'),cf:bg('pb-cf'),comuneResidenza:bg('pb-res'),viaResidenza:bg('pb-via'),docTipo:dt?dt.value:'',docNum:bg('pb-docnum'),docRilascio:bg('pb-docril'),docScadenza:bg('pb-docsca'),docEnte:bg('pb-docente'),titolo:bg('pb-tit'),quota:bg('pb-quo'),cedolare:ced?ced.value:''});
+  });
+  existing.push({});
+  locsEl.innerHTML = '';
+  existing.forEach(function(p,i){ locsEl.innerHTML+=pbBlock('l',i,p).replace(/remP\(/g,'remPMod('); });
+}
+
+function remPMod(t, i) {
+  var locsEl = T('mapt-locs'); if (!locsEl) return;
+  var existing = [];
+  locsEl.querySelectorAll('.pb').forEach(function(b,idx){
+    var bg=function(cls){var e=b.querySelector('.'+cls);return e?e.value||'':'';}; 
+    var dt=b.querySelector('.pb-doctipo'); var ced=b.querySelector('.pb-ced');
+    existing.push({cognome:bg('pb-cog'),nome:bg('pb-nom'),luogoNascita:bg('pb-lng'),dataNascita:bg('pb-dtn'),cf:bg('pb-cf'),comuneResidenza:bg('pb-res'),viaResidenza:bg('pb-via'),docTipo:dt?dt.value:'',docNum:bg('pb-docnum'),docRilascio:bg('pb-docril'),docScadenza:bg('pb-docsca'),docEnte:bg('pb-docente'),titolo:bg('pb-tit'),quota:bg('pb-quo'),cedolare:ced?ced.value:''});
+  });
+  if (existing.length <= 1) return; // almeno uno
+  existing.splice(i, 1);
+  locsEl.innerHTML = '';
+  existing.forEach(function(p,i2){ locsEl.innerHTML+=pbBlock('l',i2,p).replace(/remP\(/g,'remPMod('); });
 }
 
 function eliminaApt() {
@@ -1498,59 +1627,97 @@ function inviaMsgLibero() {
 function apriNuovoApt() { naptStep=0; naptD={}; renderNapt(); apriOv('ov-napt'); }
 
 function renderNapt() {
-  ST('napt-ttl','Passo '+(naptStep+1)+' di 3');
-  var prog=T('napt-prog'); if(prog){prog.innerHTML=''; for(var i=0;i<3;i++){var d=document.createElement('div');d.className='pd';d.style.background=i<naptStep?'#2D7A4F':i===naptStep?'#E8631A':'#e5e5e5';prog.appendChild(d);}}
+  var NAPT_STEPS = 4;
+  ST('napt-ttl','Passo '+(naptStep+1)+' di '+NAPT_STEPS);
+  var prog=T('napt-prog'); if(prog){prog.innerHTML=''; for(var i=0;i<NAPT_STEPS;i++){var d=document.createElement('div');d.className='pd';d.style.background=i<naptStep?'#2D7A4F':i===naptStep?'#E8631A':'#e5e5e5';prog.appendChild(d);}}
   var body=T('napt-body'); var btn=T('napt-btn'); if(!body||!btn) return;
+
   if (naptStep===0) {
     body.innerHTML='<div class="card"><div class="cb"><div class="sec">NOME IMMOBILE</div>'
       +'<div class="info">Es. Casa Garibaldi, Bilocale centro</div>'
       +'<label class="lbl">Nome immobile *</label>'
-      +'<input type="text" class="inp" id="n0" placeholder="es. Casa Garibaldi" value="'+(naptD.nome||'')+'"/>'
+      +'<input type="text" class="inp" id="n0" placeholder="es. Casa Garibaldi" value="'+(naptD.nome||'')+'"\/>'
       +'</div></div>';
     btn.textContent='Avanti: Dati immobile';
+
   } else if (naptStep===1) {
     body.innerHTML='<div class="card"><div class="cb"><div class="sec">DATI IMMOBILE</div>'
       +'<label class="lbl">Comune</label><input type="text" class="inp" id="n1" placeholder="L AQUILA" value="'+(naptD.comune||'')+'"/>'
-      +'<label class="lbl">Via e n. civico</label><input type="text" class="inp" id="n2" placeholder="VIA GARIBALDI 15" value="'+(naptD.via||'')+'"/>'
+      +'<label class="lbl">Via</label><input type="text" class="inp" id="n2" placeholder="VIA GARIBALDI" value="'+(naptD.via||'')+'"/>'
+      +'<label class="lbl">N° civico</label><input type="text" class="inp" id="n2b" placeholder="15" value="'+(naptD.nCivico||'')+'"/>'
       +'<div class="g2"><div><label class="lbl">Piano</label><input type="text" class="inp" id="n3" placeholder="2" value="'+(naptD.piano||'')+'"/></div>'
-      +'<div><label class="lbl">Interno</label><input type="text" class="inp" id="n4" placeholder="3" value="'+(naptD.interno||'')+'"/></div></div>'
+      +'<div><label class="lbl">Scala</label><input type="text" class="inp" id="n3b" placeholder="A" value="'+(naptD.scala||'')+'"/></div></div>'
+      +'<div class="g2"><div><label class="lbl">Interno</label><input type="text" class="inp" id="n4" placeholder="3" value="'+(naptD.interno||'')+'"/></div>'
+      +'<div><label class="lbl">N. vani</label><input type="text" class="inp" id="n4b" placeholder="4" value="'+(naptD.nVani||'')+'"/></div></div>'
       +'<div class="sec" style="margin-top:4px">DATI CATASTALI</div>'
       +'<div class="g2"><div><label class="lbl">Categoria</label><input type="text" class="inp" id="n5" placeholder="A/2" value="'+(naptD.catCategoria||'')+'"/></div>'
-      +'<div><label class="lbl">Rendita</label><input type="text" class="inp" id="n6" placeholder="450,00" value="'+(naptD.catRendita||'')+'"/></div></div>'
-      +'<label class="lbl">Sezione catastale <span style="font-size:10px;color:#8E8E93;font-weight:500">(solo se presente)</span></label>'
-      +'<input type="text" class="inp" id="nSez" placeholder="es. A oppure BO" value="'+(naptD.catSezione||'')+'"/>'
+      +'<div><label class="lbl">Rendita €</label><input type="text" class="inp" id="n6" placeholder="450,00" value="'+(naptD.catRendita||'')+'"/></div></div>'
+      +'<label class="lbl">Sezione catastale <span style="font-size:10px;color:#8E8E93">(solo se presente)</span></label>'
+      +'<input type="text" class="inp" id="nSez" placeholder="es. A" value="'+(naptD.catSezione||'')+'"/>'
       +'<div class="g2"><div><label class="lbl">Foglio</label><input type="text" class="inp" id="n7" placeholder="45" value="'+(naptD.catFoglio||'')+'"/></div>'
       +'<div><label class="lbl">Particella</label><input type="text" class="inp" id="n8" placeholder="123" value="'+(naptD.catParticella||'')+'"/></div></div>'
       +'<label class="lbl">Subalterno</label><input type="text" class="inp" id="n9" placeholder="4" value="'+(naptD.catSubalterno||'')+'"/>'
       +'</div></div>';
-    btn.textContent='Avanti: Locatore';
+    btn.textContent='Avanti: Locatori';
+
+  } else if (naptStep===2) {
+    // Locatori completi con pbBlock
+    if (!naptD.locatori || !naptD.locatori.length) naptD.locatori = [{}];
+    var locHtml = '<div id="napt-locs">';
+    naptD.locatori.forEach(function(p,i){ locHtml += pbBlock('l',i,p).replace(/remP\(/g,"remPNapt("); });
+    locHtml += '</div>';
+    body.innerHTML = '<div class="card"><div class="cb"><div class="sec">LOCATORI</div>'
+      + locHtml
+      +'<button class="bd" style="margin-top:8px" onclick="addPNapt()">+ Aggiungi locatore</button>'
+      +'</div></div>';
+    btn.textContent='Avanti: Salva immobile';
+
   } else {
-    body.innerHTML='<div class="card"><div class="cb"><div class="sec">LOCATORE</div>'
-      +'<label class="lbl">Nome e Cognome</label><input type="text" class="inp" id="na" placeholder="MARIO ROSSI" value="'+(naptD.locNome||'')+'"/>'
-      +'<label class="lbl">Codice Fiscale</label><input type="text" class="inp" id="nb2" placeholder="RSSMRA70A01G878X" style="font-family:monospace" value="'+(naptD.locCF||'')+'"/>'
-      +'<label class="lbl">Indirizzo residenza</label><input type="text" class="inp" id="nc2" placeholder="VIA ROMA 1, L\'AQUILA" value="'+(naptD.locResidenza||'')+'"/>'
-      +'<label class="lbl">Telefono</label><input type="text" class="inp" id="nd" placeholder="+39 333 111 2222" value="'+(naptD.locTel||'')+'"/>'
+    // Step 3: riepilogo e salva
+    var locRie = (naptD.locatori||[]).map(function(l){
+      return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7;font-size:13px"><b>'+(l.cognome||'')+(l.nome?' '+l.nome:'')+'</b>'+(l.cf?' — '+l.cf:'')+'</div>';
+    }).join('');
+    body.innerHTML = '<div class="card"><div class="cb"><div class="sec">RIEPILOGO IMMOBILE</div>'
+      +'<div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:8px">'+(naptD.nome||'')+'</div>'
+      +'<div style="font-size:12px;color:var(--tx2);margin-bottom:12px">'+(naptD.via||'')+' n°'+(naptD.nCivico||'')+' — '+(naptD.comune||'')+'</div>'
+      +'<div class="sec">LOCATORI</div>'
+      + locRie
       +'</div></div>';
     btn.textContent='Salva immobile';
   }
 }
+
 
 function naptAvanti() {
   if (naptStep===0) {
     naptD.nome=(T('n0')||{}).value||'';
     if(!naptD.nome.trim()){alert("Inserisci il nome dell'immobile");return;}
   } else if (naptStep===1) {
-    naptD.comune=(T('n1')||{}).value||''; naptD.via=(T('n2')||{}).value||'';
-    naptD.piano=(T('n3')||{}).value||''; naptD.interno=(T('n4')||{}).value||'';
-    naptD.catCategoria=(T('n5')||{}).value||''; naptD.catRendita=(T('n6')||{}).value||'';
-    naptD.catSezione=(T('nSez')||{}).value||''; naptD.catFoglio=(T('n7')||{}).value||''; naptD.catParticella=(T('n8')||{}).value||'';
+    naptD.comune   =(T('n1')||{}).value||'';
+    naptD.via      =(T('n2')||{}).value||'';
+    naptD.nCivico  =(T('n2b')||{}).value||'';
+    naptD.piano    =(T('n3')||{}).value||'';
+    naptD.scala    =(T('n3b')||{}).value||'';
+    naptD.interno  =(T('n4')||{}).value||'';
+    naptD.nVani    =(T('n4b')||{}).value||'';
+    naptD.catCategoria=(T('n5')||{}).value||'';
+    naptD.catRendita  =(T('n6')||{}).value||'';
+    naptD.catSezione  =(T('nSez')||{}).value||'';
+    naptD.catFoglio   =(T('n7')||{}).value||'';
+    naptD.catParticella=(T('n8')||{}).value||'';
     naptD.catSubalterno=(T('n9')||{}).value||'';
-    naptD.indirizzo=(naptD.via||'')+', '+(naptD.comune||'');
+    naptD.indirizzo=(naptD.via||'')+' n°'+(naptD.nCivico||'')+', '+(naptD.comune||'');
+  } else if (naptStep===2) {
+    // Leggi locatori completi dal DOM
+    leggiPersoneNapt();
+    if(!naptD.locatori||!naptD.locatori.length||!(naptD.locatori[0].cognome||naptD.locatori[0].nome)){
+      alert('Inserisci almeno un locatore'); return;
+    }
   } else {
-    naptD.locNome=(T('na')||{}).value||''; naptD.locCF=(T('nb2')||{}).value||'';
-    naptD.locResidenza=(T('nc2')||{}).value||''; naptD.locTel=(T('nd')||{}).value||'';
+    // Step 3: salva
+    naptD.userId = S && S.user ? (S.user.userId||S.user.id||'') : '';
     api('saveAppartamento',{data:naptD},function(err,r){
-      if(!err&&r&&r.ok){ chiudiOv('ov-napt'); naptStep=0; naptD={}; caricaDati(); alert('Immobile salvato!'); }
+      if(!err&&r&&r.ok){ chiudiOv('ov-napt'); naptStep=0; naptD={}; caricaDati(); }
       else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
     });
     return;
@@ -1559,7 +1726,59 @@ function naptAvanti() {
   renderNapt();
 }
 
-// ── NUOVO CONTRATTO ───────────────────────────────────────────
+function leggiPersoneNapt() {
+  // Legge i locatori dal wizard immobile (container #napt-locs)
+  var container = T('napt-locs');
+  if (!container) return;
+  if (!naptD.locatori) naptD.locatori = [];
+  var blocks = container.querySelectorAll('.pb');
+  for (var i=0; i<blocks.length; i++) {
+    if (!naptD.locatori[i]) naptD.locatori[i] = {};
+    var b = blocks[i];
+    var g = function(cls){ var el=b.querySelector('.'+cls); return el?el.value||'':''; };
+    naptD.locatori[i].cognome       = g('pb-cog');
+    naptD.locatori[i].nome          = g('pb-nom');
+    naptD.locatori[i].luogoNascita  = g('pb-lng');
+    naptD.locatori[i].dataNascita   = g('pb-dtn');
+    naptD.locatori[i].cf            = g('pb-cf');
+    naptD.locatori[i].comuneResidenza = g('pb-res');
+    naptD.locatori[i].viaResidenza  = g('pb-via');
+    var dt = b.querySelector('.pb-doctipo');
+    naptD.locatori[i].docTipo     = dt ? dt.value||'' : '';
+    naptD.locatori[i].docNum      = g('pb-docnum');
+    naptD.locatori[i].docRilascio = g('pb-docril');
+    naptD.locatori[i].docScadenza = g('pb-docsca');
+    naptD.locatori[i].docEnte     = g('pb-docente');
+    naptD.locatori[i].titolo      = g('pb-tit');
+    naptD.locatori[i].quota       = g('pb-quo');
+    var ced = b.querySelector('.pb-ced');
+    naptD.locatori[i].cedolare = ced ? ced.value||'' : '';
+  }
+}
+
+function addPNapt() {
+  leggiPersoneNapt();
+  if (!naptD.locatori) naptD.locatori = [];
+  naptD.locatori.push({});
+  var el = T('napt-locs'); if (!el) return;
+  el.innerHTML = '';
+  naptD.locatori.forEach(function(p,i){
+    el.innerHTML += pbBlock('l',i,p).replace(/remP\(/g,'remPNapt(');
+  });
+}
+
+function remPNapt(t,i) {
+  leggiPersoneNapt();
+  if (!naptD.locatori || naptD.locatori.length <= 1) return;
+  naptD.locatori.splice(i,1);
+  var el = T('napt-locs'); if (!el) return;
+  el.innerHTML = '';
+  naptD.locatori.forEach(function(p,i2){
+    el.innerHTML += pbBlock('l',i2,p).replace(/remP\(/g,'remPNapt(');
+  });
+}
+
+
 function apriNuovoCnt() {
   ncntStep=0;
   ncntD={appartamentoId:curApt?curApt.id:'', locatori:[{}], conduttori:[{}], garanti:[]};
@@ -1706,15 +1925,21 @@ function buildNcntStep() {
       +'<button class="bd" style="margin-top:4px" onclick="addPert()">+ Aggiungi pertinenza</button>'
       +'</div></div>';
   } else if(ncntStep===4){
-    h='<div class="card"><div class="cb"><div class="sec">LOCATORI</div><div id="nlocs">';
-    ncntD.locatori.forEach(function(_,i){ h+=pbBlock('l',i); });
-    h+='</div><button class="ba" onclick="addP(\'l\')">+ Aggiungi locatore</button></div></div>';
+    if((!ncntD.locatori||!ncntD.locatori.length||!(ncntD.locatori[0].cognome||ncntD.locatori[0].nome))&&curApt&&curApt.locatori&&curApt.locatori.length){
+      ncntD.locatori=JSON.parse(JSON.stringify(curApt.locatori));
+    }
+    if(!ncntD.locatori||!ncntD.locatori.length) ncntD.locatori=[{}];
+    h='<div class="card"><div class="cb"><div class="sec">LOCATORI</div>';
+    if(curApt&&curApt.locatori&&curApt.locatori.length)h+='<div class="infob" style="margin-bottom:10px">Precompilati dall\'immobile. Verifica o modifica.</div>';
+    h+='<div id="nlocs">';
+    ncntD.locatori.forEach(function(p,i){ h+=pbBlock('l',i,p); });
+    h+='</div><button class="bd" onclick="addP(\'l\')">+ Aggiungi locatore</button></div></div>';
   } else if(ncntStep===5){
     h='<div class="card"><div class="cb"><div class="sec">CONDUTTORI</div>'
       +(ncntD.tipo==='Tipo B'?'<div class="infob">Tipo B: indicare motivo transitorietà.</div>':'')
       +(ncntD.tipo==='Tipo C'?'<div class="infob">Tipo C: indicare facolta e matricola.</div>':'')
       +'<div id="ncons">';
-    ncntD.conduttori.forEach(function(_,i){ h+=pbBlock('c',i); });
+    ncntD.conduttori.forEach(function(p,i){ h+=pbBlock('c',i,p); });
     h+='</div><button class="ba" onclick="addP(\'c\')">+ Aggiungi conduttore</button></div></div>';
     h+='<div class="card"><div class="cb"><div class="sec">PERSONE CONVIVENTI</div>'
       +'<div style="font-size:12px;color:#8E8E93;margin-bottom:8px">Indicare nome e cognome delle persone conviventi con il conduttore (art. 7). Se nessuna scrivere "nessuno".</div>'
@@ -1722,7 +1947,7 @@ function buildNcntStep() {
       +'</div></div>';
   } else if(ncntStep===6){
     h='<div class="card"><div class="cb"><div class="sec">GARANTI (OPZIONALI)</div><div id="ngars">';
-    ncntD.garanti.forEach(function(_,i){ h+=pbBlock('g',i); });
+    ncntD.garanti.forEach(function(p,i){ h+=pbBlock('g',i,p); });
     h+='</div><button class="ba" onclick="addP(\'g\')">+ Aggiungi garante</button></div></div>';
   } else if(ncntStep===7){
     h='<div class="card"><div class="cb"><div class="sec">NOTE E CLAUSOLE AGGIUNTIVE</div>'
@@ -1809,33 +2034,40 @@ function togG(id) {
   var b=T(id+'-b'); if(b){b.className='cb2'+(ncntD[id]?' on':'');b.innerHTML=ncntD[id]?'&#10003;':'';}
 }
 
-function pbBlock(t,i) {
+function pbBlock(t,i,p) {
+  p = p || {};
   var isL=t==='l', isG=t==='g';
   var lbl=isL?'LOCATORE':isG?'GARANTE':'CONDUTTORE';
   var showMot=t==='c'&&(ncntD.tipo==='Tipo B'||ncntD.tipo==='Tipo C');
+  // Seleziona il tipo documento corretto
+  var docOpts=['','Carta di identita','Passaporto','Patente di guida'];
+  var docSel = docOpts.map(function(o){ return '<option'+(p.docTipo===o&&o?' selected':'')+'>'+o+'</option>'; }).join('');
+  var cedOpts=['Si','No'];
+  var cedSel = cedOpts.map(function(o){ return '<option'+(p.cedolare===o?' selected':'')+'>'+o+'</option>'; }).join('');
   var h='<div class="pb" id="pb-'+t+'-'+i+'">'
     +'<div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:10px">'+lbl+' '+(i+1)+'</div>'
     +'<button class="pr" onclick="remP(\''+t+'\','+i+')">&#10005;</button>'
-    +'<label class="lbl">Cognome</label><input type="text" class="inp pb-cog" placeholder="ROSSI"/>'
-    +'<label class="lbl">Nome</label><input type="text" class="inp pb-nom" placeholder="MARIO"/>'
-    +'<div class="g2"><div><label class="lbl">Luogo nascita</label><input type="text" class="inp pb-lng" placeholder="L AQUILA"/></div>'
-    +'<div><label class="lbl">Data nascita</label><input type="text" class="inp pb-dtn" placeholder="01/01/1980" maxlength="10" oninput="autoDate(this)"/></div></div>'
-    +'<label class="lbl">Codice Fiscale</label><input type="text" class="inp pb-cf" placeholder="RSSMRA80A01G878X" style="font-family:monospace"/>'
-    +'<label class="lbl">Comune residenza</label><input type="text" class="inp pb-res" placeholder="L AQUILA"/>'
-    +'<label class="lbl">Via e n. civico</label><input type="text" class="inp pb-via" placeholder="VIA ROMA 1"/>'
+    +'<label class="lbl">Cognome</label><input type="text" class="inp pb-cog" placeholder="ROSSI" value="'+(p.cognome||'')+'"/>'
+    +'<label class="lbl">Nome</label><input type="text" class="inp pb-nom" placeholder="MARIO" value="'+(p.nome||'')+'"/>'
+    +'<div class="g2"><div><label class="lbl">Luogo nascita</label><input type="text" class="inp pb-lng" value="'+(p.luogoNascita||'')+'" placeholder="L AQUILA"/></div>'
+    +'<div><label class="lbl">Data nascita</label><input type="text" class="inp pb-dtn" value="'+(p.dataNascita||'')+'" placeholder="01/01/1980" maxlength="10" oninput="autoDate(this)"/></div></div>'
+    +'<label class="lbl">Codice Fiscale</label><input type="text" class="inp pb-cf" value="'+(p.cf||'')+'" placeholder="RSSMRA80A01G878X" style="font-family:monospace"/>'
+    +'<label class="lbl">Comune residenza</label><input type="text" class="inp pb-res" value="'+(p.comuneResidenza||'')+'" placeholder="L AQUILA"/>'
+    +'<label class="lbl">Via e n. civico</label><input type="text" class="inp pb-via" value="'+(p.viaResidenza||'')+'" placeholder="VIA ROMA 1"/>'
     +'<div class="sec" style="margin-top:4px;margin-bottom:8px">DOCUMENTO DI RICONOSCIMENTO</div>'
-    +'<label class="lbl">Tipo documento</label><select class="inp pb-doctipo"><option value="">-- Seleziona --</option><option>Carta di identita</option><option>Passaporto</option><option>Patente di guida</option></select>'
-    +'<label class="lbl">Numero documento</label><input type="text" class="inp pb-docnum" placeholder="CA00000AA"/>'
-    +'<div class="g2"><div><label class="lbl">Data rilascio</label><input type="text" class="inp pb-docril" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/></div>'
-    +'<div><label class="lbl">Data scadenza</label><input type="text" class="inp pb-docsca" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/></div></div>'
-    +'<label class="lbl">Rilasciato da</label><input type="text" class="inp pb-docente" placeholder="Comune di L&apos;AQUILA"/>';
-  if(isL) h+='<label class="lbl">Titolo</label><input type="text" class="inp pb-tit" placeholder="Proprietario"/>'
-    +'<div class="g2"><div><label class="lbl">Quota %</label><input type="text" class="inp pb-quo" placeholder="100"/></div>'
-    +'<div><label class="lbl">Cedolare</label><select class="inp pb-ced"><option>Si</option><option>No</option></select></div></div>';
-  if(showMot) h+='<label class="lbl">Motivo/Facolta e matricola</label><input type="text" class="inp pb-mot" placeholder="es. Ingegneria 123456"/>';
-  if(isG) h+='<label class="lbl">Conduttore riferimento</label><input type="text" class="inp pb-cr2" placeholder="es. Mario Rossi"/>';
+    +'<label class="lbl">Tipo documento</label><select class="inp pb-doctipo">'+docSel+'</select>'
+    +'<label class="lbl">Numero documento</label><input type="text" class="inp pb-docnum" value="'+(p.docNum||'')+'" placeholder="CA00000AA"/>'
+    +'<div class="g2"><div><label class="lbl">Data rilascio</label><input type="text" class="inp pb-docril" value="'+(p.docRilascio||'')+'" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/></div>'
+    +'<div><label class="lbl">Data scadenza</label><input type="text" class="inp pb-docsca" value="'+(p.docScadenza||'')+'" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/></div></div>'
+    +'<label class="lbl">Rilasciato da</label><input type="text" class="inp pb-docente" value="'+(p.docEnte||'')+'" placeholder="Comune di L\'AQUILA"/>';
+  if(isL) h+='<label class="lbl">Titolo</label><input type="text" class="inp pb-tit" value="'+(p.titolo||'Proprietario')+'" placeholder="Proprietario"/>'
+    +'<div class="g2"><div><label class="lbl">Quota %</label><input type="text" class="inp pb-quo" value="'+(p.quota||'100')+'" placeholder="100"/></div>'
+    +'<div><label class="lbl">Cedolare</label><select class="inp pb-ced">'+cedSel+'</select></div></div>';
+  if(showMot) h+='<label class="lbl">Motivo/Facolta e matricola</label><input type="text" class="inp pb-mot" value="'+(p.mot||'')+'" placeholder="es. Ingegneria 123456"/>';
+  if(isG) h+='<label class="lbl">Conduttore riferimento</label><input type="text" class="inp pb-cr2" value="'+(p.cr2||'')+'" placeholder="es. Mario Rossi"/>';
   h+='</div>'; return h;
 }
+
 
 function addP(t) {
   var map={l:'nlocs',c:'ncons',g:'ngars'};
@@ -1846,12 +2078,14 @@ function addP(t) {
 }
 
 function remP(t,i) {
+  // Prima salva i dati esistenti
+  leggiPersone(t);
   var arr=t==='l'?ncntD.locatori:t==='c'?ncntD.conduttori:ncntD.garanti;
   if((t==='l'||t==='c')&&arr.length<=1) return;
   arr.splice(i,1);
   var map={l:'nlocs',c:'ncons',g:'ngars'};
   var el=T(map[t]); if(!el) return;
-  el.innerHTML=''; arr.forEach(function(_,i2){ el.innerHTML+=pbBlock(t,i2); });
+  el.innerHTML=''; arr.forEach(function(p,i2){ el.innerHTML+=pbBlock(t,i2,p); });
 }
 
 function autoDate(inp) {

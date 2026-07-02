@@ -270,6 +270,7 @@ select.inp{cursor:pointer;}
     <div style="font-size:17px;font-weight:800;margin-bottom:10px">Contratti</div>
     <div id="oa-cnts"></div>
     <button class="bp" onclick="apriNuovoCnt()">+ Nuovo contratto</button>
+    <button class="bs" onclick="apriModAptAs()">✏️ Modifica immobile</button>
     <button class="bs" id="btn-del-apt" style="color:var(--rd);border-color:var(--rdl)">🗑️ Rimuovi immobile</button>
   </div>
 </div>
@@ -741,28 +742,31 @@ function naptAvanti() {
     naptD.nome = (T('n0')||{}).value || '';
     if (!naptD.nome.trim()) { alert("Inserisci il nome dell'immobile"); return; }
   } else if (naptStep === 1) {
-    naptD.comune=(T('n1')||{}).value||''; naptD.via=(T('n2')||{}).value||'';
-    naptD.piano=(T('n3')||{}).value||''; naptD.interno=(T('n4')||{}).value||'';
+    naptD.comune    =(T('n1')||{}).value||''; naptD.via   =(T('n2')||{}).value||'';
+    naptD.nCivico   =(T('n2b')||{}).value||''; naptD.piano=(T('n3')||{}).value||'';
+    naptD.scala     =(T('n3b')||{}).value||''; naptD.interno=(T('n4')||{}).value||'';
+    naptD.nVani     =(T('n4b')||{}).value||'';
     naptD.catCategoria=(T('n5')||{}).value||''; naptD.catRendita=(T('n6')||{}).value||'';
-    naptD.catSezione=(T('nSez')||{}).value||''; naptD.catFoglio=(T('n7')||{}).value||''; naptD.catParticella=(T('n8')||{}).value||'';
-    naptD.catSubalterno=(T('n9')||{}).value||'';
-    naptD.indirizzo = (naptD.via||'') + (naptD.comune?', '+naptD.comune:'');
+    naptD.catSezione  =(T('nSez')||{}).value||''; naptD.catFoglio=(T('n7')||{}).value||'';
+    naptD.catParticella=(T('n8')||{}).value||''; naptD.catSubalterno=(T('n9')||{}).value||'';
+    naptD.indirizzo=(naptD.via||'')+' n°'+(naptD.nCivico||'')+', '+(naptD.comune||'');
+  } else if (naptStep === 2) {
+    leggiPersoneNapt();
+    if (!naptD.locatori||!naptD.locatori.length||!(naptD.locatori[0].cognome||naptD.locatori[0].nome)) {
+      alert('Inserisci almeno un locatore'); return;
+    }
   } else {
-    naptD.locNome=(T('na')||{}).value||''; naptD.locCF=(T('nb2')||{}).value||'';
-    naptD.locResidenza=(T('nc2')||{}).value||''; naptD.locTel=(T('nd')||{}).value||'';
-    naptD.userId = SOCIO.id;
+    naptD.userId = SOCIO ? SOCIO.id : '';
     api('saveAppartamento', { data: naptD }, function(err,r){
-      if (!err && r && r.ok) {
-        chiudiOv('ov-napt'); naptStep=0; naptD={};
-        caricaDatiSocio();
-      } else { alert('Errore: ' + ((r&&r.error)||err||'Riprova')); }
+      if (!err && r && r.ok) { chiudiOv('ov-napt'); naptStep=0; naptD={}; caricaDatiSocio(); }
+      else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
     });
     return;
   }
   naptStep++; renderNapt();
 }
 
-// ── NUOVO CONTRATTO wizard 9 step ─────────────
+
 function apriNuovoCnt() {
   ncntStep = 0;
   ncntD = { appartamentoId: curApt?curApt.id:'', userId:SOCIO.id, locatori:[{}], conduttori:[{}], garanti:[] };
@@ -844,26 +848,33 @@ function buildStep() {
       +'</div></div></div>'
       +'<div class="card"><div class="cb"><div class="sec">PERTINENZE</div>'
       +'<div style="font-size:12px;color:#8E8E93;margin-bottom:10px">Solo pertinenze con dati catastali diversi (garage, cantina, posto auto).</div>'
-      +'<div id="pert-lista"></div>'
+      +'<div id="pert-lista">'+(ncntD.pertinenze&&ncntD.pertinenze.length?ncntD.pertinenze.map(function(p,i){return buildPertBlock(i,p);}).join(''):'')+'</div>'
       +'<button class="bd" style="margin-top:4px" onclick="addPert()">+ Aggiungi pertinenza</button>'
       +'</div></div>';
 
   } else if (ncntStep===4) {
-    h='<div class="card"><div class="cb"><div class="sec">LOCATORI</div><div id="nlocs">';
-    ncntD.locatori.forEach(function(_,i){ h+=pbBlock('l',i); });
-    h+='</div><button class="bd" style="margin-top:4px" onclick="addP(\'l\')">+ Aggiungi locatore</button></div></div>';
+    if((!ncntD.locatori||!ncntD.locatori.length||!(ncntD.locatori[0].cognome||ncntD.locatori[0].nome))&&curApt&&curApt.locatori&&curApt.locatori.length){
+      ncntD.locatori=JSON.parse(JSON.stringify(curApt.locatori));
+    }
+    if(!ncntD.locatori||!ncntD.locatori.length) ncntD.locatori=[{}];
+    h='<div class="card"><div class="cb"><div class="sec">LOCATORI</div>';
+    if(curApt&&curApt.locatori&&curApt.locatori.length)h+='<div class="infob" style="margin-bottom:10px">Precompilati dall\'immobile. Verifica o modifica.</div>';
+    h+='<div id="nlocs">';
+    ncntD.locatori.forEach(function(p,i){ h+=pbBlock('l',i,p); });
+    h+='</div><button class="bd" onclick="addP(\'l\')">+ Aggiungi locatore</button></div></div>';
+  
   } else if (ncntStep===5) {
     h='<div class="card"><div class="cb"><div class="sec">CONDUTTORI</div>'
       +(ncntD.tipo==='Tipo B'||ncntD.tipo==='Tipo C'?'<div class="infob">Indicare motivo/facoltà e matricola nel campo apposito.</div>':'')
       +'<div id="ncons">';
-    ncntD.conduttori.forEach(function(_,i){ h+=pbBlock('c',i); });
+    ncntD.conduttori.forEach(function(p,i){ h+=pbBlock('c',i,p); });
     h+='</div><button class="bd" style="margin-top:4px" onclick="addP(\'c\')">+ Aggiungi conduttore</button>'
       +'</div></div>';
     h+='<div class="card"><div class="cb"><div class="sec">CONVIVENTI</div>'
       +'<input type="text" class="inp" id="c5conv" placeholder="nessuno" value="'+(ncntD.conviventi||'nessuno')+'"/></div></div>';
   } else if (ncntStep===6) {
     h='<div class="card"><div class="cb"><div class="sec">GARANTI (opzionali)</div><div id="ngars">';
-    ncntD.garanti.forEach(function(_,i){ h+=pbBlock('g',i); });
+    ncntD.garanti.forEach(function(p,i){ h+=pbBlock('g',i,p); });
     h+='</div><button class="bd" style="margin-top:4px" onclick="addP(\'g\')">+ Aggiungi garante</button></div></div>';
   } else if (ncntStep===7) {
     h='<div class="card"><div class="cb"><div class="sec">NOTE</div>'
@@ -943,21 +954,25 @@ function pbBlock(t,i){
 }
 
 function addP(t){
+  leggiPersone(t);
   var map={l:'nlocs',c:'ncons',g:'ngars'};
   var arr=t==='l'?ncntD.locatori:t==='c'?ncntD.conduttori:ncntD.garanti;
   arr.push({});
   var el=T(map[t]); if(!el) return;
-  el.innerHTML=''; arr.forEach(function(_,i){ el.innerHTML+=pbBlock(t,i); });
+  el.innerHTML=''; arr.forEach(function(p,i){ el.innerHTML+=pbBlock(t,i,p); });
 }
 
+
 function remP(t,i){
+  leggiPersone(t);
   var arr=t==='l'?ncntD.locatori:t==='c'?ncntD.conduttori:ncntD.garanti;
   if((t==='l'||t==='c')&&arr.length<=1) return;
   arr.splice(i,1);
   var map={l:'nlocs',c:'ncons',g:'ngars'};
   var el=T(map[t]); if(!el) return;
-  el.innerHTML=''; arr.forEach(function(_,i2){ el.innerHTML+=pbBlock(t,i2); });
+  el.innerHTML=''; arr.forEach(function(p,i2){ el.innerHTML+=pbBlock(t,i2,p); });
 }
+
 
 function leggiPersone(t){
   var map={l:'nlocs',c:'ncons',g:'ngars'};
@@ -1004,7 +1019,9 @@ function buildPertBlock(i, p) {
     +'<input type="text" class="inp pert-sez" placeholder="es. A oppure BO" value="'+(p.catSezione||'')+'"/>'
     +'<div class="g2"><div><span class="lbl">Foglio</span><input type="text" class="inp pert-fog" value="'+(p.catFoglio||'')+'"/></div>'
     +'<div><span class="lbl">Particella</span><input type="text" class="inp pert-par" value="'+(p.catParticella||'')+'"/></div></div>'
-    +'<span class="lbl">Subalterno</span><input type="text" class="inp pert-sub" value="'+(p.catSubalterno||'')+'"/>'
+    +'<div class="g2"><div><span class="lbl">Subalterno</span><input type="text" class="inp pert-sub" value="'+(p.catSubalterno||'')+'"/></div>'
+    +'<div><span class="lbl">Categoria</span><input type="text" class="inp pert-cat" placeholder="es. C/6" value="'+(p.catCategoria||'')+'"/></div></div>'
+    +'<span class="lbl">Rendita catastale €</span><input type="text" class="inp pert-rend" placeholder="es. 35,00" value="'+(p.catRendita||'')+'"/>'
     +'</div>';
 }
 
@@ -1029,7 +1046,8 @@ function leggiPertinenze() {
     var g = function(cls){ var e=b.querySelector('.'+cls); return e?e.value||'':''; };
     out.push({
       tipo:g('pert-tipo'), catSezione:g('pert-sez'),
-      catFoglio:g('pert-fog'), catParticella:g('pert-par'), catSubalterno:g('pert-sub')
+      catFoglio:g('pert-fog'), catParticella:g('pert-par'), catSubalterno:g('pert-sub'),
+      catCategoria:g('pert-cat'), catRendita:g('pert-rend')
     });
   });
   return out;
@@ -1206,7 +1224,143 @@ function generaEStampaContrattoAs(ct) {
   else { alert('Il browser ha bloccato il popup. Consenti i popup per questo sito e riprova.'); }
 }
 
+// ── MODIFICA IMMOBILE (assistenza) ───────────────────────────
+function apriModAptAs() {
+  if (!curApt) return;
+  var ttl = T('mapt-ttl-as'); if(ttl) ttl.textContent = curApt.nome||'';
+  var set = function(id,val){ var e=T(id); if(e) e.value=val||''; };
+  set('mapt-nome-as',     curApt.nome);
+  set('mapt-comune-as',   curApt.comune);
+  set('mapt-via-as',      curApt.via);
+  set('mapt-nciv-as',     curApt.nCivico);
+  set('mapt-piano-as',    curApt.piano);
+  set('mapt-scala-as',    curApt.scala);
+  set('mapt-interno-as',  curApt.interno);
+  set('mapt-vani-as',     curApt.nVani);
+  set('mapt-cat-as',      curApt.catCategoria);
+  set('mapt-rendita-as',  curApt.catRendita);
+  set('mapt-sez-as',      curApt.catSezione);
+  set('mapt-foglio-as',   curApt.catFoglio);
+  set('mapt-particella-as',curApt.catParticella);
+  set('mapt-sub-as',      curApt.catSubalterno);
+  var locs = curApt.locatori && curApt.locatori.length ? curApt.locatori : [{}];
+  var el = T('mapt-locs-as'); if(el){
+    el.innerHTML='';
+    locs.forEach(function(p,i){ el.innerHTML+=pbBlock('l',i,p).replace(/remP\(/g,'remPModAs('); });
+  }
+  apriOv('ov-mod-apt-as');
+}
+
+function leggiLocModAs() {
+  var el=T('mapt-locs-as'); if(!el) return [];
+  var out=[];
+  el.querySelectorAll('.pb').forEach(function(b){
+    var g=function(cls){var e=b.querySelector('.'+cls);return e?e.value||'':'';}; 
+    var dt=b.querySelector('.pb-doctipo'); var ced=b.querySelector('.pb-ced');
+    out.push({cognome:g('pb-cog'),nome:g('pb-nom'),luogoNascita:g('pb-lng'),dataNascita:g('pb-dtn'),cf:g('pb-cf'),comuneResidenza:g('pb-res'),viaResidenza:g('pb-via'),docTipo:dt?dt.value:'',docNum:g('pb-docnum'),docRilascio:g('pb-docril'),docScadenza:g('pb-docsca'),docEnte:g('pb-docente'),titolo:g('pb-tit'),quota:g('pb-quo'),cedolare:ced?ced.value:''});
+  });
+  return out;
+}
+
+function addLocModAs() {
+  var locs = leggiLocModAs(); locs.push({});
+  var el=T('mapt-locs-as'); if(!el) return;
+  el.innerHTML='';
+  locs.forEach(function(p,i){ el.innerHTML+=pbBlock('l',i,p).replace(/remP\(/g,'remPModAs('); });
+}
+
+function remPModAs(t, i) {
+  var locs = leggiLocModAs();
+  if (locs.length<=1) return;
+  locs.splice(i,1);
+  var el=T('mapt-locs-as'); if(!el) return;
+  el.innerHTML='';
+  locs.forEach(function(p,i2){ el.innerHTML+=pbBlock('l',i2,p).replace(/remP\(/g,'remPModAs('); });
+}
+
+function salvaModAptAs() {
+  var g=function(id){var e=T(id);return e?e.value.trim():'';};
+  if(!g('mapt-nome-as')){alert('Inserisci il nome');return;}
+  var locs=leggiLocModAs();
+  curApt.nome         =g('mapt-nome-as');
+  curApt.comune       =g('mapt-comune-as');
+  curApt.via          =g('mapt-via-as');
+  curApt.nCivico      =g('mapt-nciv-as');
+  curApt.piano        =g('mapt-piano-as');
+  curApt.scala        =g('mapt-scala-as');
+  curApt.interno      =g('mapt-interno-as');
+  curApt.nVani        =g('mapt-vani-as');
+  curApt.catCategoria =g('mapt-cat-as');
+  curApt.catRendita   =g('mapt-rendita-as');
+  curApt.catSezione   =g('mapt-sez-as');
+  curApt.catFoglio    =g('mapt-foglio-as');
+  curApt.catParticella=g('mapt-particella-as');
+  curApt.catSubalterno=g('mapt-sub-as');
+  curApt.locatori     =locs;
+  curApt.indirizzo    =(curApt.via||'')+' n°'+(curApt.nCivico||'')+', '+(curApt.comune||'');
+
+  api('saveAppartamento',{data:curApt},function(err,r){
+    if(!err&&r&&r.ok){
+      // Aggiorna cache locale
+      for(var i=0;i<ALL_APT.length;i++){if(ALL_APT[i].id===curApt.id){ALL_APT[i]=curApt;break;}}
+      chiudiOv('ov-mod-apt-as');
+      // Aggiorna header overlay apt
+      var ttl=T('oa-ttl'); if(ttl) ttl.textContent=curApt.nome||'';
+      var ind=T('oa-ind'); if(ind) ind.textContent=curApt.indirizzo||'';
+      var cat=T('oa-cat'); if(cat) cat.textContent=curApt.catCategoria||'';
+      renderImmobili();
+    } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+  });
+}
+
 </script>
 <script src="contratti_template.js"></script>
+<!-- ════ OV: MODIFICA APPARTAMENTO ════ -->
+<div id="ov-mod-apt-as" class="ov">
+  <div class="oh">
+    <div><div class="ohlbl">MODIFICA IMMOBILE</div><div class="ohttl" id="mapt-ttl-as">—</div></div>
+    <button class="exbtn" onclick="chiudiOv('ov-mod-apt-as')">← Indietro</button>
+  </div>
+  <div style="padding:16px 16px 100px">
+    <div class="card"><div class="cb">
+      <div class="sec">DATI IMMOBILE</div>
+      <span class="lbl">Nome immobile *</span><input type="text" class="inp" id="mapt-nome-as"/>
+      <span class="lbl">Comune</span><input type="text" class="inp" id="mapt-comune-as"/>
+      <span class="lbl">Via</span><input type="text" class="inp" id="mapt-via-as"/>
+      <span class="lbl">N° civico</span><input type="text" class="inp" id="mapt-nciv-as"/>
+      <div class="g2">
+        <div><span class="lbl">Piano</span><input type="text" class="inp" id="mapt-piano-as"/></div>
+        <div><span class="lbl">Scala</span><input type="text" class="inp" id="mapt-scala-as"/></div>
+      </div>
+      <div class="g2">
+        <div><span class="lbl">Interno</span><input type="text" class="inp" id="mapt-interno-as"/></div>
+        <div><span class="lbl">N. vani</span><input type="text" class="inp" id="mapt-vani-as"/></div>
+      </div>
+    </div></div>
+    <div class="card"><div class="cb">
+      <div class="sec">DATI CATASTALI</div>
+      <div class="g2">
+        <div><span class="lbl">Categoria</span><input type="text" class="inp" id="mapt-cat-as" placeholder="A/2"/></div>
+        <div><span class="lbl">Rendita €</span><input type="text" class="inp" id="mapt-rendita-as"/></div>
+      </div>
+      <span class="lbl">Sezione <span style="font-size:10px;color:#8E8E93">(solo se presente)</span></span>
+      <input type="text" class="inp" id="mapt-sez-as"/>
+      <div class="g2">
+        <div><span class="lbl">Foglio</span><input type="text" class="inp" id="mapt-foglio-as"/></div>
+        <div><span class="lbl">Particella</span><input type="text" class="inp" id="mapt-particella-as"/></div>
+      </div>
+      <span class="lbl">Subalterno</span><input type="text" class="inp" id="mapt-sub-as"/>
+    </div></div>
+    <div class="card"><div class="cb">
+      <div class="sec">LOCATORI</div>
+      <div id="mapt-locs-as"></div>
+      <button class="bd" style="margin-top:8px" onclick="addLocModAs()">+ Aggiungi locatore</button>
+    </div></div>
+  </div>
+  <div style="position:fixed;bottom:0;left:0;right:0;padding:12px 16px 32px;background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.07);z-index:10">
+    <button class="bp" onclick="salvaModAptAs()">Salva modifiche</button>
+  </div>
+</div>
+
 </body>
 </html>
