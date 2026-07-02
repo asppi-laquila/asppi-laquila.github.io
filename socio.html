@@ -1702,7 +1702,7 @@ function buildNcntStep() {
       +'</div></div></div>'
       +'<div class="card"><div class="cb"><div class="sec">PERTINENZE</div>'
       +'<div style="font-size:12px;color:#8E8E93;margin-bottom:10px">Solo pertinenze con dati catastali diversi dall\'unità principale (garage, cantine, posti auto).</div>'
-      +'<div id="pert-lista"></div>'
+      +'<div id="pert-lista">'+(ncntD.pertinenze&&ncntD.pertinenze.length?ncntD.pertinenze.map(function(p,i){return buildPertBlock(i,p);}).join(''):'')+'</div>'
       +'<button class="bd" style="margin-top:4px" onclick="addPert()">+ Aggiungi pertinenza</button>'
       +'</div></div>';
   } else if(ncntStep===4){
@@ -1949,7 +1949,9 @@ function buildPertBlock(i, p) {
     +'<input type="text" class="inp pert-sez" placeholder="es. A oppure BO" value="'+(p.catSezione||'')+'"/>'
     +'<div class="g2"><div><label class="lbl">Foglio</label><input type="text" class="inp pert-fog" value="'+(p.catFoglio||'')+'"/></div>'
     +'<div><label class="lbl">Particella</label><input type="text" class="inp pert-par" value="'+(p.catParticella||'')+'"/></div></div>'
-    +'<label class="lbl">Subalterno</label><input type="text" class="inp pert-sub" value="'+(p.catSubalterno||'')+'"/>'
+    +'<div class="g2"><div><label class="lbl">Subalterno</label><input type="text" class="inp pert-sub" value="'+(p.catSubalterno||'')+'"/></div>'
+    +'<div><label class="lbl">Categoria</label><input type="text" class="inp pert-cat" placeholder="es. C/6" value="'+(p.catCategoria||'')+'"/></div></div>'
+    +'<label class="lbl">Rendita catastale €</label><input type="text" class="inp pert-rend" placeholder="es. 35,00" value="'+(p.catRendita||'')+'"/>'
     +'</div>';
 }
 
@@ -1974,7 +1976,8 @@ function leggiPertinenze() {
     var g = function(cls){ var e=b.querySelector('.'+cls); return e?e.value||'':''; };
     out.push({
       tipo:g('pert-tipo'), catSezione:g('pert-sez'),
-      catFoglio:g('pert-fog'), catParticella:g('pert-par'), catSubalterno:g('pert-sub')
+      catFoglio:g('pert-fog'), catParticella:g('pert-par'), catSubalterno:g('pert-sub'),
+      catCategoria:g('pert-cat'), catRendita:g('pert-rend')
     });
   });
   return out;
