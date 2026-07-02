@@ -267,6 +267,10 @@ select.inp{cursor:pointer;}
       <div style="font-size:12px;color:var(--tx2);margin-bottom:4px">Categoria catastale</div>
       <div style="font-size:14px;font-weight:600" id="oa-cat">—</div>
     </div></div>
+    <div class="card"><div class="cb">
+      <div class="sec">LOCATORI</div>
+      <div id="oa-locs">—</div>
+    </div></div>
     <div style="font-size:17px;font-weight:800;margin-bottom:10px">Contratti</div>
     <div id="oa-cnts"></div>
     <button class="bp" onclick="apriNuovoCnt()">+ Nuovo contratto</button>
@@ -570,6 +574,20 @@ function apriApt(a) {
       div.addEventListener('click', (function(ct){ return function(){ apriCnt(ct); }; })(ct));
       el.appendChild(div);
     });
+  }
+  // Locatori
+  var locsEl = T('oa-locs');
+  if (locsEl) {
+    var locs = a.locatori && a.locatori.length ? a.locatori : [];
+    if (!locs.length && (a.locNome || a.locCF)) locs = [{nome: a.locNome, cognome:'', cf: a.locCF}];
+    locsEl.innerHTML = locs.length ? locs.map(function(l){
+      var nome = ((l.cognome||'')+' '+(l.nome||'')).trim()||'—';
+      return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7">'
+        +'<div style="font-size:14px;font-weight:600">'+nome+'</div>'
+        +(l.cf?'<div style="font-size:12px;color:#8E8E93;font-family:monospace">'+l.cf+'</div>':'')
+        +(l.comuneResidenza?'<div style="font-size:12px;color:#8E8E93">'+l.comuneResidenza+(l.viaResidenza?', '+l.viaResidenza:'')+'</div>':'')
+        +'</div>';
+    }).join('') : '<div style="color:#8E8E93;font-size:13px">Nessun locatore inserito</div>';
   }
   T('btn-del-apt').onclick = function(){ eliminaApt(a); };
   apriOv('ov-apt');
