@@ -676,14 +676,13 @@ textarea.inp{min-height:100px;resize:vertical;}
       <div class="lbl">Indirizzo</div><div class="val" id="oa-ind"></div>
     </div></div>
     <div class="card"><div class="cb">
-      <div class="sec">LOCATORE</div>
-      <div class="lbl">Nome</div><div class="val" id="oa-loc"></div>
-      <div class="lbl">CF</div><div class="val" id="oa-cf" style="font-family:monospace"></div>
+      <div class="sec">LOCATORI</div>
+      <div id="oa-locs"></div>
     </div></div>
     <div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:10px">Contratti</div>
     <div id="oa-cnts"></div>
     <button class="bp" id="btn-nuovo-cnt">+ Nuovo contratto</button>
-    <button class="bs" id="btn-mod-apt">✏️ Modifica nome immobile</button>
+    <button class="bs" id="btn-mod-apt">✏️ Modifica immobile</button>
     <button class="bs" id="btn-del-apt" style="color:var(--red);border-color:#FDEEEC">🗑️ Rimuovi immobile</button>
   </div>
 </div>
@@ -1355,8 +1354,26 @@ function apriApt(id) {
   ST('oa-cat', a.catCategoria||'—');
   ST('oa-piano', a.piano||'—');
   ST('oa-ind', a.indirizzo||a.via||'—');
-  ST('oa-loc', a.locNome||'—');
-  ST('oa-cf', a.locCF||'—');
+  // Popola locatori dinamicamente
+  var locsEl = T('oa-locs');
+  if (locsEl) {
+    var locs = a.locatori && a.locatori.length ? a.locatori : [];
+    if (!locs.length && (a.locNome || a.locCF)) {
+      locs = [{nome: a.locNome, cognome:'', cf: a.locCF}];
+    }
+    if (!locs.length) {
+      locsEl.innerHTML = '<div class="val">Nessun locatore inserito</div>';
+    } else {
+      locsEl.innerHTML = locs.map(function(l) {
+        var nome = ((l.cognome||'') + ' ' + (l.nome||'')).trim() || '—';
+        return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7">'
+          + '<div class="val">'+nome+'</div>'
+          + (l.cf ? '<div class="lbl">CF: <span style="font-family:monospace">'+l.cf+'</span></div>' : '')
+          + (l.comuneResidenza ? '<div class="lbl">Res.: '+l.comuneResidenza+(l.viaResidenza?', '+l.viaResidenza:'')+'</div>' : '')
+          + '</div>';
+      }).join('');
+    }
+  }
   var el = T('oa-cnts'); el.innerHTML='';
   var cnts = D.contratti.filter(function(c){ return c.appartamentoId===id; });
   if (!cnts.length) {
@@ -1379,8 +1396,6 @@ function apriApt(id) {
 }
 
 var _modAptLocsModificati = false; // flag: utente ha toccato i locatori
-
-var _modAptLocsModificati = false;
 function apriModApt() {
   _modAptLocsModificati = false;
   if (!curApt) return;
