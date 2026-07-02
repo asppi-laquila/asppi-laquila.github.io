@@ -1226,6 +1226,7 @@ function generaEStampaContrattoAs(ct) {
 
 // ── MODIFICA IMMOBILE (assistenza) ───────────────────────────
 function apriModAptAs() {
+  _modAptLocsModificatiAs = false;
   if (!curApt) return;
   var ttl = T('mapt-ttl-as'); if(ttl) ttl.textContent = curApt.nome||'';
   var set = function(id,val){ var e=T(id); if(e) e.value=val||''; };
@@ -1262,7 +1263,9 @@ function leggiLocModAs() {
   return out;
 }
 
+var _modAptLocsModificatiAs = false;
 function addLocModAs() {
+  _modAptLocsModificatiAs = true;
   var locs = leggiLocModAs(); locs.push({});
   var el=T('mapt-locs-as'); if(!el) return;
   el.innerHTML='';
@@ -1270,6 +1273,7 @@ function addLocModAs() {
 }
 
 function remPModAs(t, i) {
+  _modAptLocsModificatiAs = true;
   var locs = leggiLocModAs();
   if (locs.length<=1) return;
   locs.splice(i,1);
@@ -1296,7 +1300,7 @@ function salvaModAptAs() {
   curApt.catFoglio    =g('mapt-foglio-as');
   curApt.catParticella=g('mapt-particella-as');
   curApt.catSubalterno=g('mapt-sub-as');
-  curApt.locatori     =locs;
+  if (_modAptLocsModificatiAs) curApt.locatori = locs;
   curApt.indirizzo    =(curApt.via||'')+' n°'+(curApt.nCivico||'')+', '+(curApt.comune||'');
 
   api('saveAppartamento',{data:curApt},function(err,r){

@@ -1371,8 +1371,13 @@ function apriApt(id) {
   apriOv('ov-apt');
 }
 
+var _modAptLocsModificati = false; // flag: utente ha toccato i locatori
+
+var _modAptLocsModificati = false;
 function apriModApt() {
+  _modAptLocsModificati = false;
   if (!curApt) return;
+  _modAptLocsModificati = false;
   ST('mapt-ttl', curApt.nome || 'Immobile');
   // Popola tutti i campi
   var set = function(id, val){ var e=T(id); if(e) e.value=val||''; };
@@ -1421,7 +1426,8 @@ function salvaModApt() {
       });
     });
   }
-  // Aggiorna curApt
+  // Aggiorna curApt — locatori solo se presenti nel DOM
+  var locsValidi = locatori.filter(function(l){ return l.cognome||l.nome||l.cf; });
   curApt.nome         = g('mapt-nome');
   curApt.comune       = g('mapt-comune');
   curApt.via          = g('mapt-via');
@@ -1436,7 +1442,7 @@ function salvaModApt() {
   curApt.catFoglio    = g('mapt-foglio');
   curApt.catParticella= g('mapt-particella');
   curApt.catSubalterno= g('mapt-sub');
-  curApt.locatori     = locatori;
+  if (_modAptLocsModificati) curApt.locatori = locatori; // sovrascrive solo se utente ha modificato
   curApt.indirizzo    = (curApt.via||'')+' n°'+(curApt.nCivico||'')+', '+(curApt.comune||'');
 
   api('saveAppartamento', {data:curApt}, function(err,r){
@@ -1456,6 +1462,7 @@ function salvaModApt() {
 }
 
 function addLocMod() {
+  _modAptLocsModificati = true;
   // Leggi locatori esistenti prima di aggiungere
   var locsEl = T('mapt-locs'); if (!locsEl) return;
   var existing = [];
@@ -1470,6 +1477,7 @@ function addLocMod() {
 }
 
 function remPMod(t, i) {
+  _modAptLocsModificati = true;
   var locsEl = T('mapt-locs'); if (!locsEl) return;
   var existing = [];
   locsEl.querySelectorAll('.pb').forEach(function(b,idx){
