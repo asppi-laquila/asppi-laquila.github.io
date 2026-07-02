@@ -2737,6 +2737,9 @@ function generaEStampaContratto() {
     locatori:      (curCnt.locatori && curCnt.locatori.length) ? curCnt.locatori : (apt.locatori || []),
     // Pertinenze dal contratto
     pertinenze:    curCnt.pertinenze   || [],
+    // Garanti deserializzati
+    garanti:       curCnt.garanti && curCnt.garanti.length ? curCnt.garanti :
+                   (function(){ try{ return JSON.parse(curCnt.garantiJSON||'[]'); }catch(e){ return []; } })(),
   });
 
   // Calcola lettere importi

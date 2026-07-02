@@ -76,19 +76,25 @@ function persona(p, titolo, idx, tipo) {
 
 function garante(g, artRif) {
   if (!g || (!g.nome && !g.cognome)) return '';
-  var nome = vb((g.cognome && g.nome) ? g.cognome + ' ' + g.nome : g.nome, 160);
-  var luogo = v(g.luogoNascita, 100);
-  var data  = v(g.dataNascita, 80);
-  var cf    = vb(g.cf, 160);
-  var res   = v(g.comuneResidenza, 100);
-  var via   = v(g.viaResidenza, 160);
+  var nome    = vb((g.cognome && g.nome) ? g.cognome + ' ' + g.nome : (g.nome || g.cognome || ''), 160);
+  var luogo   = v(g.luogoNascita, 100);
+  var data    = v(g.dataNascita, 80);
+  var cf      = vb(g.cf, 160);
+  var res     = v(g.comuneResidenza, 100);
+  var via     = v(g.viaResidenza, 160);
+  var docTipo = v(g.docTipo, 100);
+  var docNum  = v(g.docNum, 100);
+  var docEnte = v(g.docEnte, 120);
+  var docRil  = v(g.docRilascio, 80);
+  var docSca  = v(g.docScadenza, 80);
   var condRef = v(g.cr2, 140);
-  var canone  = v('', 60);
-  return '<p><i>Il/la Sig./Sig.ra ' + nome + ', nato/a a ' + luogo + ' il ' + data +
-    '., <b>CF:</b> ' + cf + ', residente in ' + res + ', Via ' + via +
-    ', <b>si costituisce nel presente atto irrevocabilmente GARANTE personale e solidale' +
-    ' e senza condizione alcuna per le obbligazioni assunte con il contratto</b>' +
-    ' del/la Sig./Sig.ra ' + condRef + ' come meglio specificato nel successivo art. ' + artRif + ')</i></p>';
+  return '<p>Il/la Sig./Sig.ra <b>' + nome + '</b>, nato/a a ' + luogo + ' il ' + data +
+    ', <b>C.F.: ' + cf + '</b>, residente in ' + res + ', Via ' + via +
+    ', identificato/a mediante ' + docTipo + ' n°' + docNum +
+    ' rilasciata da ' + docEnte + ' il ' + docRil + ', scadente in data ' + docSca + ','
+    + ' <b>si costituisce nel presente atto irrevocabilmente GARANTE personale e solidale'
+    + ' e senza condizione alcuna per le obbligazioni assunte con il contratto</b>'
+    + ' del/la Sig./Sig.ra ' + condRef + ' come meglio specificato nel successivo art. ' + artRif + '.</p>';
 }
 
 function bloccoImmobile(d, allegato) {
@@ -301,6 +307,14 @@ function prepDati(d) {
 
   // n° vani: leggi da nVani o compCamere
   if (!d.compCamere) d.compCamere = d.nVani || '';
+
+  // Deserializza array JSON se arrivano come stringhe
+  if (!d.locatori   || !Array.isArray(d.locatori))   { try { d.locatori   = JSON.parse(d.locatoriJSON   ||'[]'); } catch(e){ d.locatori=[]; } }
+  if (!d.conduttori || !Array.isArray(d.conduttori)) { try { d.conduttori = JSON.parse(d.conduttoriJSON ||'[]'); } catch(e){ d.conduttori=[]; } }
+  if (!d.garanti    || !Array.isArray(d.garanti))    { try { d.garanti    = JSON.parse(d.garantiJSON    ||'[]'); } catch(e){ d.garanti=[]; } }
+  if (!d.pertinenze || !Array.isArray(d.pertinenze)) { try { d.pertinenze = JSON.parse(d.pertinenzaJSON ||'[]'); } catch(e){ d.pertinenze=[]; } }
+  if (!d.locatori.length)   d.locatori   = [{}];
+  if (!d.conduttori.length) d.conduttori = [{}];
 
   // Helper pertinenze
   d.pertTesto = function() {

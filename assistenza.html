@@ -1231,6 +1231,8 @@ function generaEStampaContrattoAs(ct) {
     ammobiliata:   ct.ammobiliata   || apt.ammobiliata || '',
     locatori:      (ct.locatori && ct.locatori.length) ? ct.locatori : (apt.locatori || []),
     pertinenze:    ct.pertinenze    || [],
+    garanti:       ct.garanti && ct.garanti.length ? ct.garanti :
+                   (function(){ try{ return JSON.parse(ct.garantiJSON||'[]'); }catch(e){ return []; } })(),
   });
 
   dati.pertTesto = function() {
