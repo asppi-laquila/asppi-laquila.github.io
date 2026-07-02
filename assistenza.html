@@ -396,24 +396,29 @@ function chiudiOv(id) { var e=T(id); if(e) e.className='ov'; }
 function showErr(id, msg) { var e=T(id); if(e){e.textContent=msg;e.style.display=msg?'':'none';} }
 
 // ── API ───────────────────────────────────────
-function api(action, data, cb) {
-  var payload = Object.assign({ action: action, token: ATOKEN }, data || {});
-  fetch(API, {
-    method: 'POST',
-    headers: {'Content-Type': 'text/plain'},
-    body: JSON.stringify(payload),
-    redirect: 'follow'
-  })
-  .then(function(r){ return r.text(); })
-  .then(function(txt){
-    var r;
-    try { r = JSON.parse(txt); } catch(e) { r = {ok:false, error:'Risposta non valida: '+txt.substring(0,80)}; }
-    cb(null, r);
-  })
-  .catch(function(e){ cb(e.message); });
+function api(action, data, cb, _retry) {
+  var payload = {action: action, token: ADMIN_TOKEN};
+  if (data) { for (var k in data) { if (data.hasOwnProperty(k)) payload[k] = data[k]; } }
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', API_URL, true);
+  xhr.setRequestHeader('Content-Type', 'text/plain');
+  xhr.timeout = 45000;
+  xhr.onload = function() {
+    try { cb(null, JSON.parse(xhr.responseText)); }
+    catch(e) { cb('Errore risposta'); }
+  };
+  xhr.onerror = function() {
+    if (!_retry) { setTimeout(function(){ api(action, data, cb, true); }, 2000); }
+    else { cb('Errore connessione'); }
+  };
+  xhr.ontimeout = function() {
+    if (!_retry) { setTimeout(function(){ api(action, data, cb, true); }, 3000); }
+    else { cb('Timeout — riprova'); }
+  };
+  xhr.send(JSON.stringify(payload));
 }
 
-// ── SOCI ──────────────────────────────────────
+
 function caricaSoci() {
   T('lista-soci').innerHTML = '<div class="info">⏳ Caricamento...</div>';
   api('getUtenti', {}, function(err, r) {

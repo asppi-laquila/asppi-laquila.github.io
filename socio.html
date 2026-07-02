@@ -1044,23 +1044,30 @@ function caricaDati() {
 }
 
 // ── API ───────────────────────────────────────────────────────
-function api(action, data, cb) {
+function api(action, data, cb, _retry) {
   var payload = {action: action, token: S && S.token ? S.token : ''};
-  if (data) {
-    for (var k in data) {
-      if (data.hasOwnProperty(k)) payload[k] = data[k];
-    }
-  }
+  if (data) { for (var k in data) { if (data.hasOwnProperty(k)) payload[k] = data[k]; } }
   var xhr = new XMLHttpRequest();
   xhr.open('POST', API, true);
   xhr.setRequestHeader('Content-Type', 'text/plain');
-  xhr.timeout = 25000;
+  xhr.timeout = 45000; // 45s per il cold start di GAS
   xhr.onload = function() {
     try { cb(null, JSON.parse(xhr.responseText)); }
-    catch(e) { cb('Errore risposta'); }
+    catch(e) { cb('Errore risposta: ' + xhr.responseText.substring(0,100)); }
   };
-  xhr.onerror = function() { cb('Errore connessione'); };
-  xhr.ontimeout = function() { cb('Timeout'); };
+  xhr.onerror = function() {
+    if (!_retry) { setTimeout(function(){ api(action, data, cb, true); }, 2000); }
+    else { cb('Errore connessione'); }
+  };
+  xhr.ontimeout = function() {
+    // Retry automatico una volta in caso di timeout (cold start GAS)
+    if (!_retry) {
+      console.warn('Timeout su ' + action + ', retry...');
+      setTimeout(function(){ api(action, data, cb, true); }, 3000);
+    } else {
+      cb('Timeout — il server è lento, riprova tra qualche secondo');
+    }
+  };
   xhr.send(JSON.stringify(payload));
 }
 
