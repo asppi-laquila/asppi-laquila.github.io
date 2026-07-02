@@ -334,7 +334,7 @@ function generaContratto_A(raw) {
   var dataAl  = vb(fmtData(d.duraAl), 80);
 
   var html = '<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"/>';
-  html += '<title>Contratto Tipo A</title>';
+  html += '<title>' + (d.nomeContratto || 'Contratto Tipo A') + '</title>';
   html += '<style>' + CSS_CONTRATTO + '</style></head><body>';
   html += '<button class="print-btn no-print" onclick="window.print()">🖨️ Stampa / Salva PDF</button>';
   html += '<div class="page">';
@@ -590,7 +590,7 @@ function generaContratto_B(raw) {
   var modalAccesso = v(d.modalitaAccesso, 200);
 
   var html = '<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"/>';
-  html += '<title>Contratto Tipo B</title>';
+  html += '<title>' + (d.nomeContratto || 'Contratto Tipo B') + '</title>';
   html += '<style>' + CSS_CONTRATTO + '</style></head><body>';
   html += '<button class="print-btn no-print" onclick="window.print()">🖨️ Stampa / Salva PDF</button>';
   html += '<div class="page">';
@@ -848,7 +848,7 @@ function generaContratto_C(raw) {
   var modalAccesso = v(d.modalitaAccesso, 200);
 
   var html = '<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"/>';
-  html += '<title>Contratto Tipo C</title>';
+  html += '<title>' + (d.nomeContratto || 'Contratto Tipo C') + '</title>';
   html += '<style>' + CSS_CONTRATTO + '</style></head><body>';
   html += '<button class="print-btn no-print" onclick="window.print()">🖨️ Stampa / Salva PDF</button>';
   html += '<div class="page">';

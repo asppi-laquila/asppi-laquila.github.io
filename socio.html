@@ -2268,7 +2268,8 @@ function ncntAvanti() {
     var locs=ncntD.locatori||[], cons=ncntD.conduttori||[];
     var cogL=(locs[0]&&(locs[0].cognome||locs[0].nome))||'';
     var cogC=(cons[0]&&(cons[0].cognome||cons[0].nome))||'';
-    ncntD.nomeContratto=cogL&&cogC?'CNT_'+cogL+'_'+cogC:(ncntD.tipo||'Contratto');
+    var _anno = new Date().getFullYear().toString().slice(-2);
+    ncntD.nomeContratto = _anno + '_CNT_' + (cogL||'LOCATORE').toUpperCase() + '_' + (cogC||'CONDUTTORE').toUpperCase();
     if(ncntD._mod) ncntD.modificato=new Date().toISOString();
     _lastCntDati = JSON.parse(JSON.stringify(ncntD)); // copia globale per generazione immediata
     api('saveContratto',{data:ncntD},function(err,r){

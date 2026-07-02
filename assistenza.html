@@ -1091,7 +1091,10 @@ function ncntAvanti(){
     var locs=ncntD.locatori||[], cons=ncntD.conduttori||[];
     var cogL=(locs[0]&&(locs[0].cognome||locs[0].nome))||'';
     var cogC=(cons[0]&&(cons[0].cognome||cons[0].nome))||'';
-    ncntD.nomeContratto=cogL&&cogC?'CNT_'+cogL+'_'+cogC:(ncntD.tipo||'Contratto');
+    var tipoDesc = ncntD.tipo==='Tipo A' ? 'Agevolato 3+2' :
+                  ncntD.tipo==='Tipo B' ? 'Transitorio '+(ncntD.duraMesi||'')+'m' :
+                  ncntD.tipo==='Tipo C' ? 'Studenti '+(ncntD.duraMesi||'')+'m' : (ncntD.tipo||'Contratto');
+    ncntD.nomeContratto = new Date().getFullYear().toString().slice(-2) + '_CNT_' + (cogL||'LOCATORE').toUpperCase() + '_' + (cogC||'CONDUTTORE').toUpperCase();
     ncntD.userId = SOCIO.id;
     _lastCntDati = JSON.parse(JSON.stringify(ncntD));
     api('saveContratto', { data: ncntD }, function(err,r){
