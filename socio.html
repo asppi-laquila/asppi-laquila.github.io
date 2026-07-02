@@ -1865,11 +1865,15 @@ function modificaCnt() {
   ncntStep=0;
   ncntD=JSON.parse(JSON.stringify(curCnt));
   ncntD._mod=true;
-  try{ncntD.locatori=JSON.parse(curCnt.locatoriJSON||'[]');}catch(e){ncntD.locatori=[{}];}
+  // Deserializza tutti i campi JSON
+  try{ncntD.locatori  =JSON.parse(curCnt.locatoriJSON  ||'[]');}catch(e){ncntD.locatori=[{}];}
   try{ncntD.conduttori=JSON.parse(curCnt.conduttoriJSON||'[]');}catch(e){ncntD.conduttori=[{}];}
-  try{ncntD.garanti=JSON.parse(curCnt.garantiJSON||'[]');}catch(e){ncntD.garanti=[];}
-  if(!ncntD.locatori.length) ncntD.locatori=[{}];
+  try{ncntD.garanti   =JSON.parse(curCnt.garantiJSON   ||'[]');}catch(e){ncntD.garanti=[];}
+  try{ncntD.pertinenze=JSON.parse(curCnt.pertinenzaJSON||'[]');}catch(e){ncntD.pertinenze=[];}
+  if(!ncntD.locatori.length)   ncntD.locatori=[{}];
   if(!ncntD.conduttori.length) ncntD.conduttori=[{}];
+  // Ripristina campi semplici salvati nel contratto
+  // (già presenti in ncntD dal JSON.parse(JSON.stringify(curCnt)) sopra)
   ST('ncnt-lbl','MODIFICA CONTRATTO');
   renderNcnt();
   apriOv('ov-ncnt');
