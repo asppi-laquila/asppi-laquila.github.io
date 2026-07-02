@@ -25,7 +25,22 @@ p{text-align:justify;margin-bottom:6pt;font-size:9pt;font-family:Verdana,Geneva,
 .print-btn{position:fixed;bottom:24px;right:24px;background:#E8631A;color:#fff;border:none;border-radius:50px;padding:14px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:sans-serif;box-shadow:0 4px 20px rgba(232,99,26,.4);z-index:1000;}
 `;
 
-// ── HELPER ────────────────────────────────────────────────────
+// ── HELPER ──
+function fmtData(d) {
+  if (!d) return '';
+  var s = String(d).trim();
+  // Già in formato gg/mm/aaaa
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(s)) return s;
+  // Formato ISO o simile
+  try {
+    var dt = new Date(s);
+    if (!isNaN(dt)) {
+      return ('0'+dt.getDate()).slice(-2)+'/'+('0'+(dt.getMonth()+1)).slice(-2)+'/'+dt.getFullYear();
+    }
+  } catch(e) {}
+  return s;
+}
+
 function v(val, larghezza) {
   // Se il valore c'è → lo restituisce
   // Se manca → una riga tratteggiata della larghezza giusta
@@ -78,31 +93,32 @@ function garante(g, artRif) {
 }
 
 function bloccoImmobile(d, allegato) {
-  var comune = vb(d.comune || '', 100);
-  var via    = vb(d.via || '', 160);
-  var nciv   = v(d.nCivico || '', 40);
-  var piano  = v(d.piano || '', 60);
-  var scala  = v(d.scala || '', 40);
-  var interno= v(d.interno || '', 40);
-  var vani   = v(d.compCamere || '', 40);
-  var acc    = (d.elemAccessori && d.elemAccessori.trim()) ? d.elemAccessori.trim() : 'nessuno';
-  var arred  = d.ammobiliata === 'si' ? 'ammobiliata' : 'non ammobiliata';
-  var sezione= v(d.catSezione, 40);
-  var foglio = vb(d.catFoglio, 40);
-  var plla   = vb(d.catParticella, 40);
-  var sub    = vb(d.catSubalterno, 40);
-  var cat    = vb(d.catCategoria, 40);
-  var rendita= vb(d.catRendita, 60);
-  var classe = v(d.apeClasse, 30);
-  var tabProp= v(d.tabMillProp, 60);
-  var tabRisc= v(d.tabMillRisc, 60);
+  // I dati immobile vengono dall'appartamento (curApt) mergiato nei dati contratto
+  var apt = d.appartamento || {};
+  var comune  = vb(d.comune  || apt.comune  || '', 100);
+  var via     = vb(d.via     || apt.via     || '', 160);
+  var nciv    = v(d.nCivico  || apt.nCivico || '', 40);
+  var piano   = v(d.piano    || apt.piano   || '', 60);
+  var scala   = v(d.scala    || apt.scala   || '', 40);
+  var interno = v(d.interno  || apt.interno || '', 40);
+  var vani    = v(d.compCamere || d.nVani || apt.nVani || apt.compCamere || '', 40);
+  var acc     = (d.elemAccessori && d.elemAccessori.trim()) ? d.elemAccessori.trim() : 'nessuno';
+  var arred   = d.ammobiliata === 'si' ? 'ammobiliata' : 'non ammobiliata';
+  var sezione = v(d.catSezione || apt.catSezione || '', 40);
+  var foglio  = vb(d.catFoglio  || apt.catFoglio  || '', 40);
+  var plla    = vb(d.catParticella || apt.catParticella || '', 40);
+  var sub     = vb(d.catSubalterno || apt.catSubalterno || '', 40);
+  var cat     = vb(d.catCategoria  || apt.catCategoria  || '', 40);
+  var rendita = vb(d.catRendita    || apt.catRendita    || '', 60);
+  var classe  = v(d.apeClasse  || '', 30);
+  var tabProp = v(d.tabMillProp || apt.tabMillProp || '', 60);
+  var tabRisc = v(d.tabMillRisc || apt.tabMillRisc || '', 60);
   var statoImm = v(d.statoImmobile, 200);
 
   var introImm = (d.tipoLocazione === 'porzione')
     ? 'porzione dell\'unità immobiliare'
     : 'l\'unità immobiliare';
 
-  // Testo pertinenze per la riga introduttiva
   var pertTxt = 'nessuna';
   if (d.pertinenze && d.pertinenze.length) {
     var tipi = d.pertinenze.map(function(p){ return p.tipo || ''; }).filter(Boolean);
@@ -118,20 +134,15 @@ function bloccoImmobile(d, allegato) {
     ', e delle seguenti pertinenze: ' + pertTxt +
     ', ' + arred + ' come da separato elenco sottoscritto dalle parti.</p>';
 
-  // a) dati catastali unità principale
   html += '<p>a) estremi catastali identificativi dell\'unità immobiliare: ' +
     '<b>Sezione ' + sezione + '. Foglio ' + foglio + '. p.lla ' + plla +
     '. sub ' + sub + '. cat. ' + cat + '. rendita Euro ' + rendita + ';</b></p>';
 
-  // a.n) pertinenze con dati catastali completi
   if (d.pertinenze && d.pertinenze.length) {
     d.pertinenze.forEach(function(p, i) {
-      var ptipo = v(p.tipo, 80);
-      var psez  = v(p.catSezione, 40);
-      var pfog  = vb(p.catFoglio, 40);
-      var ppar  = vb(p.catParticella, 40);
-      var psub  = vb(p.catSubalterno, 40);
-      var pcat  = vb(p.catCategoria, 40);
+      var ptipo = v(p.tipo, 80); var psez = v(p.catSezione, 40);
+      var pfog  = vb(p.catFoglio, 40); var ppar = vb(p.catParticella, 40);
+      var psub  = vb(p.catSubalterno, 40); var pcat = vb(p.catCategoria, 40);
       var prend = vb(p.catRendita, 60);
       html += '<p>a.' + (i+1) + ') pertinenza – ' + ptipo +
         ': <b>Sezione ' + psez + '. Foglio ' + pfog + '. p.lla ' + ppar +
@@ -147,7 +158,6 @@ function bloccoImmobile(d, allegato) {
   html += '<p>d) tabelle millesimali: proprietà ' + tabProp +
     ' riscaldamento ' + tabRisc + ' acqua a consumo;</p>';
   html += '<p>La locazione è regolata dalle pattuizioni seguenti.</p>';
-
   return html;
 }
 
@@ -268,10 +278,31 @@ var ACCORDO_B = 'FEDERPROPRIETA\' – ARPE, U.P.P.I., CONFABITARE, CONFEDILIZIA,
 
 // ── PREPARA DATI ──────────────────────────────────────────────
 function prepDati(d) {
-  // d = dati dal wizard (ncntD)
-  // Aggiunge helper per le pertinenze
+  // Normalizza date ISO in gg/mm/aaaa
+  d.duraDal = fmtData(d.duraDal);
+  d.duraAl  = fmtData(d.duraAl);
+
+  // Campi immobile: leggi anche da appartamento annidato se presenti
+  if (!d.comune      && d.appartamento) d.comune       = d.appartamento.comune;
+  if (!d.via         && d.appartamento) d.via          = d.appartamento.via;
+  if (!d.nCivico     && d.appartamento) d.nCivico      = d.appartamento.nCivico;
+  if (!d.piano       && d.appartamento) d.piano        = d.appartamento.piano;
+  if (!d.scala       && d.appartamento) d.scala        = d.appartamento.scala;
+  if (!d.interno     && d.appartamento) d.interno      = d.appartamento.interno;
+  if (!d.compCamere  && d.appartamento) d.compCamere   = d.appartamento.nVani || d.appartamento.compCamere;
+  if (!d.catSezione  && d.appartamento) d.catSezione   = d.appartamento.catSezione;
+  if (!d.catFoglio   && d.appartamento) d.catFoglio    = d.appartamento.catFoglio;
+  if (!d.catParticella && d.appartamento) d.catParticella = d.appartamento.catParticella;
+  if (!d.catSubalterno && d.appartamento) d.catSubalterno = d.appartamento.catSubalterno;
+  if (!d.catCategoria  && d.appartamento) d.catCategoria  = d.appartamento.catCategoria;
+  if (!d.catRendita    && d.appartamento) d.catRendita    = d.appartamento.catRendita;
+
+  // n° vani: leggi da nVani o compCamere
+  if (!d.compCamere) d.compCamere = d.nVani || '';
+
+  // Helper pertinenze
   d.pertTesto = function() {
-    if (!d.pertinenze || !d.pertinenze.length) return v('', 160);
+    if (!d.pertinenze || !d.pertinenze.length) return 'nessuna';
     return d.pertinenze.map(function(p) {
       return (p.tipo || '') + (p.catFoglio ? ' (Fg.' + p.catFoglio + ' p.' + p.catParticella + ' sub.' + p.catSubalterno + ')' : '');
     }).join(', ');
@@ -297,8 +328,8 @@ function generaContratto_A(raw) {
   var depImpL= v(d.depositoImportoLettere, 140);
   var conviventi = (d.conviventi && d.conviventi.trim() && d.conviventi.trim().toLowerCase() !== 'nessuno') ? d.conviventi.trim() : 'nessuno';
   var statoImm   = v(d.statoImmobile, 200);
-  var dataDal = vb(d.duraDal, 80);
-  var dataAl  = vb(d.duraAl, 80);
+  var dataDal = vb(fmtData(d.duraDal), 80);
+  var dataAl  = vb(fmtData(d.duraAl), 80);
 
   var html = '<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"/>';
   html += '<title>Contratto Tipo A</title>';
@@ -371,7 +402,7 @@ function generaContratto_A(raw) {
     ' che il conduttore si obbliga a corrispondere nel domicilio del locatore ovvero a mezzo' +
     ' bonifico bancario in n°12 rate eguali anticipate di' +
     ' <b>euro ' + canMes + ' (' + canMesL + '/00)</b> ciascuna, con scadenza il giorno 5' +
-    ' (cinque/00) di ciascun mese. Il locatore dichiara di volersi avvalere della modalità di' +
+    ' (cinque/00) di ciascun mese' + (d.canoneIBAN&&d.canoneIBAN.trim()?', da versare sul conto corrente bancario IBAN: <b>'+d.canoneIBAN.trim()+'</b>':'') + '. Il locatore dichiara di volersi avvalere della modalità di' +
     ' tassazione sui redditi da locazione prevista dal D.lgs. n. 23 del 14 marzo 2011 denominata' +
     ' "cedolare secca". Pertanto la registrazione fiscale di tale contratto non comporterà alcun' +
     ' pagamento di imposta di registro o imposta di bollo. Non verrà inoltre applicata negli anni' +
@@ -548,8 +579,8 @@ function generaContratto_B(raw) {
   var depMesi = v(d.depositoMesi, 30);
   var mesiDur = vb(d.duraMesi, 40);
   var mesiDurL= v(d.duraMesiLettere, 100);
-  var dataDal = vb(d.duraDal, 80);
-  var dataAl  = vb(d.duraAl, 80);
+  var dataDal = vb(fmtData(d.duraDal), 80);
+  var dataAl  = vb(fmtData(d.duraAl), 80);
   var esigente= v(d.esigenzaTipo, 80);  // 'locatore' o 'conduttore'
   var esigenzaTesto = v(d.esigenzaMotivazione, 300);
   var conviventi = (d.conviventi && d.conviventi.trim() && d.conviventi.trim().toLowerCase() !== 'nessuno') ? d.conviventi.trim() : 'nessuno';
@@ -598,6 +629,7 @@ function generaContratto_B(raw) {
     ' bisogno di alcuna disdetta.</p>';
 
   // ART 2
+  var esigente = (d.esigenzaTipo && d.esigenzaTipo.trim()) ? d.esigenzaTipo.trim() : v('', 80);
   var esigenzaFrase;
   if (d.esigenzaMotivazione === 'altro_loc' || d.esigenzaMotivazione === 'altro_con') {
     esigenzaFrase = (d.esigenzaAltroTesto && d.esigenzaAltroTesto.trim()) ? d.esigenzaAltroTesto.trim() : v('', 300);
@@ -635,7 +667,7 @@ function generaContratto_B(raw) {
     ' annuali o se inferiore all\'anno per il periodo della locazione, che il conduttore si' +
     ' obbliga a corrispondere nel domicilio del locatore ovvero a mezzo bonifico bancario in' +
     ' rate mensili eguali anticipate di <b>euro ' + canMes + ' (' + canMesL + '/00)</b> ciascuna,' +
-    ' con scadenza il giorno 5 (cinque) di ciascun mese. Il locatore dichiara di volersi avvalere' +
+    ' con scadenza il giorno 5 (cinque) di ciascun mese' + (d.canoneIBAN&&d.canoneIBAN.trim()?', da versare sul conto corrente bancario IBAN: <b>'+d.canoneIBAN.trim()+'</b>':'') + '. Il locatore dichiara di volersi avvalere' +
     ' della modalità di tassazione sui redditi da locazione prevista dal D.lgs. n. 23 del 14 marzo' +
     ' 2011 denominata "cedolare secca". Pertanto la registrazione fiscale di tale contratto non' +
     ' comporterà alcun pagamento di imposta di registro o imposta di bollo. Non verrà inoltre' +
@@ -805,8 +837,8 @@ function generaContratto_C(raw) {
   var depImpL = v(d.depositoImportoLettere, 140);
   var depMesi = v(d.depositoMesi, 30);
   var mesiDur = vb(d.duraMesi, 60);
-  var dataDal = vb(d.duraDal, 80);
-  var dataAl  = vb(d.duraAl, 80);
+  var dataDal = vb(fmtData(d.duraDal), 80);
+  var dataAl  = vb(fmtData(d.duraAl), 80);
   var ateneo  = v(d.ateneo, 160);
   var facolta = v(d.facolta, 160);
   var mesiMax = v(d.mesiMax || '12', 30);
@@ -953,7 +985,7 @@ function generaContratto_C(raw) {
     ' corrente indicato dal locatore, in n. 1 rata anticipata di' +
     ' <b>euro ' + primaRata + ' (' + primaRataL + '/00)</b> e le seguenti ' + nRateSucc +
     ' rate da <b>euro ' + rateSucc + ' (' + rateSuccL + '/00)</b> ciascuna, alle seguenti' +
-    ' date: entro il giorno 5 (cinque) di ogni mese.</p>';
+    ' date: entro il giorno 5 (cinque) di ogni mese' + (d.canoneIBAN&&d.canoneIBAN.trim()?', da versare sul conto corrente bancario IBAN: <b>'+d.canoneIBAN.trim()+'</b>':'') + '.</p>';
 
   // ART 4
   html += '<p class="art">Articolo 4</p><p class="art-sub">(Deposito cauzionale e altre forme di garanzia)</p>';

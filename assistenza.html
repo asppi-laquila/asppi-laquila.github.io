@@ -1204,21 +1204,23 @@ function generaEStampaContrattoAs(ct) {
   var apt = ALL_APT.find(function(a){ return a.id === ct.appartamentoId; }) || {};
 
   var dati = Object.assign({}, ct, {
-    comune: apt.comune || apt.indirizzo || '',
-    via: apt.via || '',
-    nCivico: apt.nCivico || '',
-    piano: apt.piano || '',
-    scala: apt.scala || '',
-    interno: apt.interno || '',
-    catSezione: apt.catSezione || '',
-    catFoglio: apt.catFoglio || '',
-    catParticella: apt.catParticella || '',
-    catSubalterno: apt.catSubalterno || '',
+    comune:       apt.comune || apt.indirizzo || '',
+    via:          apt.via || '',
+    nCivico:      apt.nCivico || '',
+    piano:        apt.piano || '',
+    scala:        apt.scala || '',
+    interno:      apt.interno || '',
+    compCamere:   apt.nVani || apt.compCamere || ct.compCamere || '',
+    catSezione:   apt.catSezione || '',
+    catFoglio:    apt.catFoglio || '',
+    catParticella:apt.catParticella || '',
+    catSubalterno:apt.catSubalterno || '',
     catCategoria: apt.catCategoria || '',
-    catRendita: apt.catRendita || '',
-    tabMillProp: apt.tabMillProp || '',
-    tabMillRisc: apt.tabMillRisc || '',
-    ammobiliata: apt.ammobiliata || '',
+    catRendita:   apt.catRendita || '',
+    tabMillProp:  apt.tabMillProp || '',
+    tabMillRisc:  apt.tabMillRisc || '',
+    ammobiliata:  apt.ammobiliata || '',
+    locatori:     (ct.locatori && ct.locatori.length) ? ct.locatori : (apt.locatori || []),
   });
 
   dati.pertTesto = function() {
