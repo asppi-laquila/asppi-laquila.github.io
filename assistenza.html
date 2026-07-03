@@ -415,10 +415,10 @@ function showErr(id, msg) { var e=T(id); if(e){e.textContent=msg;e.style.display
 
 // ── API ───────────────────────────────────────
 function api(action, data, cb, _retry) {
-  var payload = {action: action, token: ADMIN_TOKEN};
+  var payload = {action: action, token: ATOKEN || ADMIN_TOKEN || ''};
   if (data) { for (var k in data) { if (data.hasOwnProperty(k)) payload[k] = data[k]; } }
   var xhr = new XMLHttpRequest();
-  xhr.open('POST', API_URL, true);
+  xhr.open('POST', API_URL || API, true);
   xhr.setRequestHeader('Content-Type', 'text/plain');
   xhr.timeout = 45000;
   xhr.onload = function() {
