@@ -1085,27 +1085,23 @@ function esci() { localStorage.removeItem('asppi_admin_ok'); localStorage.remove
 function carica() {
   var hprens = document.getElementById('h-prens'); if(hprens) hprens.innerHTML='<div class="info">Caricamento...</div>';
   // Chiamate separate per evitare timeout
-  // Carica tutto in parallelo — renderHome quando tutti pronti
-  var _ld = {pren:false, cnt:false, utenti:false, avvisi:false};
-  function _tryRenderHome() {
-    if (_ld.pren && _ld.cnt && _ld.utenti && _ld.avvisi) renderHome();
-  }
+  // Carica tutto — renderHome si aggiorna ad ogni risposta
   apiCall('getPrenotazioni', {}, function(err, r) {
     D.prenotazioni = (!err && r && r.ok) ? (r.data||[]) : [];
-    _ld.pren = true; _tryRenderHome(); renderPren();
+    renderHome(); renderPren();
   });
   apiCall('getContratti', {}, function(err, r) {
     D.contratti = (!err && r && r.ok) ? (r.data||[]) : [];
-    _ld.cnt = true; _tryRenderHome(); renderPrat(); renderChat();
+    renderHome(); renderPrat(); renderChat();
   });
   apiCall('getUtenti', {}, function(err, r) {
     D.utenti = (!err && r && r.ok) ? (r.data||[]) : [];
     window._utentiData = D.utenti;
-    _ld.utenti = true; _tryRenderHome();
+    renderHome();
   });
   apiCall('getAvvisi', {}, function(err, r) {
     D.avvisi = (!err && r && r.ok) ? (r.data||[]) : [];
-    _ld.avvisi = true; _tryRenderHome();
+    renderHome();
   });
   apiCall('getAllChat', {}, function(err, r) {
     D.chat = (!err && r && r.ok) ? (r.data||[]) : [];
@@ -1126,60 +1122,88 @@ function carica() {
 
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome() {
-  // ── CONTATORI ──────────────────────────────────────────────
-  var nSoci    = D.utenti ? D.utenti.length : 0;
-  var prenAttesa = D.prenotazioni.filter(function(p){ return p.stato==='in_attesa'||p.stato==='confermata'; }).length;
-  var cntAttesa  = D.contratti.filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; }).length;
-  var msgNonLetti = D.chat ? D.chat.filter(function(m){ return m.mittente==='socio' && !m.letto; }).length : 0;
-  var incassato  = 0;
-  if (D.pagamenti) D.pagamenti.forEach(function(p){ if(p.stato==='confermato') incassato += parseFloat(p.importo)||0; });
+  // Inizializza D se necessario
+  if (!D.prenotazioni) D.prenotazioni = [];
+  if (!D.contratti)    D.contratti    = [];
+  if (!D.utenti)       D.utenti       = [];
+  if (!D.avvisi)       D.avvisi       = [];
+  if (!D.chat)         D.chat         = [];
+  if (!D.pagamenti)    D.pagamenti    = [];
 
-  setText('sh-soci', nSoci);
-  setText('sh-att',  prenAttesa + cntAttesa); // totale da fare
-  setText('sh-inc',  '€ ' + incassato.toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2}));
-  setText('sh-msg',  msgNonLetti);
+  // ── CONTATORI ──────────────────────────────────────────────
+  var prenDaFare = D.prenotazioni.filter(function(p){
+    return p.stato==='in_attesa' || p.stato==='confermata';
+  }).length;
+  var cntDaFare = D.contratti.filter(function(c){
+    return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true';
+  }).length;
+  var msgNonLetti = D.chat.filter(function(m){
+    return m.mittente==='socio' && !m.letto;
+  }).length;
+  var incassato = 0;
+  D.pagamenti.forEach(function(p){
+    if (p.stato==='confermato') incassato += parseFloat(p.importo)||0;
+  });
+
+  setText('sh-soci', D.utenti.length || '—');
+  setText('sh-att',  prenDaFare + cntDaFare || '0');
+  setText('sh-inc',  incassato > 0 ? '€ ' + incassato.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}) : '€ 0,00');
+  setText('sh-msg',  msgNonLetti || '0');
 
   // ── ANTEPRIMA APPUNTAMENTI ─────────────────────────────────
-  var prevPren = document.getElementById('h-preview-pren');
+  var prevPren  = document.getElementById('h-preview-pren');
   var badgePren = document.getElementById('h-badge-pren');
-  var prens = D.prenotazioni.filter(function(p){ return p.stato==='in_attesa'||p.stato==='confermata'; })
+  var prens = D.prenotazioni
+    .filter(function(p){ return p.stato==='in_attesa'||p.stato==='confermata'; })
     .sort(function(a,b){ return (a.data||'').localeCompare(b.data||''); })
     .slice(0,3);
-  if (badgePren) { badgePren.textContent = prenAttesa; badgePren.style.display = prenAttesa ? '' : 'none'; }
+  if (badgePren) {
+    badgePren.textContent = prenDaFare;
+    badgePren.style.display = prenDaFare > 0 ? '' : 'none';
+  }
   if (prevPren) {
     if (!prens.length) {
-      prevPren.innerHTML = '<div style="color:#8E8E93;font-style:italic">Nessun appuntamento in attesa</div>';
+      prevPren.innerHTML = '<div style="color:#8E8E93;font-style:italic;font-size:13px">Nessun appuntamento in attesa</div>';
     } else {
       prevPren.innerHTML = prens.map(function(p) {
-        var stato = p.stato==='confermata' ? '<span style="color:#16A34A;font-weight:600">✓ Confermato</span>' : '<span style="color:#E8631A;font-weight:600">⏳ In attesa</span>';
-        return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7">'
-          + '<div style="font-weight:600;font-size:13px">' + (p.nomeUtente||'—') + '</div>'
-          + '<div style="font-size:12px;color:#8E8E93">' + (p.data||'') + ' ore ' + (p.ora||'') + ' — ' + stato + '</div>'
-          + '</div>';
+        var statoCol = p.stato==='confermata' ? '#16A34A' : '#E8631A';
+        var statoLbl = p.stato==='confermata' ? '✓ Confermato' : '⏳ In attesa';
+        return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7;last-child:border:none">'
+          + '<div style="font-weight:600;font-size:13px;color:var(--tx)">' + (p.nomeUtente||'—') + '</div>'
+          + '<div style="font-size:12px;color:#8E8E93">'
+          + (p.data||'') + (p.ora?' ore '+p.ora:'')
+          + ' &nbsp;·&nbsp; <span style="color:'+statoCol+';font-weight:600">'+statoLbl+'</span>'
+          + '</div></div>';
       }).join('');
     }
   }
 
   // ── ANTEPRIMA CONTRATTI DA VERIFICARE ─────────────────────
-  var prevPrat = document.getElementById('h-preview-prat');
+  var prevPrat  = document.getElementById('h-preview-prat');
   var badgePrat = document.getElementById('h-badge-prat');
-  var prats = D.contratti.filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; })
+  var prats = D.contratti
+    .filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; })
     .sort(function(a,b){ return (b.dataRichiesta||'').localeCompare(a.dataRichiesta||''); })
     .slice(0,3);
-  if (badgePrat) { badgePrat.textContent = cntAttesa; badgePrat.style.display = cntAttesa ? '' : 'none'; }
+  if (badgePrat) {
+    badgePrat.textContent = cntDaFare;
+    badgePrat.style.display = cntDaFare > 0 ? '' : 'none';
+  }
   if (prevPrat) {
     if (!prats.length) {
-      prevPrat.innerHTML = '<div style="color:#8E8E93;font-style:italic">Nessun contratto da verificare</div>';
+      prevPrat.innerHTML = '<div style="color:#8E8E93;font-style:italic;font-size:13px">Nessun contratto da verificare</div>';
     } else {
       prevPrat.innerHTML = prats.map(function(c) {
         var gg = '';
         if (c.dataRichiesta) {
-          var diff = Math.floor((new Date() - new Date(c.dataRichiesta)) / 86400000);
-          gg = diff === 0 ? 'oggi' : diff === 1 ? 'ieri' : diff + ' gg fa';
+          try {
+            var diff = Math.floor((new Date() - new Date(c.dataRichiesta)) / 86400000);
+            gg = diff === 0 ? 'oggi' : diff === 1 ? 'ieri' : diff + ' gg fa';
+          } catch(e) {}
         }
-        return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7;cursor:pointer">'
-          + '<div style="font-weight:600;font-size:13px">' + (c.nomeContratto||c.tipo||'—') + '</div>'
-          + '<div style="font-size:12px;color:#8E8E93">' + (c.tipo||'') + (gg?' — '+gg:'') + '</div>'
+        return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7">'
+          + '<div style="font-weight:600;font-size:13px;color:var(--tx)">' + (c.nomeContratto||c.tipo||'—') + '</div>'
+          + '<div style="font-size:12px;color:#8E8E93">' + (c.tipo||'') + (gg?' &nbsp;·&nbsp; '+gg:'') + '</div>'
           + '</div>';
       }).join('');
     }
@@ -1187,14 +1211,16 @@ function renderHome() {
 
   // ── AVVISO ATTIVO ─────────────────────────────────────────
   var avvisoBox = document.getElementById('h-avviso-box');
-  if (avvisoBox && D.avvisi) {
+  if (avvisoBox) {
     var oggi = new Date();
-    var avvisiAttivi = D.avvisi.filter(function(a){
-      var attivo = a.attivo===true || String(a.attivo).toLowerCase()==='true';
-      if (!attivo) return false;
+    var avvisiAttivi = D.avvisi.filter(function(a) {
+      if (a.attivo!==true && String(a.attivo).toLowerCase()!=='true') return false;
       if (a.dataFine) {
-        var fine = new Date(a.dataFine.split('/').reverse().join('-'));
-        if (fine < oggi) return false;
+        try {
+          var parts = String(a.dataFine).split('/');
+          var fine = parts.length===3 ? new Date(parts[2]+'-'+parts[1]+'-'+parts[0]) : new Date(a.dataFine);
+          if (fine < oggi) return false;
+        } catch(e) {}
       }
       return true;
     });
@@ -1202,15 +1228,15 @@ function renderHome() {
       var av = avvisiAttivi[0];
       var testEl = document.getElementById('h-avviso-testo');
       var dataEl = document.getElementById('h-avviso-data');
-      if (testEl) testEl.textContent = av.titolo + ': ' + (av.testo||'');
-      if (dataEl) dataEl.textContent = (av.dataFine ? 'Valido fino al ' + av.dataFine : '');
+      if (testEl) testEl.textContent = (av.titolo||'') + (av.testo ? ': ' + av.testo : '');
+      if (dataEl) dataEl.textContent = av.dataFine ? 'Valido fino al ' + av.dataFine : '';
       avvisoBox.style.display = '';
     } else {
       avvisoBox.style.display = 'none';
     }
   }
 
-  // ── Mantieni hidden per compatibilità ─────────────────────
+  // Mantieni compatibilità con vecchi elementi nascosti
   var hp = document.getElementById('h-prens'); if(hp) hp.innerHTML='';
   var hpr = document.getElementById('h-prats'); if(hpr) hpr.innerHTML='';
 }
@@ -3622,27 +3648,23 @@ function esci() { localStorage.removeItem('asppi_admin_ok'); localStorage.remove
 function carica() {
   var hprens = document.getElementById('h-prens'); if(hprens) hprens.innerHTML='<div class="info">Caricamento...</div>';
   // Chiamate separate per evitare timeout
-  // Carica tutto in parallelo — renderHome quando tutti pronti
-  var _ld = {pren:false, cnt:false, utenti:false, avvisi:false};
-  function _tryRenderHome() {
-    if (_ld.pren && _ld.cnt && _ld.utenti && _ld.avvisi) renderHome();
-  }
+  // Carica tutto — renderHome si aggiorna ad ogni risposta
   apiCall('getPrenotazioni', {}, function(err, r) {
     D.prenotazioni = (!err && r && r.ok) ? (r.data||[]) : [];
-    _ld.pren = true; _tryRenderHome(); renderPren();
+    renderHome(); renderPren();
   });
   apiCall('getContratti', {}, function(err, r) {
     D.contratti = (!err && r && r.ok) ? (r.data||[]) : [];
-    _ld.cnt = true; _tryRenderHome(); renderPrat(); renderChat();
+    renderHome(); renderPrat(); renderChat();
   });
   apiCall('getUtenti', {}, function(err, r) {
     D.utenti = (!err && r && r.ok) ? (r.data||[]) : [];
     window._utentiData = D.utenti;
-    _ld.utenti = true; _tryRenderHome();
+    renderHome();
   });
   apiCall('getAvvisi', {}, function(err, r) {
     D.avvisi = (!err && r && r.ok) ? (r.data||[]) : [];
-    _ld.avvisi = true; _tryRenderHome();
+    renderHome();
   });
   apiCall('getAllChat', {}, function(err, r) {
     D.chat = (!err && r && r.ok) ? (r.data||[]) : [];
