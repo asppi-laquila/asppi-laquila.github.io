@@ -379,7 +379,7 @@ function buildNomeDoc(tipo, cogL, cogC) {
   var anno = new Date().getFullYear().toString().slice(-2);
   return anno + '_' + tipo + '_' + normalizzaCognome(cogL) + '_' + normalizzaCognome(cogC);
 }
-var NLABELS     = ['Tipo','Durata','Canone','Immobile','Locatori','Conduttori','Garanti','Note','Privacy'];
+var NLABELS = ['Tipo','Durata','Canone','Immobile','Locatori','Conduttori','Garanti','Note','Privacy'];
 
 // ── INIT ──────────────────────────────────────
 window.onload = function() {
@@ -833,66 +833,72 @@ function renderNcnt() {
 }
 
 function buildStep() {
-  var h = '';
-  if (ncntStep===0) {
+  var h='';
+  if(ncntStep===0){
     h='<div class="card"><div class="cb"><div class="sec">TIPO DI CONTRATTO</div>';
-    [{id:'Tipo A',d:'Locazione agevolata — 3+2 anni'},
-     {id:'Tipo B',d:'Transitorio lavoratori — max 18 mesi'},
-     {id:'Tipo C',d:'Transitorio studenti — 6-36 mesi'}].forEach(function(t){
+    [{id:'Tipo A',d:'Locazione agevolata - 3+2 anni'},{id:'Tipo B',d:'Transitorio lavoratori - max 18 mesi'},{id:'Tipo C',d:'Transitorio studenti - 6-36 mesi'}].forEach(function(t){
       var sel=ncntD.tipo===t.id;
-      h+='<label style="display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;margin-bottom:8px;cursor:pointer;border:2px solid '+(sel?'#E8631A':'#E5E5EA')+';background:'+(sel?'#FDF0E8':'#fff')+'">'
+      h+='<label style="display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;margin-bottom:8px;cursor:pointer;border:2px solid '+(sel?'#E8631A':'#e5e5e5')+';background:'+(sel?'#FDF0E8':'#fff')+'">'
         +'<input type="radio" name="ntipo" value="'+t.id+'" '+(sel?'checked':'')+' style="width:auto;margin:0;accent-color:#E8631A"/>'
-        +'<div><div style="font-size:14px;font-weight:800">'+t.id+'</div><div style="font-size:12px;color:#8E8E93">'+t.d+'</div></div></label>';
+        +'<div><div style="font-size:14px;font-weight:800">'+t.id+'</div><div style="font-size:12px;color:#8A8A8A">'+t.d+'</div></div></label>';
     });
     h+='</div></div>';
-  } else if (ncntStep===1) {
+  } else if(ncntStep===1){
     h='<div class="card"><div class="cb"><div class="sec">DURATA</div>'
-      +'<span class="lbl">Data inizio *</span><input type="text" class="inp" id="c1a" placeholder="gg/mm/aaaa" maxlength="10" value="'+(ncntD.duraDal||'')+'" oninput="ad(this)" onblur="calcMesi()"/>'
-      +'<span class="lbl">Data fine *</span><input type="text" class="inp" id="c1b" placeholder="gg/mm/aaaa" maxlength="10" value="'+(ncntD.duraAl||'')+'" oninput="ad(this)" onblur="calcMesi()"/>'
-      +'<span class="lbl">N. mensilità (automatico)</span><input type="text" class="inp" id="c1c" value="'+(ncntD.duraMesi||'')+'" readonly style="background:#F8F7F5;color:#8E8E93"/>'
+      +'<label class="lbl">Data inizio *</label><input type="text" class="inp" id="c1a" placeholder="gg/mm/aaaa" maxlength="10" value="'+(ncntD.duraDal||'')+'" oninput="autoDate(this)" onblur="calcMesi()"/>'
+      +'<label class="lbl">Data fine *</label><input type="text" class="inp" id="c1b" placeholder="gg/mm/aaaa" maxlength="10" value="'+(ncntD.duraAl||'')+'" oninput="autoDate(this)" onblur="calcMesi()"/>'
+      +'<label class="lbl">N. mensilita (automatico)</label><input type="text" class="inp" id="c1c" value="'+(ncntD.duraMesi||'')+'" readonly style="background:#F8F7F5;color:#8A8A8A"/>'
       +'</div></div>';
-  } else if (ncntStep===2) {
+  } else if(ncntStep===2){
     h='<div class="card"><div class="cb"><div class="sec">CANONE</div>'
-      +'<span class="lbl">Canone mensile € *</span><input type="text" class="inp" id="c2a" placeholder="es. 580,00" value="'+(ncntD.canoneMensile||'')+'" oninput="calcAnn()"/>'
-      +'<span class="lbl">Canone annuale (automatico)</span><input type="text" class="inp" id="c2b" value="'+(ncntD.canoneAnnuale||'')+'" readonly style="background:#F8F7F5;color:#8E8E93"/>'
-      +'<span class="lbl">IBAN locatore (opz.)</span><input type="text" class="inp" id="c2c" value="'+(ncntD.canoneIBAN||'')+'"/>'
-      +'</div></div><div class="card"><div class="cb"><div class="sec">DEPOSITO</div>'
-      +'<span class="lbl">Importo €</span><input type="text" class="inp" id="c2d" value="'+(ncntD.depositoImporto||'')+'"/>'
-      +'<span class="lbl">N. mensilità</span><input type="text" class="inp" id="c2e" value="'+(ncntD.depositoMesi||'')+'"/>'
+      +'<label class="lbl">Canone mensile € *</label><input type="text" class="inp" id="c2a" placeholder="es. 580,00" value="'+(ncntD.canoneMensile||'')+'" oninput="calcAnn()"/>'
+      +'<label class="lbl">Canone annuale (automatico)</label><input type="text" class="inp" id="c2b" value="'+(ncntD.canoneAnnuale||'')+'" readonly style="background:#F8F7F5;color:#8A8A8A"/>'
+      +'<label class="lbl">IBAN locatore (opzionale)</label><input type="text" class="inp" id="c2c" value="'+(ncntD.canoneIBAN||'')+'"/>'
+      +'</div></div>'
+      +'<div class="card"><div class="cb"><div class="sec">DEPOSITO</div>'
+      +'<label class="lbl">Importo € *</label><input type="text" class="inp" id="c2d" value="'+(ncntD.depositoImporto||'')+'"/>'
+      +'<label class="lbl">N. mensilita</label><input type="text" class="inp" id="c2e" value="'+(ncntD.depositoMesi||'')+'"/>'
+      +'</div></div>'
+      +'<div class="card"><div class="cb"><div class="sec">ONERI ACCESSORI</div>'
+      +'<label class="lbl">Oneri mensili €</label><input type="text" class="inp" id="c2f" value="'+(ncntD.oneriMensili||'')+'"/>'
       +'</div></div>';
-  } else if (ncntStep===3) {
+  } else if(ncntStep===3){
     h='<div class="card"><div class="cb"><div class="sec">DATI IMMOBILE</div>'
-      +'<div class="g2"><div><span class="lbl">Classe energetica *</span><input type="text" class="inp" id="c3b" placeholder="es. D" value="'+(ncntD.apeClasse||'')+'"/></div>'
-      +'<div><span class="lbl">N. cert. APE</span><input type="text" class="inp" id="c3a" placeholder="N. certificato" value="'+(ncntD.apeNumero||'')+'"/></div></div>'
-      +'<div class="g2">'
-      +'<div><span class="lbl">Camere</span><input type="text" class="inp" id="c3c" value="'+(ncntD.compCamere||'')+'"/></div>'
-      +'<div><span class="lbl">Bagni</span><input type="text" class="inp" id="c3d" value="'+(ncntD.compBagni||'')+'"/></div>'
-      +'</div>'
-      +'<span class="lbl">Elementi accessori (balconi, terrazzi...)</span>'
-      +'<input type="text" class="inp" id="c3x1" placeholder="es. balcone" value="'+(ncntD.elemAccessori||'')+'"/>'
-      +'<span class="lbl">Arredamento</span>'
-      +'<select class="inp" id="c3x2"><option value="si" '+(ncntD.ammobiliata==="si"?'selected':'')+'>Ammobiliata</option><option value="no" '+(ncntD.ammobiliata==="no"?'selected':'')+'>Non ammobiliata</option></select>'
-      +'<div class="g2"><div><span class="lbl">Tab. millesimali proprietà</span><input type="text" class="inp" id="c3x3" value="'+(ncntD.tabMillProp||'')+'"/></div>'
-      +'<div><span class="lbl">Riscaldamento</span><input type="text" class="inp" id="c3x4" value="'+(ncntD.tabMillRisc||'')+'"/></div></div>'
-      +'</div></div>'
+      +'<div class="g2"><div><label class="lbl">Classe energetica *</label><input type="text" class="inp" id="c3b" placeholder="es. D" value="'+(ncntD.apeClasse||'')+'"/></div>'
+      +'<div><label class="lbl">N. cert. APE</label><input type="text" class="inp" id="c3a" placeholder="N. certificato" value="'+(ncntD.apeNumero||'')+'"/></div></div>'
+      +'<div class="g2"><div><label class="lbl">Camere</label><input type="text" class="inp" id="c3c" value="'+(ncntD.compCamere||'')+'"/></div>'
+      +'<div><label class="lbl">Cucina</label><input type="text" class="inp" id="c3d" value="'+(ncntD.compCucina||'')+'"/></div>'
+      +'<div><label class="lbl">Bagni</label><input type="text" class="inp" id="c3e" value="'+(ncntD.compBagni||'')+'"/></div>'
+      +'<div><label class="lbl">Balconi</label><input type="text" class="inp" id="c3f" value="'+(ncntD.compBalconi||'')+'"/></div></div>'
+      +'<label class="lbl">Elementi accessori (balconi, terrazzi...)</label>'
+      +'<input type="text" class="inp" id="c3x1" placeholder="es. balcone frontale, terrazzo" value="'+(ncntD.elemAccessori||'')+'"/>'
+      +'<label class="lbl">Arredamento</label>'
+      +'<select class="inp" id="c3x2">'
+      +'<option value="si" '+(ncntD.ammobiliata==="si"?'selected':'')+'>Ammobiliata</option>'
+      +'<option value="no" '+(ncntD.ammobiliata==="no"?'selected':'')+'>Non ammobiliata</option>'
+      +'</select>'
+      +'<div class="sec" style="margin-top:10px">TABELLE MILLESIMALI</div>'
+      +'<div class="g2"><div><label class="lbl">Proprietà</label><input type="text" class="inp" id="c3x3" placeholder="es. 12,50" value="'+(ncntD.tabMillProp||'')+'"/></div>'
+      +'<div><label class="lbl">Riscaldamento</label><input type="text" class="inp" id="c3x4" placeholder="es. 15,00" value="'+(ncntD.tabMillRisc||'')+'"/></div></div>'
++'</div></div>'
       +'<div class="card"><div class="cb"><div class="sec">STATO IMMOBILE</div>'
-      +'<textarea class="inp" id="c3x5" placeholder="es. buono stato locativo" style="min-height:70px">'+(ncntD.statoImmobile||'')+'</textarea>'
-      +'</div></div>'
+      +'<div style="font-size:12px;color:#8E8E93;margin-bottom:8px">Descrivere lo stato al momento della consegna (art. 9)</div>'
+      +'<textarea class="inp" id="c3x5" placeholder="es. immobile in buono stato di manutenzione, pavimenti integri, impianti funzionanti" style="min-height:70px">'+(ncntD.statoImmobile||'')+'</textarea>'
++'</div></div>'
       +'<div class="card"><div class="cb"><div class="sec">INTERO O PORZIONE</div>'
-      +'<span class="lbl">Si affitta</span>'
-      +'<select class="inp" id="c3g" onchange="togglePorzione()"><option value="intero" '+(ncntD.tipoLocazione==="porzione"?'':'selected')+'>Intero immobile</option>'
-      +'<option value="porzione" '+(ncntD.tipoLocazione==="porzione"?'selected':'')+'>Porzione di immobile</option></select>'
-      +'<div id="c3g-det" style="'+(ncntD.tipoLocazione==="porzione"?'display:block':'display:none')+'">'
-      +'<span class="lbl">Descrizione porzione</span>'
+      +'<label class="lbl">Si affitta</label>'
+      +'<select class="inp" id="c3g" onchange="togglePorzione()"><option value="intero" '+(ncntD.tipoLocazione==='porzione'?'':'selected')+'>Intero immobile</option>'
+      +'<option value="porzione" '+(ncntD.tipoLocazione==='porzione'?'selected':'')+'>Porzione di immobile</option></select>'
+      +'<div id="c3g-det" style="'+(ncntD.tipoLocazione==='porzione'?'display:block':'display:none')+'">'
+      +'<label class="lbl">Descrizione porzione</label>'
       +'<input type="text" class="inp" id="c3h" placeholder="es. piano primo, vani 3 e 4" value="'+(ncntD.descrizioneLocazione||'')+'"/>'
       +'</div></div></div>'
       +'<div class="card"><div class="cb"><div class="sec">PERTINENZE</div>'
-      +'<div style="font-size:12px;color:#8E8E93;margin-bottom:10px">Solo pertinenze con dati catastali diversi (garage, cantina, posto auto).</div>'
+      +'<div style="font-size:12px;color:#8E8E93;margin-bottom:10px">Solo pertinenze con dati catastali diversi dall\'unità principale (garage, cantine, posti auto).</div>'
       +'<div id="pert-lista">'+(ncntD.pertinenze&&ncntD.pertinenze.length?ncntD.pertinenze.map(function(p,i){return buildPertBlock(i,p);}).join(''):'')+'</div>'
       +'<button class="bd" style="margin-top:4px" onclick="addPert()">+ Aggiungi pertinenza</button>'
       +'</div></div>';
-
-  } else if (ncntStep===4) {
+  } else if(ncntStep===4){
     if((!ncntD.locatori||!ncntD.locatori.length||!(ncntD.locatori[0].cognome||ncntD.locatori[0].nome))&&curApt&&curApt.locatori&&curApt.locatori.length){
       ncntD.locatori=JSON.parse(JSON.stringify(curApt.locatori));
     }
@@ -902,108 +908,154 @@ function buildStep() {
     h+='<div id="nlocs">';
     ncntD.locatori.forEach(function(p,i){ h+=pbBlock('l',i,p); });
     h+='</div><button class="bd" onclick="addP(\'l\')">+ Aggiungi locatore</button></div></div>';
-  
-  } else if (ncntStep===5) {
+  } else if(ncntStep===5){
     h='<div class="card"><div class="cb"><div class="sec">CONDUTTORI</div>'
-      +(ncntD.tipo==='Tipo B'||ncntD.tipo==='Tipo C'?'<div class="infob">Indicare motivo/facoltà e matricola nel campo apposito.</div>':'')
+      +(ncntD.tipo==='Tipo B'?'<div class="infob">Tipo B: indicare motivo transitorietà.</div>':'')
+      +(ncntD.tipo==='Tipo C'?'<div class="infob">Tipo C: indicare facolta e matricola.</div>':'')
       +'<div id="ncons">';
     ncntD.conduttori.forEach(function(p,i){ h+=pbBlock('c',i,p); });
-    h+='</div><button class="bd" style="margin-top:4px" onclick="addP(\'c\')">+ Aggiungi conduttore</button>'
+    h+='</div><button class="ba" onclick="addP(\'c\')">+ Aggiungi conduttore</button></div></div>';
+    h+='<div class="card"><div class="cb"><div class="sec">PERSONE CONVIVENTI</div>'
+      +'<div style="font-size:12px;color:#8E8E93;margin-bottom:8px">Indicare nome e cognome delle persone conviventi con il conduttore (art. 7). Se nessuna scrivere "nessuno".</div>'
+      +'<input type="text" class="inp" id="c5conv" placeholder="es. nessuno" value="'+(ncntD.conviventi||'nessuno')+'"/>'
       +'</div></div>';
-    h+='<div class="card"><div class="cb"><div class="sec">CONVIVENTI</div>'
-      +'<input type="text" class="inp" id="c5conv" placeholder="nessuno" value="'+(ncntD.conviventi||'nessuno')+'"/></div></div>';
-  } else if (ncntStep===6) {
-    h='<div class="card"><div class="cb"><div class="sec">GARANTI (opzionali)</div><div id="ngars">';
+  } else if(ncntStep===6){
+    h='<div class="card"><div class="cb"><div class="sec">GARANTI (OPZIONALI)</div><div id="ngars">';
     ncntD.garanti.forEach(function(p,i){ h+=pbBlock('g',i,p); });
-    h+='</div><button class="bd" style="margin-top:4px" onclick="addP(\'g\')">+ Aggiungi garante</button></div></div>';
-  } else if (ncntStep===7) {
-    h='<div class="card"><div class="cb"><div class="sec">NOTE</div>'
-      +'<textarea class="inp" id="c7a" style="min-height:80px">'+(ncntD.note||'')+'</textarea>'
+    h+='</div><button class="ba" onclick="addP(\'g\')">+ Aggiungi garante</button></div></div>';
+  } else if(ncntStep===7){
+    h='<div class="card"><div class="cb"><div class="sec">NOTE E CLAUSOLE AGGIUNTIVE</div>'
+      +'<textarea class="inp" id="c7a" placeholder="Clausole particolari..." style="min-height:80px">'+(ncntD.note||'')+'</textarea>'
       +'</div></div>';
-    h+='<div class="card"><div class="cb"><div class="sec">ACCESSO (art. 13)</div>'
-      +'<input type="text" class="inp" id="c7b" placeholder="es. previo avviso telefonico" value="'+(ncntD.modalitaAccesso||'')+'"/></div></div>';
+    h+='<div class="card"><div class="cb"><div class="sec">MODALITÀ DI ACCESSO (art. 13)</div>'
+      +'<div style="font-size:12px;color:#8E8E93;margin-bottom:8px">Come si concorda la visita dell\'immobile in caso di vendita/nuova locazione (es. previo avviso telefonico con un paio di giorni di anticipo)</div>'
+      +'<input type="text" class="inp" id="c7b" placeholder="es. previo avviso telefonico con 2 giorni di anticipo" value="'+(ncntD.modalitaAccesso||'')+'"/>'
+      +'</div></div>';
     if(ncntD.tipo==='Tipo B'){
-      h+='<div class="card"><div class="cb"><div class="sec">ESIGENZA TRANSITORIETÀ</div>'
-        +'<span class="lbl">Chi dichiara</span><select class="inp" id="c7c"><option value="locatore" '+(ncntD.esigenzaTipo==="locatore"||!ncntD.esigenzaTipo?'selected':'')+'>Locatore</option><option value="conduttore" '+(ncntD.esigenzaTipo==="conduttore"?'selected':'')+'>Conduttore</option></select>'
-        +'<span class="lbl">Motivazione</span><select class="inp" id="c7d" onchange="toggleEsigenzaAltro()"><option value="">-- Seleziona --</option>'
-        +'<optgroup label="Locatore"><option value="destinare l\'immobile ad uso abitativo proprio o del coniuge/figli/parenti 2° grado">Uso proprio/familiare</option><option value="ristrutturazione con concessione già rilasciata">Ristrutturazione</option><option value="attesa di vendita con preliminare stipulato">Attesa vendita</option><option value="trasferimento temporaneo sede di lavoro">Trasferimento lavoro</option><option value="matrimonio proprio o dei figli">Matrimonio</option><option value="separazione o divorzio">Separazione/divorzio</option><option value="rientro dall\'estero">Rientro estero</option><option value="altro_loc">Altra...</option></optgroup>'
-        +'<optgroup label="Conduttore"><option value="trasferimento temporaneo sede di lavoro in Comune diverso">Trasferimento lavoro</option><option value="ricerca lavoro in Comune diverso">Ricerca lavoro</option><option value="separazione o divorzio">Separazione/divorzio</option><option value="uso come seconda casa">Seconda casa</option><option value="altro_con">Altra...</option></optgroup></select>'
-        +'<div id="c7d-altro" style="'+(ncntD.esigenzaMotivazione==="altro_loc"||ncntD.esigenzaMotivazione==="altro_con"?'':'display:none')+'">'
-        +'<span class="lbl">Descrivi</span><textarea class="inp" id="c7e" style="min-height:60px">'+(ncntD.esigenzaAltroTesto||'')+'</textarea></div>'
-        +'</div></div>';}
+      h+='<div class="card"><div class="cb"><div class="sec">ESIGENZA DI TRANSITORIETÀ (art. 2)</div>'
+        +'<label class="lbl">Chi dichiara l\'esigenza</label>'
+        +'<select class="inp" id="c7c">'
+        +'<option value="locatore" '+(ncntD.esigenzaTipo==="locatore"||!ncntD.esigenzaTipo?'selected':'')+'>Locatore</option>'
+        +'<option value="conduttore" '+(ncntD.esigenzaTipo==="conduttore"?'selected':'')+'>Conduttore</option>'
+        +'</select>'
+        +'<label class="lbl">Motivazione</label>'
+        +'<select class="inp" id="c7d" onchange="toggleEsigenzaAltro()">'
+        +'<option value="">-- Seleziona motivazione --</option>'
+        +'<optgroup label="Per il locatore">'
+        +'<option '+(ncntD.esigenzaMotivazione==="uso abitativo proprio o familiari\'s"?'selected':'')+' value="destinare l\'immobile ad uso abitativo, commerciale o professionale proprio, del coniuge, dei genitori, dei figli o parenti entro il 2° grado">Uso proprio o familiare entro 2° grado</option>'
+        +'<option value="persona giuridica che destina l\'immobile all\'esercizio di attività istituzionali">Persona giuridica/ente per finalità istituzionali</option>'
+        +'<option value="immobile in edificio gravemente danneggiato da ricostruire (rilascio condizionato al possesso della concessione edilizia)">Edificio gravemente danneggiato — ricostruzione</option>'
+        +'<option value="immobile in stabile da ristrutturare integralmente o demolire (rilascio condizionato alla concessione edilizia)">Ristrutturazione integrale o demolizione</option>'
+        +'<option value="cambio di destinazione d\'uso degli immobili">Cambio destinazione d\'uso</option>'
+        +'<option value="ristrutturazione con concessione edilizia già rilasciata">Ristrutturazione con concessione già rilasciata</option>'
+        +'<option value="attesa di vendita con preliminare già stipulato">Attesa di vendita con preliminare stipulato</option>'
+        +'<option value="trasferimento temporaneo della sede di lavoro">Trasferimento temporaneo sede di lavoro</option>'
+        +'<option value="matrimonio proprio o dei figli">Matrimonio proprio o dei figli</option>'
+        +'<option value="separazione o divorzio">Separazione o divorzio</option>'
+        +'<option value="rientro dall\'estero">Rientro dall\'estero</option>'
+        +'<option value="altro_loc">Altra esigenza specifica locatore...</option>'
+        +'</optgroup>'
+        +'<optgroup label="Per il conduttore">'
+        +'<option value="trasferimento temporaneo della sede di lavoro in Comune diverso da quello di residenza">Trasferimento temporaneo sede di lavoro</option>'
+        +'<option value="ricerca di lavoro in Comune diverso da quello di residenza">Ricerca di lavoro in altro Comune</option>'
+        +'<option value="contratto di lavoro a tempo determinato in Comune diverso da quello di residenza">Contratto di lavoro a tempo determinato in altro Comune</option>'
+        +'<option value="assegnazione di alloggio di edilizia pubblica o acquisto in cooperativa/privati entro il periodo (con compromesso stipulato)">Assegnazione alloggio pubblico o acquisto con compromesso</option>'
+        +'<option value="vicinanza momentanea a parenti bisognosi">Vicinanza a parenti bisognosi</option>'
+        +'<option value="separazione o divorzio">Separazione o divorzio</option>'
+        +'<option value="uso come seconda casa">Uso come seconda casa</option>'
+        +'<option value="campagna elettorale">Campagna elettorale</option>'
+        +'<option value="altro_con">Altra esigenza specifica conduttore...</option>'
+        +'</optgroup>'
+        +'</select>'
+        +'<div id="c7d-altro" style="'+(ncntD.esigenzaMotivazione&&(ncntD.esigenzaMotivazione==="altro_loc"||ncntD.esigenzaMotivazione==="altro_con")?'display:block':'display:none')+'">'
+        +'<label class="lbl">Descrivi l\'esigenza specifica</label>'
+        +'<textarea class="inp" id="c7e" placeholder="Descrizione esigenza..." style="min-height:60px">'+(ncntD.esigenzaAltroTesto||'')+'</textarea>'
+        +'</div>'
+        +'</div></div>';
+    }
     if(ncntD.tipo==='Tipo C'){
-      h+='<div class="card"><div class="cb"><div class="sec">UNIVERSITÀ</div>'
-        +'<span class="lbl">Ateneo</span><input type="text" class="inp" id="c7f" value="'+(ncntD.ateneo||'')+'"/>'
-        +'<span class="lbl">Facoltà</span><input type="text" class="inp" id="c7g" value="'+(ncntD.facolta||'')+'"/>'
-        +'<span class="lbl">Mesi max</span><input type="text" class="inp" id="c7h" value="'+(ncntD.mesiMax||'12')+'"/>'
-        +'</div></div>';}
-
-  } else {
+      h+='<div class="card"><div class="cb"><div class="sec">FREQUENZA UNIVERSITARIA (art. 2)</div>'
+        +'<label class="lbl">Università / Ateneo *</label>'
+        +'<input type="text" class="inp" id="c7f" placeholder="es. Università degli Studi dell\'Aquila" value="'+(ncntD.ateneo||'')+'"/>'
+        +'<label class="lbl">Facoltà / Corso di studi</label>'
+        +'<input type="text" class="inp" id="c7g" placeholder="es. Ingegneria Civile" value="'+(ncntD.facolta||'')+'"/>'
+        +'<label class="lbl">Durata massima frequenza (mesi)</label>'
+        +'<input type="text" class="inp" id="c7h" placeholder="es. 12" value="'+(ncntD.mesiMax||'12')+'"/>'
+        +'</div></div>';
+    }
+  } else if(ncntStep===8){
     var gs=['g1','g2','g3','g4'];
-    var tt=["Ho ricevuto e compreso l'informativa (art. 13 GDPR).",
-            "Presto consenso al trattamento tramite AI.",
-            "Sono legittimato a fornire i dati di tutti i soggetti.",
-            "Presto consenso al trasferimento dati extra-UE."];
+    var testi=["Ho ricevuto e compreso l'informativa (art. 13 GDPR).","Presto consenso al trattamento tramite AI.","Sono legittimato a fornire i dati di tutti i soggetti.","Presto consenso al trasferimento dati extra-UE."];
     h='<div class="card"><div class="cb"><div class="sec">CONSENSO DATI (GDPR)</div>';
     gs.forEach(function(g,i){
-      h+='<div class="cr" onclick="togG(\''+g+'\')"><div class="cb2 '+(ncntD[g]?'on':'')+'" id="'+g+'-b">'+(ncntD[g]?'✓':'')+'</div>'
-        +'<div style="font-size:13px;line-height:1.5">'+tt[i]+'</div></div>';
+      h+='<div class="cr" onclick="togG(\''+g+'\')">'
+        +'<div class="cb2 '+(ncntD[g]?'on':'')+'" id="'+g+'-b">'+(ncntD[g]?'&#10003;':'')+'</div>'
+        +'<div style="font-size:13px;line-height:1.5">'+testi[i]+'</div></div>';
     });
     h+='</div></div><div class="card"><div class="cb"><div class="sec">RIEPILOGO</div>';
-    [['Tipo',ncntD.tipo||'—'],['Dal',ncntD.duraDal||'—'],['Al',ncntD.duraAl||'—'],
-     ['Canone','€ '+(ncntD.canoneMensile||'—')+'/mese'],
-     ['Locatori',(ncntD.locatori||[]).length],['Conduttori',(ncntD.conduttori||[]).length]].forEach(function(row){
-      h+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #F2F2F7">'
-        +'<span style="font-size:12px;color:#8E8E93">'+row[0]+'</span>'
-        +'<span style="font-size:13px;font-weight:700">'+row[1]+'</span></div>';
+    [['Tipo',ncntD.tipo||'—'],['Locatori',(ncntD.locatori||[]).length],['Conduttori',(ncntD.conduttori||[]).length],['Garanti',(ncntD.garanti||[]).length||'Nessuno']].forEach(function(r){
+      h+='<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e5e5e5">'
+        +'<span style="font-size:12px;color:#8A8A8A">'+r[0]+'</span>'
+        +'<span style="font-size:13px;font-weight:700">'+r[1]+'</span></div>';
     });
     h+='</div></div>';
   }
   return h;
 }
 
+
 function togG(id){
   ncntD[id]=!ncntD[id];
   var b=T(id+'-b'); if(b){b.className='cb2'+(ncntD[id]?' on':'');b.innerHTML=ncntD[id]?'✓':'';}
 }
 
-function pbBlock(t,i){
-  var lbl=t==='l'?'LOCATORE':t==='g'?'GARANTE':'CONDUTTORE';
+function pbBlock(t,i,p) {
+  p = p || {};
+  var isL=t==='l', isG=t==='g';
+  var lbl=isL?'LOCATORE':isG?'GARANTE':'CONDUTTORE';
   var showMot=t==='c'&&(ncntD.tipo==='Tipo B'||ncntD.tipo==='Tipo C');
+  // Seleziona il tipo documento corretto
+  var docOpts=['','Carta di identita','Passaporto','Patente di guida'];
+  var docSel = docOpts.map(function(o){ return '<option'+(p.docTipo===o&&o?' selected':'')+'>'+o+'</option>'; }).join('');
+  var cedOpts=['Si','No'];
+  var cedSel = cedOpts.map(function(o){ return '<option'+(p.cedolare===o?' selected':'')+'>'+o+'</option>'; }).join('');
   var h='<div class="pb" id="pb-'+t+'-'+i+'">'
     +'<div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:10px">'+lbl+' '+(i+1)+'</div>'
-    +'<button class="pr" onclick="remP(\''+t+'\','+i+')">✕</button>'
-    +'<span class="lbl">Cognome</span><input type="text" class="inp pb-cog" placeholder="ROSSI"/>'
-    +'<span class="lbl">Nome</span><input type="text" class="inp pb-nom" placeholder="MARIO"/>'
-    +'<div class="g2"><div><span class="lbl">Luogo nascita</span><input type="text" class="inp pb-lng"/></div>'
-    +'<div><span class="lbl">Data nascita</span><input type="text" class="inp pb-dtn" placeholder="gg/mm/aaaa" maxlength="10" oninput="ad(this)"/></div></div>'
-    +'<span class="lbl">Codice Fiscale</span><input type="text" class="inp pb-cf" style="font-family:monospace"/>'
-    +'<span class="lbl">Comune residenza</span><input type="text" class="inp pb-res"/>'
-    +'<span class="lbl">Via e n. civico</span><input type="text" class="inp pb-via"/>'
-    +'<div class="sec" style="margin-top:10px;margin-bottom:8px">DOCUMENTO</div>'
-    +'<span class="lbl">Tipo</span><select class="inp pb-doctipo"><option value="">-- Seleziona --</option><option>Carta di identità</option><option>Passaporto</option><option>Patente di guida</option></select>'
-    +'<span class="lbl">Numero</span><input type="text" class="inp pb-docnum"/>'
-    +'<div class="g2"><div><span class="lbl">Rilascio</span><input type="text" class="inp pb-docril" placeholder="gg/mm/aaaa" maxlength="10" oninput="ad(this)"/></div>'
-    +'<div><span class="lbl">Scadenza</span><input type="text" class="inp pb-docsca" placeholder="gg/mm/aaaa" maxlength="10" oninput="ad(this)"/></div></div>'
-    +'<span class="lbl">Rilasciato da</span><input type="text" class="inp pb-docente" placeholder="Comune di L\'AQUILA"/>';
-  if(t==='l') h+='<span class="lbl">Titolo</span><input type="text" class="inp pb-tit" placeholder="Proprietario"/>'
-    +'<div class="g2"><div><span class="lbl">Quota %</span><input type="text" class="inp pb-quo" placeholder="100"/></div>'
-    +'<div><span class="lbl">Cedolare</span><select class="inp pb-ced"><option>Si</option><option>No</option></select></div></div>';
-  if(showMot) h+='<span class="lbl">Motivo/Facoltà e matricola</span><input type="text" class="inp pb-mot"/>';
+    +'<button class="pr" onclick="remP(\''+t+'\','+i+')">&#10005;</button>'
+    +'<label class="lbl">Cognome</label><input type="text" class="inp pb-cog" placeholder="ROSSI" value="'+(p.cognome||'')+'"/>'
+    +'<label class="lbl">Nome</label><input type="text" class="inp pb-nom" placeholder="MARIO" value="'+(p.nome||'')+'"/>'
+    +'<div class="g2"><div><label class="lbl">Luogo nascita</label><input type="text" class="inp pb-lng" value="'+(p.luogoNascita||'')+'" placeholder="L AQUILA"/></div>'
+    +'<div><label class="lbl">Data nascita</label><input type="text" class="inp pb-dtn" value="'+(p.dataNascita||'')+'" placeholder="01/01/1980" maxlength="10" oninput="autoDate(this)"/></div></div>'
+    +'<label class="lbl">Codice Fiscale</label><input type="text" class="inp pb-cf" value="'+(p.cf||'')+'" placeholder="RSSMRA80A01G878X" style="font-family:monospace"/>'
+    +'<label class="lbl">Comune residenza</label><input type="text" class="inp pb-res" value="'+(p.comuneResidenza||'')+'" placeholder="L AQUILA"/>'
+    +'<label class="lbl">Via e n. civico</label><input type="text" class="inp pb-via" value="'+(p.viaResidenza||'')+'" placeholder="VIA ROMA 1"/>'
+    +'<div class="sec" style="margin-top:4px;margin-bottom:8px">DOCUMENTO DI RICONOSCIMENTO</div>'
+    +'<label class="lbl">Tipo documento</label><select class="inp pb-doctipo">'+docSel+'</select>'
+    +'<label class="lbl">Numero documento</label><input type="text" class="inp pb-docnum" value="'+(p.docNum||'')+'" placeholder="CA00000AA"/>'
+    +'<div class="g2"><div><label class="lbl">Data rilascio</label><input type="text" class="inp pb-docril" value="'+(p.docRilascio||'')+'" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/></div>'
+    +'<div><label class="lbl">Data scadenza</label><input type="text" class="inp pb-docsca" value="'+(p.docScadenza||'')+'" placeholder="gg/mm/aaaa" maxlength="10" oninput="autoDate(this)"/></div></div>'
+    +'<label class="lbl">Rilasciato da</label><input type="text" class="inp pb-docente" value="'+(p.docEnte||'')+'" placeholder="Comune di L\'AQUILA"/>';
+  if(isL) h+='<label class="lbl">Titolo</label><input type="text" class="inp pb-tit" value="'+(p.titolo||'Proprietario')+'" placeholder="Proprietario"/>'
+    +'<div class="g2"><div><label class="lbl">Quota %</label><input type="text" class="inp pb-quo" value="'+(p.quota||'100')+'" placeholder="100"/></div>'
+    +'<div><label class="lbl">Cedolare</label><select class="inp pb-ced">'+cedSel+'</select></div></div>';
+  if(showMot) h+='<label class="lbl">Motivo/Facolta e matricola</label><input type="text" class="inp pb-mot" value="'+(p.mot||'')+'" placeholder="es. Ingegneria 123456"/>';
+  if(isG) h+='<label class="lbl">Conduttore riferimento</label><input type="text" class="inp pb-cr2" value="'+(p.cr2||'')+'" placeholder="es. Mario Rossi"/>';
   h+='</div>'; return h;
 }
 
-function addP(t){
-  leggiPersone(t);
+
+
+function addP(t) {
   var map={l:'nlocs',c:'ncons',g:'ngars'};
   var arr=t==='l'?ncntD.locatori:t==='c'?ncntD.conduttori:ncntD.garanti;
   arr.push({});
   var el=T(map[t]); if(!el) return;
-  el.innerHTML=''; arr.forEach(function(p,i){ el.innerHTML+=pbBlock(t,i,p); });
+  el.innerHTML=''; arr.forEach(function(_,i){ el.innerHTML+=pbBlock(t,i); });
 }
 
 
-function remP(t,i){
+function remP(t,i) {
+  // Prima salva i dati esistenti
   leggiPersone(t);
   var arr=t==='l'?ncntD.locatori:t==='c'?ncntD.conduttori:ncntD.garanti;
   if((t==='l'||t==='c')&&arr.length<=1) return;
@@ -1014,24 +1066,47 @@ function remP(t,i){
 }
 
 
-function leggiPersone(t){
-  var map={l:'nlocs',c:'ncons',g:'ngars'};
-  var arr=t==='l'?ncntD.locatori:t==='c'?ncntD.conduttori:ncntD.garanti;
-  var container=T(map[t]); if(!container) return;
-  var blocks=container.querySelectorAll('.pb');
-  for(var i=0;i<blocks.length&&i<arr.length;i++){
-    var b=blocks[i];
-    var g=function(cls){var e=b.querySelector('.'+cls);return e?e.value||'':'';}; 
-    arr[i].cognome=g('pb-cog'); arr[i].nome=g('pb-nom');
-    arr[i].luogoNascita=g('pb-lng'); arr[i].dataNascita=g('pb-dtn');
-    arr[i].cf=g('pb-cf'); arr[i].comuneResidenza=g('pb-res'); arr[i].viaResidenza=g('pb-via');
-    var dt=b.querySelector('.pb-doctipo'); arr[i].docTipo=dt?dt.value||'':'';
-    arr[i].docNum=g('pb-docnum'); arr[i].docRilascio=g('pb-docril');
-    arr[i].docScadenza=g('pb-docsca'); arr[i].docEnte=g('pb-docente');
-    if(t==='l'){arr[i].titolo=g('pb-tit');arr[i].quota=g('pb-quo');var ce=b.querySelector('.pb-ced');arr[i].cedolare=ce?ce.value||'':'';}
-    if(t==='c') arr[i].mot=g('pb-mot');
+function leggiPersone(t) {
+  var map = {l:'nlocs', c:'ncons', g:'ngars'};
+  var arr = t==='l' ? ncntD.locatori : t==='c' ? ncntD.conduttori : ncntD.garanti;
+  var container = T(map[t]);
+  if (!container) return;
+  var blocks = container.querySelectorAll('.pb');
+  for (var i=0; i<blocks.length && i<arr.length; i++) {
+    var b = blocks[i];
+    var get = function(cls){ var el=b.querySelector('.'+cls); return el?el.value||'':''; };
+    arr[i].cognome       = get('pb-cog');
+    arr[i].nome          = get('pb-nom');
+    arr[i].luogoNascita  = get('pb-lng');
+    arr[i].dataNascita   = get('pb-dtn');
+    arr[i].cf            = get('pb-cf');
+    arr[i].comuneResidenza = get('pb-res');
+    arr[i].viaResidenza  = get('pb-via');
+    // Documento
+    var docTipoEl = b.querySelector('.pb-doctipo');
+    arr[i].docTipo    = docTipoEl ? docTipoEl.value||'' : '';
+    arr[i].docNum     = get('pb-docnum');
+    arr[i].docRilascio= get('pb-docril');
+    arr[i].docScadenza= get('pb-docsca');
+    arr[i].docEnte    = get('pb-docente');
+    // Locatore specifico
+    if (t==='l') {
+      arr[i].titolo   = get('pb-tit');
+      arr[i].quota    = get('pb-quo');
+      var cedEl = b.querySelector('.pb-ced');
+      arr[i].cedolare = cedEl ? cedEl.value||'' : '';
+    }
+    // Conduttore specifico
+    if (t==='c') {
+      arr[i].mot = get('pb-mot');
+    }
+    // Garante specifico
+    if (t==='g') {
+      arr[i].cr2 = get('pb-cr2');
+    }
   }
 }
+
 
 
 function toggleEsigenzaAltro() {
@@ -1048,22 +1123,23 @@ function buildPertBlock(i, p) {
   return '<div class="pb" id="pert-'+i+'" style="margin-bottom:10px">'
     +'<div style="font-size:11px;font-weight:700;color:#E8631A;margin-bottom:8px">PERTINENZA '+(i+1)+'</div>'
     +'<button class="pr" onclick="remPert('+i+')">✕</button>'
-    +'<span class="lbl">Tipo pertinenza</span>'
+    +'<label class="lbl">Tipo pertinenza</label>'
     +'<select class="inp pert-tipo"><option value="">-- Seleziona --</option>'
     +'<option '+(p.tipo==="Garage"?'selected':'')+'>Garage</option>'
     +'<option '+(p.tipo==="Cantina"?'selected':'')+'>Cantina</option>'
     +'<option '+(p.tipo==="Posto auto"?'selected':'')+'>Posto auto</option>'
     +'<option '+(p.tipo==="Soffitta"?'selected':'')+'>Soffitta</option>'
     +'<option '+(p.tipo==="Altro"?'selected':'')+'>Altro</option></select>'
-    +'<span class="lbl">Sezione catastale <span style="font-size:10px;color:#8E8E93;font-weight:500">(solo se presente)</span></span>'
+    +'<label class="lbl">Sezione catastale <span style="font-size:10px;color:#8E8E93;font-weight:500">(solo se presente)</span></label>'
     +'<input type="text" class="inp pert-sez" placeholder="es. A oppure BO" value="'+(p.catSezione||'')+'"/>'
-    +'<div class="g2"><div><span class="lbl">Foglio</span><input type="text" class="inp pert-fog" value="'+(p.catFoglio||'')+'"/></div>'
-    +'<div><span class="lbl">Particella</span><input type="text" class="inp pert-par" value="'+(p.catParticella||'')+'"/></div></div>'
-    +'<div class="g2"><div><span class="lbl">Subalterno</span><input type="text" class="inp pert-sub" value="'+(p.catSubalterno||'')+'"/></div>'
-    +'<div><span class="lbl">Categoria</span><input type="text" class="inp pert-cat" placeholder="es. C/6" value="'+(p.catCategoria||'')+'"/></div></div>'
-    +'<span class="lbl">Rendita catastale €</span><input type="text" class="inp pert-rend" placeholder="es. 35,00" value="'+(p.catRendita||'')+'"/>'
+    +'<div class="g2"><div><label class="lbl">Foglio</label><input type="text" class="inp pert-fog" value="'+(p.catFoglio||'')+'"/></div>'
+    +'<div><label class="lbl">Particella</label><input type="text" class="inp pert-par" value="'+(p.catParticella||'')+'"/></div></div>'
+    +'<div class="g2"><div><label class="lbl">Subalterno</label><input type="text" class="inp pert-sub" value="'+(p.catSubalterno||'')+'"/></div>'
+    +'<div><label class="lbl">Categoria</label><input type="text" class="inp pert-cat" placeholder="es. C/6" value="'+(p.catCategoria||'')+'"/></div></div>'
+    +'<label class="lbl">Rendita catastale €</label><input type="text" class="inp pert-rend" placeholder="es. 35,00" value="'+(p.catRendita||'')+'"/>'
     +'</div>';
 }
+
 
 function addPert() {
   if (!ncntD.pertinenze) ncntD.pertinenze = [];
@@ -1072,12 +1148,14 @@ function addPert() {
   el.innerHTML = ncntD.pertinenze.map(function(p,i){ return buildPertBlock(i,p); }).join('');
 }
 
+
 function remPert(i) {
   if (!ncntD.pertinenze) return;
   ncntD.pertinenze.splice(i,1);
   var el = T('pert-lista'); if (!el) return;
   el.innerHTML = ncntD.pertinenze.map(function(p,idx){ return buildPertBlock(idx,p); }).join('');
 }
+
 
 function leggiPertinenze() {
   var blocks = document.querySelectorAll('#pert-lista .pb');
@@ -1093,38 +1171,36 @@ function leggiPertinenze() {
   return out;
 }
 
-function ncntAvanti(){
+
+function ncntAvanti() {
   if(ncntStep===0){ncntD.tipo=(document.querySelector('input[name="ntipo"]:checked')||{}).value||'';if(!ncntD.tipo){alert('Seleziona il tipo');return;}}
   if(ncntStep===1){ncntD.duraDal=(T('c1a')||{}).value||'';ncntD.duraAl=(T('c1b')||{}).value||'';ncntD.duraMesi=(T('c1c')||{}).value||'';if(!ncntD.duraDal||!ncntD.duraAl){alert('Inserisci le date');return;}}
-  if(ncntStep===2){ncntD.canoneMensile=(T('c2a')||{}).value||'';ncntD.canoneAnnuale=(T('c2b')||{}).value||'';ncntD.canoneIBAN=(T('c2c')||{}).value||'';ncntD.depositoImporto=(T('c2d')||{}).value||'';ncntD.depositoMesi=(T('c2e')||{}).value||'';if(!ncntD.canoneMensile){alert('Inserisci il canone');return;}}
-  if(ncntStep===3){ncntD.apeNumero=(T('c3a')||{}).value||'';ncntD.apeClasse=(T('c3b')||{}).value||'';ncntD.compCamere=(T('c3c')||{}).value||'';ncntD.compBagni=(T('c3d')||{}).value||'';ncntD.elemAccessori=(T('c3x1')||{}).value||'';var selAm2=T('c3x2');ncntD.ammobiliata=selAm2?selAm2.value:'si';ncntD.tabMillProp=(T('c3x3')||{}).value||'';ncntD.tabMillRisc=(T('c3x4')||{}).value||'';ncntD.statoImmobile=(T('c3x5')||{}).value||'';var selTL2=T('c3g');ncntD.tipoLocazione=selTL2?selTL2.value:'intero';ncntD.descrizioneLocazione=(T('c3h')||{}).value||'';ncntD.pertinenze=leggiPertinenze();}
-  if(ncntStep===4) leggiPersone('l');
+  if(ncntStep===2){ncntD.canoneMensile=(T('c2a')||{}).value||'';ncntD.canoneAnnuale=(T('c2b')||{}).value||'';ncntD.canoneIBAN=(T('c2c')||{}).value||'';ncntD.depositoImporto=(T('c2d')||{}).value||'';ncntD.depositoMesi=(T('c2e')||{}).value||'';ncntD.oneriMensili=(T('c2f')||{}).value||'';if(!ncntD.canoneMensile){alert('Inserisci il canone');return;}}
+  if(ncntStep===3){ncntD.apeNumero=(T('c3a')||{}).value||'';ncntD.apeClasse=(T('c3b')||{}).value||'';ncntD.compCamere=(T('c3c')||{}).value||'';ncntD.compCucina=(T('c3d')||{}).value||'';ncntD.compBagni=(T('c3e')||{}).value||'';ncntD.compBalconi=(T('c3f')||{}).value||'';var selTL=T('c3g');ncntD.tipoLocazione=selTL?selTL.value||'intero':'intero';ncntD.descrizioneLocazione=(T('c3h')||{}).value||'';ncntD.pertinenze=leggiPertinenze();ncntD.elemAccessori=(T('c3x1')||{}).value||'';var selAm=T('c3x2');ncntD.ammobiliata=selAm?selAm.value:'si';ncntD.tabMillProp=(T('c3x3')||{}).value||'';ncntD.tabMillRisc=(T('c3x4')||{}).value||'';ncntD.statoImmobile=(T('c3x5')||{}).value||'';}
+  if(ncntStep===4){ leggiPersone('l'); }
   if(ncntStep===5){ leggiPersone('c'); ncntD.conviventi=(T('c5conv')||{}).value||'nessuno'; }
-  if(ncntStep===6) leggiPersone('g');
-  if(ncntStep===7){ncntD.note=(T('c7a')||{}).value||'';ncntD.modalitaAccesso=(T('c7b')||{}).value||'';if(ncntD.tipo==='Tipo B'){var selEt=T('c7c');ncntD.esigenzaTipo=selEt?selEt.value:'locatore';var selEm=T('c7d');var emVal=selEm?selEm.value:'';ncntD.esigenzaMotivazione=emVal;ncntD.esigenzaAltroTesto=(emVal==='altro_loc'||emVal==='altro_con')?(T('c7e')||{}).value||'':'';}if(ncntD.tipo==='Tipo C'){ncntD.ateneo=(T('c7f')||{}).value||'';ncntD.facolta=(T('c7g')||{}).value||'';ncntD.mesiMax=(T('c7h')||{}).value||'12';}}
+  if(ncntStep===6){ leggiPersone('g'); }
+  if(ncntStep===7){ncntD.note=(T('c7a')||{}).value||'';ncntD.modalitaAccesso=(T('c7b')||{}).value||'';if(ncntD.tipo==='Tipo B'){var selEt=T('c7c');ncntD.esigenzaTipo=selEt?selEt.value:'locatore';var selEm=T('c7d');var emVal=selEm?selEm.value:'';if(emVal==='altro_loc'||emVal==='altro_con'){ncntD.esigenzaMotivazione=emVal;ncntD.esigenzaAltroTesto=(T('c7e')||{}).value||'';} else {ncntD.esigenzaMotivazione=emVal;ncntD.esigenzaAltroTesto='';}}if(ncntD.tipo==='Tipo C'){ncntD.ateneo=(T('c7f')||{}).value||'';ncntD.facolta=(T('c7g')||{}).value||'';ncntD.mesiMax=(T('c7h')||{}).value||'12';}}
   if(ncntStep===8){
-    if(!ncntD.g1||!ncntD.g2||!ncntD.g3||!ncntD.g4){alert('Accetta tutti e 4 i consensi GDPR');return;}
+    if(!ncntD.g1||!ncntD.g2||!ncntD.g3||!ncntD.g4){alert('Devi accettare tutti e 4 i consensi GDPR');return;}
     var locs=ncntD.locatori||[], cons=ncntD.conduttori||[];
     var cogL=(locs[0]&&(locs[0].cognome||locs[0].nome))||'';
     var cogC=(cons[0]&&(cons[0].cognome||cons[0].nome))||'';
-    var tipoDesc = ncntD.tipo==='Tipo A' ? 'Agevolato 3+2' :
-                  ncntD.tipo==='Tipo B' ? 'Transitorio '+(ncntD.duraMesi||'')+'m' :
-                  ncntD.tipo==='Tipo C' ? 'Studenti '+(ncntD.duraMesi||'')+'m' : (ncntD.tipo||'Contratto');
     ncntD.nomeContratto = buildNomeDoc('CNT', cogL||'LOCATORE', cogC||'CONDUTTORE');
-    ncntD.userId = SOCIO.id;
-    _lastCntDati = JSON.parse(JSON.stringify(ncntD));
-    api('saveContratto', { data: ncntD }, function(err,r){
+    if(ncntD._mod) ncntD.modificato=new Date().toISOString();
+    _lastCntDati = JSON.parse(JSON.stringify(ncntD)); // copia globale per generazione immediata
+    api('saveContratto',{data:ncntD},function(err,r){
       if(!err&&r&&r.ok){
-        if(r.id) _lastCntDati.id = r.id;
-        chiudiOv('ov-ncnt'); chiudiOv('ov-apt');
-        caricaDatiSocio();
-        alert('✅ Pratica creata! Il socio la vedrà nel suo portale.');
-      } else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
+        if(r.id) _lastCntDati.id = r.id; // aggiorna l'id ricevuto dal server
+        chiudiOv('ov-ncnt');chiudiOv('ov-apt');chiudiOv('ov-cnt');caricaDati();navTo('home');alert(ncntD._mod?'Contratto modificato!':'Richiesta inviata!');
+      } else{alert('Errore: '+((r&&r.error)||err||'Riprova'));}
     });
     return;
   }
   ncntStep++; renderNcnt();
 }
+
+// ── CALENDARIO ────────────────────────────────────────────────
 
 function calcMesi(){
   var a=(T('c1a')||{}).value||'',b=(T('c1b')||{}).value||'';
@@ -1219,65 +1295,87 @@ function numLettere(n) {
 
 // ── GENERA CONTRATTO (assistenza) ─────────────────────────────
 function generaEStampaContrattoAs(ct) {
-  if (!ct) { alert('Nessun contratto selezionato'); return; }
+  if (!ct && !curCnt) { alert('Nessun contratto selezionato'); return; }
+  if (!ct) ct = curCnt;
+  // Usa dati freschi del wizard se disponibili per questo contratto
   var srcCnt = (_lastCntDati && (_lastCntDati.id === ct.id || !ct.id))
     ? Object.assign({}, ct, _lastCntDati)
     : ct;
-  var tipo = srcCnt.tipo || ct.tipo;
+  var tipo = srcCnt.tipo || ct.tipo; // 'Tipo A', 'Tipo B', 'Tipo C'
   if (!tipo) { alert('Tipo contratto non definito'); return; }
 
-  var apt = ALL_APT.find(function(a){ return a.id === (srcCnt.appartamentoId||ct.appartamentoId); }) || {};
+  // Trova l'appartamento collegato
+  var apt = (ALL_APT||[]).find(function(a){ return a.id === (srcCnt.appartamentoId||ct.appartamentoId); }) || {};
 
-  var dati = Object.assign({}, ct, srcCnt, {
-    comune:        ct.comune        || apt.comune || '',
-    via:           ct.via           || apt.via || '',
-    nCivico:       ct.nCivico       || apt.nCivico || '',
-    piano:         ct.piano         || apt.piano || '',
-    scala:         ct.scala         || apt.scala || '',
-    interno:       ct.interno       || apt.interno || '',
-    compCamere:    ct.compCamere    || apt.nVani || apt.compCamere || '',
-    catSezione:    ct.catSezione    || apt.catSezione || '',
-    catFoglio:     ct.catFoglio     || apt.catFoglio || '',
-    catParticella: ct.catParticella || apt.catParticella || '',
-    catSubalterno: ct.catSubalterno || apt.catSubalterno || '',
-    catCategoria:  ct.catCategoria  || apt.catCategoria || '',
-    catRendita:    ct.catRendita    || apt.catRendita || '',
-    tabMillProp:   ct.tabMillProp   || apt.tabMillProp || '',
-    tabMillRisc:   ct.tabMillRisc   || apt.tabMillRisc || '',
-    ammobiliata:   ct.ammobiliata   || apt.ammobiliata || '',
+  // Assembla dati completi — i campi del contratto hanno priorità su quelli apt
+  var dati = Object.assign({}, curCnt, srcCnt, {
+    // Campi immobile dall'apt (solo se non già nel contratto)
+    comune:        curCnt.comune       || apt.comune || '',
+    via:           curCnt.via          || apt.via || '',
+    nCivico:       curCnt.nCivico      || apt.nCivico || '',
+    piano:         curCnt.piano        || apt.piano || '',
+    scala:         curCnt.scala        || apt.scala || '',
+    interno:       curCnt.interno      || apt.interno || '',
+    compCamere:    curCnt.compCamere   || apt.nVani || apt.compCamere || '',
+    catSezione:    curCnt.catSezione   || apt.catSezione || '',
+    catFoglio:     curCnt.catFoglio    || apt.catFoglio || '',
+    catParticella: curCnt.catParticella|| apt.catParticella || '',
+    catSubalterno: curCnt.catSubalterno|| apt.catSubalterno || '',
+    catCategoria:  curCnt.catCategoria || apt.catCategoria || '',
+    catRendita:    curCnt.catRendita   || apt.catRendita || '',
+    tabMillProp:   curCnt.tabMillProp  || apt.tabMillProp || '',
+    tabMillRisc:   curCnt.tabMillRisc  || apt.tabMillRisc || '',
+    ammobiliata:   curCnt.ammobiliata  || apt.ammobiliata || '',
+    // Locatori: dal contratto se presenti, altrimenti dall'apt
     locatori:      (ct.locatori && ct.locatori.length) ? ct.locatori : (apt.locatori || []),
-    pertinenze:    ct.pertinenze    || [],
-    garanti:       ct.garanti && ct.garanti.length ? ct.garanti :
+    // Pertinenze dal contratto
+    pertinenze:    ct.pertinenze   || [],
+    // Garanti deserializzati
+    garanti:       curCnt.garanti && curCnt.garanti.length ? curCnt.garanti :
                    (function(){ try{ return JSON.parse(ct.garantiJSON||'[]'); }catch(e){ return []; } })(),
   });
 
+  // Calcola lettere importi
+  dati.canoneAnnualeLettere    = numLettere(dati.canoneAnnuale);
+  dati.canoneMensileLettere    = numLettere(dati.canoneMensile);
+  dati.depositoImportoLettere  = numLettere(dati.depositoImporto);
+  dati.oneriMensiliLettere     = numLettere(dati.oneriMensili);
+  dati.duraMesiLettere         = numLettere(dati.duraMesi);
+  // Per Tipo C: stessa rata per prima e successive (semplificato)
+  dati.primaRataImporto        = dati.canoneMensile;
+  dati.primaRataLettere        = dati.canoneMensileLettere;
+  dati.rateSuccessiveImporto   = dati.canoneMensile;
+  dati.rateSuccessiveLettere   = dati.canoneMensileLettere;
+  dati.nRateSuccessive         = dati.duraMesi ? String(parseInt(dati.duraMesi)-1) : '___';
+  // Esigenza Tipo B: se "altro" usa il testo libero
+  if (dati.esigenzaMotivazione && (dati.esigenzaMotivazione === 'altro_loc' || dati.esigenzaMotivazione === 'altro_con')) {
+    dati.esigenzaMotivazione = dati.esigenzaAltroTesto || '';
+  }
+
+  // Helper pertinenze
   dati.pertTesto = function() {
     if (!dati.pertinenze || !dati.pertinenze.length) return 'nessuna';
     return dati.pertinenze.map(function(p){
       return (p.tipo||'') + (p.catFoglio ? ' (Fg.'+p.catFoglio+' p.'+p.catParticella+' sub.'+p.catSubalterno+')' : '');
     }).join(', ');
   };
-  dati.canoneAnnualeLettere   = numLettere(dati.canoneAnnuale);
-  dati.canoneMensileLettere   = numLettere(dati.canoneMensile);
-  dati.depositoImportoLettere = numLettere(dati.depositoImporto);
-  dati.oneriMensiliLettere    = numLettere(dati.oneriMensili);
-  dati.duraMesiLettere        = numLettere(dati.duraMesi);
-  dati.primaRataImporto       = dati.canoneMensile;
-  dati.primaRataLettere       = dati.canoneMensileLettere;
-  dati.rateSuccessiveImporto  = dati.canoneMensile;
-  dati.rateSuccessiveLettere  = dati.canoneMensileLettere;
-  dati.nRateSuccessive        = dati.duraMesi ? String(parseInt(dati.duraMesi)-1) : '___';
-  if (dati.esigenzaMotivazione && (dati.esigenzaMotivazione==='altro_loc'||dati.esigenzaMotivazione==='altro_con')) {
-    dati.esigenzaMotivazione = dati.esigenzaAltroTesto || '';
-  }
 
   var html = generaContratto(dati, tipo);
   var win = window.open('', '_blank');
-  if (win) { win.document.write(html); win.document.close(); }
-  else { alert('Il browser ha bloccato il popup. Consenti i popup per questo sito e riprova.'); }
+  if (win) {
+    win.document.write(html);
+    win.document.close();
+  } else {
+    alert('Il browser ha bloccato il popup. Consenti i popup per questo sito e riprova.');
+  }
 }
 
-// ── MODIFICA IMMOBILE (assistenza) ───────────────────────────
+</script>
+<script src="contratti_template.js"></script>
+</body>
+</html>
+
+
 function apriModAptAs() {
   _modAptLocsModificatiAs = false;
   if (!curApt) return;
@@ -1372,73 +1470,21 @@ function salvaModAptAs() {
 
 // ── MODIFICA CONTRATTO (assistenza) ──────────────────────────
 function modificaCntAs(ct) {
-  ncntStep = 0;
-  ncntD = JSON.parse(JSON.stringify(ct));
-  ncntD._mod = true;
-  // Deserializza array JSON
-  try { ncntD.locatori   = JSON.parse(ct.locatoriJSON   ||'[]'); } catch(e){ ncntD.locatori=[{}]; }
-  try { ncntD.conduttori = JSON.parse(ct.conduttoriJSON ||'[]'); } catch(e){ ncntD.conduttori=[{}]; }
-  try { ncntD.garanti    = JSON.parse(ct.garantiJSON    ||'[]'); } catch(e){ ncntD.garanti=[]; }
-  try { ncntD.pertinenze = JSON.parse(ct.pertinenzaJSON ||'[]'); } catch(e){ ncntD.pertinenze=[]; }
-  if (!ncntD.locatori.length)   ncntD.locatori=[{}];
-  if (!ncntD.conduttori.length) ncntD.conduttori=[{}];
-  // Precarica locatori dall'immobile se assenti nel contratto
-  if (!(ncntD.locatori[0].cognome||ncntD.locatori[0].nome) && curApt && curApt.locatori && curApt.locatori.length) {
-    ncntD.locatori = JSON.parse(JSON.stringify(curApt.locatori));
-  }
-  T('ncnt-lbl').textContent = 'MODIFICA CONTRATTO';
+  ncntStep=0;
+  if (ct) curCnt=ct;
+  ncntD=JSON.parse(JSON.stringify(curCnt));
+  ncntD._mod=true;
+  // Deserializza tutti i campi JSON
+  try{ncntD.locatori  =JSON.parse(curCnt.locatoriJSON  ||'[]');}catch(e){ncntD.locatori=[{}];}
+  try{ncntD.conduttori=JSON.parse(curCnt.conduttoriJSON||'[]');}catch(e){ncntD.conduttori=[{}];}
+  try{ncntD.garanti   =JSON.parse(curCnt.garantiJSON   ||'[]');}catch(e){ncntD.garanti=[];}
+  try{ncntD.pertinenze=JSON.parse(curCnt.pertinenzaJSON||'[]');}catch(e){ncntD.pertinenze=[];}
+  if(!ncntD.locatori.length)   ncntD.locatori=[{}];
+  if(!ncntD.conduttori.length) ncntD.conduttori=[{}];
+  // Ripristina campi semplici salvati nel contratto
+  // (già presenti in ncntD dal JSON.parse(JSON.stringify(curCnt)) sopra)
+  if(T('ncnt-lbl')) T('ncnt-lbl').textContent='MODIFICA CONTRATTO';
   renderNcnt();
   apriOv('ov-ncnt');
 }
 
-</script>
-<script src="contratti_template.js"></script>
-<!-- ════ OV: MODIFICA APPARTAMENTO ════ -->
-<div id="ov-mod-apt-as" class="ov">
-  <div class="oh">
-    <div><div class="ohlbl">MODIFICA IMMOBILE</div><div class="ohttl" id="mapt-ttl-as">—</div></div>
-    <button class="exbtn" onclick="chiudiOv('ov-mod-apt-as')">← Indietro</button>
-  </div>
-  <div style="padding:16px 16px 100px">
-    <div class="card"><div class="cb">
-      <div class="sec">DATI IMMOBILE</div>
-      <span class="lbl">Nome immobile *</span><input type="text" class="inp" id="mapt-nome-as"/>
-      <span class="lbl">Comune</span><input type="text" class="inp" id="mapt-comune-as"/>
-      <span class="lbl">Via</span><input type="text" class="inp" id="mapt-via-as"/>
-      <span class="lbl">N° civico</span><input type="text" class="inp" id="mapt-nciv-as"/>
-      <div class="g2">
-        <div><span class="lbl">Piano</span><input type="text" class="inp" id="mapt-piano-as"/></div>
-        <div><span class="lbl">Scala</span><input type="text" class="inp" id="mapt-scala-as"/></div>
-      </div>
-      <div class="g2">
-        <div><span class="lbl">Interno</span><input type="text" class="inp" id="mapt-interno-as"/></div>
-        <div><span class="lbl">N. vani</span><input type="text" class="inp" id="mapt-vani-as"/></div>
-      </div>
-    </div></div>
-    <div class="card"><div class="cb">
-      <div class="sec">DATI CATASTALI</div>
-      <div class="g2">
-        <div><span class="lbl">Categoria</span><input type="text" class="inp" id="mapt-cat-as" placeholder="A/2"/></div>
-        <div><span class="lbl">Rendita €</span><input type="text" class="inp" id="mapt-rendita-as"/></div>
-      </div>
-      <span class="lbl">Sezione <span style="font-size:10px;color:#8E8E93">(solo se presente)</span></span>
-      <input type="text" class="inp" id="mapt-sez-as"/>
-      <div class="g2">
-        <div><span class="lbl">Foglio</span><input type="text" class="inp" id="mapt-foglio-as"/></div>
-        <div><span class="lbl">Particella</span><input type="text" class="inp" id="mapt-particella-as"/></div>
-      </div>
-      <span class="lbl">Subalterno</span><input type="text" class="inp" id="mapt-sub-as"/>
-    </div></div>
-    <div class="card"><div class="cb">
-      <div class="sec">LOCATORI</div>
-      <div id="mapt-locs-as"></div>
-      <button class="bd" style="margin-top:8px" onclick="addLocModAs()">+ Aggiungi locatore</button>
-    </div></div>
-  </div>
-  <div style="position:fixed;bottom:0;left:0;right:0;padding:12px 16px 32px;background:rgba(255,255,255,.96);backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.07);z-index:10">
-    <button class="bp" onclick="salvaModAptAs()">Salva modifiche</button>
-  </div>
-</div>
-
-</body>
-</html>
