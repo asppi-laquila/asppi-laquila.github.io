@@ -1085,21 +1085,32 @@ function esci() { localStorage.removeItem('asppi_admin_ok'); localStorage.remove
 function carica() {
   var hprens = document.getElementById('h-prens'); if(hprens) hprens.innerHTML='<div class="info">Caricamento...</div>';
   // Chiamate separate per evitare timeout
+  // Carica tutto e chiama renderHome solo quando tutti i dati principali sono pronti
+  var _loadedFlags = {pren:false, cnt:false, utenti:false, avvisi:false};
+  function _checkRenderHome() {
+    if (_loadedFlags.pren && _loadedFlags.cnt && _loadedFlags.utenti && _loadedFlags.avvisi) {
+      renderHome();
+    }
+  }
   apiCall('getPrenotazioni', {}, function(err, r) {
     D.prenotazioni = (!err && r && r.ok) ? (r.data||[]) : [];
-    renderHome();
+    _loadedFlags.pren = true; _checkRenderHome();
     renderPren();
   });
   apiCall('getContratti', {}, function(err, r) {
     D.contratti = (!err && r && r.ok) ? (r.data||[]) : [];
-    renderHome();
+    _loadedFlags.cnt = true; _checkRenderHome();
     renderPrat();
     renderChat();
   });
   apiCall('getUtenti', {}, function(err, r) {
     D.utenti = (!err && r && r.ok) ? (r.data||[]) : [];
     window._utentiData = D.utenti;
-    setText('sh-soci', D.utenti.length);
+    _loadedFlags.utenti = true; _checkRenderHome();
+  });
+  apiCall('getAvvisi', {}, function(err, r) {
+    D.avvisi = (!err && r && r.ok) ? (r.data||[]) : [];
+    _loadedFlags.avvisi = true; _checkRenderHome();
   });
   apiCall('getAllChat', {}, function(err, r) {
     D.chat = (!err && r && r.ok) ? (r.data||[]) : [];
@@ -3616,21 +3627,32 @@ function esci() { localStorage.removeItem('asppi_admin_ok'); localStorage.remove
 function carica() {
   var hprens = document.getElementById('h-prens'); if(hprens) hprens.innerHTML='<div class="info">Caricamento...</div>';
   // Chiamate separate per evitare timeout
+  // Carica tutto e chiama renderHome solo quando tutti i dati principali sono pronti
+  var _loadedFlags = {pren:false, cnt:false, utenti:false, avvisi:false};
+  function _checkRenderHome() {
+    if (_loadedFlags.pren && _loadedFlags.cnt && _loadedFlags.utenti && _loadedFlags.avvisi) {
+      renderHome();
+    }
+  }
   apiCall('getPrenotazioni', {}, function(err, r) {
     D.prenotazioni = (!err && r && r.ok) ? (r.data||[]) : [];
-    renderHome();
+    _loadedFlags.pren = true; _checkRenderHome();
     renderPren();
   });
   apiCall('getContratti', {}, function(err, r) {
     D.contratti = (!err && r && r.ok) ? (r.data||[]) : [];
-    renderHome();
+    _loadedFlags.cnt = true; _checkRenderHome();
     renderPrat();
     renderChat();
   });
   apiCall('getUtenti', {}, function(err, r) {
     D.utenti = (!err && r && r.ok) ? (r.data||[]) : [];
     window._utentiData = D.utenti;
-    setText('sh-soci', D.utenti.length);
+    _loadedFlags.utenti = true; _checkRenderHome();
+  });
+  apiCall('getAvvisi', {}, function(err, r) {
+    D.avvisi = (!err && r && r.ok) ? (r.data||[]) : [];
+    _loadedFlags.avvisi = true; _checkRenderHome();
   });
   apiCall('getAllChat', {}, function(err, r) {
     D.chat = (!err && r && r.ok) ? (r.data||[]) : [];
