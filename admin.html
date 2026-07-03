@@ -874,6 +874,9 @@ window.onload = function() {
   if (localStorage.getItem('asppi_admin_ok') !== 'yes') { window.location.replace('index.html'); return; }
   bindEvents();
   carica();
+  // Re-render dopo 4s per dati lenti dal backend
+  setTimeout(function(){ renderHome(); }, 4000);
+  setTimeout(function(){ renderHome(); }, 8000);
 };
 
 // ── HELPERS ───────────────────────────────────────────────────
@@ -1136,7 +1139,13 @@ function renderHome() {
 
   // ── CONTATORI ──────────────────────────────────────────────
   var prenDaFare = D.prenotazioni.filter(function(p){
-    return p.stato==='in_attesa' || p.stato==='confermata';
+    if (p.stato==='cancellata' || p.stato==='annullata') return false;
+    if (!p.data) return true;
+    try {
+      var parts = p.data.split('/');
+      var d = parts.length===3 ? new Date(parts[2]+'-'+parts[1]+'-'+parts[0]) : new Date(p.data);
+      return d >= new Date(new Date().toDateString());
+    } catch(e) { return true; }
   }).length;
   var cntDaFare = D.contratti.filter(function(c){
     return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true';
