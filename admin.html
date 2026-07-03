@@ -383,6 +383,15 @@ textarea.inp{min-height:90px;resize:vertical;}
   </div>
 
 
+
+<div id="p-prat" class="pg">
+  <div class="page-title">Pratiche</div>
+  <div class="frow" id="prat-filtri"></div>
+  <div id="l-prat"><div class="info">Caricamento...</div></div>
+</div>
+
+<!-- ════════════ CHAT ════════════ -->
+
 <!-- ════════════ CHAT ════════════ -->
 <div id="p-chat" class="pg" style="padding:0">
   <div style="padding:16px 16px 8px">
@@ -704,7 +713,7 @@ textarea.inp{min-height:90px;resize:vertical;}
 
   <div id="tc-contratto" style="display:none;padding:16px">
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-      <button class="bp" id="btn-genera-pdf-admin" style="flex:1;background:#1A5FA8">📄 Genera e stampa PDF</button>
+      <button class="bp" id="btn-genera-pdf-admin" onclick="generaPDFAdmin()" style="flex:1;background:#1A5FA8">📄 Genera e stampa PDF</button>
       <button class="bp" id="btn-copia-dati" style="flex:1">📋 Copia dati skill</button>
       <button class="bd" id="btn-scarica-dati" style="flex:1">⬇️ Scarica .txt</button>
     </div>
@@ -978,7 +987,6 @@ function bindEvents() {
   document.getElementById('tab-dati').addEventListener('click', function(){ switchTab('dati'); });
   document.getElementById('tab-chat').addEventListener('click', function(){ switchTab('chat'); });
   if(document.getElementById('tab-contratto')) document.getElementById('tab-contratto').addEventListener('click', function(){ switchTab('contratto'); });
-  if(document.getElementById('btn-genera-pdf-admin')) document.getElementById('btn-genera-pdf-admin').addEventListener('click', generaPDFAdmin);
   if(document.getElementById('btn-copia-dati')) document.getElementById('btn-copia-dati').addEventListener('click', copiaDatiContratto);
   if(document.getElementById('btn-scarica-dati')) document.getElementById('btn-scarica-dati').addEventListener('click', scaricaDatiContratto);
   // Chat
@@ -1034,7 +1042,7 @@ function apiCall(action, data, cb) {
 
 // ── NAV ───────────────────────────────────────────────────────
 function navTo(id) {
-  var pages = ['home','pren','prat','chat','slot','soci','pag','srv','imp'];
+  var pages = ['home','pren','prat','chat','soci','pag','srv','imp'];
   for (var i=0; i<pages.length; i++) {
     var pg = document.getElementById('p-'+pages[i]);
     var nb = document.getElementById('nb-'+pages[i]);
@@ -3527,7 +3535,6 @@ function bindEvents() {
   document.getElementById('tab-dati').addEventListener('click', function(){ switchTab('dati'); });
   document.getElementById('tab-chat').addEventListener('click', function(){ switchTab('chat'); });
   if(document.getElementById('tab-contratto')) document.getElementById('tab-contratto').addEventListener('click', function(){ switchTab('contratto'); });
-  if(document.getElementById('btn-genera-pdf-admin')) document.getElementById('btn-genera-pdf-admin').addEventListener('click', generaPDFAdmin);
   if(document.getElementById('btn-copia-dati')) document.getElementById('btn-copia-dati').addEventListener('click', copiaDatiContratto);
   if(document.getElementById('btn-scarica-dati')) document.getElementById('btn-scarica-dati').addEventListener('click', scaricaDatiContratto);
   // Chat
@@ -3583,7 +3590,7 @@ function apiCall(action, data, cb) {
 
 // ── NAV ───────────────────────────────────────────────────────
 function navTo(id) {
-  var pages = ['home','pren','prat','chat','slot','soci','pag','srv','imp'];
+  var pages = ['home','pren','prat','chat','soci','pag','srv','imp'];
   for (var i=0; i<pages.length; i++) {
     var pg = document.getElementById('p-'+pages[i]);
     var nb = document.getElementById('nb-'+pages[i]);
@@ -3626,6 +3633,10 @@ function generaPDFAdmin() {
   var win = window.open('','_blank');
   if (win){ win.document.write(html); win.document.close(); }
   else { alert('Popup bloccato — consenti i popup per questo sito'); }
+}
+
+function vaiAssistenza() {
+  window.location.href = 'assistenza.html';
 }
 
 </script>
