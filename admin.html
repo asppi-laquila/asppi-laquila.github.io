@@ -874,9 +874,10 @@ window.onload = function() {
   if (localStorage.getItem('asppi_admin_ok') !== 'yes') { window.location.replace('index.html'); return; }
   bindEvents();
   carica();
-  // Re-render dopo 4s per dati lenti dal backend
-  setTimeout(function(){ renderHome(); }, 4000);
-  setTimeout(function(){ renderHome(); }, 8000);
+  // Re-render periodico per dati lenti dal backend
+  setTimeout(function(){ renderHome(); }, 2000);
+  setTimeout(function(){ renderHome(); }, 5000);
+  setTimeout(function(){ renderHome(); }, 10000);
 };
 
 // ── HELPERS ───────────────────────────────────────────────────
@@ -1150,7 +1151,8 @@ function renderHome() {
     } catch(e) { return true; }
   }).length;
   var cntDaFare = D.contratti.filter(function(c){
-    return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true';
+    var el = c.eliminato; if (el===true || el===1 || String(el).toLowerCase()==='true') return false;
+    return c.stato==='richiesta';
   }).length;
   var msgNonLetti = D.chat.filter(function(m){
     return m.mittente==='socio' && !m.letto;
