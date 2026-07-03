@@ -384,50 +384,6 @@ textarea.inp{min-height:90px;resize:vertical;}
   </div>
 
   <!-- CARD ANTEPRIME -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
-
-    <!-- Appuntamenti -->
-    <div style="background:var(--card);border-radius:18px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-weight:700;font-size:14px;color:var(--tx)">📅 Prossimi appuntamenti</div>
-        <div id="h-badge-pren" style="background:#E8631A;color:#fff;border-radius:50px;font-size:11px;font-weight:700;padding:2px 8px;display:none">0</div>
-      </div>
-      <div id="h-preview-pren" style="font-size:13px;color:#8E8E93">Caricamento...</div>
-      <div onclick="document.getElementById('nb-pren').click()"
-        style="margin-top:12px;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer;text-align:right">
-        → Vedi tutti
-      </div>
-    </div>
-
-    <!-- Contratti da verificare -->
-    <div style="background:var(--card);border-radius:18px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-weight:700;font-size:14px;color:var(--tx)">📋 Contratti da verificare</div>
-        <div id="h-badge-prat" style="background:#E8631A;color:#fff;border-radius:50px;font-size:11px;font-weight:700;padding:2px 8px;display:none">0</div>
-      </div>
-      <div id="h-preview-prat" style="font-size:13px;color:#8E8E93">Caricamento...</div>
-      <div onclick="document.getElementById('nb-prat').click()"
-        style="margin-top:12px;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer;text-align:right">
-        → Vedi tutti
-      </div>
-    </div>
-
-  </div>
-
-  <!-- AVVISO ATTIVO -->
-  <div id="h-avviso-box" style="margin-top:12px;display:none">
-    <div style="background:#FFF8EC;border:1.5px solid #F6A623;border-radius:16px;padding:14px 16px">
-      <div style="font-weight:700;font-size:13px;color:#E8631A;margin-bottom:6px">📢 Avviso attivo (visibile ai soci)</div>
-      <div id="h-avviso-testo" style="font-size:13px;color:var(--tx);margin-bottom:10px"></div>
-      <div id="h-avviso-data" style="font-size:11px;color:#8E8E93;margin-bottom:10px"></div>
-      <div style="display:flex;gap:8px">
-        <button onclick="document.getElementById('nb-avv').click()"
-          style="flex:1;padding:8px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">
-          ✏️ Gestisci avvisi
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- Alert urgenti (nascosti, usati da renderHome) -->
   <div id="h-pren-attesa" style="display:none"></div>
@@ -5793,23 +5749,4 @@ function generaPDFAdmin() {
 </script>
 <script src="contratti_template.js"></script>
 </body>
-</html><div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
-    <div class="stat-card s-blue" onclick="navTo('soci');caricaSoci()">
-      <div class="stat-num" id="sh-soci">—</div>
-      <div class="stat-lbl">👥 Soci</div>
-    </div>
-    <div class="stat-card s-orange" onclick="navTo('prat');cercaPratiche('')">
-      <div class="stat-num" id="sh-att">—</div>
-      <div class="stat-lbl">⏳ Da fare</div>
-    </div>
-    <div class="stat-card s-green" onclick="navTo('pag');caricaPagamenti()">
-      <div class="stat-num" id="sh-inc">—</div>
-      <div class="stat-lbl">💰 Incassato €</div>
-    </div>
-    <div class="stat-card s-purple">
-      <div class="stat-num" id="sh-msg">—</div>
-      <div class="stat-lbl">💬 Messaggi</div>
-    </div>
-  </div>
-
-
+</html>
