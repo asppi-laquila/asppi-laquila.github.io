@@ -3595,7 +3595,40 @@ function navTo(id) {
 function apri(id) { var e=document.getElementById(id); if(e){ e.className='ov on'; e.scrollTop=0; } }
 function chiudi(id) { var e=document.getElementById(id); if(e) e.className='ov'; }
 function esci() { localStorage.removeItem('asppi_admin_ok'); localStorage.removeItem('asppi_admin_pwd'); window.location.replace('index.html'); }
-</script></script>
+
+
+function generaPDFAdmin() {
+  var cnt = null;
+  for (var i=0;i<D.contratti.length;i++){ if(D.contratti[i].id===curPratId){ cnt=D.contratti[i]; break; } }
+  if (!cnt) { alert('Apri prima una pratica dalla sezione Pratiche'); return; }
+  var apt = (D.appartamenti||[]).find(function(a){ return a.id===cnt.appartamentoId; }) || {};
+  var dati = Object.assign({}, cnt, {
+    comune:cnt.comune||apt.comune||'', via:cnt.via||apt.via||'',
+    nCivico:cnt.nCivico||apt.nCivico||'', piano:cnt.piano||apt.piano||'',
+    scala:cnt.scala||apt.scala||'', interno:cnt.interno||apt.interno||'',
+    compCamere:cnt.compCamere||apt.nVani||apt.compCamere||'',
+    catSezione:cnt.catSezione||apt.catSezione||'', catFoglio:cnt.catFoglio||apt.catFoglio||'',
+    catParticella:cnt.catParticella||apt.catParticella||'',
+    catSubalterno:cnt.catSubalterno||apt.catSubalterno||'',
+    catCategoria:cnt.catCategoria||apt.catCategoria||'',
+    catRendita:cnt.catRendita||apt.catRendita||'',
+    tabMillProp:cnt.tabMillProp||apt.tabMillProp||'',
+    tabMillRisc:cnt.tabMillRisc||apt.tabMillRisc||'',
+    locatori:cnt.locatori&&cnt.locatori.length?cnt.locatori:(apt.locatori||[]),
+    pertinenze:cnt.pertinenze||[], garanti:cnt.garanti||[],
+  });
+  [{k:'locatori',j:'locatoriJSON'},{k:'conduttori',j:'conduttoriJSON'},
+   {k:'garanti',j:'garantiJSON'},{k:'pertinenze',j:'pertinenzaJSON'}].forEach(function(x){
+    if (!Array.isArray(dati[x.k])||!dati[x.k].length){ try{dati[x.k]=JSON.parse(cnt[x.j]||'[]');}catch(e){dati[x.k]=[];} }
+  });
+  if (!dati.tipo){ alert('Tipo contratto non definito'); return; }
+  var html = generaContratto(dati, dati.tipo);
+  var win = window.open('','_blank');
+  if (win){ win.document.write(html); win.document.close(); }
+  else { alert('Popup bloccato — consenti i popup per questo sito'); }
+}
+
+</script>
 <script src="contratti_template.js"></script>
 </body>
 </html>
