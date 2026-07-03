@@ -1100,6 +1100,8 @@ function carica() {
   apiCall('getUtenti', {}, function(err, r) {
     D.utenti = (!err && r && r.ok) ? (r.data||[]) : [];
     window._utentiData = D.utenti;
+    var el = document.getElementById('sh-soci');
+    if (el) el.textContent = D.utenti.length;
     renderHome();
   });
   apiCall('getAvvisi', {}, function(err, r) {
@@ -3677,6 +3679,8 @@ function carica() {
   apiCall('getUtenti', {}, function(err, r) {
     D.utenti = (!err && r && r.ok) ? (r.data||[]) : [];
     window._utentiData = D.utenti;
+    var el = document.getElementById('sh-soci');
+    if (el) el.textContent = D.utenti.length;
     renderHome();
   });
   apiCall('getAvvisi', {}, function(err, r) {
