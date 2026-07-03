@@ -686,9 +686,10 @@ textarea.inp{min-height:90px;resize:vertical;}
   </div>
 
   <div id="tc-contratto" style="display:none;padding:16px">
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      <button class="bp" id="btn-copia-dati" style="flex:1">📋 Copia dati per skill</button>
-      <button class="bd" id="btn-scarica-dati" style="flex:1">📄 Scarica .txt</button>
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <button class="bp" id="btn-genera-pdf-admin" style="flex:1;background:#1A5FA8">📄 Genera e stampa PDF</button>
+      <button class="bp" id="btn-copia-dati" style="flex:1">📋 Copia dati skill</button>
+      <button class="bd" id="btn-scarica-dati" style="flex:1">⬇️ Scarica .txt</button>
     </div>
     <div id="dati-contratto-box"
       style="background:#F8F7F5;border-radius:12px;padding:14px;font-size:12px;font-family:monospace;white-space:pre-wrap;line-height:1.6;max-height:400px;overflow-y:auto;border:1px solid var(--border)">
@@ -960,6 +961,7 @@ function bindEvents() {
   document.getElementById('tab-dati').addEventListener('click', function(){ switchTab('dati'); });
   document.getElementById('tab-chat').addEventListener('click', function(){ switchTab('chat'); });
   if(document.getElementById('tab-contratto')) document.getElementById('tab-contratto').addEventListener('click', function(){ switchTab('contratto'); });
+  if(document.getElementById('btn-genera-pdf-admin')) document.getElementById('btn-genera-pdf-admin').addEventListener('click', generaPDFAdmin);
   if(document.getElementById('btn-copia-dati')) document.getElementById('btn-copia-dati').addEventListener('click', copiaDatiContratto);
   if(document.getElementById('btn-scarica-dati')) document.getElementById('btn-scarica-dati').addEventListener('click', scaricaDatiContratto);
   // Chat
@@ -3417,6 +3419,7 @@ function bindEvents() {
   document.getElementById('tab-dati').addEventListener('click', function(){ switchTab('dati'); });
   document.getElementById('tab-chat').addEventListener('click', function(){ switchTab('chat'); });
   if(document.getElementById('tab-contratto')) document.getElementById('tab-contratto').addEventListener('click', function(){ switchTab('contratto'); });
+  if(document.getElementById('btn-genera-pdf-admin')) document.getElementById('btn-genera-pdf-admin').addEventListener('click', generaPDFAdmin);
   if(document.getElementById('btn-copia-dati')) document.getElementById('btn-copia-dati').addEventListener('click', copiaDatiContratto);
   if(document.getElementById('btn-scarica-dati')) document.getElementById('btn-scarica-dati').addEventListener('click', scaricaDatiContratto);
   // Chat
@@ -5593,6 +5596,50 @@ function vaiAssistenza() {
 
 // Pulsante assistenza: porta sempre a assistenza.html
 
+
+function generaPDFAdmin() {
+  // Trova il contratto corrente tramite curPratId (stesso usato da generaDatiContratto)
+  var cnt = null;
+  for (var i=0; i<D.contratti.length; i++) { if(D.contratti[i].id===curPratId){ cnt=D.contratti[i]; break; } }
+  if (!cnt) { alert('Nessun contratto selezionato. Apri prima una pratica.'); return; }
+  var apt = (D.appartamenti||[]).find(function(a){ return a.id===cnt.appartamentoId; }) || {};
+  var dati = Object.assign({}, cnt, {
+    comune:        cnt.comune        || apt.comune || '',
+    via:           cnt.via           || apt.via || '',
+    nCivico:       cnt.nCivico       || apt.nCivico || '',
+    piano:         cnt.piano         || apt.piano || '',
+    scala:         cnt.scala         || apt.scala || '',
+    interno:       cnt.interno       || apt.interno || '',
+    compCamere:    cnt.compCamere    || apt.nVani || apt.compCamere || '',
+    catSezione:    cnt.catSezione    || apt.catSezione || '',
+    catFoglio:     cnt.catFoglio     || apt.catFoglio || '',
+    catParticella: cnt.catParticella || apt.catParticella || '',
+    catSubalterno: cnt.catSubalterno || apt.catSubalterno || '',
+    catCategoria:  cnt.catCategoria  || apt.catCategoria || '',
+    catRendita:    cnt.catRendita    || apt.catRendita || '',
+    tabMillProp:   cnt.tabMillProp   || apt.tabMillProp || '',
+    tabMillRisc:   cnt.tabMillRisc   || apt.tabMillRisc || '',
+    ammobiliata:   cnt.ammobiliata   || apt.ammobiliata || '',
+    locatori:      cnt.locatori && cnt.locatori.length ? cnt.locatori : (apt.locatori || []),
+    pertinenze:    cnt.pertinenze    || [],
+    garanti:       cnt.garanti       || [],
+  });
+  // Deserializza array JSON se necessario
+  var jsonMap = {locatori:'locatoriJSON', conduttori:'conduttoriJSON', garanti:'garantiJSON', pertinenze:'pertinenzaJSON'};
+  Object.keys(jsonMap).forEach(function(k) {
+    if (!Array.isArray(dati[k])) {
+      try { dati[k] = JSON.parse(cnt[jsonMap[k]]||'[]'); } catch(e) { dati[k]=[]; }
+    }
+  });
+  var tipo = dati.tipo;
+  if (!tipo) { alert('Tipo contratto non definito'); return; }
+  var html = generaContratto(dati, tipo);
+  var win = window.open('', '_blank');
+  if (win) { win.document.write(html); win.document.close(); }
+  else { alert('Popup bloccato. Consenti i popup per questo sito.'); }
+}
+
 </script>
+<script src="contratti_template.js"></script>
 </body>
 </html>

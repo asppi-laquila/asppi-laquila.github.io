@@ -324,6 +324,7 @@ select.inp{cursor:pointer;}
       <div class="rb"><div class="rt">📤 Cessione</div><div class="rs">Cede il contratto a terzi</div></div>
       <div class="rarr">›</div>
     </div>
+    <button class="bp" id="btn-genera-cnt-as" style="background:#1A5FA8;box-shadow:0 3px 12px rgba(26,95,168,.25)">📄 Genera e stampa contratto</button>
     <button class="bs" id="btn-elimina-cnt" style="color:var(--rd);border-color:var(--rdl);margin-top:4px">🗑️ Elimina pratica</button>
   </div>
 </div>
@@ -365,6 +366,18 @@ var curCnt      = null;
 var naptStep    = 0; var naptD = {};
 var ncntStep    = 0; var ncntD = {};
 var _lastCntDati = null;
+
+function normalizzaCognome(v) {
+  if (!v) return '';
+  return String(v).toUpperCase()
+    .replace(/['’`]/g, '')
+    .replace(/\s+/g, '')
+    .replace(/[^A-Z0-9]/g, '');
+}
+function buildNomeDoc(tipo, cogL, cogC) {
+  var anno = new Date().getFullYear().toString().slice(-2);
+  return anno + '_' + tipo + '_' + normalizzaCognome(cogL) + '_' + normalizzaCognome(cogC);
+}
 var NLABELS     = ['Tipo','Durata','Canone','Immobile','Locatori','Conduttori','Garanti','Note','Privacy'];
 
 // ── INIT ──────────────────────────────────────
@@ -617,7 +630,8 @@ function apriCnt(ct) {
   T('btn-proroga-cnt').onclick  = function(){ apriAdm('proroga'); };
   T('btn-subentro-cnt').onclick = function(){ apriAdm('subentro'); };
   T('btn-cessione-cnt').onclick = function(){ apriAdm('cessione'); };
-  T('btn-elimina-cnt').onclick  = function(){ eliminaCnt(ct); };
+  T('btn-genera-cnt-as').onclick = function(){ generaEStampaContrattoAs(ct); };
+  T('btn-elimina-cnt').onclick    = function(){ eliminaCnt(ct); };
   apriOv('ov-cnt');
 }
 
@@ -1094,7 +1108,7 @@ function ncntAvanti(){
     var tipoDesc = ncntD.tipo==='Tipo A' ? 'Agevolato 3+2' :
                   ncntD.tipo==='Tipo B' ? 'Transitorio '+(ncntD.duraMesi||'')+'m' :
                   ncntD.tipo==='Tipo C' ? 'Studenti '+(ncntD.duraMesi||'')+'m' : (ncntD.tipo||'Contratto');
-    ncntD.nomeContratto = new Date().getFullYear().toString().slice(-2) + '_CNT_' + (cogL||'LOCATORE').toUpperCase() + '_' + (cogC||'CONDUTTORE').toUpperCase();
+    ncntD.nomeContratto = buildNomeDoc('CNT', cogL||'LOCATORE', cogC||'CONDUTTORE');
     ncntD.userId = SOCIO.id;
     _lastCntDati = JSON.parse(JSON.stringify(ncntD));
     api('saveContratto', { data: ncntD }, function(err,r){

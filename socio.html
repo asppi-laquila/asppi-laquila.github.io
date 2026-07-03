@@ -861,6 +861,18 @@ var calDay = null, calSlot = null, calYear = new Date().getFullYear(), calMonth 
 var naptStep = 0, naptD = {};
 var ncntStep = 0, ncntD = {};
 var _lastCntDati = null; // ultimi dati contratto wizard
+
+function normalizzaCognome(v) {
+  if (!v) return '';
+  return String(v).toUpperCase()
+    .replace(/['’`]/g, '')
+    .replace(/\s+/g, '')
+    .replace(/[^A-Z0-9]/g, '');
+}
+function buildNomeDoc(tipo, cogL, cogC) {
+  var anno = new Date().getFullYear().toString().slice(-2);
+  return anno + '_' + tipo + '_' + normalizzaCognome(cogL) + '_' + normalizzaCognome(cogC);
+}
 var MESI = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
 var NLABELS = ['Tipo','Durata','Canone','Immobile','Locatori','Conduttori','Garanti','Note','Privacy'];
 
@@ -1525,7 +1537,7 @@ function apriCnt(id) {
   if (!ct) return;
   curCnt = ct;
   ST('oc-lbl', 'CONTRATTO');
-  ST('oc-ttl', ct.tipo||'—');
+  ST('oc-ttl', ct.nomeContratto||ct.tipo||'—');
   ST('oc-tipo', ct.tipo||'—');
   ST('oc-dal', fmtDate(ct.duraDal));
   ST('oc-al', fmtDate(ct.duraAl));
@@ -1585,8 +1597,17 @@ function inviaAdm(tipo) {
   var errEl = T('adm-err');
   if (errEl) errEl.style.display='none';
   if (!taj||!data) { if(errEl){errEl.textContent='Compila tutti i campi obbligatori';errEl.style.display='';} return; }
+  // Genera nome adempimento con schema AA_TIPO_COGNOMELOC_COGNOMECOND
+  var _tipoMap = {proroga:'PRG', risoluzione:'RIS', subentro:'SUB'};
+  var _acr = _tipoMap[tipo] || tipo.toUpperCase().substring(0,3);
+  var _locs = []; try{ _locs=JSON.parse((curCnt&&curCnt.locatoriJSON)||'[]'); }catch(e){}
+  var _cons = []; try{ _cons=JSON.parse((curCnt&&curCnt.conduttoriJSON)||'[]'); }catch(e){}
+  var _cogL = _locs[0]&&(_locs[0].cognome||_locs[0].nome)||'';
+  var _cogC = _cons[0]&&(_cons[0].cognome||_cons[0].nome)||'';
+  var nomeAdm = buildNomeDoc(_acr, _cogL||'LOCATORE', _cogC||'CONDUTTORE');
   var payload = {contrattoId:curCnt?curCnt.id:'', tipoAdempimento:tipo, taj:taj, data:data,
-    nuovoCond:(T('adm-nc')||{}).value||'', nuovoCF:(T('adm-ncf')||{}).value||''};
+    nuovoCond:(T('adm-nc')||{}).value||'', nuovoCF:(T('adm-ncf')||{}).value||'',
+    nomeAdempimento: nomeAdm};
   api('saveAdempimento', payload, function(err,r){
     if (!err&&r&&r.ok) {
       var btn = T('adm-btn'); if(btn) btn.style.display='none';
@@ -2261,8 +2282,7 @@ function ncntAvanti() {
     var locs=ncntD.locatori||[], cons=ncntD.conduttori||[];
     var cogL=(locs[0]&&(locs[0].cognome||locs[0].nome))||'';
     var cogC=(cons[0]&&(cons[0].cognome||cons[0].nome))||'';
-    var _anno = new Date().getFullYear().toString().slice(-2);
-    ncntD.nomeContratto = _anno + '_CNT_' + (cogL||'LOCATORE').toUpperCase() + '_' + (cogC||'CONDUTTORE').toUpperCase();
+    ncntD.nomeContratto = buildNomeDoc('CNT', cogL||'LOCATORE', cogC||'CONDUTTORE');
     if(ncntD._mod) ncntD.modificato=new Date().toISOString();
     _lastCntDati = JSON.parse(JSON.stringify(ncntD)); // copia globale per generazione immediata
     api('saveContratto',{data:ncntD},function(err,r){
