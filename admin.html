@@ -179,6 +179,8 @@ textarea.inp{min-height:90px;resize:vertical;}
   position:relative;overflow:hidden;
 }
 .stat-card:active{transform:scale(0.96);}
+.s-purple::before{background:#7C3AED;}
+.s-purple .stat-num{color:#7C3AED;}
 .stat-card::before{
   content:'';position:absolute;inset:0;
   border-radius:18px;opacity:0.07;
@@ -325,18 +327,23 @@ textarea.inp{min-height:90px;resize:vertical;}
   <div id="export-status" style="display:none;font-size:12px;color:var(--text2);text-align:center;margin-top:-10px;margin-bottom:10px"></div>
 
   <!-- Stat cards -->
-  <div class="stat-row">
+  <!-- STAT CARDS — 4 contatori cliccabili -->
+  <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
     <div class="stat-card s-blue" onclick="document.getElementById('nb-soci').click()">
       <div class="stat-num" id="sh-soci">—</div>
-      <div class="stat-lbl">Soci</div>
+      <div class="stat-lbl">👥 Soci</div>
     </div>
     <div class="stat-card s-orange" onclick="document.getElementById('nb-prat').click()">
       <div class="stat-num" id="sh-att">—</div>
-      <div class="stat-lbl">In attesa</div>
+      <div class="stat-lbl">⏳ Da fare</div>
     </div>
     <div class="stat-card s-green" onclick="document.getElementById('nb-pag').click()">
       <div class="stat-num" id="sh-inc">—</div>
-      <div class="stat-lbl">Incassato €</div>
+      <div class="stat-lbl">💰 Incassato €</div>
+    </div>
+    <div class="stat-card s-purple" onclick="document.getElementById('nb-chat').click()" style="cursor:pointer">
+      <div class="stat-num" id="sh-msg">—</div>
+      <div class="stat-lbl">💬 Messaggi</div>
     </div>
   </div>
 
@@ -348,12 +355,56 @@ textarea.inp{min-height:90px;resize:vertical;}
   </div>
   <div id="global-results"></div>
 
-  <!-- Alert urgenti -->
-  <div id="h-pren-attesa"></div>
-  <div id="h-alert-box"></div>
-  <div id="h-alerts"></div>
+  <!-- CARD ANTEPRIME -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
 
-  <!-- Nascosti ma usati da renderHome -->
+    <!-- Appuntamenti -->
+    <div style="background:var(--card);border-radius:18px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-weight:700;font-size:14px;color:var(--tx)">📅 Prossimi appuntamenti</div>
+        <div id="h-badge-pren" style="background:#E8631A;color:#fff;border-radius:50px;font-size:11px;font-weight:700;padding:2px 8px;display:none">0</div>
+      </div>
+      <div id="h-preview-pren" style="font-size:13px;color:#8E8E93">Caricamento...</div>
+      <div onclick="document.getElementById('nb-pren').click()"
+        style="margin-top:12px;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer;text-align:right">
+        → Vedi tutti
+      </div>
+    </div>
+
+    <!-- Contratti da verificare -->
+    <div style="background:var(--card);border-radius:18px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-weight:700;font-size:14px;color:var(--tx)">📋 Contratti da verificare</div>
+        <div id="h-badge-prat" style="background:#E8631A;color:#fff;border-radius:50px;font-size:11px;font-weight:700;padding:2px 8px;display:none">0</div>
+      </div>
+      <div id="h-preview-prat" style="font-size:13px;color:#8E8E93">Caricamento...</div>
+      <div onclick="document.getElementById('nb-prat').click()"
+        style="margin-top:12px;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer;text-align:right">
+        → Vedi tutti
+      </div>
+    </div>
+
+  </div>
+
+  <!-- AVVISO ATTIVO -->
+  <div id="h-avviso-box" style="margin-top:12px;display:none">
+    <div style="background:#FFF8EC;border:1.5px solid #F6A623;border-radius:16px;padding:14px 16px">
+      <div style="font-weight:700;font-size:13px;color:#E8631A;margin-bottom:6px">📢 Avviso attivo (visibile ai soci)</div>
+      <div id="h-avviso-testo" style="font-size:13px;color:var(--tx);margin-bottom:10px"></div>
+      <div id="h-avviso-data" style="font-size:11px;color:#8E8E93;margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px">
+        <button onclick="document.getElementById('nb-avv').click()"
+          style="flex:1;padding:8px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">
+          ✏️ Gestisci avvisi
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert urgenti (nascosti, usati da renderHome) -->
+  <div id="h-pren-attesa" style="display:none"></div>
+  <div id="h-alert-box" style="display:none"></div>
+  <div id="h-alerts" style="display:none"></div>
   <div id="h-prens" style="display:none"></div>
   <div id="h-prats" style="display:none"></div>
 
@@ -1069,23 +1120,96 @@ function carica() {
 
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome() {
-  setText('sh-app', D.prenotazioni.filter(function(p){ return p.stato==='confermata'; }).length);
-  setText('sh-att', D.contratti.filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; }).length);
-  // Prenotazioni
-  var hp = document.getElementById('h-prens'); if(!hp) return;
-  var prens = D.prenotazioni.filter(function(p){ return p.stato==='confermata'; }).slice(0,3);
-  hp.innerHTML = '';
-  if (!prens.length) { hp.innerHTML='<div class="info">Nessun appuntamento confermato.</div>'; }
-  else { for(var i=0;i<prens.length;i++) hp.appendChild(makePrenCard(prens[i])); }
-  // Pratiche
-  var hpr = document.getElementById('h-prats'); if(!hpr) return;
-  hpr.innerHTML = '';
-  var pratAttive = D.contratti.filter(function(c){ return c.stato!=='completato' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; });
-  if (!pratAttive.length) { hpr.innerHTML='<div class="info">Nessuna pratica attiva.</div>'; }
-  else { var listP=pratAttive.slice(0,3); for(var j=0;j<listP.length;j++) hpr.appendChild(makePratCard(listP[j])); }
+  // ── CONTATORI ──────────────────────────────────────────────
+  var nSoci    = D.utenti ? D.utenti.length : 0;
+  var prenAttesa = D.prenotazioni.filter(function(p){ return p.stato==='in_attesa'||p.stato==='confermata'; }).length;
+  var cntAttesa  = D.contratti.filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; }).length;
+  var msgNonLetti = D.chat ? D.chat.filter(function(m){ return m.mittente==='socio' && !m.letto; }).length : 0;
+  var incassato  = 0;
+  if (D.pagamenti) D.pagamenti.forEach(function(p){ if(p.stato==='confermato') incassato += parseFloat(p.importo)||0; });
+
+  setText('sh-soci', nSoci);
+  setText('sh-att',  prenAttesa + cntAttesa); // totale da fare
+  setText('sh-inc',  '€ ' + incassato.toLocaleString('it-IT', {minimumFractionDigits:2, maximumFractionDigits:2}));
+  setText('sh-msg',  msgNonLetti);
+
+  // ── ANTEPRIMA APPUNTAMENTI ─────────────────────────────────
+  var prevPren = document.getElementById('h-preview-pren');
+  var badgePren = document.getElementById('h-badge-pren');
+  var prens = D.prenotazioni.filter(function(p){ return p.stato==='in_attesa'||p.stato==='confermata'; })
+    .sort(function(a,b){ return (a.data||'').localeCompare(b.data||''); })
+    .slice(0,3);
+  if (badgePren) { badgePren.textContent = prenAttesa; badgePren.style.display = prenAttesa ? '' : 'none'; }
+  if (prevPren) {
+    if (!prens.length) {
+      prevPren.innerHTML = '<div style="color:#8E8E93;font-style:italic">Nessun appuntamento in attesa</div>';
+    } else {
+      prevPren.innerHTML = prens.map(function(p) {
+        var stato = p.stato==='confermata' ? '<span style="color:#16A34A;font-weight:600">✓ Confermato</span>' : '<span style="color:#E8631A;font-weight:600">⏳ In attesa</span>';
+        return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7">'
+          + '<div style="font-weight:600;font-size:13px">' + (p.nomeUtente||'—') + '</div>'
+          + '<div style="font-size:12px;color:#8E8E93">' + (p.data||'') + ' ore ' + (p.ora||'') + ' — ' + stato + '</div>'
+          + '</div>';
+      }).join('');
+    }
+  }
+
+  // ── ANTEPRIMA CONTRATTI DA VERIFICARE ─────────────────────
+  var prevPrat = document.getElementById('h-preview-prat');
+  var badgePrat = document.getElementById('h-badge-prat');
+  var prats = D.contratti.filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; })
+    .sort(function(a,b){ return (b.dataRichiesta||'').localeCompare(a.dataRichiesta||''); })
+    .slice(0,3);
+  if (badgePrat) { badgePrat.textContent = cntAttesa; badgePrat.style.display = cntAttesa ? '' : 'none'; }
+  if (prevPrat) {
+    if (!prats.length) {
+      prevPrat.innerHTML = '<div style="color:#8E8E93;font-style:italic">Nessun contratto da verificare</div>';
+    } else {
+      prevPrat.innerHTML = prats.map(function(c) {
+        var gg = '';
+        if (c.dataRichiesta) {
+          var diff = Math.floor((new Date() - new Date(c.dataRichiesta)) / 86400000);
+          gg = diff === 0 ? 'oggi' : diff === 1 ? 'ieri' : diff + ' gg fa';
+        }
+        return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7;cursor:pointer">'
+          + '<div style="font-weight:600;font-size:13px">' + (c.nomeContratto||c.tipo||'—') + '</div>'
+          + '<div style="font-size:12px;color:#8E8E93">' + (c.tipo||'') + (gg?' — '+gg:'') + '</div>'
+          + '</div>';
+      }).join('');
+    }
+  }
+
+  // ── AVVISO ATTIVO ─────────────────────────────────────────
+  var avvisoBox = document.getElementById('h-avviso-box');
+  if (avvisoBox && D.avvisi) {
+    var oggi = new Date();
+    var avvisiAttivi = D.avvisi.filter(function(a){
+      var attivo = a.attivo===true || String(a.attivo).toLowerCase()==='true';
+      if (!attivo) return false;
+      if (a.dataFine) {
+        var fine = new Date(a.dataFine.split('/').reverse().join('-'));
+        if (fine < oggi) return false;
+      }
+      return true;
+    });
+    if (avvisiAttivi.length) {
+      var av = avvisiAttivi[0];
+      var testEl = document.getElementById('h-avviso-testo');
+      var dataEl = document.getElementById('h-avviso-data');
+      if (testEl) testEl.textContent = av.titolo + ': ' + (av.testo||'');
+      if (dataEl) dataEl.textContent = (av.dataFine ? 'Valido fino al ' + av.dataFine : '');
+      avvisoBox.style.display = '';
+    } else {
+      avvisoBox.style.display = 'none';
+    }
+  }
+
+  // ── Mantieni hidden per compatibilità ─────────────────────
+  var hp = document.getElementById('h-prens'); if(hp) hp.innerHTML='';
+  var hpr = document.getElementById('h-prats'); if(hpr) hpr.innerHTML='';
 }
 
-// ── PRENOTAZIONI ──────────────────────────────────────────────
+
 function makePrenCard(p) {
   var col = p.stato==='cancellata' ? '#8A8A8A' : '#2D7A4F';
   var div = document.createElement('div'); div.className='row';
