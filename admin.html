@@ -327,7 +327,7 @@ textarea.inp{min-height:90px;resize:vertical;}
   <div id="export-status" style="display:none;font-size:12px;color:var(--text2);text-align:center;margin-top:-10px;margin-bottom:10px"></div>
 
   <!-- Stat cards -->
-  <!-- STAT CARDS — 4 contatori cliccabili -->
+  <!-- HOME: contatori + ricerca + anteprime + avvisi -->
   <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
     <div class="stat-card s-blue" onclick="document.getElementById('nb-soci').click()">
       <div class="stat-num" id="sh-soci">—</div>
@@ -341,52 +341,47 @@ textarea.inp{min-height:90px;resize:vertical;}
       <div class="stat-num" id="sh-inc">—</div>
       <div class="stat-lbl">💰 Incassato €</div>
     </div>
-    <div class="stat-card s-purple" onclick="document.getElementById('nb-chat').click()" style="cursor:pointer">
+    <div class="stat-card s-purple">
       <div class="stat-num" id="sh-msg">—</div>
       <div class="stat-lbl">💬 Messaggi</div>
     </div>
   </div>
 
-  <!-- Ricerca globale -->
   <div class="search-wrap">
     <span class="search-icon">🔍</span>
-    <input type="text" id="global-search" placeholder="Cerca soci, pratiche, pagamenti..."
-      oninput="globalSearch(this.value)"/>
+    <input type="text" id="global-search" placeholder="Cerca soci, pratiche, pagamenti..." oninput="globalSearch(this.value)"/>
   </div>
   <div id="global-results"></div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
     <div style="background:var(--card);border-radius:18px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-weight:700;font-size:14px">📅 Prossimi appuntamenti</div>
-        <div id="h-badge-pren" style="background:#E8631A;color:#fff;border-radius:50px;font-size:11px;font-weight:700;padding:2px 8px;display:none">0</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-weight:700;font-size:14px;color:var(--tx)">📅 Prossimi appuntamenti</div>
+        <span id="h-badge-pren" style="background:#E8631A;color:#fff;border-radius:50px;font-size:11px;font-weight:700;padding:2px 8px;display:none">0</span>
       </div>
       <div id="h-preview-pren" style="font-size:13px;color:#8E8E93">Caricamento...</div>
-      <div onclick="document.getElementById('nb-pren').click()" style="margin-top:12px;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer;text-align:right">→ Vedi tutti</div>
+      <div onclick="document.getElementById('nb-pren').click()" style="margin-top:10px;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer;text-align:right">→ Vedi tutti</div>
     </div>
     <div style="background:var(--card);border-radius:18px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="font-weight:700;font-size:14px">📋 Contratti da verificare</div>
-        <div id="h-badge-prat" style="background:#E8631A;color:#fff;border-radius:50px;font-size:11px;font-weight:700;padding:2px 8px;display:none">0</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-weight:700;font-size:14px;color:var(--tx)">📋 Contratti da verificare</div>
+        <span id="h-badge-prat" style="background:#E8631A;color:#fff;border-radius:50px;font-size:11px;font-weight:700;padding:2px 8px;display:none">0</span>
       </div>
       <div id="h-preview-prat" style="font-size:13px;color:#8E8E93">Caricamento...</div>
-      <div onclick="document.getElementById('nb-prat').click()" style="margin-top:12px;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer;text-align:right">→ Vedi tutti</div>
+      <div onclick="document.getElementById('nb-prat').click()" style="margin-top:10px;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer;text-align:right">→ Vedi tutti</div>
     </div>
   </div>
 
   <div id="h-avviso-box" style="margin-top:12px;display:none">
     <div style="background:#FFF8EC;border:1.5px solid #F6A623;border-radius:16px;padding:14px 16px">
       <div style="font-weight:700;font-size:13px;color:#E8631A;margin-bottom:6px">📢 Avviso attivo (visibile ai soci)</div>
-      <div id="h-avviso-testo" style="font-size:13px;color:var(--tx);margin-bottom:6px"></div>
+      <div id="h-avviso-testo" style="font-size:13px;color:var(--tx);margin-bottom:4px"></div>
       <div id="h-avviso-data" style="font-size:11px;color:#8E8E93;margin-bottom:10px"></div>
       <button onclick="document.getElementById('nb-avv') && document.getElementById('nb-avv').click()"
-        style="padding:8px 16px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">
-        ✏️ Gestisci avvisi
-      </button>
+        style="padding:8px 16px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">✏️ Gestisci avvisi</button>
     </div>
   </div>
 
-  <!-- CARD ANTEPRIME -->
 
 <!-- ════════════ CHAT ════════════ -->
 <div id="p-chat" class="pg" style="padding:0">
@@ -1082,8 +1077,8 @@ function carica() {
     D.chiusure = (!err && r && r.ok) ? (r.data||[]) : [];
     renderChiusure();
   });
-  apiCall('getAvvisi', {}, function(err, r) {
-    D.avvisi = (!err && r && r.ok) ? (r.data||[]) : [];
+  apiCall('getPagamenti', {}, function(err, r) {
+    D.pagamenti = (!err && r && r.ok) ? (r.data||[]) : [];
     renderHome();
   });
   apiCall('getSlot', {}, function(err, r) {
@@ -1097,72 +1092,105 @@ function carica() {
 
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome() {
-  if (!D.prenotazioni) D.prenotazioni = [];
-  if (!D.contratti)    D.contratti    = [];
-  if (!D.utenti)       D.utenti       = [];
-  if (!D.avvisi)       D.avvisi       = [];
-  if (!D.chat)         D.chat         = [];
-  if (!D.pagamenti)    D.pagamenti    = [];
+  // Dati con fallback a array vuoto
+  var pren = D.prenotazioni || [];
+  var cnt  = D.contratti    || [];
+  var ute  = D.utenti       || [];
+  var avv  = D.avvisi       || [];
+  var chat = D.chat         || [];
+  var pag  = D.pagamenti    || [];
 
-  var prenDaFare  = D.prenotazioni.filter(function(p){ return p.stato==='in_attesa'||p.stato==='confermata'; }).length;
-  var cntDaFare   = D.contratti.filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; }).length;
-  var msgNonLetti = D.chat.filter(function(m){ return m.mittente==='socio' && !m.letto; }).length;
+  // ── Contatori ──────────────────────────────────────────────
+  var prenDaFare  = pren.filter(function(p){ return p.stato==='in_attesa'; }).length;
+  var cntDaFare   = cnt.filter(function(c){
+    return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true';
+  }).length;
+  var msgNonLetti = chat.filter(function(m){ return m.mittente==='socio' && !m.letto; }).length;
   var incassato   = 0;
-  (D.pagamenti||[]).forEach(function(p){ if(p.stato==='confermato') incassato += parseFloat(p.importo)||0; });
+  pag.forEach(function(p){ if (p.stato==='confermato') incassato += parseFloat(p.importo)||0; });
 
-  setText('sh-soci', D.utenti.length || '0');
+  setText('sh-soci', ute.length);
   setText('sh-att',  prenDaFare + cntDaFare);
   setText('sh-inc',  '€ ' + incassato.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}));
   setText('sh-msg',  msgNonLetti);
 
-  var prevPren  = document.getElementById('h-preview-pren');
-  var badgePren = document.getElementById('h-badge-pren');
-  var prens = D.prenotazioni.filter(function(p){ return p.stato==='in_attesa'||p.stato==='confermata'; })
-    .sort(function(a,b){ return (a.data||'').localeCompare(b.data||''); }).slice(0,3);
-  if (badgePren){ badgePren.textContent=prenDaFare; badgePren.style.display=prenDaFare>0?'':'none'; }
-  if (prevPren) {
-    prevPren.innerHTML = !prens.length
-      ? '<div style="color:#8E8E93;font-style:italic;font-size:13px">Nessun appuntamento in attesa</div>'
-      : prens.map(function(p){
-          var col=p.stato==='confermata'?'#16A34A':'#E8631A';
-          var lbl=p.stato==='confermata'?'✓ Confermato':'⏳ In attesa';
-          return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7">'
-            +'<div style="font-weight:600;font-size:13px">'+(p.nomeUtente||'—')+'</div>'
-            +'<div style="font-size:12px;color:#8E8E93">'+(p.data||'')+(p.ora?' ore '+p.ora:'')
-            +' &nbsp;·&nbsp; <span style="color:'+col+';font-weight:600">'+lbl+'</span></div></div>';
-        }).join('');
+  // ── Appuntamenti: 5 più vicini in ordine di data ──────────
+  var badge1 = document.getElementById('h-badge-pren');
+  var prev1  = document.getElementById('h-preview-pren');
+  var prens  = pren
+    .filter(function(p){ return p.stato==='in_attesa' || p.stato==='confermata'; })
+    .sort(function(a,b){ return (a.data||'').localeCompare(b.data||''); })
+    .slice(0,5);
+  if (badge1) { badge1.textContent = prenDaFare; badge1.style.display = prenDaFare>0 ? '' : 'none'; }
+  if (prev1) {
+    if (!prens.length) {
+      prev1.innerHTML = '<div style="color:#8E8E93;font-style:italic">Nessun appuntamento</div>';
+    } else {
+      prev1.innerHTML = prens.map(function(p){
+        var col = p.stato==='confermata' ? '#16A34A' : '#E8631A';
+        var lbl = p.stato==='confermata' ? '✓ Confermato' : '⏳ In attesa';
+        return '<div style="padding:7px 0;border-bottom:1px solid #F2F2F7">'
+          + '<div style="font-weight:600;font-size:13px">' + (p.nomeUtente||'—') + '</div>'
+          + '<div style="font-size:12px;color:#8E8E93">' + (p.data||'') + (p.ora ? ' ore '+p.ora : '')
+          + ' &nbsp;·&nbsp; <span style="color:'+col+';font-weight:600">'+lbl+'</span></div>'
+          + '</div>';
+      }).join('');
+    }
   }
 
-  var prevPrat  = document.getElementById('h-preview-prat');
-  var badgePrat = document.getElementById('h-badge-prat');
-  var prats = D.contratti.filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; })
-    .sort(function(a,b){ return (b.dataRichiesta||'').localeCompare(a.dataRichiesta||''); }).slice(0,3);
-  if (badgePrat){ badgePrat.textContent=cntDaFare; badgePrat.style.display=cntDaFare>0?'':'none'; }
-  if (prevPrat) {
-    prevPrat.innerHTML = !prats.length
-      ? '<div style="color:#8E8E93;font-style:italic;font-size:13px">Nessun contratto da verificare</div>'
-      : prats.map(function(c){
-          var gg=''; try{ var diff=Math.floor((new Date()-new Date(c.dataRichiesta))/86400000); gg=diff===0?'oggi':diff===1?'ieri':diff+' gg fa'; }catch(e){}
-          return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7">'
-            +'<div style="font-weight:600;font-size:13px">'+(c.nomeContratto||c.tipo||'—')+'</div>'
-            +'<div style="font-size:12px;color:#8E8E93">'+(c.tipo||'')+(gg?' &nbsp;·&nbsp; '+gg:'')+'</div></div>';
-        }).join('');
+  // ── Contratti: 5 più vecchi in attesa (ordine di arrivo) ──
+  var badge2 = document.getElementById('h-badge-prat');
+  var prev2  = document.getElementById('h-preview-prat');
+  var prats  = cnt
+    .filter(function(c){
+      return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true';
+    })
+    .sort(function(a,b){ return (a.dataRichiesta||'').localeCompare(b.dataRichiesta||''); }) // prima il più vecchio
+    .slice(0,5);
+  if (badge2) { badge2.textContent = cntDaFare; badge2.style.display = cntDaFare>0 ? '' : 'none'; }
+  if (prev2) {
+    if (!prats.length) {
+      prev2.innerHTML = '<div style="color:#8E8E93;font-style:italic">Nessun contratto da verificare</div>';
+    } else {
+      prev2.innerHTML = prats.map(function(c){
+        var gg = '';
+        try {
+          var diff = Math.floor((new Date() - new Date(c.dataRichiesta)) / 86400000);
+          gg = diff===0 ? 'oggi' : diff===1 ? 'ieri' : diff+' gg fa';
+        } catch(e) {}
+        return '<div style="padding:7px 0;border-bottom:1px solid #F2F2F7">'
+          + '<div style="font-weight:600;font-size:13px">' + (c.nomeContratto||c.tipo||'—') + '</div>'
+          + '<div style="font-size:12px;color:#8E8E93">' + (c.tipo||'') + (gg?' &nbsp;·&nbsp; '+gg:'') + '</div>'
+          + '</div>';
+      }).join('');
+    }
   }
 
-  var avvisoBox = document.getElementById('h-avviso-box');
-  if (avvisoBox && D.avvisi) {
+  // ── Avvisi attivi ─────────────────────────────────────────
+  var avBox = document.getElementById('h-avviso-box');
+  if (avBox) {
     var oggi = new Date();
-    var avvAtt = D.avvisi.filter(function(a){
+    var attivi = avv.filter(function(a){
       if (a.attivo!==true && String(a.attivo).toLowerCase()!=='true') return false;
-      if (a.dataFine) { try{ var p=String(a.dataFine).split('/'); var f=p.length===3?new Date(p[2]+'-'+p[1]+'-'+p[0]):new Date(a.dataFine); if(f<oggi) return false; }catch(e){} }
+      if (a.dataFine) {
+        try {
+          var p = String(a.dataFine).split('/');
+          var fine = p.length===3 ? new Date(p[2]+'-'+p[1]+'-'+p[0]) : new Date(a.dataFine);
+          if (fine < oggi) return false;
+        } catch(e) {}
+      }
       return true;
     });
-    if (avvAtt.length) {
-      var av=avvAtt[0];
-      var te=document.getElementById('h-avviso-testo'); if(te) te.textContent=(av.titolo||'')+(av.testo?': '+av.testo:'');
-      var de=document.getElementById('h-avviso-data');  if(de) de.textContent=av.dataFine?'Valido fino al '+av.dataFine:'';
-      avvisoBox.style.display='';
-    } else { avvisoBox.style.display='none'; }
+    if (attivi.length) {
+      var av = attivi[0];
+      var te = document.getElementById('h-avviso-testo');
+      var de = document.getElementById('h-avviso-data');
+      if (te) te.textContent = (av.titolo||'') + (av.testo ? ': '+av.testo : '');
+      if (de) de.textContent = av.dataFine ? 'Valido fino al ' + av.dataFine : '';
+      avBox.style.display = '';
+    } else {
+      avBox.style.display = 'none';
+    }
   }
 }
 
