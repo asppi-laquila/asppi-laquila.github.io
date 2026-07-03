@@ -355,35 +355,51 @@ textarea.inp{min-height:90px;resize:vertical;}
   </div>
   <div id="global-results"></div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
+  <!-- CARD ANTEPRIME -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px">
+
+    <!-- Appuntamenti -->
     <div style="background:var(--card);border-radius:18px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div style="font-weight:700;font-size:14px">📅 Prossimi appuntamenti</div>
-        <span id="h-badge-pren" style="background:#E8631A;color:#fff;border-radius:50px;font-size:11px;font-weight:700;padding:2px 8px;display:none">0</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-weight:700;font-size:14px;color:var(--tx)">📅 Prossimi appuntamenti</div>
+        <div id="h-badge-pren" style="background:#E8631A;color:#fff;border-radius:50px;font-size:11px;font-weight:700;padding:2px 8px;display:none">0</div>
       </div>
       <div id="h-preview-pren" style="font-size:13px;color:#8E8E93">Caricamento...</div>
-      <div onclick="navTo('pren');caricaPrenotazioni()" style="margin-top:10px;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer;text-align:right">→ Vedi tutti</div>
+      <div onclick="document.getElementById('nb-pren').click()"
+        style="margin-top:12px;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer;text-align:right">
+        → Vedi tutti
+      </div>
     </div>
+
+    <!-- Contratti da verificare -->
     <div style="background:var(--card);border-radius:18px;padding:16px;box-shadow:0 2px 12px rgba(0,0,0,.06)">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <div style="font-weight:700;font-size:14px">📋 Contratti da verificare</div>
-        <span id="h-badge-prat" style="background:#E8631A;color:#fff;border-radius:50px;font-size:11px;font-weight:700;padding:2px 8px;display:none">0</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-weight:700;font-size:14px;color:var(--tx)">📋 Contratti da verificare</div>
+        <div id="h-badge-prat" style="background:#E8631A;color:#fff;border-radius:50px;font-size:11px;font-weight:700;padding:2px 8px;display:none">0</div>
       </div>
       <div id="h-preview-prat" style="font-size:13px;color:#8E8E93">Caricamento...</div>
-      <div onclick="navTo('prat');cercaPratiche('')" style="margin-top:10px;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer;text-align:right">→ Vedi tutti</div>
+      <div onclick="document.getElementById('nb-prat').click()"
+        style="margin-top:12px;font-size:12px;color:#E8631A;font-weight:600;cursor:pointer;text-align:right">
+        → Vedi tutti
+      </div>
     </div>
+
   </div>
 
+  <!-- AVVISO ATTIVO -->
   <div id="h-avviso-box" style="margin-top:12px;display:none">
     <div style="background:#FFF8EC;border:1.5px solid #F6A623;border-radius:16px;padding:14px 16px">
       <div style="font-weight:700;font-size:13px;color:#E8631A;margin-bottom:6px">📢 Avviso attivo (visibile ai soci)</div>
-      <div id="h-avviso-testo" style="font-size:13px;color:var(--tx);margin-bottom:4px"></div>
+      <div id="h-avviso-testo" style="font-size:13px;color:var(--tx);margin-bottom:10px"></div>
       <div id="h-avviso-data" style="font-size:11px;color:#8E8E93;margin-bottom:10px"></div>
-      <button onclick="navTo('imp');caricaAvvisi()" style="padding:8px 16px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">✏️ Gestisci avvisi</button>
+      <div style="display:flex;gap:8px">
+        <button onclick="document.getElementById('nb-avv').click()"
+          style="flex:1;padding:8px;background:#E8631A;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer">
+          ✏️ Gestisci avvisi
+        </button>
+      </div>
     </div>
   </div>
-
-  <!-- CARD ANTEPRIME -->
 
   <!-- Alert urgenti (nascosti, usati da renderHome) -->
   <div id="h-pren-attesa" style="display:none"></div>
@@ -722,7 +738,7 @@ textarea.inp{min-height:90px;resize:vertical;}
 
   <div id="tc-contratto" style="display:none;padding:16px">
     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-      <button class="bp" id="btn-genera-pdf-admin" onclick="generaPDFAdmin()" style="flex:1;background:#1A5FA8">📄 Genera e stampa PDF</button>
+      <button class="bp" id="btn-genera-pdf-admin" style="flex:1;background:#1A5FA8">📄 Genera e stampa PDF</button>
       <button class="bp" id="btn-copia-dati" style="flex:1">📋 Copia dati skill</button>
       <button class="bd" id="btn-scarica-dati" style="flex:1">⬇️ Scarica .txt</button>
     </div>
@@ -1095,10 +1111,6 @@ function carica() {
     D.chiusure = (!err && r && r.ok) ? (r.data||[]) : [];
     renderChiusure();
   });
-  apiCall('getAvvisi', {}, function(err, r) {
-    D.avvisi = (!err && r && r.ok) ? (r.data||[]) : [];
-    renderHome();
-  });
   apiCall('getPagamenti', {}, function(err, r) {
     D.pagamenti = (!err && r && r.ok) ? (r.data||[]) : [];
     renderHome();
@@ -1114,74 +1126,125 @@ function carica() {
 
 // ── HOME ──────────────────────────────────────────────────────
 function renderHome() {
-  var pren = D.prenotazioni || [];
-  var cnt  = D.contratti    || [];
-  var ute  = D.utenti       || [];
-  var avv  = D.avvisi       || [];
-  var chat = D.chat         || [];
-  var pag  = D.pagamenti    || [];
+  // Inizializza D se necessario
+  if (!D.prenotazioni) D.prenotazioni = [];
+  if (!D.contratti)    D.contratti    = [];
+  if (!D.utenti)       D.utenti       = [];
+  if (!D.avvisi)       D.avvisi       = [];
+  if (!D.chat)         D.chat         = [];
+  if (!D.pagamenti)    D.pagamenti    = [];
 
-  var prenDaFare  = pren.filter(function(p){ return p.stato==='in_attesa'; }).length;
-  var cntDaFare   = cnt.filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; }).length;
-  var msgNonLetti = chat.filter(function(m){ return m.mittente==='socio' && !m.letto; }).length;
-  var incassato   = 0;
-  pag.forEach(function(p){ if(p.stato==='confermato') incassato += parseFloat(p.importo)||0; });
+  // ── CONTATORI ──────────────────────────────────────────────
+  var prenDaFare = D.prenotazioni.filter(function(p){
+    return p.stato==='in_attesa' || p.stato==='confermata';
+  }).length;
+  var cntDaFare = D.contratti.filter(function(c){
+    return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true';
+  }).length;
+  var msgNonLetti = D.chat.filter(function(m){
+    return m.mittente==='socio' && !m.letto;
+  }).length;
+  var incassato = 0;
+  D.pagamenti.forEach(function(p){
+    if (p.stato==='confermato') incassato += parseFloat(p.importo)||0;
+  });
 
-  setText('sh-soci', ute.length);
-  setText('sh-att',  prenDaFare + cntDaFare);
-  setText('sh-inc',  '€ ' + incassato.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}));
-  setText('sh-msg',  msgNonLetti);
+  setText('sh-soci', D.utenti.length || '—');
+  setText('sh-att',  prenDaFare + cntDaFare || '0');
+  setText('sh-inc',  incassato > 0 ? '€ ' + incassato.toLocaleString('it-IT',{minimumFractionDigits:2,maximumFractionDigits:2}) : '€ 0,00');
+  setText('sh-msg',  msgNonLetti || '0');
 
-  var prev1 = document.getElementById('h-preview-pren');
-  var badge1 = document.getElementById('h-badge-pren');
-  var prens = pren.filter(function(p){ return p.stato==='in_attesa'||p.stato==='confermata'; })
-    .sort(function(a,b){ return (a.data||'').localeCompare(b.data||''); }).slice(0,5);
-  if (badge1){ badge1.textContent=prenDaFare; badge1.style.display=prenDaFare>0?'':'none'; }
-  if (prev1) {
-    prev1.innerHTML = !prens.length
-      ? '<div style="color:#8E8E93;font-style:italic">Nessun appuntamento</div>'
-      : prens.map(function(p){
-          var col=p.stato==='confermata'?'#16A34A':'#E8631A';
-          var lbl=p.stato==='confermata'?'✓ Confermato':'⏳ In attesa';
-          return '<div style="padding:7px 0;border-bottom:1px solid #F2F2F7">'
-            +'<div style="font-weight:600;font-size:13px">'+(p.nomeUtente||'—')+'</div>'
-            +'<div style="font-size:12px;color:#8E8E93">'+(p.data||'')+(p.ora?' ore '+p.ora:'')
-            +' &nbsp;·&nbsp; <span style="color:'+col+';font-weight:600">'+lbl+'</span></div></div>';
-        }).join('');
+  // ── ANTEPRIMA APPUNTAMENTI ─────────────────────────────────
+  var prevPren  = document.getElementById('h-preview-pren');
+  var badgePren = document.getElementById('h-badge-pren');
+  var prens = D.prenotazioni
+    .filter(function(p){ return p.stato==='in_attesa'||p.stato==='confermata'; })
+    .sort(function(a,b){ return (a.data||'').localeCompare(b.data||''); })
+    .slice(0,3);
+  if (badgePren) {
+    badgePren.textContent = prenDaFare;
+    badgePren.style.display = prenDaFare > 0 ? '' : 'none';
+  }
+  if (prevPren) {
+    if (!prens.length) {
+      prevPren.innerHTML = '<div style="color:#8E8E93;font-style:italic;font-size:13px">Nessun appuntamento in attesa</div>';
+    } else {
+      prevPren.innerHTML = prens.map(function(p) {
+        var statoCol = p.stato==='confermata' ? '#16A34A' : '#E8631A';
+        var statoLbl = p.stato==='confermata' ? '✓ Confermato' : '⏳ In attesa';
+        return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7;last-child:border:none">'
+          + '<div style="font-weight:600;font-size:13px;color:var(--tx)">' + (p.nomeUtente||'—') + '</div>'
+          + '<div style="font-size:12px;color:#8E8E93">'
+          + (p.data||'') + (p.ora?' ore '+p.ora:'')
+          + ' &nbsp;·&nbsp; <span style="color:'+statoCol+';font-weight:600">'+statoLbl+'</span>'
+          + '</div></div>';
+      }).join('');
+    }
   }
 
-  var prev2 = document.getElementById('h-preview-prat');
-  var badge2 = document.getElementById('h-badge-prat');
-  var prats = cnt.filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; })
-    .sort(function(a,b){ return (a.dataRichiesta||'').localeCompare(b.dataRichiesta||''); }).slice(0,5);
-  if (badge2){ badge2.textContent=cntDaFare; badge2.style.display=cntDaFare>0?'':'none'; }
-  if (prev2) {
-    prev2.innerHTML = !prats.length
-      ? '<div style="color:#8E8E93;font-style:italic">Nessun contratto da verificare</div>'
-      : prats.map(function(c){
-          var gg=''; try{ var d=Math.floor((new Date()-new Date(c.dataRichiesta))/86400000); gg=d===0?'oggi':d===1?'ieri':d+' gg fa'; }catch(e){}
-          return '<div style="padding:7px 0;border-bottom:1px solid #F2F2F7">'
-            +'<div style="font-weight:600;font-size:13px">'+(c.nomeContratto||c.tipo||'—')+'</div>'
-            +'<div style="font-size:12px;color:#8E8E93">'+(c.tipo||'')+(gg?' &nbsp;·&nbsp; '+gg:'')+'</div></div>';
-        }).join('');
+  // ── ANTEPRIMA CONTRATTI DA VERIFICARE ─────────────────────
+  var prevPrat  = document.getElementById('h-preview-prat');
+  var badgePrat = document.getElementById('h-badge-prat');
+  var prats = D.contratti
+    .filter(function(c){ return c.stato==='richiesta' && c.eliminato!==true && String(c.eliminato).toLowerCase()!=='true'; })
+    .sort(function(a,b){ return (b.dataRichiesta||'').localeCompare(a.dataRichiesta||''); })
+    .slice(0,3);
+  if (badgePrat) {
+    badgePrat.textContent = cntDaFare;
+    badgePrat.style.display = cntDaFare > 0 ? '' : 'none';
+  }
+  if (prevPrat) {
+    if (!prats.length) {
+      prevPrat.innerHTML = '<div style="color:#8E8E93;font-style:italic;font-size:13px">Nessun contratto da verificare</div>';
+    } else {
+      prevPrat.innerHTML = prats.map(function(c) {
+        var gg = '';
+        if (c.dataRichiesta) {
+          try {
+            var diff = Math.floor((new Date() - new Date(c.dataRichiesta)) / 86400000);
+            gg = diff === 0 ? 'oggi' : diff === 1 ? 'ieri' : diff + ' gg fa';
+          } catch(e) {}
+        }
+        return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7">'
+          + '<div style="font-weight:600;font-size:13px;color:var(--tx)">' + (c.nomeContratto||c.tipo||'—') + '</div>'
+          + '<div style="font-size:12px;color:#8E8E93">' + (c.tipo||'') + (gg?' &nbsp;·&nbsp; '+gg:'') + '</div>'
+          + '</div>';
+      }).join('');
+    }
   }
 
-  var avBox = document.getElementById('h-avviso-box');
-  if (avBox) {
+  // ── AVVISO ATTIVO ─────────────────────────────────────────
+  var avvisoBox = document.getElementById('h-avviso-box');
+  if (avvisoBox) {
     var oggi = new Date();
-    var attivi = avv.filter(function(a){
+    var avvisiAttivi = D.avvisi.filter(function(a) {
       if (a.attivo!==true && String(a.attivo).toLowerCase()!=='true') return false;
-      if (a.dataFine) { try{ var p=String(a.dataFine).split('/'); var f=p.length===3?new Date(p[2]+'-'+p[1]+'-'+p[0]):new Date(a.dataFine); if(f<oggi) return false; }catch(e){} }
+      if (a.dataFine) {
+        try {
+          var parts = String(a.dataFine).split('/');
+          var fine = parts.length===3 ? new Date(parts[2]+'-'+parts[1]+'-'+parts[0]) : new Date(a.dataFine);
+          if (fine < oggi) return false;
+        } catch(e) {}
+      }
       return true;
     });
-    if (attivi.length) {
-      var av=attivi[0];
-      var te=document.getElementById('h-avviso-testo'); if(te) te.textContent=(av.titolo||'')+(av.testo?': '+av.testo:'');
-      var de=document.getElementById('h-avviso-data');  if(de) de.textContent=av.dataFine?'Valido fino al '+av.dataFine:'';
-      avBox.style.display='';
-    } else { avBox.style.display='none'; }
+    if (avvisiAttivi.length) {
+      var av = avvisiAttivi[0];
+      var testEl = document.getElementById('h-avviso-testo');
+      var dataEl = document.getElementById('h-avviso-data');
+      if (testEl) testEl.textContent = (av.titolo||'') + (av.testo ? ': ' + av.testo : '');
+      if (dataEl) dataEl.textContent = av.dataFine ? 'Valido fino al ' + av.dataFine : '';
+      avvisoBox.style.display = '';
+    } else {
+      avvisoBox.style.display = 'none';
+    }
   }
+
+  // Mantieni compatibilità con vecchi elementi nascosti
+  var hp = document.getElementById('h-prens'); if(hp) hp.innerHTML='';
+  var hpr = document.getElementById('h-prats'); if(hpr) hpr.innerHTML='';
 }
+
 
 function makePrenCard(p) {
   var col = p.stato==='cancellata' ? '#8A8A8A' : '#2D7A4F';
@@ -2483,6 +2546,10 @@ var GIORNI_SETTIMANA = ['Lun','Mar','Mer','Gio','Ven','Sab'];
 var slotMatrix = {};
 
 function caricaSlotAdmin() {
+  apiCall('getPagamenti', {}, function(err, r) {
+    D.pagamenti = (!err && r && r.ok) ? (r.data||[]) : [];
+    renderHome();
+  });
   apiCall('getSlot', {}, function(err, r) {
     // slotMatrix e' ora un oggetto giorno->array orari
     slotMatrix = {};
@@ -3614,10 +3681,6 @@ function carica() {
   apiCall('getChiusure', {}, function(err, r) {
     D.chiusure = (!err && r && r.ok) ? (r.data||[]) : [];
     renderChiusure();
-  });
-  apiCall('getAvvisi', {}, function(err, r) {
-    D.avvisi = (!err && r && r.ok) ? (r.data||[]) : [];
-    renderHome();
   });
   apiCall('getPagamenti', {}, function(err, r) {
     D.pagamenti = (!err && r && r.ok) ? (r.data||[]) : [];
@@ -4944,6 +5007,10 @@ var GIORNI_SETTIMANA = ['Lun','Mar','Mer','Gio','Ven','Sab'];
 var slotMatrix = {};
 
 function caricaSlotAdmin() {
+  apiCall('getPagamenti', {}, function(err, r) {
+    D.pagamenti = (!err && r && r.ok) ? (r.data||[]) : [];
+    renderHome();
+  });
   apiCall('getSlot', {}, function(err, r) {
     // slotMatrix e' ora un oggetto giorno->array orari
     slotMatrix = {};
