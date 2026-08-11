@@ -394,6 +394,11 @@ var ELEMENTI_B = [
   "Impianto fotovoltaico con accumulo",
   "Certificazione energetica A o B"
 ];
+
+// ── ALIAS per compatibilità patch ──
+function T(id) { return document.getElementById(id); }
+function ST(id, val) { var e=document.getElementById(id); if(e) e.textContent=val||''; }
+function SH(id, v) { var e=document.getElementById(id); if(e) e.style.display=v?'':'none'; }
 var ATOKEN = 'ASPPI_ADMIN_asppi2025laquila';
 
 var SOCIO       = null;   // socio selezionato
@@ -602,97 +607,73 @@ function renderImmobili() {
 }
 
 // ── APPARTAMENTO ──────────────────────────────
-function apriApt(id) {
-  var a = null;
-  for (var i=0; i<D.appartamenti.length; i++) { if(D.appartamenti[i].id===id){ a=D.appartamenti[i]; break; } }
-  if (!a) return;
+function apriApt(a) {
   curApt = a;
-  ST('oa-ttl', a.nome||'Immobile');
-  ST('oa-cat', a.catCategoria||'—');
-  ST('oa-piano', a.piano||'—');
-  ST('oa-ind', a.indirizzo||a.via||'—');
-
+  T('oa-ttl').textContent = a.nome || 'Immobile';
+  T('oa-ind').textContent = a.indirizzo || a.via || '—';
+  T('oa-cat').textContent = a.catCategoria || '—';
+  var el = T('oa-cnts'); el.innerHTML = '';
+  var cnts = ALL_CNT.filter(function(c){ return c.appartamentoId === a.id; });
+  if (!cnts.length) {
+    el.innerHTML = '<div class="info" style="margin-bottom:12px">Nessun contratto ancora.</div>';
+  } else {
+    cnts.forEach(function(ct) {
+      var col = ct.stato==='completato'?'#8E8E93':ct.stato==='lavorazione'?'#1A5FA8':'#E8631A';
+      var lbl = ct.stato==='completato'?'Completato':ct.stato==='lavorazione'?'In lavorazione':'In attesa';
+      var div = document.createElement('div'); div.className = 'row';
+      var bar = document.createElement('div'); bar.className = 'bar'; bar.style.background = col;
+      var rb  = document.createElement('div'); rb.className = 'rb';
+      rb.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center">'
+        + '<div class="rt">' + (ct.nomeContratto||ct.tipo||'Contratto') + '</div>'
+        + '<span class="bdg" style="color:'+col+';background:'+col+'22">'+lbl+'</span></div>'
+        + '<div class="rs">' + fmt(ct.duraDal) + ' → ' + fmt(ct.duraAl) + '</div>';
+      var arr = document.createElement('div'); arr.className = 'rarr'; arr.textContent = '›';
+      div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
+      div.addEventListener('click', (function(ct){ return function(){ apriCnt(ct); }; })(ct));
+      el.appendChild(div);
+    });
+  }
   // Locatori
   var locsEl = T('oa-locs');
   if (locsEl) {
     var locs = a.locatori && a.locatori.length ? a.locatori : [];
     if (!locs.length && (a.locNome || a.locCF)) locs = [{nome: a.locNome, cognome:'', cf: a.locCF}];
-    if (!locs.length) {
-      locsEl.innerHTML = '<div class="val">Nessun locatore inserito</div>';
-    } else {
-      locsEl.innerHTML = locs.map(function(l) {
-        var nome = ((l.cognome||'') + ' ' + (l.nome||'')).trim() || '—';
-        return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7">'
-          + '<div class="val">'+nome+'</div>'
-          + (l.cf ? '<div class="lbl">CF: <span style="font-family:monospace">'+l.cf+'</span></div>' : '')
-          + (l.comuneResidenza ? '<div class="lbl">Res.: '+l.comuneResidenza+(l.viaResidenza?', '+l.viaResidenza:'')+'</div>' : '')
-          + '</div>';
-      }).join('');
-    }
-  }
-
-  // Contratti
-  var el = T('oa-cnts'); el.innerHTML='';
-  var cnts = D.contratti.filter(function(c){ return c.appartamentoId===id; });
-  if (!cnts.length) {
-    el.innerHTML='<div class="info" style="margin-bottom:12px">Nessun contratto ancora.</div>';
-  } else {
-    cnts.forEach(function(ct){
-      var div = document.createElement('div'); div.className='row'; div.style.marginBottom='10px';
-      var bar = document.createElement('div'); bar.className='bar'; bar.style.background=ct.stato==='completato'?'#8A8A8A':'#E8631A';
-      var rb = document.createElement('div'); rb.className='rb';
-      var rt = document.createElement('div'); rt.className='rt'; rt.textContent=ct.nomeContratto||ct.tipo||'Contratto';
-      var rs = document.createElement('div'); rs.className='rs';
-      rs.textContent = fmtDate(ct.duraDal) + ' → ' + fmtDate(ct.duraAl);
-      var arr = document.createElement('div'); arr.style.cssText='display:flex;align-items:center;padding-right:14px;color:#8A8A8A'; arr.textContent='›';
-      rb.appendChild(rt); rb.appendChild(rs); div.appendChild(bar); div.appendChild(rb); div.appendChild(arr);
-      div.addEventListener('click', (function(cid){ return function(){ apriCnt(cid); }; })(ct.id));
-      el.appendChild(div);
-    });
-  }
-
-  apriOv('ov-apt');
-
-  // ── CRUSCOTTO MASSIMALE (asincrono, si aggiunge dopo) ──
-  if (a.superficieResidenziale && a.microzona) {
-    var annoCorrente = new Date().getFullYear();
-    api('getCruscottoAnnuale', {appartamentoId: id, anno: annoCorrente}, function(err, r) {
-      var ovBody = T('ov-apt');
-      if (!ovBody || !r || !r.ok) return;
-      // Rimuovi cruscotto precedente se esiste
-      var old = ovBody.querySelector('.cruscotto-massimale');
-      if (old) old.remove();
-
-      if (!r.isCategoriaAbitativa) return; // solo abitativi
-
-      var pct = r.percentualeUsata || 0;
-      var col = pct >= 80 ? '#DC2626' : pct >= 50 ? '#E8631A' : '#16A34A';
-      var barColor = pct >= 80 ? '#FEE2E2' : pct >= 50 ? '#FDF0E8' : '#ECFDF5';
-
-      var div = document.createElement('div');
-      div.className = 'cruscotto-massimale';
-      div.style.cssText = 'margin:0 16px 14px;padding:14px;background:'+barColor+';border-radius:14px;border:1.5px solid '+col+'22';
-      div.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
-        +'<div style="font-size:11px;font-weight:700;color:'+col+';text-transform:uppercase;letter-spacing:.06em">Massimale '+annoCorrente+'</div>'
-        +'<div style="font-size:11px;font-weight:700;color:'+col+'">'+pct+'% usato</div>'
-        +'</div>'
-        +'<div style="height:6px;background:'+col+'33;border-radius:3px;margin-bottom:10px;overflow:hidden">'
-        +'<div style="height:100%;width:'+Math.min(pct,100)+'%;background:'+col+';border-radius:3px;transition:width .4s"></div>'
-        +'</div>'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center">'
-        +'<div><div style="font-size:10px;color:#8E8E93;font-weight:600">MASSIMALE</div>'
-        +'<div style="font-size:13px;font-weight:800;color:#1C1C1E">€ '+r.massimaleAnnuo.toFixed(0)+'</div></div>'
-        +'<div><div style="font-size:10px;color:#8E8E93;font-weight:600">IMPEGNATO</div>'
-        +'<div style="font-size:13px;font-weight:800;color:'+col+'">€ '+r.canoneImpegnato.toFixed(0)+'</div></div>'
-        +'<div><div style="font-size:10px;color:#8E8E93;font-weight:600">RESIDUO</div>'
-        +'<div style="font-size:13px;font-weight:800;color:#16A34A">€ '+r.residuoDisponibile.toFixed(0)+'</div></div>'
+    locsEl.innerHTML = locs.length ? locs.map(function(l){
+      var nome = ((l.cognome||'')+' '+(l.nome||'')).trim()||'—';
+      return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7">'
+        +'<div style="font-size:14px;font-weight:600">'+nome+'</div>'
+        +(l.cf?'<div style="font-size:12px;color:#8E8E93;font-family:monospace">'+l.cf+'</div>':'')
+        +(l.comuneResidenza?'<div style="font-size:12px;color:#8E8E93">'+l.comuneResidenza+(l.viaResidenza?', '+l.viaResidenza:'')+'</div>':'')
         +'</div>';
-
-      // Inserisci prima del pulsante nuovo contratto
-      var btnNuovoCnt = ovBody.querySelector('#btn-nuovo-cnt');
-      if (btnNuovoCnt && btnNuovoCnt.parentNode) {
-        btnNuovoCnt.parentNode.insertBefore(div, btnNuovoCnt);
-      }
+    }).join('') : '<div style="color:#8E8E93;font-size:13px">Nessun locatore inserito</div>';
+  }
+  T('btn-del-apt').onclick = function(){ eliminaApt(a); };
+  apriOv('ov-apt');
+  if (a.superficieResidenziale && a.microzona) {
+    var anno = new Date().getFullYear();
+    api('getCruscottoAnnuale', {appartamentoId: a.id, anno: anno}, function(err, r) {
+      var ovBody = document.getElementById('ov-apt');
+      if (!ovBody || !r || !r.ok) return;
+      var old2 = ovBody.querySelector('.cruscotto-massimale'); if(old2) old2.remove();
+      if (!r.isCategoriaAbitativa) return;
+      var pct = r.percentualeUsata || 0;
+      var col = pct>=80?'#DC2626':pct>=50?'#E8631A':'#16A34A';
+      var barColor = pct>=80?'#FEE2E2':pct>=50?'#FDF0E8':'#ECFDF5';
+      var div = document.createElement('div');
+      div.className='cruscotto-massimale';
+      div.style.cssText='margin:0 16px 14px;padding:14px;background:'+barColor+';border-radius:14px;border:1.5px solid '+col+'22';
+      div.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+        +'<div style="font-size:11px;font-weight:700;color:'+col+';text-transform:uppercase">Massimale '+anno+'</div>'
+        +'<div style="font-size:11px;color:'+col+'">'+pct+'% usato</div></div>'
+        +'<div style="height:6px;background:'+col+'33;border-radius:3px;margin-bottom:10px;overflow:hidden">'
+        +'<div style="height:100%;width:'+Math.min(pct,100)+'%;background:'+col+';border-radius:3px"></div></div>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center">'
+        +'<div><div style="font-size:10px;color:#8E8E93">MASSIMALE</div><div style="font-size:13px;font-weight:800">&#8364; '+r.massimaleAnnuo.toFixed(0)+'</div></div>'
+        +'<div><div style="font-size:10px;color:#8E8E93">IMPEGNATO</div><div style="font-size:13px;font-weight:800;color:'+col+'">&#8364; '+r.canoneImpegnato.toFixed(0)+'</div></div>'
+        +'<div><div style="font-size:10px;color:#8E8E93">RESIDUO</div><div style="font-size:13px;font-weight:800;color:#16A34A">&#8364; '+r.residuoDisponibile.toFixed(0)+'</div></div>'
+        +'</div>';
+      var btnNuovoCnt = ovBody.querySelector('button.bp');
+      if (btnNuovoCnt && btnNuovoCnt.parentNode) btnNuovoCnt.parentNode.insertBefore(div, btnNuovoCnt);
     });
   }
 }
@@ -710,22 +691,6 @@ function eliminaApt(a) {
 function apriCnt(ct) {
   curCnt = ct;
   T('oc-ttl').textContent    = ct.nomeContratto || ct.tipo || '—';
-  // Verifica attestazione
-  var btnAttAs = document.getElementById('btn-genera-att-as');
-  var attWarnAs = document.getElementById('att-warning-as');
-  if (btnAttAs) btnAttAs.style.display = 'none';
-  if (attWarnAs) attWarnAs.style.display = 'none';
-  if (ct.appartamentoId) {
-    api('verificaAttestazione', {
-      appartamentoId: ct.appartamentoId, contrattoId: ct.id,
-      canoneMensile: ct.canoneMensile, duraDal: ct.duraDal, duraAl: ct.duraAl
-    }, function(err, r) {
-      if (!err && r) {
-        if (r.ok) { if (btnAttAs) btnAttAs.style.display = ''; }
-        else if (r.motivo) { if (attWarnAs) { attWarnAs.textContent='⚠️ '+r.motivo; attWarnAs.style.display=''; } }
-      }
-    });
-  }
   T('oc-tipo').textContent   = ct.tipo || '—';
   var col = ct.stato==='completato'?'#8E8E93':ct.stato==='lavorazione'?'#1A5FA8':'#E8631A';
   var lbl = ct.stato==='completato'?'Completato':ct.stato==='lavorazione'?'In lavorazione':ct.stato==='da_firmare'?'Da firmare':'In attesa';
@@ -738,7 +703,20 @@ function apriCnt(ct) {
   T('btn-cessione-cnt').onclick = function(){ apriAdm('cessione'); };
   T('btn-modifica-cnt-as').onclick = function(){ modificaCntAs(ct); };
   T('btn-genera-cnt-as').onclick   = function(){ generaEStampaContrattoAs(ct); };
-  var _btnAtt=document.getElementById('btn-genera-att-as'); if(_btnAtt) _btnAtt.onclick=function(){ generaEStampaAttestazione(); };
+  var _bAtt=document.getElementById('btn-genera-att-as');
+  var _bWarn=document.getElementById('att-warning-as');
+  if(_bAtt) _bAtt.style.display='none';
+  if(_bWarn) _bWarn.style.display='none';
+  if(ct.appartamentoId){
+    api('verificaAttestazione',{appartamentoId:ct.appartamentoId,contrattoId:ct.id,
+      canoneMensile:ct.canoneMensile,duraDal:ct.duraDal,duraAl:ct.duraAl},function(err,r){
+      if(!err&&r){
+        if(r.ok&&_bAtt) _bAtt.style.display='';
+        else if(r.motivo&&_bWarn){_bWarn.textContent='⚠️ '+r.motivo;_bWarn.style.display='';}
+      }
+    });
+  }
+  if(_bAtt) _bAtt.onclick=function(){ generaEStampaAttestazione(); };
   T('btn-elimina-cnt').onclick     = function(){ eliminaCnt(ct); };
   apriOv('ov-cnt');
 }
@@ -1813,18 +1791,16 @@ function modificaCntAs(ct) {
 </script>
 <script src="contratti_template.js"></script>
 <script src="attestazione_template.js">
-// ── GENERA ATTESTAZIONE ──────────────────────────────────────
 function generaEStampaAttestazione() {
   if (!curCnt) { alert('Nessun contratto selezionato'); return; }
-  api('getDatiAttestazione', {
-    appartamentoId: curCnt.appartamentoId, contrattoId: curCnt.id
-  }, function(err, r) {
-    if (err || !r || !r.ok) { alert('Errore: ' + ((r&&r.error)||err||'Riprova')); return; }
-    var html = generaAttestazione(r);
-    var win = window.open('', '_blank');
-    if (win) { win.document.write(html); win.document.close(); }
-    else { alert('Popup bloccato. Consenti i popup e riprova.'); }
-  });
+  api('getDatiAttestazione', {appartamentoId:curCnt.appartamentoId,contrattoId:curCnt.id},
+    function(err, r) {
+      if (err||!r||!r.ok) { alert('Errore: '+((r&&r.error)||err||'Riprova')); return; }
+      var h = generaAttestazione(r);
+      var win = window.open('','_blank');
+      if (win) { win.document.write(h); win.document.close(); }
+      else { alert('Popup bloccato. Consenti i popup e riprova.'); }
+    });
 }
 </script>
 </body>

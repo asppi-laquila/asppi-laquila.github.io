@@ -1630,24 +1630,17 @@ function apriCnt(id) {
   ST('oc-taj', ct.taj||'Non inserito');
   var inp = T('oc-taj-inp'); if(inp) inp.value = ct.taj||'';
   SH('oc-taj-ok', false);
-  // Verifica attestazione
   var btnAtt = T('btn-genera-att');
   var attWarn = T('att-warning');
   if (btnAtt) btnAtt.style.display = 'none';
   if (attWarn) attWarn.style.display = 'none';
   api('verificaAttestazione', {
-    appartamentoId: ct.appartamentoId,
-    contrattoId: ct.id,
-    canoneMensile: ct.canoneMensile,
-    duraDal: ct.duraDal,
-    duraAl: ct.duraAl
+    appartamentoId: ct.appartamentoId, contrattoId: ct.id,
+    canoneMensile: ct.canoneMensile, duraDal: ct.duraDal, duraAl: ct.duraAl
   }, function(err, r) {
     if (!err && r) {
-      if (r.ok) {
-        if (btnAtt) btnAtt.style.display = '';
-      } else if (r.motivo) {
-        if (attWarn) { attWarn.textContent = '⚠️ ' + r.motivo; attWarn.style.display = ''; }
-      }
+      if (r.ok && btnAtt) btnAtt.style.display = '';
+      else if (r.motivo && attWarn) { attWarn.textContent='⚠️ '+r.motivo; attWarn.style.display=''; }
     }
   });
   // Mostra bottone rinnova solo se pratica completata
@@ -3094,27 +3087,16 @@ function generaEStampaContratto() {
 </script>
 <script src="contratti_template.js"></script>
 <script src="attestazione_template.js">
-// ── GENERA ATTESTAZIONE ──────────────────────────────────────
 function generaEStampaAttestazione() {
   if (!curCnt) { alert('Nessun contratto selezionato'); return; }
-  var apt = D.appartamenti.find(function(a){ return a.id === curCnt.appartamentoId; }) || {};
-  api('getDatiAttestazione', {
-    appartamentoId: curCnt.appartamentoId,
-    contrattoId: curCnt.id
-  }, function(err, r) {
-    if (err || !r || !r.ok) {
-      alert('Errore nel recupero dati: ' + ((r && r.error) || err || 'Riprova'));
-      return;
-    }
-    var html = generaAttestazione(r);
-    var win = window.open('', '_blank');
-    if (win) {
-      win.document.write(html);
-      win.document.close();
-    } else {
-      alert('Il browser ha bloccato il popup. Consenti i popup per questo sito e riprova.');
-    }
-  });
+  api('getDatiAttestazione', {appartamentoId:curCnt.appartamentoId,contrattoId:curCnt.id},
+    function(err, r) {
+      if (err||!r||!r.ok) { alert('Errore: '+((r&&r.error)||err||'Riprova')); return; }
+      var h = generaAttestazione(r);
+      var win = window.open('','_blank');
+      if (win) { win.document.write(h); win.document.close(); }
+      else { alert('Popup bloccato. Consenti i popup e riprova.'); }
+    });
 }
 </script>
 </body>
