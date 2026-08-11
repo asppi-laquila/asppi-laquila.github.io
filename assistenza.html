@@ -353,12 +353,6 @@ select.inp{cursor:pointer;}
 </div>
 
 <script>
-// ── ALIAS e GLOBALS (prima di tutto) ──
-function T(id) { return document.getElementById(id); }
-function ST(id, val) { var e=document.getElementById(id); if(e) e.textContent=val||''; }
-function SH(id, v) { var e=document.getElementById(id); if(e) e.style.display=v?'':'none'; }
-function autoDate(inp) { ad(inp); } // alias per compatibilità patch
-
 var ELEMENTI_A = [
   "Riscaldamento centralizzato",
   "Riscaldamento autonomo",
@@ -394,6 +388,114 @@ var ELEMENTI_B = [
   "Impianto fotovoltaico con accumulo",
   "Certificazione energetica A o B"
 ];
+
+// ── Alias e funzioni di supporto ──
+function T(id) { return document.getElementById(id); }
+function ST(id, val) { var e=document.getElementById(id); if(e) e.textContent=val||''; }
+function SH(id, v) { var e=document.getElementById(id); if(e) e.style.display=v?'':'none'; }
+
+// Auto-formattazione date: inserisce / automaticamente mentre si digita
+function autoDate(inp) {
+  var pos = inp.selectionStart;
+  var v = inp.value.replace(/[^0-9]/g,'');
+  var out = '';
+  if (v.length >= 1) out = v.substring(0,Math.min(2,v.length));
+  if (v.length > 2)  out += '/' + v.substring(2,Math.min(4,v.length));
+  if (v.length > 4)  out += '/' + v.substring(4,Math.min(8,v.length));
+  inp.value = out;
+}
+
+// leggiPersoneNapt, addPNapt, remPNapt per wizard immobile
+function leggiPersoneNapt() {
+  var container = T('napt-locs');
+  if (!container) return;
+  if (!naptD.locatori) naptD.locatori = [];
+  var blocks = container.querySelectorAll('.pb');
+  for (var i=0; i<blocks.length; i++) {
+    if (!naptD.locatori[i]) naptD.locatori[i] = {};
+    var b = blocks[i];
+    var g = function(cls){ var el=b.querySelector('.'+cls); return el?el.value||'':''; };
+    naptD.locatori[i].cognome         = g('pb-cog');
+    naptD.locatori[i].nome            = g('pb-nom');
+    naptD.locatori[i].luogoNascita    = g('pb-lng');
+    naptD.locatori[i].dataNascita     = g('pb-dtn');
+    naptD.locatori[i].cf              = g('pb-cf');
+    naptD.locatori[i].comuneResidenza = g('pb-res');
+    naptD.locatori[i].viaResidenza    = g('pb-via');
+    var dt = b.querySelector('.pb-doctipo');
+    naptD.locatori[i].docTipo     = dt ? dt.value||'' : '';
+    naptD.locatori[i].docNum      = g('pb-docnum');
+    naptD.locatori[i].docRilascio = g('pb-docril');
+    naptD.locatori[i].docScadenza = g('pb-docsca');
+    naptD.locatori[i].docEnte     = g('pb-docente');
+    naptD.locatori[i].titolo      = g('pb-tit');
+    naptD.locatori[i].quota       = g('pb-quo');
+    var ced = b.querySelector('.pb-ced');
+    naptD.locatori[i].cedolare = ced ? ced.value||'' : '';
+  }
+}
+
+function addPNapt() {
+  leggiPersoneNapt();
+  if (!naptD.locatori) naptD.locatori = [];
+  naptD.locatori.push({});
+  var el = T('napt-locs'); if (!el) return;
+  el.innerHTML = '';
+  naptD.locatori.forEach(function(p,i){
+    el.innerHTML += pbBlock('l',i,p).replace(/remP\(/g,'remPNapt(');
+  });
+}
+
+function remPNapt(t,i) {
+  leggiPersoneNapt();
+  if (!naptD.locatori || naptD.locatori.length <= 1) return;
+  naptD.locatori.splice(i,1);
+  var el = T('napt-locs'); if (!el) return;
+  el.innerHTML = '';
+  naptD.locatori.forEach(function(p,i2){
+    el.innerHTML += pbBlock('l',i2,p).replace(/remP\(/g,'remPNapt(');
+  });
+}
+
+function aggiornaMassimalePreview() {
+  var elemA = [], elemB = [];
+  document.querySelectorAll('.elem-a:checked').forEach(function(el){ elemA.push(parseInt(el.dataset.idx)); });
+  document.querySelectorAll('.elem-b:checked').forEach(function(el){ elemB.push(parseInt(el.dataset.idx)); });
+  var el = T('napt-mass-result'); if (!el) return;
+  if (!naptD.superficieResidenziale || !naptD.microzona) {
+    el.innerHTML = '<span style="color:#8E8E93">Inserisci superfici per vedere il calcolo</span>';
+    return;
+  }
+  el.innerHTML = '<span style="color:#E8631A">Calcolo in corso...</span>';
+  var datiCalcolo = {
+    superficieResidenziale: naptD.superficieResidenziale,
+    superficieAltezzaBassa: naptD.superficieAltezzaBassa || 0,
+    supBalconi: naptD.supBalconi || 0, supCantine: naptD.supCantine || 0,
+    supGarage: naptD.supGarage || 0, supPostoAuto: naptD.supPostoAuto || 0,
+    supAreaVerde: naptD.supAreaVerde || 0,
+    tipologiaImmobile: naptD.tipologiaImmobile || 'condominio',
+    flagSeminterrato: naptD.flagSeminterrato || false,
+    apeClasse: naptD.apeClasse || '', microzona: naptD.microzona,
+    elementiAJSON: JSON.stringify(elemA), elementiiBJSON: JSON.stringify(elemB),
+    catCategoria: naptD.catCategoria || '',
+  };
+  api('calcolaMassimale', {appartamentoId:'__preview__', datiAppartamento:datiCalcolo}, function(err, r) {
+    if (!err && r && r.ok && r.data) {
+      var d = r.data;
+      naptD.massimaleAnnuo = d.massimaleAnnuo;
+      naptD.superficieConvTotale = d.supConvTotale;
+      var fasciaCol = d.fascia===2?'#1A5FA8':'#E8631A';
+      el.innerHTML = '<div style="display:flex;justify-content:space-between;margin-bottom:4px">'
+        +'<span style="font-size:11px;color:#8E8E93">MASSIMALE ANNUO</span>'
+        +'<span style="font-size:11px;font-weight:700;color:'+fasciaCol+'">Fascia '+d.fascia+'</span></div>'
+        +'<div style="font-size:20px;font-weight:800;color:#16A34A">€ '+d.massimaleAnnuo.toFixed(2)+'</div>'
+        +'<div style="font-size:13px;color:#16A34A">€ '+d.massimaleMensile.toFixed(2)+'/mese</div>';
+    } else {
+      el.innerHTML = '<span style="color:#8E8E93">Dati insufficienti per il calcolo</span>';
+    }
+  });
+}
+
 // ════════════════════════════════════════════
 // ASPPI ASSISTENZA — v3
 // Accesso admin, operazioni per conto socio
@@ -440,13 +542,7 @@ window.onload = function() {
 
 // ── UTILS ─────────────────────────────────────
 function T(id) { return document.getElementById(id); }
-function ad(inp) {
-  var v = inp.value.replace(/[^0-9]/g,'');
-  if (v.length > 2) v = v.substring(0,2) + '/' + v.substring(2);
-  if (v.length > 5) v = v.substring(0,5) + '/' + v.substring(5);
-  inp.value = v.substring(0,10);
-}
-function autoDate(inp) { ad(inp); }
+function ad(inp) { autoDate(inp); }
 function fmt(d) {
   if (!d) return '—';
   if (typeof d === 'string' && d.includes('T')) {
@@ -652,26 +748,21 @@ function apriApt(a) {
   apriOv('ov-apt');
   if (a.superficieResidenziale && a.microzona) {
     var _anno = new Date().getFullYear();
-    api('getCruscottoAnnuale', {appartamentoId: a.id, anno: _anno}, function(err, r) {
-      var ovBody = document.getElementById('ov-apt');
-      if (!ovBody || !r || !r.ok) return;
-      var _old = ovBody.querySelector('.cruscotto-massimale'); if(_old) _old.remove();
-      if (!r.isCategoriaAbitativa) return;
-      var pct = r.percentualeUsata || 0;
-      var col = pct>=80?'#DC2626':pct>=50?'#E8631A':'#16A34A';
-      var div = document.createElement('div');
-      div.className='cruscotto-massimale';
+    api('getCruscottoAnnuale',{appartamentoId:a.id,anno:_anno},function(err,r){
+      var ob=document.getElementById('ov-apt'); if(!ob||!r||!r.ok) return;
+      var _o=ob.querySelector('.cruscotto-massimale'); if(_o) _o.remove();
+      if(!r.isCategoriaAbitativa) return;
+      var pct=r.percentualeUsata||0, col=pct>=80?'#DC2626':pct>=50?'#E8631A':'#16A34A';
+      var div=document.createElement('div'); div.className='cruscotto-massimale';
       div.style.cssText='margin:0 16px 14px;padding:14px;background:'+(pct>=80?'#FEE2E2':pct>=50?'#FDF0E8':'#ECFDF5')+';border-radius:14px';
       div.innerHTML='<div style="font-size:11px;font-weight:700;color:'+col+';margin-bottom:6px">Massimale '+_anno+' — '+pct+'% usato</div>'
-        +'<div style="height:6px;background:'+col+'33;border-radius:3px;margin-bottom:8px">'
-        +'<div style="height:100%;width:'+Math.min(pct,100)+'%;background:'+col+';border-radius:3px"></div></div>'
+        +'<div style="height:6px;background:'+col+'33;border-radius:3px;margin-bottom:8px"><div style="height:100%;width:'+Math.min(pct,100)+'%;background:'+col+';border-radius:3px"></div></div>'
         +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;text-align:center;font-size:12px">'
         +'<div><div style="color:#8E8E93">Max</div><b>&#8364;'+r.massimaleAnnuo.toFixed(0)+'</b></div>'
         +'<div><div style="color:#8E8E93">Imp.</div><b style="color:'+col+'">&#8364;'+r.canoneImpegnato.toFixed(0)+'</b></div>'
         +'<div><div style="color:#8E8E93">Res.</div><b style="color:#16A34A">&#8364;'+r.residuoDisponibile.toFixed(0)+'</b></div>'
         +'</div>';
-      var btn = ovBody.querySelector('button.bp');
-      if (btn && btn.parentNode) btn.parentNode.insertBefore(div, btn);
+      var btn=ob.querySelector('button.bp'); if(btn&&btn.parentNode) btn.parentNode.insertBefore(div,btn);
     });
   }
 }
@@ -983,112 +1074,6 @@ function renderNapt() {
       +'</div></div>';
     btn.textContent='Salva immobile';
   }
-}
-
-function aggiornaMassimalePreview() {
-  var elemA = [];
-  var elemB = [];
-  document.querySelectorAll('.elem-a:checked').forEach(function(el){ elemA.push(parseInt(el.dataset.idx)); });
-  document.querySelectorAll('.elem-b:checked').forEach(function(el){ elemB.push(parseInt(el.dataset.idx)); });
-
-  var el = T('napt-mass-result'); if (!el) return;
-
-  if (!naptD.superficieResidenziale || !naptD.microzona) {
-    el.innerHTML = '<span style="color:#8E8E93">Inserisci superfici e foglio catastale per vedere il calcolo</span>';
-    return;
-  }
-
-  el.innerHTML = '<span style="color:#E8631A">Calcolo in corso...</span>';
-
-  var datiCalcolo = {
-    superficieResidenziale: naptD.superficieResidenziale,
-    superficieAltezzaBassa: naptD.superficieAltezzaBassa || 0,
-    supBalconi:   naptD.supBalconi   || 0,
-    supCantine:   naptD.supCantine   || 0,
-    supGarage:    naptD.supGarage    || 0,
-    supPostoAuto: naptD.supPostoAuto || 0,
-    supAreaVerde: naptD.supAreaVerde || 0,
-    tipologiaImmobile: naptD.tipologiaImmobile || 'condominio',
-    flagSeminterrato: naptD.flagSeminterrato || false,
-    apeClasse: naptD.apeClasse || '',
-    microzona: naptD.microzona,
-    elementiAJSON: JSON.stringify(elemA),
-    elementiiBJSON: JSON.stringify(elemB),
-    catCategoria: naptD.catCategoria || '',
-  };
-
-  api('calcolaMassimale', {appartamentoId: '__preview__', datiAppartamento: datiCalcolo}, function(err, r) {
-    if (!err && r && r.ok && r.data) {
-      var d = r.data;
-      naptD.massimaleAnnuo = d.massimaleAnnuo;
-      naptD.superficieConvTotale = d.supConvTotale;
-      var fasciaCol = d.fascia === 2 ? '#1A5FA8' : '#E8631A';
-      el.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
-        +'<span style="font-size:11px;font-weight:700;color:#8E8E93">MASSIMALE ANNUO</span>'
-        +'<span style="font-size:11px;font-weight:700;color:'+fasciaCol+'">Fascia '+d.fascia+' · '+d.nElemA+'A+'+d.nElemB+'B</span>'
-        +'</div>'
-        +'<div style="font-size:22px;font-weight:800;color:#2D7A4F">€ '+d.massimaleAnnuo.toFixed(2)+'</div>'
-        +'<div style="font-size:13px;color:#2D7A4F;margin-bottom:8px">€ '+d.massimaleMensile.toFixed(2)+'/mese</div>'
-        +'<div style="font-size:11px;color:#8E8E93">Sup. conv. '+d.supConvTotale+' mq · €/mq '+d.valoreMqFinale
-        +(d.maggiorazione>0?' · +'+Math.round(d.maggiorazione*100)+'% ('+d.tipoMaggiorazione+')':'')
-        +(d.riduzione>0?' · -10% seminterrato':'')+'</div>';
-    } else {
-      el.innerHTML = '<span style="color:#8E8E93">Dati insufficienti per il calcolo</span>';
-    }
-  });
-}
-
-
-// ── Funzioni wizard immobile (patch) ──
-function leggiPersoneNapt() {
-  var container = T('napt-locs');
-  if (!container) return;
-  if (!naptD.locatori) naptD.locatori = [];
-  var blocks = container.querySelectorAll('.pb');
-  for (var i=0; i<blocks.length; i++) {
-    if (!naptD.locatori[i]) naptD.locatori[i] = {};
-    var b = blocks[i];
-    var g = function(cls){ var el=b.querySelector('.'+cls); return el?el.value||'':''; };
-    naptD.locatori[i].cognome        = g('pb-cog');
-    naptD.locatori[i].nome           = g('pb-nom');
-    naptD.locatori[i].luogoNascita   = g('pb-lng');
-    naptD.locatori[i].dataNascita    = g('pb-dtn');
-    naptD.locatori[i].cf             = g('pb-cf');
-    naptD.locatori[i].comuneResidenza= g('pb-res');
-    naptD.locatori[i].viaResidenza   = g('pb-via');
-    var dt = b.querySelector('.pb-doctipo');
-    naptD.locatori[i].docTipo    = dt ? dt.value||'' : '';
-    naptD.locatori[i].docNum     = g('pb-docnum');
-    naptD.locatori[i].docRilascio= g('pb-docril');
-    naptD.locatori[i].docScadenza= g('pb-docsca');
-    naptD.locatori[i].docEnte    = g('pb-docente');
-    naptD.locatori[i].titolo     = g('pb-tit');
-    naptD.locatori[i].quota      = g('pb-quo');
-    var ced = b.querySelector('.pb-ced');
-    naptD.locatori[i].cedolare = ced ? ced.value||'' : '';
-  }
-}
-
-function addPNapt() {
-  leggiPersoneNapt();
-  if (!naptD.locatori) naptD.locatori = [];
-  naptD.locatori.push({});
-  var el = T('napt-locs'); if (!el) return;
-  el.innerHTML = '';
-  naptD.locatori.forEach(function(p,i){
-    el.innerHTML += pbBlock('l',i,p).replace(/remP\(/g,'remPNapt(');
-  });
-}
-
-function remPNapt(t,i) {
-  leggiPersoneNapt();
-  if (!naptD.locatori || naptD.locatori.length <= 1) return;
-  naptD.locatori.splice(i,1);
-  var el = T('napt-locs'); if (!el) return;
-  el.innerHTML = '';
-  naptD.locatori.forEach(function(p,i2){
-    el.innerHTML += pbBlock('l',i2,p).replace(/remP\(/g,'remPNapt(');
-  });
 }
 
 function naptAvanti() {
@@ -1844,14 +1829,13 @@ function modificaCntAs(ct) {
 <script src="attestazione_template.js">
 function generaEStampaAttestazione() {
   if (!curCnt) { alert('Nessun contratto selezionato'); return; }
-  api('getDatiAttestazione', {appartamentoId:curCnt.appartamentoId,contrattoId:curCnt.id},
-    function(err, r) {
-      if (err||!r||!r.ok) { alert('Errore: '+((r&&r.error)||err||'Riprova')); return; }
-      var h = generaAttestazione(r);
-      var win = window.open('','_blank');
-      if (win) { win.document.write(h); win.document.close(); }
-      else { alert('Popup bloccato. Consenti i popup e riprova.'); }
-    });
+  api('getDatiAttestazione',{appartamentoId:curCnt.appartamentoId,contrattoId:curCnt.id},function(err,r){
+    if(err||!r||!r.ok){alert('Errore: '+((r&&r.error)||err||'Riprova'));return;}
+    var h=generaAttestazione(r);
+    var win=window.open('','_blank');
+    if(win){win.document.write(h);win.document.close();}
+    else{alert('Popup bloccato. Consenti i popup e riprova.');}
+  });
 }
 </script>
 </body>
