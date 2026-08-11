@@ -849,8 +849,6 @@ function salvaAdm(tipo) {
 // ── NUOVO APPARTAMENTO wizard ─────────────────
 function apriNuovoApt() { naptStep=0; naptD={}; renderNapt(); apriOv('ov-napt'); }
 
-function renderNapt()
-// ============================================================
 function renderNapt() {
   var NAPT_STEPS = 6;
   ST('napt-ttl','Passo '+(naptStep+1)+' di '+NAPT_STEPS);
@@ -1070,8 +1068,6 @@ function aggiornaMassimalePreview() {
   });
 }
 
-function naptAvanti()
-// ============================================================
 function naptAvanti() {
   if (naptStep===0) {
     naptD.nome=(T('n0')||{}).value||'';
