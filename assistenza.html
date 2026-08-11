@@ -353,11 +353,10 @@ select.inp{cursor:pointer;}
 </div>
 
 <script>
-// ════════════════════════════════════════════
-// ASPPI ASSISTENZA — v3
-// Accesso admin, operazioni per conto socio
-// ════════════════════════════════════════════
-var API    = 'https://rough-resonance-cba6.asppilaquila.workers.dev';
+// ── ALIAS compatibilità (devono stare prima di tutto) ──
+function T(id) { return document.getElementById(id); }
+function ST(id, val) { var e=document.getElementById(id); if(e) e.textContent=val||''; }
+function SH(id, v) { var e=document.getElementById(id); if(e) e.style.display=v?'':'none'; }
 
 var ELEMENTI_A = [
   "Riscaldamento centralizzato",
@@ -394,11 +393,11 @@ var ELEMENTI_B = [
   "Impianto fotovoltaico con accumulo",
   "Certificazione energetica A o B"
 ];
-
-// ── ALIAS per compatibilità patch ──
-function T(id) { return document.getElementById(id); }
-function ST(id, val) { var e=document.getElementById(id); if(e) e.textContent=val||''; }
-function SH(id, v) { var e=document.getElementById(id); if(e) e.style.display=v?'':'none'; }
+// ════════════════════════════════════════════
+// ASPPI ASSISTENZA — v3
+// Accesso admin, operazioni per conto socio
+// ════════════════════════════════════════════
+var API    = 'https://rough-resonance-cba6.asppilaquila.workers.dev';
 var ATOKEN = 'ASPPI_ADMIN_asppi2025laquila';
 
 var SOCIO       = null;   // socio selezionato
@@ -650,30 +649,27 @@ function apriApt(a) {
   T('btn-del-apt').onclick = function(){ eliminaApt(a); };
   apriOv('ov-apt');
   if (a.superficieResidenziale && a.microzona) {
-    var anno = new Date().getFullYear();
-    api('getCruscottoAnnuale', {appartamentoId: a.id, anno: anno}, function(err, r) {
+    var _anno = new Date().getFullYear();
+    api('getCruscottoAnnuale', {appartamentoId: a.id, anno: _anno}, function(err, r) {
       var ovBody = document.getElementById('ov-apt');
       if (!ovBody || !r || !r.ok) return;
-      var old2 = ovBody.querySelector('.cruscotto-massimale'); if(old2) old2.remove();
+      var _old = ovBody.querySelector('.cruscotto-massimale'); if(_old) _old.remove();
       if (!r.isCategoriaAbitativa) return;
       var pct = r.percentualeUsata || 0;
       var col = pct>=80?'#DC2626':pct>=50?'#E8631A':'#16A34A';
-      var barColor = pct>=80?'#FEE2E2':pct>=50?'#FDF0E8':'#ECFDF5';
       var div = document.createElement('div');
       div.className='cruscotto-massimale';
-      div.style.cssText='margin:0 16px 14px;padding:14px;background:'+barColor+';border-radius:14px;border:1.5px solid '+col+'22';
-      div.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
-        +'<div style="font-size:11px;font-weight:700;color:'+col+';text-transform:uppercase">Massimale '+anno+'</div>'
-        +'<div style="font-size:11px;color:'+col+'">'+pct+'% usato</div></div>'
-        +'<div style="height:6px;background:'+col+'33;border-radius:3px;margin-bottom:10px;overflow:hidden">'
+      div.style.cssText='margin:0 16px 14px;padding:14px;background:'+(pct>=80?'#FEE2E2':pct>=50?'#FDF0E8':'#ECFDF5')+';border-radius:14px';
+      div.innerHTML='<div style="font-size:11px;font-weight:700;color:'+col+';margin-bottom:6px">Massimale '+_anno+' — '+pct+'% usato</div>'
+        +'<div style="height:6px;background:'+col+'33;border-radius:3px;margin-bottom:8px">'
         +'<div style="height:100%;width:'+Math.min(pct,100)+'%;background:'+col+';border-radius:3px"></div></div>'
-        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center">'
-        +'<div><div style="font-size:10px;color:#8E8E93">MASSIMALE</div><div style="font-size:13px;font-weight:800">&#8364; '+r.massimaleAnnuo.toFixed(0)+'</div></div>'
-        +'<div><div style="font-size:10px;color:#8E8E93">IMPEGNATO</div><div style="font-size:13px;font-weight:800;color:'+col+'">&#8364; '+r.canoneImpegnato.toFixed(0)+'</div></div>'
-        +'<div><div style="font-size:10px;color:#8E8E93">RESIDUO</div><div style="font-size:13px;font-weight:800;color:#16A34A">&#8364; '+r.residuoDisponibile.toFixed(0)+'</div></div>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;text-align:center;font-size:12px">'
+        +'<div><div style="color:#8E8E93">Max</div><b>&#8364;'+r.massimaleAnnuo.toFixed(0)+'</b></div>'
+        +'<div><div style="color:#8E8E93">Imp.</div><b style="color:'+col+'">&#8364;'+r.canoneImpegnato.toFixed(0)+'</b></div>'
+        +'<div><div style="color:#8E8E93">Res.</div><b style="color:#16A34A">&#8364;'+r.residuoDisponibile.toFixed(0)+'</b></div>'
         +'</div>';
-      var btnNuovoCnt = ovBody.querySelector('button.bp');
-      if (btnNuovoCnt && btnNuovoCnt.parentNode) btnNuovoCnt.parentNode.insertBefore(div, btnNuovoCnt);
+      var btn = ovBody.querySelector('button.bp');
+      if (btn && btn.parentNode) btn.parentNode.insertBefore(div, btn);
     });
   }
 }
