@@ -854,6 +854,42 @@ textarea.inp{min-height:100px;resize:vertical;}
 
 <script>
 var API = "https://rough-resonance-cba6.asppilaquila.workers.dev";
+
+var ELEMENTI_A = [
+  "Riscaldamento centralizzato",
+  "Riscaldamento autonomo",
+  "Aria condizionata",
+  "Ascensore",
+  "Portineria",
+  "Posto auto in area condominiale",
+  "Videocitofono",
+  "Doppi vetri / infissi isolanti",
+  "Impianto di allarme",
+  "Pannelli solari / fotovoltaici",
+  "Caldaia di recente installazione (< 5 anni)",
+  "Bagno finestrato",
+  "Cucina separata",
+  "Cantina",
+  "Soffitta",
+  "Terrazzo/balcone > 10 mq",
+  "Giardino privato",
+  "Locale lavanderia condominiale",
+  "Impianto gas metano",
+  "Impianto citofonico"
+];
+
+var ELEMENTI_B = [
+  "Posizione ai piani alti (dal 3° in su)",
+  "Vista panoramica",
+  "Ristrutturazione recente (< 5 anni)",
+  "Parquet o pavimento pregiato",
+  "Domotica",
+  "Piscina condominiale",
+  "Palestra condominiale",
+  "Posto auto coperto / box",
+  "Impianto fotovoltaico con accumulo",
+  "Certificazione energetica A o B"
+];
 var S = null;
 var D = {appartamenti:[], contratti:[], prenotazioni:[], slot:[], chat:[]};
 var curApt = null, curCnt = null, curChatId = null;
@@ -1351,6 +1387,9 @@ function renderImmobili() {
   }
 }
 
+function apriApt(id)
+// Aggiunge cruscotto massimale in fondo all'overlay appartamento
+// ============================================================
 function apriApt(id) {
   var a = null;
   for (var i=0; i<D.appartamenti.length; i++) { if(D.appartamenti[i].id===id){ a=D.appartamenti[i]; break; } }
@@ -1360,13 +1399,12 @@ function apriApt(id) {
   ST('oa-cat', a.catCategoria||'—');
   ST('oa-piano', a.piano||'—');
   ST('oa-ind', a.indirizzo||a.via||'—');
-  // Popola locatori dinamicamente
+
+  // Locatori
   var locsEl = T('oa-locs');
   if (locsEl) {
     var locs = a.locatori && a.locatori.length ? a.locatori : [];
-    if (!locs.length && (a.locNome || a.locCF)) {
-      locs = [{nome: a.locNome, cognome:'', cf: a.locCF}];
-    }
+    if (!locs.length && (a.locNome || a.locCF)) locs = [{nome: a.locNome, cognome:'', cf: a.locCF}];
     if (!locs.length) {
       locsEl.innerHTML = '<div class="val">Nessun locatore inserito</div>';
     } else {
@@ -1380,6 +1418,8 @@ function apriApt(id) {
       }).join('');
     }
   }
+
+  // Contratti
   var el = T('oa-cnts'); el.innerHTML='';
   var cnts = D.contratti.filter(function(c){ return c.appartamentoId===id; });
   if (!cnts.length) {
@@ -1398,7 +1438,51 @@ function apriApt(id) {
       el.appendChild(div);
     });
   }
+
   apriOv('ov-apt');
+
+  // ── CRUSCOTTO MASSIMALE (asincrono, si aggiunge dopo) ──
+  if (a.superficieResidenziale && a.microzona) {
+    var annoCorrente = new Date().getFullYear();
+    api('getCruscottoAnnuale', {appartamentoId: id, anno: annoCorrente}, function(err, r) {
+      var ovBody = T('ov-apt');
+      if (!ovBody || !r || !r.ok) return;
+      // Rimuovi cruscotto precedente se esiste
+      var old = ovBody.querySelector('.cruscotto-massimale');
+      if (old) old.remove();
+
+      if (!r.isCategoriaAbitativa) return; // solo abitativi
+
+      var pct = r.percentualeUsata || 0;
+      var col = pct >= 80 ? '#DC2626' : pct >= 50 ? '#E8631A' : '#16A34A';
+      var barColor = pct >= 80 ? '#FEE2E2' : pct >= 50 ? '#FDF0E8' : '#ECFDF5';
+
+      var div = document.createElement('div');
+      div.className = 'cruscotto-massimale';
+      div.style.cssText = 'margin:0 16px 14px;padding:14px;background:'+barColor+';border-radius:14px;border:1.5px solid '+col+'22';
+      div.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+        +'<div style="font-size:11px;font-weight:700;color:'+col+';text-transform:uppercase;letter-spacing:.06em">Massimale '+annoCorrente+'</div>'
+        +'<div style="font-size:11px;font-weight:700;color:'+col+'">'+pct+'% usato</div>'
+        +'</div>'
+        +'<div style="height:6px;background:'+col+'33;border-radius:3px;margin-bottom:10px;overflow:hidden">'
+        +'<div style="height:100%;width:'+Math.min(pct,100)+'%;background:'+col+';border-radius:3px;transition:width .4s"></div>'
+        +'</div>'
+        +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center">'
+        +'<div><div style="font-size:10px;color:#8E8E93;font-weight:600">MASSIMALE</div>'
+        +'<div style="font-size:13px;font-weight:800;color:#1C1C1E">€ '+r.massimaleAnnuo.toFixed(0)+'</div></div>'
+        +'<div><div style="font-size:10px;color:#8E8E93;font-weight:600">IMPEGNATO</div>'
+        +'<div style="font-size:13px;font-weight:800;color:'+col+'">€ '+r.canoneImpegnato.toFixed(0)+'</div></div>'
+        +'<div><div style="font-size:10px;color:#8E8E93;font-weight:600">RESIDUO</div>'
+        +'<div style="font-size:13px;font-weight:800;color:#16A34A">€ '+r.residuoDisponibile.toFixed(0)+'</div></div>'
+        +'</div>';
+
+      // Inserisci prima del pulsante nuovo contratto
+      var btnNuovoCnt = ovBody.querySelector('#btn-nuovo-cnt');
+      if (btnNuovoCnt && btnNuovoCnt.parentNode) {
+        btnNuovoCnt.parentNode.insertBefore(div, btnNuovoCnt);
+      }
+    });
+  }
 }
 
 var _modAptLocsModificati = false; // flag: utente ha toccato i locatori
@@ -1671,10 +1755,20 @@ function inviaMsgLibero() {
 // ── NUOVO APPARTAMENTO ────────────────────────────────────────
 function apriNuovoApt() { naptStep=0; naptD={}; renderNapt(); apriOv('ov-napt'); }
 
+function renderNapt()
+// ============================================================
 function renderNapt() {
-  var NAPT_STEPS = 4;
+  var NAPT_STEPS = 6;
   ST('napt-ttl','Passo '+(naptStep+1)+' di '+NAPT_STEPS);
-  var prog=T('napt-prog'); if(prog){prog.innerHTML=''; for(var i=0;i<NAPT_STEPS;i++){var d=document.createElement('div');d.className='pd';d.style.background=i<naptStep?'#2D7A4F':i===naptStep?'#E8631A':'#e5e5e5';prog.appendChild(d);}}
+  var prog=T('napt-prog');
+  if(prog){
+    prog.innerHTML='';
+    for(var i=0;i<NAPT_STEPS;i++){
+      var d=document.createElement('div');d.className='pd';
+      d.style.background=i<naptStep?'#2D7A4F':i===naptStep?'#E8631A':'#e5e5e5';
+      prog.appendChild(d);
+    }
+  }
   var body=T('napt-body'); var btn=T('napt-btn'); if(!body||!btn) return;
 
   if (naptStep===0) {
@@ -1702,11 +1796,30 @@ function renderNapt() {
       +'<div class="g2"><div><label class="lbl">Foglio</label><input type="text" class="inp" id="n7" placeholder="45" value="'+(naptD.catFoglio||'')+'"/></div>'
       +'<div><label class="lbl">Particella</label><input type="text" class="inp" id="n8" placeholder="123" value="'+(naptD.catParticella||'')+'"/></div></div>'
       +'<label class="lbl">Subalterno</label><input type="text" class="inp" id="n9" placeholder="4" value="'+(naptD.catSubalterno||'')+'"/>'
+      +'</div></div>'
+      +'<div class="card"><div class="cb"><div class="sec">TIPOLOGIA E APE</div>'
+      +'<label class="lbl">Tipologia immobile</label>'
+      +'<select class="inp" id="nTipImm">'
+      +'<option value="condominio" '+(naptD.tipologiaImmobile==="condominio"||!naptD.tipologiaImmobile?'selected':'')+'>Condominio / appartamento</option>'
+      +'<option value="casa_singola" '+(naptD.tipologiaImmobile==="casa_singola"?'selected':'')+'>Casa singola / villetta</option>'
+      +'</select>'
+      +'<label class="lbl">Classe energetica APE</label>'
+      +'<select class="inp" id="nApeClasse">'
+      +'<option value="">-- Seleziona --</option>'
+      +['A4','A3','A2','A1','A','B','C','D','E','F','G'].map(function(c){
+        return '<option value="'+c+'" '+(naptD.apeClasse===c?'selected':'')+'>'+c+'</option>';
+      }).join('')
+      +'</select>'
+      +'<label class="lbl">N° certificato APE</label>'
+      +'<input type="text" class="inp" id="nApeNum" placeholder="es. AQ-2025-00123" value="'+(naptD.apeNumero||'')+'"/>'
+      +'<label style="display:flex;align-items:center;gap:10px;margin-bottom:14px;cursor:pointer">'
+      +'<input type="checkbox" id="nSemint" '+(naptD.flagSeminterrato?'checked':'')+' style="width:auto;accent-color:#E8631A"/>'
+      +'<span style="font-size:14px;font-weight:600">Immobile seminterrato (-10%)</span>'
+      +'</label>'
       +'</div></div>';
     btn.textContent='Avanti: Locatori';
 
   } else if (naptStep===2) {
-    // Locatori completi con pbBlock
     if (!naptD.locatori || !naptD.locatori.length) naptD.locatori = [{}];
     var locHtml = '<div id="napt-locs">';
     naptD.locatori.forEach(function(p,i){ locHtml += pbBlock('l',i,p).replace(/remP\(/g,"remPNapt("); });
@@ -1715,55 +1828,220 @@ function renderNapt() {
       + locHtml
       +'<button class="bd" style="margin-top:8px" onclick="addPNapt()">+ Aggiungi locatore</button>'
       +'</div></div>';
+    btn.textContent='Avanti: Superfici';
+
+  } else if (naptStep===3) {
+    // NUOVO — Superfici per attestazione
+    body.innerHTML='<div class="card"><div class="cb">'
+      +'<div class="sec">SUPERFICI PER ATTESTAZIONE</div>'
+      +'<div class="infob">Questi dati servono per calcolare il massimale di canone secondo l\'Accordo Territoriale 2025.</div>'
+      +'<label class="lbl">Superficie residenziale netta (mq) *</label>'
+      +'<input type="number" class="inp" id="nSupRes" placeholder="es. 75" min="0" step="0.5" value="'+(naptD.superficieResidenziale||'')+'"/>'
+      +'<label class="lbl">di cui con altezza &lt; 1,70 m (mq)</label>'
+      +'<input type="number" class="inp" id="nSupBass" placeholder="es. 0" min="0" step="0.5" value="'+(naptD.superficieAltezzaBassa||0)+'"/>'
+      +'<div class="sec" style="margin-top:4px">PERTINENZE NELLA PLANIMETRIA</div>'
+      +'<div style="font-size:12px;color:#8E8E93;margin-bottom:10px">Pertinenze incluse nella planimetria principale (non con subalterno separato)</div>'
+      +'<div class="g2">'
+      +'<div><label class="lbl">Balconi/terrazze (mq)</label><input type="number" class="inp" id="nSupBalc" placeholder="0" min="0" step="0.5" value="'+(naptD.supBalconi||0)+'"/></div>'
+      +'<div><label class="lbl">Cantine (mq)</label><input type="number" class="inp" id="nSupCant" placeholder="0" min="0" step="0.5" value="'+(naptD.supCantine||0)+'"/></div>'
+      +'<div><label class="lbl">Garage (mq)</label><input type="number" class="inp" id="nSupGar" placeholder="0" min="0" step="0.5" value="'+(naptD.supGarage||0)+'"/></div>'
+      +'<div><label class="lbl">Posto auto (mq)</label><input type="number" class="inp" id="nSupPosto" placeholder="0" min="0" step="0.5" value="'+(naptD.supPostoAuto||0)+'"/></div>'
+      +'</div>'
+      +'<label class="lbl">Area verde esclusiva (mq)</label>'
+      +'<input type="number" class="inp" id="nSupVerde" placeholder="0" min="0" step="1" value="'+(naptD.supAreaVerde||0)+'"/>'
+      +'</div></div>';
+    btn.textContent='Avanti: Elementi qualificativi';
+
+  } else if (naptStep===4) {
+    // NUOVO — Checklist elementi A e B
+    var elemA = naptD.elementiA || [];
+    var elemB = naptD.elementiB || [];
+
+    var htmlA = ELEMENTI_A.map(function(el, i) {
+      var checked = elemA.indexOf(i) > -1;
+      return '<label style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F2F2F7;cursor:pointer">'
+        +'<input type="checkbox" class="elem-a" data-idx="'+i+'" '+(checked?'checked':'')+' style="width:auto;accent-color:#E8631A"/>'
+        +'<span style="font-size:13px;font-weight:500">'+el+'</span>'
+        +'</label>';
+    }).join('');
+
+    var htmlB = ELEMENTI_B.map(function(el, i) {
+      var checked = elemB.indexOf(i) > -1;
+      return '<label style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F2F2F7;cursor:pointer">'
+        +'<input type="checkbox" class="elem-b" data-idx="'+i+'" '+(checked?'checked':'')+' style="width:auto;accent-color:#1A5FA8"/>'
+        +'<span style="font-size:13px;font-weight:500">'+el+'</span>'
+        +'</label>';
+    }).join('');
+
+    body.innerHTML='<div class="card"><div class="cb">'
+      +'<div class="sec">ELEMENTI TIPO A <span style="color:#E8631A;font-size:11px">(caratteristiche strutturali)</span></div>'
+      +'<div style="font-size:12px;color:#8E8E93;margin-bottom:10px">Spunta tutti gli elementi presenti nell\'immobile</div>'
+      + htmlA
+      +'</div></div>'
+      +'<div class="card"><div class="cb">'
+      +'<div class="sec">ELEMENTI TIPO B <span style="color:#1A5FA8;font-size:11px">(elementi di pregio)</span></div>'
+      +'<div style="font-size:12px;color:#8E8E93;margin-bottom:10px">Almeno 1 elemento B con 7+ totali attiva la Fascia 2</div>'
+      + htmlB
+      +'</div></div>'
+      +'<div class="card" id="napt-massimale-preview"><div class="cb">'
+      +'<div class="sec">ANTEPRIMA MASSIMALE</div>'
+      +'<div id="napt-mass-result" class="info">Seleziona gli elementi per vedere il calcolo</div>'
+      +'</div></div>';
+
+    // Bind live preview
+    setTimeout(function(){
+      document.querySelectorAll('.elem-a,.elem-b').forEach(function(el){
+        el.addEventListener('change', aggiornaMassimalePreview);
+      });
+      aggiornaMassimalePreview();
+    }, 100);
+
     btn.textContent='Avanti: Salva immobile';
 
   } else {
-    // Step 3: riepilogo e salva
+    // Step 5 — riepilogo
     var locRie = (naptD.locatori||[]).map(function(l){
       return '<div style="padding:8px 0;border-bottom:1px solid #F2F2F7;font-size:13px"><b>'+(l.cognome||'')+(l.nome?' '+l.nome:'')+'</b>'+(l.cf?' — '+l.cf:'')+'</div>';
     }).join('');
+    var massHtml = '';
+    if (naptD.massimaleAnnuo) {
+      massHtml = '<div style="margin-top:10px;padding:10px;background:#EBF5F0;border-radius:10px">'
+        +'<div style="font-size:11px;font-weight:700;color:#2D7A4F;text-transform:uppercase">Massimale canone</div>'
+        +'<div style="font-size:18px;font-weight:800;color:#2D7A4F">€ '+naptD.massimaleAnnuo.toFixed(2)+'/anno</div>'
+        +'<div style="font-size:13px;color:#2D7A4F">€ '+(naptD.massimaleAnnuo/12).toFixed(2)+'/mese</div>'
+        +'</div>';
+    }
     body.innerHTML = '<div class="card"><div class="cb"><div class="sec">RIEPILOGO IMMOBILE</div>'
-      +'<div style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:8px">'+(naptD.nome||'')+'</div>'
-      +'<div style="font-size:12px;color:var(--tx2);margin-bottom:12px">'+(naptD.via||'')+' n°'+(naptD.nCivico||'')+' — '+(naptD.comune||'')+'</div>'
-      +'<div class="sec">LOCATORI</div>'
+      +'<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">'+(naptD.nome||'')+'</div>'
+      +'<div style="font-size:12px;color:var(--text2);margin-bottom:4px">'+(naptD.via||'')+' n°'+(naptD.nCivico||'')+' — '+(naptD.comune||'')+'</div>'
+      +'<div style="font-size:12px;color:var(--text2)">Cat. '+(naptD.catCategoria||'—')+' — Sup. '+(naptD.superficieResidenziale||'—')+' mq</div>'
+      + massHtml
+      +'<div class="sec" style="margin-top:14px">LOCATORI</div>'
       + locRie
       +'</div></div>';
     btn.textContent='Salva immobile';
   }
 }
 
+function aggiornaMassimalePreview() {
+  var elemA = [];
+  var elemB = [];
+  document.querySelectorAll('.elem-a:checked').forEach(function(el){ elemA.push(parseInt(el.dataset.idx)); });
+  document.querySelectorAll('.elem-b:checked').forEach(function(el){ elemB.push(parseInt(el.dataset.idx)); });
 
+  var el = T('napt-mass-result'); if (!el) return;
+
+  if (!naptD.superficieResidenziale || !naptD.microzona) {
+    el.innerHTML = '<span style="color:#8E8E93">Inserisci superfici e foglio catastale per vedere il calcolo</span>';
+    return;
+  }
+
+  el.innerHTML = '<span style="color:#E8631A">Calcolo in corso...</span>';
+
+  var datiCalcolo = {
+    superficieResidenziale: naptD.superficieResidenziale,
+    superficieAltezzaBassa: naptD.superficieAltezzaBassa || 0,
+    supBalconi:   naptD.supBalconi   || 0,
+    supCantine:   naptD.supCantine   || 0,
+    supGarage:    naptD.supGarage    || 0,
+    supPostoAuto: naptD.supPostoAuto || 0,
+    supAreaVerde: naptD.supAreaVerde || 0,
+    tipologiaImmobile: naptD.tipologiaImmobile || 'condominio',
+    flagSeminterrato: naptD.flagSeminterrato || false,
+    apeClasse: naptD.apeClasse || '',
+    microzona: naptD.microzona,
+    elementiAJSON: JSON.stringify(elemA),
+    elementiiBJSON: JSON.stringify(elemB),
+    catCategoria: naptD.catCategoria || '',
+  };
+
+  api('calcolaMassimale', {appartamentoId: '__preview__', datiAppartamento: datiCalcolo}, function(err, r) {
+    if (!err && r && r.ok && r.data) {
+      var d = r.data;
+      naptD.massimaleAnnuo = d.massimaleAnnuo;
+      naptD.superficieConvTotale = d.supConvTotale;
+      var fasciaCol = d.fascia === 2 ? '#1A5FA8' : '#E8631A';
+      el.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+        +'<span style="font-size:11px;font-weight:700;color:#8E8E93">MASSIMALE ANNUO</span>'
+        +'<span style="font-size:11px;font-weight:700;color:'+fasciaCol+'">Fascia '+d.fascia+' · '+d.nElemA+'A+'+d.nElemB+'B</span>'
+        +'</div>'
+        +'<div style="font-size:22px;font-weight:800;color:#2D7A4F">€ '+d.massimaleAnnuo.toFixed(2)+'</div>'
+        +'<div style="font-size:13px;color:#2D7A4F;margin-bottom:8px">€ '+d.massimaleMensile.toFixed(2)+'/mese</div>'
+        +'<div style="font-size:11px;color:#8E8E93">Sup. conv. '+d.supConvTotale+' mq · €/mq '+d.valoreMqFinale
+        +(d.maggiorazione>0?' · +'+Math.round(d.maggiorazione*100)+'% ('+d.tipoMaggiorazione+')':'')
+        +(d.riduzione>0?' · -10% seminterrato':'')+'</div>';
+    } else {
+      el.innerHTML = '<span style="color:#8E8E93">Dati insufficienti per il calcolo</span>';
+    }
+  });
+}
+
+
+function naptAvanti()
+// ============================================================
 function naptAvanti() {
   if (naptStep===0) {
     naptD.nome=(T('n0')||{}).value||'';
     if(!naptD.nome.trim()){alert("Inserisci il nome dell'immobile");return;}
+
   } else if (naptStep===1) {
-    naptD.comune   =(T('n1')||{}).value||'';
-    naptD.via      =(T('n2')||{}).value||'';
-    naptD.nCivico  =(T('n2b')||{}).value||'';
-    naptD.piano    =(T('n3')||{}).value||'';
-    naptD.scala    =(T('n3b')||{}).value||'';
-    naptD.interno  =(T('n4')||{}).value||'';
-    naptD.nVani    =(T('n4b')||{}).value||'';
-    naptD.catCategoria=(T('n5')||{}).value||'';
-    naptD.catRendita  =(T('n6')||{}).value||'';
-    naptD.catSezione  =(T('nSez')||{}).value||'';
-    naptD.catFoglio   =(T('n7')||{}).value||'';
-    naptD.catParticella=(T('n8')||{}).value||'';
-    naptD.catSubalterno=(T('n9')||{}).value||'';
+    naptD.comune        =(T('n1')||{}).value||'';
+    naptD.via           =(T('n2')||{}).value||'';
+    naptD.nCivico       =(T('n2b')||{}).value||'';
+    naptD.piano         =(T('n3')||{}).value||'';
+    naptD.scala         =(T('n3b')||{}).value||'';
+    naptD.interno       =(T('n4')||{}).value||'';
+    naptD.nVani         =(T('n4b')||{}).value||'';
+    naptD.catCategoria  =(T('n5')||{}).value||'';
+    naptD.catRendita    =(T('n6')||{}).value||'';
+    naptD.catSezione    =(T('nSez')||{}).value||'';
+    naptD.catFoglio     =(T('n7')||{}).value||'';
+    naptD.catParticella =(T('n8')||{}).value||'';
+    naptD.catSubalterno =(T('n9')||{}).value||'';
     naptD.indirizzo=(naptD.via||'')+' n°'+(naptD.nCivico||'')+', '+(naptD.comune||'');
+    // Tipologia e APE
+    var selTip=T('nTipImm'); naptD.tipologiaImmobile=selTip?selTip.value:'condominio';
+    var selApe=T('nApeClasse'); naptD.apeClasse=selApe?selApe.value:'';
+    naptD.apeNumero=(T('nApeNum')||{}).value||'';
+    var chkSem=T('nSemint'); naptD.flagSeminterrato=chkSem?chkSem.checked:false;
+    // Calcola microzona automaticamente dal foglio catastale
+    if (naptD.catFoglio) {
+      api('getMicrozona', {foglio: naptD.catFoglio, sezione: naptD.catSezione||''}, function(err, r) {
+        if (!err && r && r.ok) { naptD.microzona = r.microzona; }
+      });
+    }
+
   } else if (naptStep===2) {
-    // Leggi locatori completi dal DOM
     leggiPersoneNapt();
     if(!naptD.locatori||!naptD.locatori.length||!(naptD.locatori[0].cognome||naptD.locatori[0].nome)){
       alert('Inserisci almeno un locatore'); return;
     }
+
+  } else if (naptStep===3) {
+    // Superfici
+    naptD.superficieResidenziale = parseFloat((T('nSupRes')||{}).value||0) || 0;
+    naptD.superficieAltezzaBassa = parseFloat((T('nSupBass')||{}).value||0) || 0;
+    naptD.supBalconi   = parseFloat((T('nSupBalc')||{}).value||0) || 0;
+    naptD.supCantine   = parseFloat((T('nSupCant')||{}).value||0) || 0;
+    naptD.supGarage    = parseFloat((T('nSupGar')||{}).value||0) || 0;
+    naptD.supPostoAuto = parseFloat((T('nSupPosto')||{}).value||0) || 0;
+    naptD.supAreaVerde = parseFloat((T('nSupVerde')||{}).value||0) || 0;
+    if (!naptD.superficieResidenziale) { alert('Inserisci la superficie residenziale'); return; }
+
+  } else if (naptStep===4) {
+    // Elementi A e B
+    var eA = [], eB = [];
+    document.querySelectorAll('.elem-a:checked').forEach(function(el){ eA.push(parseInt(el.dataset.idx)); });
+    document.querySelectorAll('.elem-b:checked').forEach(function(el){ eB.push(parseInt(el.dataset.idx)); });
+    naptD.elementiA = eA;
+    naptD.elementiB = eB;
+    naptD.elementiAJSON  = JSON.stringify(eA);
+    naptD.elementiiBJSON = JSON.stringify(eB);
+
   } else {
-    // Step 3: salva
+    // Step 5: salva
     naptD.userId = S && S.user ? (S.user.userId||S.user.id||'') : '';
-    console.log('saveAppartamento payload:', JSON.stringify(naptD));
     api('saveAppartamento',{data:naptD},function(err,r){
-      console.log('saveAppartamento response:', JSON.stringify(r), 'err:', err);
       if(!err&&r&&r.ok){ chiudiOv('ov-napt'); naptStep=0; naptD={}; caricaDati(); }
       else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
     });
