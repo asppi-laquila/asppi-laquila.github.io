@@ -353,6 +353,11 @@ select.inp{cursor:pointer;}
 </div>
 
 <script>
+// ════════════════════════════════════════════
+// ASPPI ASSISTENZA — v3
+// Accesso admin, operazioni per conto socio
+// ════════════════════════════════════════════
+var API    = 'https://rough-resonance-cba6.asppilaquila.workers.dev';
 
 var ELEMENTI_A = [
   "Riscaldamento centralizzato",
@@ -389,11 +394,6 @@ var ELEMENTI_B = [
   "Impianto fotovoltaico con accumulo",
   "Certificazione energetica A o B"
 ];
-// ════════════════════════════════════════════
-// ASPPI ASSISTENZA — v3
-// Accesso admin, operazioni per conto socio
-// ════════════════════════════════════════════
-var API    = 'https://rough-resonance-cba6.asppilaquila.workers.dev';
 var ATOKEN = 'ASPPI_ADMIN_asppi2025laquila';
 
 var SOCIO       = null;   // socio selezionato
@@ -708,30 +708,24 @@ function eliminaApt(a) {
 
 // ── CONTRATTO DETTAGLIO ───────────────────────
 function apriCnt(ct) {
+  curCnt = ct;
+  T('oc-ttl').textContent    = ct.nomeContratto || ct.tipo || '—';
   // Verifica attestazione
-  var btnAttAs = T('btn-genera-att-as');
-  var attWarnAs = T('att-warning-as');
+  var btnAttAs = document.getElementById('btn-genera-att-as');
+  var attWarnAs = document.getElementById('att-warning-as');
   if (btnAttAs) btnAttAs.style.display = 'none';
   if (attWarnAs) attWarnAs.style.display = 'none';
   if (ct.appartamentoId) {
     api('verificaAttestazione', {
-      appartamentoId: ct.appartamentoId,
-      contrattoId: ct.id,
-      canoneMensile: ct.canoneMensile,
-      duraDal: ct.duraDal,
-      duraAl: ct.duraAl
+      appartamentoId: ct.appartamentoId, contrattoId: ct.id,
+      canoneMensile: ct.canoneMensile, duraDal: ct.duraDal, duraAl: ct.duraAl
     }, function(err, r) {
       if (!err && r) {
-        if (r.ok) {
-          if (btnAttAs) btnAttAs.style.display = '';
-        } else if (r.motivo) {
-          if (attWarnAs) { attWarnAs.textContent = '⚠️ ' + r.motivo; attWarnAs.style.display = ''; }
-        }
+        if (r.ok) { if (btnAttAs) btnAttAs.style.display = ''; }
+        else if (r.motivo) { if (attWarnAs) { attWarnAs.textContent='⚠️ '+r.motivo; attWarnAs.style.display=''; } }
       }
     });
   }
-  curCnt = ct;
-  T('oc-ttl').textContent    = ct.nomeContratto || ct.tipo || '—';
   T('oc-tipo').textContent   = ct.tipo || '—';
   var col = ct.stato==='completato'?'#8E8E93':ct.stato==='lavorazione'?'#1A5FA8':'#E8631A';
   var lbl = ct.stato==='completato'?'Completato':ct.stato==='lavorazione'?'In lavorazione':ct.stato==='da_firmare'?'Da firmare':'In attesa';
@@ -744,7 +738,7 @@ function apriCnt(ct) {
   T('btn-cessione-cnt').onclick = function(){ apriAdm('cessione'); };
   T('btn-modifica-cnt-as').onclick = function(){ modificaCntAs(ct); };
   T('btn-genera-cnt-as').onclick   = function(){ generaEStampaContrattoAs(ct); };
-  document.getElementById('btn-genera-att-as').addEventListener('click', generaEStampaAttestazione);
+  var _btnAtt=document.getElementById('btn-genera-att-as'); if(_btnAtt) _btnAtt.onclick=function(){ generaEStampaAttestazione(); };
   T('btn-elimina-cnt').onclick     = function(){ eliminaCnt(ct); };
   apriOv('ov-cnt');
 }
@@ -1819,17 +1813,13 @@ function modificaCntAs(ct) {
 </script>
 <script src="contratti_template.js"></script>
 <script src="attestazione_template.js">
-// ── GENERA ATTESTAZIONE (assistenza) ────────────────────────
+// ── GENERA ATTESTAZIONE ──────────────────────────────────────
 function generaEStampaAttestazione() {
   if (!curCnt) { alert('Nessun contratto selezionato'); return; }
   api('getDatiAttestazione', {
-    appartamentoId: curCnt.appartamentoId,
-    contrattoId: curCnt.id
+    appartamentoId: curCnt.appartamentoId, contrattoId: curCnt.id
   }, function(err, r) {
-    if (err || !r || !r.ok) {
-      alert('Errore: ' + ((r && r.error) || err || 'Riprova'));
-      return;
-    }
+    if (err || !r || !r.ok) { alert('Errore: ' + ((r&&r.error)||err||'Riprova')); return; }
     var html = generaAttestazione(r);
     var win = window.open('', '_blank');
     if (win) { win.document.write(html); win.document.close(); }
