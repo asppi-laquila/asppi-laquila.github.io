@@ -718,6 +718,8 @@ textarea.inp{min-height:100px;resize:vertical;}
     <div class="row" id="btn-subentro"><div class="bar"></div><div class="rb"><div class="rt">👤 Subentro</div><div class="rs">Nuovo conduttore subentra</div></div><div style="display:flex;align-items:center;padding-right:14px;color:#8A8A8A">›</div></div>
     <div class="row" id="btn-cessione"><div class="bar"></div><div class="rb"><div class="rt">📤 Cessione</div><div class="rs">Cede il contratto a terzi</div></div><div style="display:flex;align-items:center;padding-right:14px;color:#8A8A8A">›</div></div>
     <button class="bp" id="btn-genera-cnt" style="background:#1A5FA8;box-shadow:0 3px 12px rgba(26,95,168,.25)">📄 Genera e stampa contratto</button>
+    <button class="bp" id="btn-genera-att" style="background:#16A34A;box-shadow:0 3px 12px rgba(22,163,74,.25);display:none">📋 Genera attestazione</button>
+    <div id="att-warning" style="display:none;background:#FDF0E8;border-radius:10px;padding:10px 14px;font-size:12px;color:#E8631A;font-weight:600;margin-bottom:10px"></div>
     <button class="bs" id="btn-chat-cnt">💬 Chat con lo studio</button>
     <button class="bs" id="btn-modifica-cnt" style="color:var(--blue);border-color:var(--blue-light)">✏️ Modifica contratto</button>
     <button class="bs" id="btn-elimina-cnt" style="color:var(--red);border-color:#FDEEEC">🗑️ Elimina pratica</button>
@@ -1189,6 +1191,7 @@ function bindAll() {
   B('btn-subentro','click',function(){ apriAdm('subentro'); });
   B('btn-cessione','click',function(){ apriAdm('cessione'); });
   B('btn-genera-cnt','click', generaEStampaContratto);
+  B('btn-genera-att','click', generaEStampaAttestazione);
   B('btn-chat-cnt','click',function(){ if(curCnt) apriChatCnt(curCnt.id); });
   B('btn-modifica-cnt','click',modificaCnt);
   B('btn-elimina-cnt','click',eliminaCnt);
@@ -1630,6 +1633,26 @@ function apriCnt(id) {
   ST('oc-taj', ct.taj||'Non inserito');
   var inp = T('oc-taj-inp'); if(inp) inp.value = ct.taj||'';
   SH('oc-taj-ok', false);
+  // Verifica attestazione
+  var btnAtt = T('btn-genera-att');
+  var attWarn = T('att-warning');
+  if (btnAtt) btnAtt.style.display = 'none';
+  if (attWarn) attWarn.style.display = 'none';
+  api('verificaAttestazione', {
+    appartamentoId: ct.appartamentoId,
+    contrattoId: ct.id,
+    canoneMensile: ct.canoneMensile,
+    duraDal: ct.duraDal,
+    duraAl: ct.duraAl
+  }, function(err, r) {
+    if (!err && r) {
+      if (r.ok) {
+        if (btnAtt) btnAtt.style.display = '';
+      } else if (r.motivo) {
+        if (attWarn) { attWarn.textContent = '⚠️ ' + r.motivo; attWarn.style.display = ''; }
+      }
+    }
+  });
   // Mostra bottone rinnova solo se pratica completata
   var btnRinnova = T('btn-rinnova-cnt');
   if (btnRinnova) btnRinnova.style.display = (ct.stato==='completato') ? '' : 'none';
@@ -3077,5 +3100,29 @@ function generaEStampaContratto() {
 
 </script>
 <script src="contratti_template.js"></script>
+<script src="attestazione_template.js">
+// ── GENERA ATTESTAZIONE ──────────────────────────────────────
+function generaEStampaAttestazione() {
+  if (!curCnt) { alert('Nessun contratto selezionato'); return; }
+  var apt = D.appartamenti.find(function(a){ return a.id === curCnt.appartamentoId; }) || {};
+  api('getDatiAttestazione', {
+    appartamentoId: curCnt.appartamentoId,
+    contrattoId: curCnt.id
+  }, function(err, r) {
+    if (err || !r || !r.ok) {
+      alert('Errore nel recupero dati: ' + ((r && r.error) || err || 'Riprova'));
+      return;
+    }
+    var html = generaAttestazione(r);
+    var win = window.open('', '_blank');
+    if (win) {
+      win.document.write(html);
+      win.document.close();
+    } else {
+      alert('Il browser ha bloccato il popup. Consenti i popup per questo sito e riprova.');
+    }
+  });
+}
+</script>
 </body>
 </html>

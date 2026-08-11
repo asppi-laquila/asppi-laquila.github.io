@@ -326,6 +326,8 @@ select.inp{cursor:pointer;}
     </div>
     <button class="bs" id="btn-modifica-cnt-as" style="margin-top:4px">✏️ Modifica contratto</button>
     <button class="bp" id="btn-genera-cnt-as" style="background:#1A5FA8;box-shadow:0 3px 12px rgba(26,95,168,.25);margin-top:4px">📄 Genera e stampa contratto</button>
+    <button class="bp" id="btn-genera-att-as" style="background:#16A34A;box-shadow:0 3px 12px rgba(22,163,74,.25);display:none;margin-top:4px">📋 Genera attestazione</button>
+    <div id="att-warning-as" style="display:none;background:#FDF0E8;border-radius:10px;padding:10px 14px;font-size:12px;color:#E8631A;font-weight:600;margin-bottom:10px"></div>
     <button class="bs" id="btn-elimina-cnt" style="color:var(--rd);border-color:var(--rdl);margin-top:4px">🗑️ Elimina pratica</button>
   </div>
 </div>
@@ -709,6 +711,28 @@ function eliminaApt(a) {
 
 // ── CONTRATTO DETTAGLIO ───────────────────────
 function apriCnt(ct) {
+  // Verifica attestazione
+  var btnAttAs = T('btn-genera-att-as');
+  var attWarnAs = T('att-warning-as');
+  if (btnAttAs) btnAttAs.style.display = 'none';
+  if (attWarnAs) attWarnAs.style.display = 'none';
+  if (ct.appartamentoId) {
+    api('verificaAttestazione', {
+      appartamentoId: ct.appartamentoId,
+      contrattoId: ct.id,
+      canoneMensile: ct.canoneMensile,
+      duraDal: ct.duraDal,
+      duraAl: ct.duraAl
+    }, function(err, r) {
+      if (!err && r) {
+        if (r.ok) {
+          if (btnAttAs) btnAttAs.style.display = '';
+        } else if (r.motivo) {
+          if (attWarnAs) { attWarnAs.textContent = '⚠️ ' + r.motivo; attWarnAs.style.display = ''; }
+        }
+      }
+    });
+  }
   curCnt = ct;
   T('oc-ttl').textContent    = ct.nomeContratto || ct.tipo || '—';
   T('oc-tipo').textContent   = ct.tipo || '—';
@@ -723,6 +747,7 @@ function apriCnt(ct) {
   T('btn-cessione-cnt').onclick = function(){ apriAdm('cessione'); };
   T('btn-modifica-cnt-as').onclick = function(){ modificaCntAs(ct); };
   T('btn-genera-cnt-as').onclick   = function(){ generaEStampaContrattoAs(ct); };
+  document.getElementById('btn-genera-att-as').addEventListener('click', generaEStampaAttestazione);
   T('btn-elimina-cnt').onclick     = function(){ eliminaCnt(ct); };
   apriOv('ov-cnt');
 }
@@ -1800,5 +1825,24 @@ function modificaCntAs(ct) {
 }
 </script>
 <script src="contratti_template.js"></script>
+<script src="attestazione_template.js">
+// ── GENERA ATTESTAZIONE (assistenza) ────────────────────────
+function generaEStampaAttestazione() {
+  if (!curCnt) { alert('Nessun contratto selezionato'); return; }
+  api('getDatiAttestazione', {
+    appartamentoId: curCnt.appartamentoId,
+    contrattoId: curCnt.id
+  }, function(err, r) {
+    if (err || !r || !r.ok) {
+      alert('Errore: ' + ((r && r.error) || err || 'Riprova'));
+      return;
+    }
+    var html = generaAttestazione(r);
+    var win = window.open('', '_blank');
+    if (win) { win.document.write(html); win.document.close(); }
+    else { alert('Popup bloccato. Consenti i popup e riprova.'); }
+  });
+}
+</script>
 </body>
 </html>
