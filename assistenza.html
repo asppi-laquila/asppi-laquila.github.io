@@ -353,10 +353,11 @@ select.inp{cursor:pointer;}
 </div>
 
 <script>
-// ── ALIAS compatibilità (devono stare prima di tutto) ──
+// ── ALIAS e GLOBALS (prima di tutto) ──
 function T(id) { return document.getElementById(id); }
 function ST(id, val) { var e=document.getElementById(id); if(e) e.textContent=val||''; }
 function SH(id, v) { var e=document.getElementById(id); if(e) e.style.display=v?'':'none'; }
+function autoDate(inp) { ad(inp); } // alias per compatibilità patch
 
 var ELEMENTI_A = [
   "Riscaldamento centralizzato",
@@ -445,6 +446,7 @@ function ad(inp) {
   if (v.length > 5) v = v.substring(0,5) + '/' + v.substring(5);
   inp.value = v.substring(0,10);
 }
+function autoDate(inp) { ad(inp); }
 function fmt(d) {
   if (!d) return '—';
   if (typeof d === 'string' && d.includes('T')) {
@@ -1033,6 +1035,59 @@ function aggiornaMassimalePreview() {
     } else {
       el.innerHTML = '<span style="color:#8E8E93">Dati insufficienti per il calcolo</span>';
     }
+  });
+}
+
+
+// ── Funzioni wizard immobile (patch) ──
+function leggiPersoneNapt() {
+  var container = T('napt-locs');
+  if (!container) return;
+  if (!naptD.locatori) naptD.locatori = [];
+  var blocks = container.querySelectorAll('.pb');
+  for (var i=0; i<blocks.length; i++) {
+    if (!naptD.locatori[i]) naptD.locatori[i] = {};
+    var b = blocks[i];
+    var g = function(cls){ var el=b.querySelector('.'+cls); return el?el.value||'':''; };
+    naptD.locatori[i].cognome        = g('pb-cog');
+    naptD.locatori[i].nome           = g('pb-nom');
+    naptD.locatori[i].luogoNascita   = g('pb-lng');
+    naptD.locatori[i].dataNascita    = g('pb-dtn');
+    naptD.locatori[i].cf             = g('pb-cf');
+    naptD.locatori[i].comuneResidenza= g('pb-res');
+    naptD.locatori[i].viaResidenza   = g('pb-via');
+    var dt = b.querySelector('.pb-doctipo');
+    naptD.locatori[i].docTipo    = dt ? dt.value||'' : '';
+    naptD.locatori[i].docNum     = g('pb-docnum');
+    naptD.locatori[i].docRilascio= g('pb-docril');
+    naptD.locatori[i].docScadenza= g('pb-docsca');
+    naptD.locatori[i].docEnte    = g('pb-docente');
+    naptD.locatori[i].titolo     = g('pb-tit');
+    naptD.locatori[i].quota      = g('pb-quo');
+    var ced = b.querySelector('.pb-ced');
+    naptD.locatori[i].cedolare = ced ? ced.value||'' : '';
+  }
+}
+
+function addPNapt() {
+  leggiPersoneNapt();
+  if (!naptD.locatori) naptD.locatori = [];
+  naptD.locatori.push({});
+  var el = T('napt-locs'); if (!el) return;
+  el.innerHTML = '';
+  naptD.locatori.forEach(function(p,i){
+    el.innerHTML += pbBlock('l',i,p).replace(/remP\(/g,'remPNapt(');
+  });
+}
+
+function remPNapt(t,i) {
+  leggiPersoneNapt();
+  if (!naptD.locatori || naptD.locatori.length <= 1) return;
+  naptD.locatori.splice(i,1);
+  var el = T('napt-locs'); if (!el) return;
+  el.innerHTML = '';
+  naptD.locatori.forEach(function(p,i2){
+    el.innerHTML += pbBlock('l',i2,p).replace(/remP\(/g,'remPNapt(');
   });
 }
 
