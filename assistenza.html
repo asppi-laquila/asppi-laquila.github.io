@@ -283,7 +283,7 @@ select.inp{cursor:pointer;}
 <div id="ov-napt" class="ov">
   <div class="oh">
     <div><div class="ohlbl">NUOVO IMMOBILE</div><div class="ohttl" id="napt-ttl">Passo 1 di 3</div></div>
-    <button class="exbtn" onclick="chiudiOv('ov-napt')">✕ Annulla</button>
+    <button class="exbtn" id="napt-back-btn" onclick="naptIndietro()">✕ Annulla</button>
   </div>
   <div class="prog" id="napt-prog"></div>
   <div style="padding:16px 16px 100px" id="napt-body"></div>
@@ -912,9 +912,21 @@ function salvaAdm(tipo) {
 // ── NUOVO APPARTAMENTO wizard ─────────────────
 function apriNuovoApt() { naptStep=0; naptD={}; renderNapt(); apriOv('ov-napt'); }
 
+function naptIndietro() {
+  if (naptStep === 0) {
+    chiudiOv('ov-napt');
+    naptStep = 0; naptD = {};
+  } else {
+    naptStep--;
+    renderNapt();
+  }
+}
+
 function renderNapt() {
   var NAPT_STEPS = 6;
   ST('napt-ttl','Passo '+(naptStep+1)+' di '+NAPT_STEPS);
+  var backBtn = T('napt-back-btn');
+  if (backBtn) backBtn.textContent = naptStep === 0 ? '✕ Annulla' : '← Indietro';
   var prog=T('napt-prog');
   if(prog){
     prog.innerHTML='';
@@ -1141,7 +1153,7 @@ function naptAvanti() {
 
   } else {
     // Step 5: salva
-    naptD.userId = S && S.user ? (S.user.userId||S.user.id||'') : '';
+    naptD.userId = SOCIO ? (SOCIO.userId||SOCIO.id||'') : '';
     api('saveAppartamento',{data:naptD},function(err,r){
       if(!err&&r&&r.ok){ chiudiOv('ov-napt'); naptStep=0; naptD={}; caricaDati(); }
       else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
