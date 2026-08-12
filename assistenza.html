@@ -1837,12 +1837,12 @@ function modificaCntAs(ct) {
 }
 </script>
 <script src="contratti_template.js"></script>
-<script src="attestazione_template.js">
+<script src="attestazione_template.js"></script>
+<script>
 function generaEStampaAttestazione() {
   if (!curCnt) { alert('Nessun contratto selezionato'); return; }
   api('getDatiAttestazione',{appartamentoId:curCnt.appartamentoId,contrattoId:curCnt.id},function(err,r){
     if(err||!r||!r.ok){alert('Errore: '+((r&&r.error)||err||'Riprova'));return;}
-    // Verifica canone vs massimale
     if(r.calcolo && r.contratto) {
       var mqEff = (r.contratto.tipoLocazione==='porzione' && parseFloat(r.contratto.mqPorzioneLocata)>0)
         ? parseFloat(r.contratto.mqPorzioneLocata) : r.calcolo.supConvTotale;
@@ -1850,9 +1850,9 @@ function generaEStampaAttestazione() {
       var vmqPat = mqEff>0 ? canAnn/mqEff : 0;
       var vmqMax = r.calcolo.valoreMqFinale || 0;
       if(vmqPat > vmqMax) {
-        alert('⚠️ ATTESTAZIONE NON GENERABILE
+        alert('ATTESTAZIONE NON GENERABILE
 
-Il valore €/mq del canone pattuito (€ '+vmqPat.toFixed(2)+'/mq/anno) supera il massimale consentito dall'Accordo Territoriale (€ '+vmqMax.toFixed(2)+'/mq/anno).
+Il valore mq/anno del canone pattuito (€ '+vmqPat.toFixed(2)+') supera il massimale dell'Accordo Territoriale (€ '+vmqMax.toFixed(2)+').
 
 Il contratto non rispetta i limiti dell'accordo territoriale.');
         return;
