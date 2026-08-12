@@ -857,39 +857,41 @@ textarea.inp{min-height:100px;resize:vertical;}
 <script>
 
 var ELEMENTI_A = [
-  "Riscaldamento centralizzato",
-  "Riscaldamento autonomo",
-  "Aria condizionata",
-  "Ascensore",
-  "Portineria",
-  "Posto auto in area condominiale",
-  "Videocitofono",
-  "Doppi vetri / infissi isolanti",
-  "Impianto di allarme",
-  "Pannelli solari / fotovoltaici",
-  "Caldaia di recente installazione (< 5 anni)",
-  "Bagno finestrato",
-  "Cucina separata",
-  "Cantina",
-  "Soffitta",
-  "Terrazzo/balcone > 10 mq",
-  "Giardino privato",
-  "Locale lavanderia condominiale",
-  "Impianto gas metano",
-  "Impianto citofonico"
+  // Allegato 3 Accordo Territoriale L'Aquila 2025 — 20 elementi tipo A
+  "Autorimessa singola o posto auto",                                              // 1
+  "Doppio vetro",                                                                  // 2
+  "Terrazza o balcone",                                                            // 3
+  "Appartamento in immobile con meno di otto unità abitative",                    // 4
+  "Cucina abitabile",                                                              // 5
+  "Riscaldamento autonomo o centralizzato con contabilizzatori",                  // 6
+  "Ascensore",                                                                     // 7
+  "Doppi servizi – almeno uno con finestra",                                      // 8
+  "Porta blindata e/o serratura di sicurezza",                                    // 9
+  "Impianto d'emergenza d'illuminazione",                                        // 10
+  "Cancello automatico",                                                           // 11
+  "Impianto di videocitofono",                                                     // 12
+  "Giardino privato o spazio esclusivo",                                          // 13
+  "Dotazione di lavatrice",                                                        // 14
+  "Dotazione di lavastoviglie",                                                    // 15
+  "Prossimità ai servizi: autobus, negozi, servizi sociali, ecc.",               // 16
+  "Cantina e/o soffitta",                                                          // 17
+  "Costruzione o completa ristrutturazione negli ultimi 15 anni",                 // 18
+  "Predisposizione linea internet / fibra",                                        // 19
+  "Arredamento parziale"                                                           // 20
 ];
 
 var ELEMENTI_B = [
-  "Posizione ai piani alti (dal 3° in su)",
-  "Vista panoramica",
-  "Ristrutturazione recente (< 5 anni)",
-  "Parquet o pavimento pregiato",
-  "Domotica",
-  "Piscina condominiale",
-  "Palestra condominiale",
-  "Posto auto coperto / box",
-  "Impianto fotovoltaico con accumulo",
-  "Certificazione energetica A o B"
+  // Allegato 3 Accordo Territoriale L'Aquila 2025 — 10 elementi tipo B
+  "Domotica",                                                   // 1
+  "Impianto fotovoltaico attivo",                               // 2
+  "Impianto solare termico attivo",                             // 3
+  "Collegamento attivo internet a carico del locatore",         // 4
+  "Impianto allarme",                                           // 5
+  "Impianto di condizionamento",                                // 6
+  "Asciugatrice o lavasciuga",                                  // 7
+  "Vincolo diretto della Soprintendenza",                       // 8
+  "Accessibilità – abbattimento barriere architettoniche",      // 9
+  "Arredamento completo"                                        // 10
 ];
 var API = "https://rough-resonance-cba6.asppilaquila.workers.dev";
 var S = null;
@@ -1869,18 +1871,20 @@ function renderNapt() {
     var elemB = naptD.elementiB || [];
 
     var htmlA = ELEMENTI_A.map(function(el, i) {
-      var checked = elemA.indexOf(i) > -1;
+      var n = i + 1; // numero ufficiale Allegato 3 (1-based)
+      var checked = elemA.indexOf(n) > -1;
       return '<label style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F2F2F7;cursor:pointer">'
-        +'<input type="checkbox" class="elem-a" data-idx="'+i+'" '+(checked?'checked':'')+' style="width:auto;accent-color:#E8631A"/>'
-        +'<span style="font-size:13px;font-weight:500">'+el+'</span>'
+        +'<input type="checkbox" class="elem-a" data-idx="'+n+'" '+(checked?'checked':'')+' style="width:auto;accent-color:#E8631A"/>'
+        +'<span style="font-size:13px;font-weight:500"><b style=\'color:#8E8E93;margin-right:4px\'>'+n+'.</b>'+el+'</span>'
         +'</label>';
     }).join('');
 
     var htmlB = ELEMENTI_B.map(function(el, i) {
-      var checked = elemB.indexOf(i) > -1;
+      var n = i + 1; // numero ufficiale Allegato 3 (1-based)
+      var checked = elemB.indexOf(n) > -1;
       return '<label style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F2F2F7;cursor:pointer">'
-        +'<input type="checkbox" class="elem-b" data-idx="'+i+'" '+(checked?'checked':'')+' style="width:auto;accent-color:#1A5FA8"/>'
-        +'<span style="font-size:13px;font-weight:500">'+el+'</span>'
+        +'<input type="checkbox" class="elem-b" data-idx="'+n+'" '+(checked?'checked':'')+' style="width:auto;accent-color:#1A5FA8"/>'
+        +'<span style="font-size:13px;font-weight:500"><b style=\'color:#8E8E93;margin-right:4px\'>'+n+'.</b>'+el+'</span>'
         +'</label>';
     }).join('');
 
