@@ -358,7 +358,7 @@ function generaAttestazione(dati) {
     +'<td class="center">'+chk(cnt.tipoLocazione!=='porzione')+'</td>'
     +'<td class="center">'+chk(cnt.tipoLocazione==='porzione')+'</td>'
     +'<td class="center">'+av(cnt.tipoLocazione==='porzione'?cnt.descrizioneLocazione:'',80)+'</td>'
-    +'<td class="center">'+av(supUtile,40)+'</td>'
+    +'<td class="center">'+av('',40)+'</td>'
     +'</tr></table>';
 
   // Elementi tipo A
@@ -426,15 +426,15 @@ function generaAttestazione(dati) {
   html += '<p>Valore canone mq/anno applicabile € <b>'+av(valoreMqFin,60)+'</b></p>';
   html += '<p class="bold">Calcolo canone massimo annuo:</p>';
 
-  if (cnt.tipoLocazione === 'porzione') {
-    var mqPorz = parseFloat(cnt.mqPorzioneLocata || 0);
-    var massAnnPorz = mqPorz > 0 ? (Math.round(parseFloat(calc.valoreMqFinale||0) * mqPorz * 100) / 100).toFixed(2) : '';
-    html += '<p style="padding-left:16pt">– Intero immobile mq <b>'+av(supConvTot,40)+'</b> X € mq/anno <b>'+av(valoreMqFin,50)+'</b> = € <b>'+av(massAnn,70)+'</b></p>';
-    html += '<p style="padding-left:16pt">– porzione locata mq <b>'+av(mqPorz||'',40)+'</b> X € mq/anno <b>'+av(valoreMqFin,50)+'</b> = € <b>'+av(massAnnPorz,70)+'</b></p>';
-  } else {
-    html += '<p style="padding-left:16pt">– Intero immobile mq <b>'+av(supConvTot,40)+'</b> X € mq/anno <b>'+av(valoreMqFin,50)+'</b> = € <b>'+av(massAnn,70)+'</b></p>';
-    html += '<p style="padding-left:16pt">– porzione locata mq '+av('',40)+' X € mq/anno '+av('',50)+' = € '+av('',70)+'</p>';
-  }
+  // Calcola massimale porzione
+  var mqPorz = parseFloat(cnt.mqPorzioneLocata || 0);
+  var massAnnPorz = (cnt.tipoLocazione === 'porzione' && mqPorz > 0)
+    ? Math.round(parseFloat(calc.valoreMqFinale||0) * mqPorz * 100) / 100
+    : 0;
+  var massAnnPorzStr = massAnnPorz > 0 ? massAnnPorz.toFixed(2) : '';
+
+  html += '<p style="padding-left:16pt">– Intero immobile mq <b>'+av(supConvTot,40)+'</b> X € mq/anno <b>'+av(valoreMqFin,50)+'</b> = € <b>'+av(massAnn,70)+'</b></p>';
+  html += '<p style="padding-left:16pt">– porzione locata mq <b>'+av(mqPorz>0?mqPorz:'',40)+'</b> X € mq/anno <b>'+av(mqPorz>0?valoreMqFin:'',50)+'</b> = € <b>'+av(massAnnPorzStr,70)+'</b></p>';
 
   html += '<table style="width:100%;margin-top:4pt"><tr>'
     +'<th style="width:60%;text-align:left;font-size:8.5pt"></th>'
@@ -462,23 +462,25 @@ function generaAttestazione(dati) {
   var maggEnVal = (calc.tipoMaggiorazione==='energetica'&&calc.massimaleAnnuo) ? calc.massimaleAnnuo.toFixed(2) : '';
   var maggElVal = (calc.tipoMaggiorazione==='elementi'&&calc.massimaleAnnuo)   ? calc.massimaleAnnuo.toFixed(2) : '';
 
+  var maggEnValPorz = (calc.tipoMaggiorazione==='energetica'&&massAnnPorz>0) ? (massAnnPorz*(1+magg)).toFixed(2) : '';
   html += '<tr><td style="font-size:8.5pt">con eventuale maggiorazione classe energetica: <b>'+av(apeClasse,20)+'</b> (+ '+av(maggEnPct,15)+'%) =</td>'
     +'<td style="border-bottom:1px solid #ccc;text-align:center">€ '+av(maggEnVal,60)+'</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">€ '+av('',60)+'</td></tr>';
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">€ '+av(maggEnValPorz,60)+'</td></tr>';
 
+  var maggElValPorz = (calc.tipoMaggiorazione==='elementi'&&massAnnPorz>0) ? (massAnnPorz*(1+magg)).toFixed(2) : '';
   html += '<tr><td style="font-size:8.5pt">con eventuale maggiorazione per numero elementi <b>'+nElemA+'A+'+nElemB+'B</b> (+ '+av(maggElPct,15)+'%) =</td>'
     +'<td style="border-bottom:1px solid #ccc;text-align:center">€ '+av(maggElVal,60)+'</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">€ '+av('',60)+'</td></tr>';
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">€ '+av(maggElValPorz,60)+'</td></tr>';
 
+  var semintPorz = (isSemint&&massAnnPorz>0) ? (massAnnPorz*(1-calc.riduzione)).toFixed(2) : '';
   html += '<tr><td style="font-size:8.5pt">con riduzione per seminterrato (- '+av(isSemint?ridPct:'',15)+'%) =</td>'
     +'<td style="border-bottom:1px solid #ccc;text-align:center">€ '+av(isSemint?massAnn:'',60)+'</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">€ '+av('',60)+'</td></tr>';
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">€ '+av(semintPorz,60)+'</td></tr>';
 
-  var massAnnPorzFin = (cnt.tipoLocazione === 'porzione' && typeof mqPorz !== 'undefined' && mqPorz > 0)
-    ? (Math.round(parseFloat(calc.valoreMqFinale||0) * mqPorz * 100) / 100).toFixed(2) : '';
+  var complessivoPorz = massAnnPorz > 0 ? massAnnPorz.toFixed(2) : '';
   html += '<tr><td class="bold" style="font-size:8.5pt">complessivo =</td>'
     +'<td style="border-bottom:2px solid #000;text-align:center"><b>€ '+av(massAnn,60)+'</b></td>'
-    +'<td style="border-bottom:2px solid #000;text-align:center">€ '+av(massAnnPorzFin,60)+'</td></tr>';
+    +'<td style="border-bottom:2px solid #000;text-align:center">€ '+av(complessivoPorz,60)+'</td></tr>';
   html += '</table>';
 
   // Riepilogo
@@ -490,10 +492,14 @@ function generaAttestazione(dati) {
     +'<td><b>CANONE MENSILE PATTUITO €</b> <b>'+av(canoneMens,70)+'</b></td>'
     +'<td></td>'
     +'</tr><tr>'
-    +'<td><b>SUPERFICIE LOCATA MQ:</b> <b>'+av(cnt.tipoLocazione==="porzione"&&cnt.mqPorzioneLocata?cnt.mqPorzioneLocata:supUtile,50)+'</b></td>'
+    +'<td><b>SUPERFICIE LOCATA MQ:</b> <b>'+av(cnt.tipoLocazione==="porzione"&&mqPorz>0?mqPorz:supUtile,50)+'</b></td>'
     +'<td></td>'
     +'</tr><tr>'
-    +'<td colspan="2" class="center"><b>VALORE CANONE LOCAZIONE MQ/ANNO €</b> <b>'+av(valoreMqFin,60)+'</b></td>'
+    +'<td colspan="2" class="center"><b>VALORE CANONE LOCAZIONE MQ/ANNO €</b> <b>'+av(function(){
+      var mqEff = (cnt.tipoLocazione==="porzione"&&mqPorz>0) ? mqPorz : parseFloat(supConvTot);
+      var canAnn = parseFloat(String(cnt.canoneAnnuale||'').replace(',','.')) || (parseFloat(String(cnt.canoneMensile||'').replace(',','.'))*12) || 0;
+      return mqEff>0 ? (Math.round(canAnn/mqEff*100)/100).toFixed(2) : '';
+    }(),60)+'</b></td>'
     +'</tr></table>';
 
   html += '<p style="font-size:8pt;margin-top:6pt">I calcoli sono eseguiti su dati, valori ed elementi oggettivi dichiarati con la sottoscrizione dell\'attestazione dal locatore.</p>';
