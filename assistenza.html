@@ -661,7 +661,7 @@ function mostraOperativa() {
 function caricaDatiSocio() {
   T('op-lista-imm').innerHTML = '<div class="info">Caricamento...</div>';
   // Carica tutti gli appartamenti con token admin (filtra client-side per userId)
-  api('getAppartamenti', {}, function(err, r) {
+  api('getAppartamenti', {token: ATOKEN}, function(err, r) {
     if (err || !r || !r.ok) {
       T('op-lista-imm').innerHTML = '<div class="info" style="color:var(--rd)">❌ ' + (err||(r&&r.error)||'Errore') + '</div>';
       return;
@@ -671,7 +671,7 @@ function caricaDatiSocio() {
         a.rimosso !== true && String(a.rimosso).toLowerCase() !== 'true';
     });
     // Ora carica contratti
-    api('getContratti', {}, function(err2, r2) {
+    api('getContratti', {token: ATOKEN}, function(err2, r2) {
       ALL_CNT = (!err2 && r2 && r2.ok) ? (r2.data || []).filter(function(c){
         return c.userId === SOCIO.id &&
           c.eliminato !== true && String(c.eliminato).toLowerCase() !== 'true';
@@ -1155,7 +1155,7 @@ function naptAvanti() {
     // Step 5: salva
     naptD.userId = SOCIO ? (SOCIO.userId||SOCIO.id||'') : '';
     api('saveAppartamento',{data:naptD},function(err,r){
-      if(!err&&r&&r.ok){ chiudiOv('ov-napt'); naptStep=0; naptD={}; caricaDati(); }
+      if(!err&&r&&r.ok){ chiudiOv('ov-napt'); naptStep=0; naptD={}; caricaDatiSocio(); }
       else { alert('Errore: '+((r&&r.error)||err||'Riprova')); }
     });
     return;
