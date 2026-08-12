@@ -330,7 +330,10 @@ function generaAttestazione(dati) {
     html += '<tr><td>Balconi, terrazze e cantine e simili</td><td></td><td class="center">x 0,25 - x 0,10</td><td></td></tr>';
   }
   var supGarF = parseFloat(supGar||0);
-  html += rigaSup('Garage', supGarF>0?supGarF:null, 'x 0,50 – x 1', supGarF>0?supGarF*0.50:0);
+  var mzNum = parseInt(microzona||0);
+  var coeffGar = (mzNum === 1) ? 1.00 : 0.50;
+  var labelGar = (mzNum === 1) ? 'x 1 (microzona 1)' : 'x 0,50 – x 1';
+  html += rigaSup('Garage', supGarF>0?supGarF:null, labelGar, supGarF>0?supGarF*coeffGar:0);
   var supPostoF = parseFloat(supPosto||0);
   html += rigaSup('Posto auto', supPostoF>0?supPostoF:null, 'x 0,20', supPostoF>0?supPostoF*0.20:0);
   var supVerdeF = parseFloat(supVerde||0);
@@ -365,16 +368,18 @@ function generaAttestazione(dati) {
   var metaA = Math.ceil(ELEM_A_LABELS.length/2);
   html += '<td style="width:50%;padding:0"><table style="width:100%;border-collapse:collapse">';
   for (var i=0; i<metaA; i++) {
-    var checked = elemA.indexOf(i) > -1;
-    html += '<tr><td style="border:1px solid #000;width:25px;text-align:center;padding:2pt">'+(i+1)+'</td>'
+    var n = i + 1; // numero ufficiale Allegato 3 (1-based)
+    var checked = elemA.indexOf(n) > -1;
+    html += '<tr><td style="border:1px solid #000;width:25px;text-align:center;padding:2pt">'+n+'</td>'
       +'<td style="border:1px solid #ccc;width:18px;text-align:center">'+chk(checked)+'</td>'
       +'<td style="border:1px solid #ccc;padding:2pt 4pt;font-size:8pt">'+ELEM_A_LABELS[i]+'</td></tr>';
   }
   html += '</table></td>';
   html += '<td style="width:50%;padding:0"><table style="width:100%;border-collapse:collapse">';
   for (var j=metaA; j<ELEM_A_LABELS.length; j++) {
-    var checkedJ = elemA.indexOf(j) > -1;
-    html += '<tr><td style="border:1px solid #000;width:25px;text-align:center;padding:2pt">'+(j+1)+'</td>'
+    var nj = j + 1; // numero ufficiale Allegato 3 (1-based)
+    var checkedJ = elemA.indexOf(nj) > -1;
+    html += '<tr><td style="border:1px solid #000;width:25px;text-align:center;padding:2pt">'+nj+'</td>'
       +'<td style="border:1px solid #ccc;width:18px;text-align:center">'+chk(checkedJ)+'</td>'
       +'<td style="border:1px solid #ccc;padding:2pt 4pt;font-size:8pt">'+ELEM_A_LABELS[j]+'</td></tr>';
   }
@@ -386,16 +391,18 @@ function generaAttestazione(dati) {
   var metaB = Math.ceil(ELEM_B_LABELS.length/2);
   html += '<td style="width:50%;padding:0"><table style="width:100%;border-collapse:collapse">';
   for (var k=0; k<metaB; k++) {
-    var chkB = elemB.indexOf(k) > -1;
-    html += '<tr><td style="border:1px solid #000;width:25px;text-align:center;padding:2pt">'+(k+1)+'</td>'
+    var nk = k + 1; // numero ufficiale Allegato 3 (1-based)
+    var chkB = elemB.indexOf(nk) > -1;
+    html += '<tr><td style="border:1px solid #000;width:25px;text-align:center;padding:2pt">'+nk+'</td>'
       +'<td style="border:1px solid #ccc;width:18px;text-align:center">'+chk(chkB)+'</td>'
       +'<td style="border:1px solid #ccc;padding:2pt 4pt;font-size:8pt">'+ELEM_B_LABELS[k]+'</td></tr>';
   }
   html += '</table></td>';
   html += '<td style="width:50%;padding:0"><table style="width:100%;border-collapse:collapse">';
   for (var m=metaB; m<ELEM_B_LABELS.length; m++) {
-    var chkBm = elemB.indexOf(m) > -1;
-    html += '<tr><td style="border:1px solid #000;width:25px;text-align:center;padding:2pt">'+(m+1)+'</td>'
+    var nm = m + 1; // numero ufficiale Allegato 3 (1-based)
+    var chkBm = elemB.indexOf(nm) > -1;
+    html += '<tr><td style="border:1px solid #000;width:25px;text-align:center;padding:2pt">'+nm+'</td>'
       +'<td style="border:1px solid #ccc;width:18px;text-align:center">'+chk(chkBm)+'</td>'
       +'<td style="border:1px solid #ccc;padding:2pt 4pt;font-size:8pt">'+ELEM_B_LABELS[m]+'</td></tr>';
   }
