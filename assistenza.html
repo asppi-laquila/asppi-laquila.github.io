@@ -1835,10 +1835,7 @@ function modificaCntAs(ct) {
   renderNcnt();
   apriOv('ov-ncnt');
 }
-</script>
-<script src="contratti_template.js"></script>
-<script src="attestazione_template.js"></script>
-<script>
+
 function generaEStampaAttestazione() {
   if (!curCnt) { alert('Nessun contratto selezionato'); return; }
   api('getDatiAttestazione',{appartamentoId:curCnt.appartamentoId,contrattoId:curCnt.id},function(err,r){
@@ -1854,6 +1851,7 @@ function generaEStampaAttestazione() {
         return;
       }
     }
+    if(typeof generaAttestazione!=='function'){alert('Errore: template attestazione non caricato. Ricarica la pagina.');return;}
     var h=generaAttestazione(r);
     var blob=new Blob([h],{type:'text/html'});
     var url=URL.createObjectURL(blob);
@@ -1862,5 +1860,7 @@ function generaEStampaAttestazione() {
   });
 }
 </script>
+<script src="contratti_template.js"></script>
+<script src="attestazione_template.js"></script>
 </body>
 </html>
