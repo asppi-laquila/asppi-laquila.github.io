@@ -1850,11 +1850,7 @@ function generaEStampaAttestazione() {
       var vmqPat = mqEff>0 ? canAnn/mqEff : 0;
       var vmqMax = r.calcolo.valoreMqFinale || 0;
       if(vmqPat > vmqMax) {
-        alert('ATTESTAZIONE NON GENERABILE
-
-Il valore mq/anno del canone pattuito (€ '+vmqPat.toFixed(2)+') supera il massimale dell'Accordo Territoriale (€ '+vmqMax.toFixed(2)+').
-
-Il contratto non rispetta i limiti dell'accordo territoriale.');
+        alert('ATTESTAZIONE NON GENERABILE\n\nIl valore mq/anno del canone pattuito (\u20ac '+vmqPat.toFixed(2)+') supera il massimale dell\'Accordo Territoriale (\u20ac '+vmqMax.toFixed(2)+').\n\nIl contratto non rispetta i limiti dell\'accordo territoriale.');
         return;
       }
     }
