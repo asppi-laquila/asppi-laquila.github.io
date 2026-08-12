@@ -582,7 +582,7 @@ function api(action, data, cb, _retry) {
 
 function caricaSoci() {
   T('lista-soci').innerHTML = '<div class="info">⏳ Caricamento...</div>';
-  api('getUtenti', {}, function(err, r) {
+  api('getUtenti', {token: ATOKEN}, function(err, r) {
     if (err || !r || !r.ok) {
       T('lista-soci').innerHTML = '<div class="info" style="color:var(--rd)">❌ ' + (err || (r&&r.error) || 'Errore') + '</div>';
       return;
