@@ -427,7 +427,10 @@ function generaAttestazione(dati) {
   html += '<p class="bold">Calcolo canone massimo annuo:</p>';
 
   if (cnt.tipoLocazione === 'porzione') {
-    html += '<p style="padding-left:16pt">– porzione locata mq <b>'+av(supUtile,40)+'</b> X € mq/anno <b>'+av(valoreMqFin,50)+'</b> = € <b>'+av(massAnn,70)+'</b></p>';
+    var mqPorz = parseFloat(cnt.mqPorzioneLocata || 0);
+    var massAnnPorz = mqPorz > 0 ? (Math.round(parseFloat(calc.valoreMqFinale||0) * mqPorz * 100) / 100).toFixed(2) : '';
+    html += '<p style="padding-left:16pt">– Intero immobile mq <b>'+av(supConvTot,40)+'</b> X € mq/anno <b>'+av(valoreMqFin,50)+'</b> = € <b>'+av(massAnn,70)+'</b></p>';
+    html += '<p style="padding-left:16pt">– porzione locata mq <b>'+av(mqPorz||'',40)+'</b> X € mq/anno <b>'+av(valoreMqFin,50)+'</b> = € <b>'+av(massAnnPorz,70)+'</b></p>';
   } else {
     html += '<p style="padding-left:16pt">– Intero immobile mq <b>'+av(supConvTot,40)+'</b> X € mq/anno <b>'+av(valoreMqFin,50)+'</b> = € <b>'+av(massAnn,70)+'</b></p>';
     html += '<p style="padding-left:16pt">– porzione locata mq '+av('',40)+' X € mq/anno '+av('',50)+' = € '+av('',70)+'</p>';
@@ -471,9 +474,11 @@ function generaAttestazione(dati) {
     +'<td style="border-bottom:1px solid #ccc;text-align:center">€ '+av(isSemint?massAnn:'',60)+'</td>'
     +'<td style="border-bottom:1px solid #ccc;text-align:center">€ '+av('',60)+'</td></tr>';
 
+  var massAnnPorzFin = (cnt.tipoLocazione === 'porzione' && typeof mqPorz !== 'undefined' && mqPorz > 0)
+    ? (Math.round(parseFloat(calc.valoreMqFinale||0) * mqPorz * 100) / 100).toFixed(2) : '';
   html += '<tr><td class="bold" style="font-size:8.5pt">complessivo =</td>'
     +'<td style="border-bottom:2px solid #000;text-align:center"><b>€ '+av(massAnn,60)+'</b></td>'
-    +'<td style="border-bottom:2px solid #000;text-align:center">€ '+av('',60)+'</td></tr>';
+    +'<td style="border-bottom:2px solid #000;text-align:center">€ '+av(massAnnPorzFin,60)+'</td></tr>';
   html += '</table>';
 
   // Riepilogo
@@ -485,7 +490,7 @@ function generaAttestazione(dati) {
     +'<td><b>CANONE MENSILE PATTUITO €</b> <b>'+av(canoneMens,70)+'</b></td>'
     +'<td></td>'
     +'</tr><tr>'
-    +'<td><b>SUPERFICIE LOCATA MQ:</b> <b>'+av(supUtile,50)+'</b></td>'
+    +'<td><b>SUPERFICIE LOCATA MQ:</b> <b>'+av(cnt.tipoLocazione==="porzione"&&cnt.mqPorzioneLocata?cnt.mqPorzioneLocata:supUtile,50)+'</b></td>'
     +'<td></td>'
     +'</tr><tr>'
     +'<td colspan="2" class="center"><b>VALORE CANONE LOCAZIONE MQ/ANNO €</b> <b>'+av(valoreMqFin,60)+'</b></td>'

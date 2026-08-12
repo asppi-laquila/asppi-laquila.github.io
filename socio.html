@@ -1898,17 +1898,12 @@ function renderNapt() {
       +'<div style="font-size:12px;color:#8E8E93;margin-bottom:10px">Almeno 1 elemento B con 7+ totali attiva la Fascia 2</div>'
       + htmlB
       +'</div></div>'
-      +'<div class="card" id="napt-massimale-preview"><div class="cb">'
-      +'<div class="sec">ANTEPRIMA MASSIMALE</div>'
-      +'<div id="napt-mass-result" class="info">Seleziona gli elementi per vedere il calcolo</div>'
-      +'</div></div>';
+      +''; // anteprima massimale rimossa
 
     // Bind live preview
     setTimeout(function(){
       document.querySelectorAll('.elem-a,.elem-b').forEach(function(el){
-        el.addEventListener('change', aggiornaMassimalePreview);
       });
-      aggiornaMassimalePreview();
     }, 100);
 
     btn.textContent='Avanti: Salva immobile';
@@ -2258,6 +2253,8 @@ function buildNcntStep() {
       +'<select class="inp" id="c3g" onchange="togglePorzione()"><option value="intero" '+(ncntD.tipoLocazione==='porzione'?'':'selected')+'>Intero immobile</option>'
       +'<option value="porzione" '+(ncntD.tipoLocazione==='porzione'?'selected':'')+'>Porzione di immobile</option></select>'
       +'<div id="c3g-det" style="'+(ncntD.tipoLocazione==='porzione'?'display:block':'display:none')+'">'
+      +'<label class="lbl">Superficie porzione locata (mq) <span style="color:var(--rd)">*</span></label>'
+      +'<input class="inp" id="c3g-mq" type="number" min="1" placeholder="es. 45" value="'+(ncntD.mqPorzioneLocata||'')+'"/>'
       +'<label class="lbl">Descrizione porzione</label>'
       +'<input type="text" class="inp" id="c3h" placeholder="es. piano primo, vani 3 e 4" value="'+(ncntD.descrizioneLocazione||'')+'"/>'
       +'</div></div></div>'
@@ -2571,7 +2568,7 @@ function ncntAvanti() {
   if(ncntStep===0){ncntD.tipo=(document.querySelector('input[name="ntipo"]:checked')||{}).value||'';if(!ncntD.tipo){alert('Seleziona il tipo');return;}}
   if(ncntStep===1){ncntD.duraDal=(T('c1a')||{}).value||'';ncntD.duraAl=(T('c1b')||{}).value||'';ncntD.duraMesi=(T('c1c')||{}).value||'';if(!ncntD.duraDal||!ncntD.duraAl){alert('Inserisci le date');return;}}
   if(ncntStep===2){ncntD.canoneMensile=(T('c2a')||{}).value||'';ncntD.canoneAnnuale=(T('c2b')||{}).value||'';ncntD.canoneIBAN=(T('c2c')||{}).value||'';ncntD.depositoImporto=(T('c2d')||{}).value||'';ncntD.depositoMesi=(T('c2e')||{}).value||'';ncntD.oneriMensili=(T('c2f')||{}).value||'';if(!ncntD.canoneMensile){alert('Inserisci il canone');return;}}
-  if(ncntStep===3){ncntD.apeNumero=(T('c3a')||{}).value||'';ncntD.apeClasse=(T('c3b')||{}).value||'';ncntD.compCamere=(T('c3c')||{}).value||'';ncntD.compCucina=(T('c3d')||{}).value||'';ncntD.compBagni=(T('c3e')||{}).value||'';ncntD.compBalconi=(T('c3f')||{}).value||'';var selTL=T('c3g');ncntD.tipoLocazione=selTL?selTL.value||'intero':'intero';ncntD.descrizioneLocazione=(T('c3h')||{}).value||'';ncntD.pertinenze=leggiPertinenze();ncntD.elemAccessori=(T('c3x1')||{}).value||'';var selAm=T('c3x2');ncntD.ammobiliata=selAm?selAm.value:'si';ncntD.tabMillProp=(T('c3x3')||{}).value||'';ncntD.tabMillRisc=(T('c3x4')||{}).value||'';ncntD.statoImmobile=(T('c3x5')||{}).value||'';}
+  if(ncntStep===3){ncntD.apeNumero=(T('c3a')||{}).value||'';ncntD.apeClasse=(T('c3b')||{}).value||'';ncntD.compCamere=(T('c3c')||{}).value||'';ncntD.compCucina=(T('c3d')||{}).value||'';ncntD.compBagni=(T('c3e')||{}).value||'';ncntD.compBalconi=(T('c3f')||{}).value||'';var selTL=T('c3g');ncntD.tipoLocazione=selTL?selTL.value||'intero':'intero';ncntD.mqPorzioneLocata=parseFloat((T('c3g-mq')||{}).value||0)||0;ncntD.descrizioneLocazione=(T('c3h')||{}).value||'';ncntD.pertinenze=leggiPertinenze();ncntD.elemAccessori=(T('c3x1')||{}).value||'';var selAm=T('c3x2');ncntD.ammobiliata=selAm?selAm.value:'si';ncntD.tabMillProp=(T('c3x3')||{}).value||'';ncntD.tabMillRisc=(T('c3x4')||{}).value||'';ncntD.statoImmobile=(T('c3x5')||{}).value||'';}
   if(ncntStep===4){ leggiPersone('l'); }
   if(ncntStep===5){ leggiPersone('c'); ncntD.conviventi=(T('c5conv')||{}).value||'nessuno'; }
   if(ncntStep===6){ leggiPersone('g'); }
