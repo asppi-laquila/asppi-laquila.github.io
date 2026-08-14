@@ -433,27 +433,40 @@ function generaAttestazione(dati) {
     +'<th style="width:20%;text-align:center;font-size:8pt">PORZIONE</th>'
     +'</tr>';
 
-  // Durata — percentuale vuota, valori vuoti
+  // Valori base (calcolati con valoreMqApplicabile, prima delle maggiorazioni)
+  var baseInteroNum = valoreMqApplicabile * parseFloat(supConvTot || 0);
+  var basePorzNum   = isPorzione && mqPorz > 0 ? valoreMqApplicabile * mqPorz : 0;
+
+  // Incremento/decremento per ogni riga
+  // Solo una maggiorazione è applicata (energia O elementi), mai entrambe
+  var incrEnIntero  = (calc.tipoMaggiorazione==='energetica' && magg>0) ? (baseInteroNum * magg).toFixed(2) : '';
+  var incrEnPorz    = (calc.tipoMaggiorazione==='energetica' && magg>0 && basePorzNum>0) ? (basePorzNum * magg).toFixed(2) : '';
+  var incrElIntero  = (calc.tipoMaggiorazione==='elementi'   && magg>0) ? (baseInteroNum * magg).toFixed(2) : '';
+  var incrElPorz    = (calc.tipoMaggiorazione==='elementi'   && magg>0 && basePorzNum>0) ? (basePorzNum * magg).toFixed(2) : '';
+  var riduIntero    = isSemint ? (baseInteroNum * rid).toFixed(2) : '';
+  var riduPorz      = (isSemint && basePorzNum>0) ? (basePorzNum * rid).toFixed(2) : '';
+
+  // Durata — percentuale sempre vuota (non gestita), valori vuoti
   html += '<tr><td style="font-size:8pt">con eventuale maggiorazione per la durata (+ '+lineetta(25)+'%) =</td>'
     +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+lineetta(60)+'</td>'
     +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+lineetta(60)+'</td></tr>';
 
-  // Classe energetica — percentuale se presente, valori vuoti
+  // Classe energetica
   html += '<tr><td style="font-size:8pt">con eventuale maggiorazione classe energetica: <b>'+av(apeClasse,20)+'</b> (+ '+av(maggEnPct,15)+'%) =</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+lineetta(60)+'</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+lineetta(60)+'</td></tr>';
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av(incrEnIntero,60)+'</td>'
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av(incrEnPorz,60)+'</td></tr>';
 
-  // Numero elementi — percentuale se presente, valori vuoti
+  // Numero elementi
   html += '<tr><td style="font-size:8pt">con eventuale maggiorazione per numero elementi <b>'+nElemA+'A+'+nElemB+'B</b> (+ '+av(maggElPct,15)+'%) =</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+lineetta(60)+'</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+lineetta(60)+'</td></tr>';
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av(incrElIntero,60)+'</td>'
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av(incrElPorz,60)+'</td></tr>';
 
-  // Seminterrato — percentuale se presente, valori vuoti
+  // Seminterrato
   html += '<tr><td style="font-size:8pt">con riduzione per seminterrato (- '+av(isSemint?ridPct:'',15)+'%) =</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+lineetta(60)+'</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+lineetta(60)+'</td></tr>';
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av(riduIntero,60)+'</td>'
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av(riduPorz,60)+'</td></tr>';
 
-  // Complessivo = valore finale con tutte le maggiorazioni/riduzioni
+  // Complessivo = valore base + incremento - riduzione
   html += '<tr><td class="bold" style="font-size:8pt">complessivo =</td>'
     +'<td style="border-bottom:2px solid #000;text-align:center">\u20ac <b>'+av(massCompIntero,60)+'</b></td>'
     +'<td style="border-bottom:2px solid #000;text-align:center">\u20ac '+av(massCompPorz,60)+'</td></tr>';
