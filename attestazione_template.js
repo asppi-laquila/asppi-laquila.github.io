@@ -492,27 +492,27 @@ function generaAttestazione(dati) {
     +'<th style="width:20%;text-align:center;font-size:8pt">PORZIONE</th>'
     +'</tr>';
 
-  // Durata
+  // Durata — solo percentuale, valore vuoto
   html += '<tr><td style="font-size:8pt">con eventuale maggiorazione per la durata (+ '+av('',15)+'%) =</td>'
     +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av('',60)+'</td>'
     +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av('',60)+'</td></tr>';
 
-  // Classe energetica
+  // Classe energetica — solo percentuale, valore vuoto
   html += '<tr><td style="font-size:8pt">con eventuale maggiorazione classe energetica: <b>'+av(apeClasse,20)+'</b> (+ '+av(maggEnPct,15)+'%) =</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av(maggEnVal,60)+'</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av(maggEnValPorz,60)+'</td></tr>';
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av('',60)+'</td>'
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av('',60)+'</td></tr>';
 
-  // Numero elementi
+  // Numero elementi — solo percentuale, valore vuoto
   html += '<tr><td style="font-size:8pt">con eventuale maggiorazione per numero elementi <b>'+nElemA+'A+'+nElemB+'B</b> (+ '+av(maggElPct,15)+'%) =</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av(maggElVal,60)+'</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av(maggElValPorz,60)+'</td></tr>';
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av('',60)+'</td>'
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av('',60)+'</td></tr>';
 
-  // Seminterrato
+  // Seminterrato — solo percentuale, valore vuoto
   html += '<tr><td style="font-size:8pt">con riduzione per seminterrato (- '+av(isSemint?ridPct:'',15)+'%) =</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av(isSemint?massAnn:'',60)+'</td>'
-    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av(semintPorz,60)+'</td></tr>';
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av('',60)+'</td>'
+    +'<td style="border-bottom:1px solid #ccc;text-align:center">\u20ac '+av('',60)+'</td></tr>';
 
-  // Complessivo
+  // Complessivo = valore finale con tutte le maggiorazioni/riduzioni applicate
   html += '<tr><td class="bold" style="font-size:8pt">complessivo =</td>'
     +'<td style="border-bottom:2px solid #000;text-align:center"><b>\u20ac '+av(massAnn,60)+'</b></td>'
     +'<td style="border-bottom:2px solid #000;text-align:center">\u20ac '+av(massAnnPorz,60)+'</td></tr>';
@@ -522,9 +522,37 @@ function generaAttestazione(dati) {
   // RIEPILOGO
   // ══════════════════════════════════════════
   html += '<h2 style="margin-top:6pt">RIEPILOGO</h2>';
+  // Canone: se durata = 12 mesi → ANNUO compilato, PERIODO vuoto
+  // Se durata ≠ 12 mesi → ANNUO vuoto, PERIODO = canone mensile × mesi
+  var durataMesiNum = parseInt(cnt.duraMesi || 0);
+  var canoneMensNum = parseFloat(cnt.canoneMensile || 0);
+  var canoneAnnNum  = parseFloat(cnt.canoneAnnuale || 0) || canoneMensNum * 12;
+  var canonePeriodo = (durataMesiNum !== 12 && durataMesiNum > 0)
+    ? (canoneMensNum * durataMesiNum).toFixed(2) : '';
+  var canoneAnnDisplay = (durataMesiNum === 12 || durataMesiNum === 0)
+    ? av(canoneAnn, 70) : av('', 70);
+
+  // Valore mq/annuo: canone mensile × 12 ÷ mq locati effettivi (sempre annualizzato)
+  var mqLocEff = isPorzione && mqPorz > 0 ? mqPorz : parseFloat(supConvTot || 0);
+  var vmqPattuito = mqLocEff > 0 ? (canoneMensNum * 12) / mqLocEff : 0;
+  var fasciMaxNum = parseFloat(fasciMax || 0);
+  var fasciMaxConMagg = fasciMaxNum * (1 + magg);
+
+  var valoreMqRiepilogoStr = '';
+  if (vmqPattuito > 0) {
+    if (vmqPattuito <= fasciMaxNum) {
+      // Caso A: dentro la fascia
+      valoreMqRiepilogoStr = vmqPattuito.toFixed(2);
+    } else if (vmqPattuito <= fasciMaxConMagg) {
+      // Caso B: supera fascia ma rientra con maggiorazioni
+      valoreMqRiepilogoStr = fasciMaxNum.toFixed(2) + ' OLTRE MAGGIORAZIONI';
+    }
+    // Caso C gestito prima della generazione con alert
+  }
+
   html += '<table class="bordi"><tr>'
-    +'<td style="width:60%"><b>CANONE PATTUITO: ANNUO \u20ac</b> <b>'+av(canoneAnn,70)+'</b></td>'
-    +'<td style="width:40%"><b>/ PERIODO \u20ac</b> '+av('',70)+'</td>'
+    +'<td style="width:60%"><b>CANONE PATTUITO: ANNUO \u20ac</b> <b>'+canoneAnnDisplay+'</b></td>'
+    +'<td style="width:40%"><b>/ PERIODO \u20ac</b> '+av(canonePeriodo,70)+'</td>'
     +'</tr><tr>'
     +'<td><b>CANONE MENSILE PATTUITO \u20ac</b> <b>'+av(canoneMens,70)+'</b></td>'
     +'<td></td>'
@@ -532,7 +560,7 @@ function generaAttestazione(dati) {
     +'<td><b>SUPERFICIE LOCATA MQ:</b> <b>'+av(supLocataRiepilogo,50)+'</b></td>'
     +'<td></td>'
     +'</tr><tr>'
-    +'<td colspan="2" class="center"><b>VALORE CANONE LOCAZIONE MQ/ANNUO \u20ac</b> <b>'+av(valoreMqRiepilogo,60)+'</b></td>'
+    +'<td colspan="2" class="center"><b>VALORE CANONE LOCAZIONE MQ/ANNUO \u20ac</b> <b>'+av(valoreMqRiepilogoStr,80)+'</b></td>'
     +'</tr></table>';
 
   html += '<p style="font-size:7.5pt;margin-top:4pt">I calcoli sono eseguiti su dati, valori ed elementi oggettivi dichiarati con la sottoscrizione dell\'attestazione dal locatore.</p>';

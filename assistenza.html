@@ -1843,11 +1843,16 @@ function generaEStampaAttestazione() {
     if(r.calcolo && r.contratto) {
       var mqEff = (r.contratto.tipoLocazione==='porzione' && parseFloat(r.contratto.mqPorzioneLocata)>0)
         ? parseFloat(r.contratto.mqPorzioneLocata) : r.calcolo.supConvTotale;
-      var canAnn = parseFloat(r.contratto.canoneAnnuale) || (parseFloat(r.contratto.canoneMensile)*12) || 0;
-      var vmqPat = mqEff>0 ? canAnn/mqEff : 0;
-      var vmqMax = r.calcolo.valoreMqFinale || 0;
-      if(vmqPat > vmqMax) {
-        alert('ATTESTAZIONE NON GENERABILE\n\nIl valore mq/anno del canone pattuito (\u20ac '+vmqPat.toFixed(2)+') supera il massimale dell\'Accordo Territoriale (\u20ac '+vmqMax.toFixed(2)+').\n\nIl contratto non rispetta i limiti dell\'accordo territoriale.');
+      // Usa sempre canone annualizzato (mensile x12) per il confronto
+      var canoneMensN = parseFloat(r.contratto.canoneMensile||0);
+      var canAnnN = canoneMensN * 12;
+      var vmqPat = mqEff>0 ? canAnnN/mqEff : 0;
+      var fasciMax = r.calcolo.fascia==2 ? r.calcolo.fascia2max : r.calcolo.fascia1max;
+      var maggN = r.calcolo.maggiorazione || 0;
+      var fasciMaxConMagg = fasciMax * (1 + maggN);
+      if(vmqPat > fasciMaxConMagg) {
+        // Caso C — non generabile
+        alert('ATTESTAZIONE NON GENERABILE\n\nIl valore \u20ac/mq annuo del canone pattuito (\u20ac '+vmqPat.toFixed(2)+') supera il massimale consentito dall\'Accordo Territoriale anche con le maggiorazioni (\u20ac '+fasciMaxConMagg.toFixed(2)+').\n\nIl contratto non rispetta i limiti dell\'accordo territoriale.');
         return;
       }
     }
